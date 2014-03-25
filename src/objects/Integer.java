@@ -1,5 +1,7 @@
 package objects;
 
+import circuits.IntegerLib;
+import flexsc.CompEnv;
 import gc.*;
 
 public class Integer {

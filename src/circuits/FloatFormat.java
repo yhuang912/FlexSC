@@ -1,10 +1,10 @@
-package gc;
+package circuits;
 
 import java.math.BigDecimal;
 
 import test.Utils;
 
-class FloatFormat {
+public class FloatFormat {
 	public boolean[] v;
 	public boolean[] p;
 	public boolean s;

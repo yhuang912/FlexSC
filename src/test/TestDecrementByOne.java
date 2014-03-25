@@ -2,10 +2,12 @@ package test;
 
 import java.util.Random;
 
-import gc.CompEnv;
-import gc.IntegerLib;
+import flexsc.CompEnv;
 import gc.Signal;
+
 import org.junit.Test;
+
+import circuits.IntegerLib;
 
 public class TestDecrementByOne extends Test_1Input1Output {
 

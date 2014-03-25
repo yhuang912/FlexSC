@@ -1,6 +1,8 @@
-package gc;
+package circuits;
 
-import objects.Float.GCFloat;
+import flexsc.CompEnv;
+import gc.Signal;
+import objects.Float.Represention;
 
 public class FloatMatrixLib extends FloatLib {
 
@@ -8,21 +10,21 @@ public class FloatMatrixLib extends FloatLib {
 		super(e);
 	}
 	
-	public GCFloat[][] add(GCFloat[][] a, GCFloat[][] b) throws Exception {
+	public Represention[][] add(Represention[][] a, Represention[][] b) throws Exception {
 		int n = a.length;
 		int m = a[0].length;
-		GCFloat result[][] = new GCFloat[n][m];
+		Represention result[][] = new Represention[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j)
 				result[i][j] = add(a[i][j], b[i][j]);
 		return result;
 	}
 	
-	public GCFloat[][] multiply(GCFloat[][] a, GCFloat[][] b) throws Exception {
+	public Represention[][] multiply(Represention[][] a, Represention[][] b) throws Exception {
 		int n = a.length;
 		int m = a[0].length;
 		int l = b[0].length;
-		GCFloat result[][] = new GCFloat[n][m];
+		Represention result[][] = new Represention[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < l; ++l) {
 				result[i][j] = multiply(a[i][0], b[0][l]);
@@ -32,26 +34,26 @@ public class FloatMatrixLib extends FloatLib {
 		return result;		
 	}
 	
-	public GCFloat[][] transpose(GCFloat[][] a){
+	public Represention[][] transpose(Represention[][] a){
 		int n = a.length;
 		int m = a[0].length;
-		GCFloat result[][] = new GCFloat[n][m];
+		Represention result[][] = new Represention[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j)
 				result[i][j] = a[j][i];
 		return result;
 	}
 	
-	public GCFloat determinant(GCFloat[][] a) throws Exception{
+	public Represention determinant(Represention[][] a) throws Exception{
 		if(a.length == 1)
 			return a[0][0];
 		if(a.length == 2){
 			return sub(multiply(a[0][0], a[1][1]), multiply(a[0][1], a[1][0]));
 		}
 		else {
-			GCFloat result = sub(a[0][0], a[0][0]);
+			Represention result = sub(a[0][0], a[0][0]);
 			for (int i = 0; i < a[0].length; ++i) {
-				GCFloat tmp = determinant(createSubMatrix(a, 0, i));
+				Represention tmp = determinant(createSubMatrix(a, 0, i));
 				tmp = multiply(a[0][i], tmp);
 				Signal t = (i % 2 == 1) ? SIGNAL_ONE : SIGNAL_ZERO;
 				tmp.s = xor(t, tmp.s);
@@ -61,11 +63,11 @@ public class FloatMatrixLib extends FloatLib {
 		}
 	}
 	
-	public GCFloat[][] createSubMatrix(GCFloat[][] a, int row, int col) throws Exception {
+	public Represention[][] createSubMatrix(Represention[][] a, int row, int col) throws Exception {
 		int n = a.length;
 		int m = a[0].length;
 		int r = -1;
-		GCFloat result[][] = new GCFloat[n-1][m-1];
+		Represention result[][] = new Represention[n-1][m-1];
 		for(int i = 0; i < n; ++i){
 			if(i == row)continue;
 			
@@ -80,24 +82,24 @@ public class FloatMatrixLib extends FloatLib {
 		return result;
 	}
 			
-	public GCFloat[][] inverse(GCFloat[][] a) throws Exception {
-		GCFloat[][] result = transpose(cofactor(a));
+	public Represention[][] inverse(Represention[][] a) throws Exception {
+		Represention[][] result = transpose(cofactor(a));
 		
-		GCFloat c = determinant(a);
-		GCFloat cInv = divide(publicFloat(1.0, c.v.length, c.p.length), c);
+		Represention c = determinant(a);
+		Represention cInv = divide(publicFloat(1.0, c.v.length, c.p.length), c);
 		for(int i = 0; i < a.length; ++i)
 			for(int j = 0; j < a[i].length; ++j)
 				result[i][j] = multiply(result[i][j], cInv);
 		return result;
 	}
 	
-	public GCFloat[][] cofactor(GCFloat[][] a) throws Exception  {
+	public Represention[][] cofactor(Represention[][] a) throws Exception  {
 		int n = a.length;
 		int m = a[0].length;
-		GCFloat[][] result = new GCFloat[n][m];
+		Represention[][] result = new Represention[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j){
-				GCFloat tmp = determinant(createSubMatrix(a, i, j));
+				Represention tmp = determinant(createSubMatrix(a, i, j));
 				Signal t = ((j+i) % 2 == 1) ?  SIGNAL_ONE : SIGNAL_ZERO;
 				tmp.s = xor(tmp.s, t);
 				result[i][j] = tmp; 
@@ -105,11 +107,11 @@ public class FloatMatrixLib extends FloatLib {
 		return result;
 	}
 	
-	public GCFloat[][] fastInverse(GCFloat[][] m) throws Exception {
+	public Represention[][] fastInverse(Represention[][] m) throws Exception {
 		int dimension = m.length;
-		GCFloat[][] extended = new GCFloat[dimension][2*dimension];
-		GCFloat zeroFloat = publicFloat(0, m[0][0].v.length, m[0][0].p.length);
-		GCFloat oneFloat = publicFloat(1, m[0][0].v.length, m[0][0].p.length);
+		Represention[][] extended = new Represention[dimension][2*dimension];
+		Represention zeroFloat = publicFloat(0, m[0][0].v.length, m[0][0].p.length);
+		Represention oneFloat = publicFloat(1, m[0][0].v.length, m[0][0].p.length);
 		for(int i = 0 ; i < dimension; ++i){
 			for(int j = 0; j < dimension; ++j)
 				extended[i][j] = m[i][j];
@@ -118,7 +120,7 @@ public class FloatMatrixLib extends FloatLib {
 			extended[i][dimension+i] = oneFloat;
 		}
 		extended = rref(extended);
-		GCFloat[][] result = new GCFloat[dimension][dimension];
+		Represention[][] result = new Represention[dimension][dimension];
 		for(int i = 0 ; i < dimension; ++i) {
 			for(int j = 0; j < dimension; ++j)
 				result[i][j] = extended[i][dimension+j];
@@ -126,8 +128,8 @@ public class FloatMatrixLib extends FloatLib {
 		return result;
 	}
 	
-	public GCFloat[][] rref(GCFloat[][] m) throws Exception {
-		GCFloat[][] result = new GCFloat[m.length][m[0].length];
+	public Represention[][] rref(Represention[][] m) throws Exception {
+		Represention[][] result = new Represention[m.length][m[0].length];
 		for (int r = 0; r < m.length; ++r)
 	        for (int c = 0; c < m[r].length; ++c)
 	            result[r][c] = m[r][c];
@@ -135,8 +137,8 @@ public class FloatMatrixLib extends FloatLib {
 	    for (int p = 0; p <  result.length; ++p)
 	    {
 	        /* Make this pivot 1 */
-	        GCFloat pv = result[p][p];
-	        GCFloat pvInv = divide(publicFloat(1.0, pv.v.length, pv.p.length), pv);
+	        Represention pv = result[p][p];
+	        Represention pvInv = divide(publicFloat(1.0, pv.v.length, pv.p.length), pv);
 	        for (int i = 0; i < result[p].length; ++i)
 	        	result[p][i] = mux(multiply(result[p][i], pvInv),result[p][i],pv.z);
 
@@ -145,7 +147,7 @@ public class FloatMatrixLib extends FloatLib {
 	        {
 	            if (r != p)
 	            {
-	                GCFloat f = result[r][p];
+	                Represention f = result[r][p];
 	                for (int i = 0; i < result[r].length; ++i)
 	                {
 	                	result[r][i] = sub(result[r][i], multiply(f, result[p][i]));

@@ -2,11 +2,13 @@ package test;
 
 import java.util.Random;
 
-import gc.CircuitLib;
-import gc.CompEnv;
-import gc.IntegerLib;
+import flexsc.CompEnv;
 import gc.Signal;
+
 import org.junit.Test;
+
+import circuits.CircuitLib;
+import circuits.IntegerLib;
 
 
 public class TestConditionalRightPublicShift extends Test_1Input1Output{

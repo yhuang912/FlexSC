@@ -1,5 +1,7 @@
 package gc;
 
+import flexsc.CompEnv;
+
 public class DbgUtils {
 
 	static void debugMsg(CompEnv<Signal> env, String msg) {

@@ -2,13 +2,16 @@ package test;
 
 import java.util.Arrays;
 import java.util.Random;
-import gc.CompEnv;
+
+import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
 import gc.Signal;
+
 import org.junit.Assert;
 import org.junit.Test;
-import sort.BitonicSortLib;
+
+import circuits.BitonicSortLib;
 
 
 public class TestSort {

@@ -1,11 +1,12 @@
 package test;
 
 
-import objects.Float.GCFloat;
-import gc.CompEnv;
+import objects.Float.Represention;
+import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
 import gc.Signal;
+
 import org.junit.Assert;
 
 
@@ -16,7 +17,7 @@ public class TestFloat {
 			this.b = b;
 			this.a = a;
 		}
-		abstract GCFloat secureCompute(GCFloat a, GCFloat b, CompEnv<Signal> env) throws Exception;
+		abstract Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception;
 		abstract double plainCompute(double a, double b);
 	}
 	
@@ -33,9 +34,9 @@ public class TestFloat {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				GCFloat fgc1 = gen.inputOfGen(h.a, 23, 9);
-				GCFloat fgc2 = gen.inputOfEva(23, 9);
-				GCFloat re = h.secureCompute(fgc1, fgc2, gen);
+				Represention fgc1 = gen.inputOfGen(h.a, 23, 9);
+				Represention fgc2 = gen.inputOfEva(23, 9);
+				Represention re = h.secureCompute(fgc1, fgc2, gen);
 									
 				z = gen.outputToGen(re);
 
@@ -59,9 +60,9 @@ public class TestFloat {
 				connect("localhost", 54321);	
 
 				GCEva eva = new GCEva(is, os);
-				GCFloat fgc1 = eva.inputOfGen(23, 9);
-				GCFloat fgc2 = eva.inputOfEva(h.b, 23, 9);
-				GCFloat re = h.secureCompute(fgc1, fgc2, eva);
+				Represention fgc1 = eva.inputOfGen(23, 9);
+				Represention fgc2 = eva.inputOfEva(h.b, 23, 9);
+				Represention re = h.secureCompute(fgc1, fgc2, eva);
 									
 				eva.outputToGen(re);
 				

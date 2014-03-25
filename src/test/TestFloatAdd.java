@@ -2,12 +2,13 @@ package test;
 
 import java.util.Random;
 
-import objects.Float.GCFloat;
-import gc.CompEnv;
-import gc.FloatLib;
+import objects.Float.Represention;
+import flexsc.CompEnv;
 import gc.Signal;
 
 import org.junit.Test;
+
+import circuits.FloatLib;
 
 
 public class TestFloatAdd extends TestFloat {
@@ -21,7 +22,7 @@ public class TestFloatAdd extends TestFloat {
 			runThreads(new Helper(rng.nextDouble(), rng.nextDouble()) {
 				
 				@Override
-				GCFloat secureCompute(GCFloat a, GCFloat b, CompEnv<Signal> env) throws Exception {
+				Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception {
 					return new FloatLib(env).add(a, b);
 				}
 				

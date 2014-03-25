@@ -1,4 +1,4 @@
-package gc;
+package flexsc;
 
 public interface CompEnv <T> {
 //	static int serverPort = 54321;

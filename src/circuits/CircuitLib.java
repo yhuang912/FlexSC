@@ -1,4 +1,7 @@
-package gc;
+package circuits;
+
+import flexsc.CompEnv;
+import gc.Signal;
 
 public class CircuitLib {
 	protected CompEnv<Signal> env;

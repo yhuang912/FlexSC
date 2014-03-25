@@ -1,13 +1,16 @@
 package test;
 
 import java.util.Random;
-import gc.CompEnv;
+
+import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
-import gc.IntegerLib;
 import gc.Signal;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import circuits.IntegerLib;
 
 
 public class TestLeadingZeros {

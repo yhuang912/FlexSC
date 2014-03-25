@@ -2,9 +2,9 @@ package test;
 
 import org.junit.Test;
 
-import gc.CircuitLib;
-import gc.CompEnv;
-import gc.IntegerLib;
+import circuits.CircuitLib;
+import circuits.IntegerLib;
+import flexsc.CompEnv;
 import gc.Signal;
 
 public class TestMux extends Test_2Input1Output{

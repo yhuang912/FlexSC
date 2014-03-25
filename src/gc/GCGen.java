@@ -3,7 +3,9 @@ package gc;
 import java.security.*;
 import java.io.*;
 
-import objects.Float.GCFloat;
+import circuits.FloatFormat;
+import flexsc.CompEnv;
+import objects.Float.Represention;
 import ot.*;
 
 public class GCGen implements CompEnv<Signal> {
@@ -63,24 +65,24 @@ public class GCGen implements CompEnv<Signal> {
 		return result;
 	}
 	
-	public GCFloat inputOfGen(double d, int widthV, int widthP) throws Exception {
+	public Represention inputOfGen(double d, int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(d, widthV, widthP);
 		Signal signalS = inputOfGen(f.s);
 		Signal signalZ = inputOfGen(f.z);
 		Signal[] v = inputOfGen(f.v);
 		Signal[] p = inputOfGen(f.p);
 		
-		return new GCFloat(signalS, p, v, signalZ);
+		return new Represention(signalS, p, v, signalZ);
 	}
 	
-	public GCFloat inputOfEva(int widthV, int widthP) throws Exception {
+	public Represention inputOfEva(int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(0, widthV, widthP);
 		Signal signalS = inputOfEva(false);
 		Signal signalZ = inputOfEva(false);
 		Signal[] v = inputOfEva(f.v);
 		Signal[] p = inputOfEva(f.p);
 		
-		return new GCFloat(signalS, p, v, signalZ);
+		return new Represention(signalS, p, v, signalZ);
 	}
 
 	public boolean outputToGen(Signal out) throws Exception {
@@ -104,7 +106,7 @@ public class GCGen implements CompEnv<Signal> {
 		return result;
 	}
 
-	public double outputToGen(GCFloat gcf) throws Exception {
+	public double outputToGen(Represention gcf) throws Exception {
 		boolean s = outputToGen(gcf.s);
 		boolean z = outputToGen(gcf.z);
 		boolean[] v = outputToGen(gcf.v);

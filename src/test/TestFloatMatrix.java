@@ -2,11 +2,13 @@ package test;
 
 import java.util.Random;
 
-import objects.Float.GCFloat;
-import gc.FloatMatrixLib;
+import objects.Float.Represention;
 import gc.GCEva;
 import gc.GCGen;
+
 import org.junit.Test;
+
+import circuits.FloatMatrixLib;
 
 
 
@@ -26,7 +28,7 @@ public class TestFloatMatrix {
 				listen(54321);
 				GCGen gen = new GCGen(is, os);
 				
-				GCFloat[][] m = new GCFloat[f.length][f[0].length];
+				Represention[][] m = new Represention[f.length][f[0].length];
 				
 				for(int i = 0; i < f.length; ++i){
 					for(int j = 0; j < f[0].length; ++j)
@@ -60,7 +62,7 @@ public class TestFloatMatrix {
 				System.out.print(result.toDouble()+" ");
 				*/
 				
-				GCFloat[][] res = new FloatMatrixLib(gen).rref(m);	//createSubMatrix(m, 0, 0);
+				Represention[][] res = new FloatMatrixLib(gen).rref(m);	//createSubMatrix(m, 0, 0);
 				double[][] r = new double[res.length][res[0].length];
 				for(int i = 0 ; i < r.length; ++i)
 					for(int j = 0; j < r[0].length; ++j)
@@ -95,7 +97,7 @@ public class TestFloatMatrix {
 			try {
 				connect("localhost", 54321);
 				GCEva eva = new GCEva(is, os);
-				GCFloat[][] m = new GCFloat[f.length][f[0].length];
+				Represention[][] m = new Represention[f.length][f[0].length];
 				
 				for(int i = 0; i < f.length; ++i){
 					for(int j = 0; j < f[0].length; ++j)
@@ -123,7 +125,7 @@ public class TestFloatMatrix {
 				System.out.print(result.toDouble()+" ");
 				*/
 				
-				GCFloat[][] res = new FloatMatrixLib(eva).rref(m);  //createSubMatrix(m, 0, 0);
+				Represention[][] res = new FloatMatrixLib(eva).rref(m);  //createSubMatrix(m, 0, 0);
 				
 				for(int i = 0 ; i < res.length; ++i)
 					for(int j = 0; j < res[0].length; ++j)

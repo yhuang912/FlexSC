@@ -1,5 +1,7 @@
 package objects;
 
+import circuits.CircuitLib;
+import flexsc.CompEnv;
 import gc.*;
 
 public class Boolean {

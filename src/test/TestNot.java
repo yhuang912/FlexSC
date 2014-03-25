@@ -2,10 +2,12 @@ package test;
 
 import java.util.Random;
 
-import gc.CompEnv;
-import gc.CircuitLib;
+import flexsc.CompEnv;
 import gc.Signal;
+
 import org.junit.Test;
+
+import circuits.CircuitLib;
 
 
 public class TestNot extends Test_1Input1Output{

@@ -2,8 +2,8 @@ package test.MUXNumbers;
 
 import org.apache.commons.cli.*;
 
+import circuits.CircuitLib;
 import gc.*;
-
 import test.Utils;
 
 public class Generator extends network.Server {

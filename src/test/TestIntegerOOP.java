@@ -1,9 +1,10 @@
 package test;
 
-import gc.CompEnv;
+import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
 import gc.Signal;
+
 import org.junit.Assert;
 
 

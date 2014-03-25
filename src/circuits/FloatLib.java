@@ -1,7 +1,11 @@
-package gc;
+package circuits;
+
+import flexsc.CompEnv;
+import gc.Signal;
 
 import java.util.Arrays;
-import objects.Float.GCFloat;
+
+import objects.Float.Represention;
 
 public class FloatLib extends IntegerLib {
 
@@ -16,26 +20,26 @@ public class FloatLib extends IntegerLib {
 		return res;
 	}
 	
-	public GCFloat one(GCFloat a) throws Exception {
+	public Represention one(Represention a) throws Exception {
 		Signal[] v = zeros(a.v.length);
 		v[v.length-1] = SIGNAL_ONE;
 		
 		Signal[] p = zeros(a.p.length);
 		p = sub(p, toSignals(v.length-1, p.length));
 		
-		GCFloat result = new GCFloat(SIGNAL_ZERO, p, v, SIGNAL_ZERO);
+		Represention result = new Represention(SIGNAL_ZERO, p, v, SIGNAL_ZERO);
 		return result;
 	}
 	
-	public GCFloat zero(GCFloat a) throws Exception {
+	public Represention zero(Represention a) throws Exception {
 		Signal[] v = zeros(a.v.length);
 		Signal[] p = zeros(a.p.length);
 		
-		GCFloat result = new GCFloat(SIGNAL_ZERO, p, v, SIGNAL_ONE);
+		Represention result = new Represention(SIGNAL_ZERO, p, v, SIGNAL_ONE);
 		return result;
 	}
 	
-	public GCFloat multiply(GCFloat a, GCFloat b) throws Exception {
+	public Represention multiply(Represention a, Represention b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
 		Signal new_z = or(a.z, b.z);
@@ -52,10 +56,10 @@ public class FloatLib extends IntegerLib {
 		Signal[] decrement = zeros(new_p.length);
 		decrement[0] = toShift;
 		new_p = sub(new_p, decrement);
-		return new GCFloat(new_s, new_p, new_v, new_z);
+		return new Represention(new_s, new_p, new_v, new_z);
 	}
 	
-	public GCFloat divide(GCFloat a, GCFloat b) throws Exception {
+	public Represention divide(Represention a, Represention b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
 		Signal new_z = a.z;
@@ -77,11 +81,11 @@ public class FloatLib extends IntegerLib {
 		Signal[] new_v = Arrays.copyOfRange(normalized_av, 0, length);
 		Signal[] new_p = add(a_sub_b, ShiftAmount);
 
-		return new GCFloat(new_s, new_p, new_v, new_z);
+		return new Represention(new_s, new_p, new_v, new_z);
 	}
 	
 	
-	public GCFloat publicFloat(double d, int lengthV, int lengthP) {
+	public Represention publicFloat(double d, int lengthV, int lengthP) {
 		FloatFormat f = new FloatFormat(d, lengthV, lengthP);
 		Signal s = f.s? SIGNAL_ONE : SIGNAL_ZERO;
 		Signal z = f.z? SIGNAL_ONE : SIGNAL_ZERO;
@@ -91,13 +95,13 @@ public class FloatLib extends IntegerLib {
 			v[i] = f.v[i] ? SIGNAL_ONE : SIGNAL_ZERO;
 		for(int i = 0; i < lengthP; ++i)
 			p[i] = f.p[i] ? SIGNAL_ONE : SIGNAL_ZERO;
-		return new GCFloat(s, p, v, z);
+		return new Represention(s, p, v, z);
 	}
 	
 	/* does not handle the case like 100000001 + 10000000001. fix later.
 	 * -> fix is newlengthV : 2->3.
 	 * */
-	public GCFloat add(GCFloat a, GCFloat b) throws Exception {
+	public Represention add(Represention a, Represention b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
 		int lengthV = a.v.length;
@@ -140,7 +144,7 @@ public class FloatLib extends IntegerLib {
 		//Signal[] absDiff = mux(diffba, diffab, aPGreater);
 		//Signal outBound = geq(absDiff, getPublicSignal(lengthV, absDiff.length));
 		//Signal[] result_v = mux(mux(a.v, b.v, aPGreater),outBound);
-		GCFloat result = new GCFloat(resultNeg, new_p, new_v, eq(new_v, zeros(lengthV)));
+		Represention result = new Represention(resultNeg, new_p, new_v, eq(new_v, zeros(lengthV)));
 		return mux(mux(result,a,b.z),b,a.z);
 	}
 	
@@ -168,15 +172,15 @@ public class FloatLib extends IntegerLib {
 //		return null;
 //	}
 	
-	public GCFloat sub(GCFloat a, GCFloat b) throws Exception {
+	public Represention sub(Represention a, Represention b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
-		GCFloat negB = b.clone();
+		Represention negB = b.clone();
 		negB.s = not(negB.s);
 		return add(a, negB);
 	}
 	
-	public GCFloat mux(GCFloat a, GCFloat b, Signal s) throws Exception{
-		return new GCFloat(mux(a.s, b.s, s), 
+	public Represention mux(Represention a, Represention b, Signal s) throws Exception{
+		return new Represention(mux(a.s, b.s, s), 
 						mux(a.p, b.p, s), 
 						mux(a.v, b.v, s), 
 						mux(a.z, b.z, s));

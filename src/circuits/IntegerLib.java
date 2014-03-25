@@ -1,4 +1,7 @@
-package gc;
+package circuits;
+
+import flexsc.CompEnv;
+import gc.Signal;
 
 import java.util.Arrays;
 

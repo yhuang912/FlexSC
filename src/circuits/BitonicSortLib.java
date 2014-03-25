@@ -1,7 +1,6 @@
-package sort;
+package circuits;
 
-import gc.CompEnv;
-import gc.IntegerLib;
+import flexsc.CompEnv;
 import gc.Signal;
 
 public class BitonicSortLib extends IntegerLib
