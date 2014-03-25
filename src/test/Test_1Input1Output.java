@@ -71,7 +71,7 @@ public class Test_1Input1Output {
 		}
 	}
 
-	public void test1Case(Helper helper) throws Exception {
+	public void runThreads(Helper helper) throws Exception {
 		GenRunnable gen = new GenRunnable(helper);
 		EvaRunnable eva = new EvaRunnable(helper);
 		Thread tGen = new Thread(gen);

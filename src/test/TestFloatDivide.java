@@ -20,7 +20,7 @@ public class TestFloatDivide extends TestFloat {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble();
 			a = (a == 0) ? 1:a;
-			test1Case(new Helper(rng.nextDouble(), a) {
+			runThreads(new Helper(rng.nextDouble(), a) {
 				
 				@Override
 				GCFloat secureCompute(GCFloat a, GCFloat b, CompEnv<Signal> env) throws Exception {

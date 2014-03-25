@@ -17,5 +17,4 @@ public class Boolean {
 		Signal result = lib.and(this.content, b.content);
 		return new Boolean(env, result);
 	}
-
 }

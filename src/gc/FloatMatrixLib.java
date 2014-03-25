@@ -84,7 +84,7 @@ public class FloatMatrixLib extends FloatLib {
 		GCFloat[][] result = transpose(cofactor(a));
 		
 		GCFloat c = determinant(a);
-		GCFloat cInv = divide(getPublicFloat(1.0, c.v.length, c.p.length), c);
+		GCFloat cInv = divide(publicFloat(1.0, c.v.length, c.p.length), c);
 		for(int i = 0; i < a.length; ++i)
 			for(int j = 0; j < a[i].length; ++j)
 				result[i][j] = multiply(result[i][j], cInv);
@@ -108,8 +108,8 @@ public class FloatMatrixLib extends FloatLib {
 	public GCFloat[][] fastInverse(GCFloat[][] m) throws Exception {
 		int dimension = m.length;
 		GCFloat[][] extended = new GCFloat[dimension][2*dimension];
-		GCFloat zeroFloat = getPublicFloat(0, m[0][0].v.length, m[0][0].p.length);
-		GCFloat oneFloat = getPublicFloat(1, m[0][0].v.length, m[0][0].p.length);
+		GCFloat zeroFloat = publicFloat(0, m[0][0].v.length, m[0][0].p.length);
+		GCFloat oneFloat = publicFloat(1, m[0][0].v.length, m[0][0].p.length);
 		for(int i = 0 ; i < dimension; ++i){
 			for(int j = 0; j < dimension; ++j)
 				extended[i][j] = m[i][j];
@@ -136,7 +136,7 @@ public class FloatMatrixLib extends FloatLib {
 	    {
 	        /* Make this pivot 1 */
 	        GCFloat pv = result[p][p];
-	        GCFloat pvInv = divide(getPublicFloat(1.0, pv.v.length, pv.p.length), pv);
+	        GCFloat pvInv = divide(publicFloat(1.0, pv.v.length, pv.p.length), pv);
 	        for (int i = 0; i < result[p].length; ++i)
 	        	result[p][i] = mux(multiply(result[p][i], pvInv),result[p][i],pv.z);
 

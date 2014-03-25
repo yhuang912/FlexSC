@@ -18,7 +18,7 @@ public class TestConditionalRightPublicShift extends Test_1Input1Output{
 
 		for (int i = 0; i < testCases; i++) {
 			final int shift = Math.abs(rnd.nextInt()%32);
-			test1Case(
+			runThreads(
 				new Helper(rnd.nextInt(1<<30)) {
 					Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
 						IntegerLib lib = new IntegerLib(e);
@@ -30,7 +30,7 @@ public class TestConditionalRightPublicShift extends Test_1Input1Output{
 					}
 				});
 			
-			test1Case(
+			runThreads(
 					new Helper(rnd.nextInt(1<<30)) {
 						Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
 							IntegerLib lib = new IntegerLib(e);

@@ -51,28 +51,28 @@ public class IntegerLib extends CircuitLib {
 
 	//tested
 	public Signal[] incrementByOne(Signal[] x) throws Exception {
-		Signal[] one = zeroSignal(x.length);
+		Signal[] one = zeros(x.length);
 		one[0] = SIGNAL_ONE;
 		return add(x, one);
 	}
 
 	//tested
 	public Signal[] decrementByOne(Signal[] x) throws Exception {
-		Signal[] one = zeroSignal(x.length);
+		Signal[] one = zeros(x.length);
 		one[0] = SIGNAL_ONE;
 		return sub(x, one);
 	}
 
 	//tested
 	public Signal[] conditionalIncreament(Signal[] x, Signal flag) throws Exception {
-		Signal[] one = zeroSignal(x.length);
+		Signal[] one = zeros(x.length);
 		one[0] = mux(SIGNAL_ZERO, SIGNAL_ONE, flag);
 		return add(x, one);
 	}
 
 	//tested
 	public Signal[] conditionalDecrement(Signal[] x, Signal flag) throws Exception {
-		Signal[] one = zeroSignal(x.length);
+		Signal[] one = zeros(x.length);
 		one[0] = mux(SIGNAL_ZERO, SIGNAL_ONE, flag);
 		return sub(x, one);
 	}
@@ -94,9 +94,9 @@ public class IntegerLib extends CircuitLib {
 	public Signal[] multiply(Signal[] x, Signal[] y) throws Exception {
 		assert(x != null && y!= null) : "multiply: bad inputs";	
 
-		Signal[] res = zeroSignal(x.length+y.length);
-		Signal[] zero = zeroSignal(res.length);
-		Signal longerX[] = zeroSignal(res.length);
+		Signal[] res = zeros(x.length+y.length);
+		Signal[] zero = zeros(res.length);
+		Signal longerX[] = zeros(res.length);
 		System.arraycopy(x, 0, longerX, 0, x.length);
 
 		for(int i = 0; i < y.length; ++i) {
@@ -109,7 +109,7 @@ public class IntegerLib extends CircuitLib {
 	//tested
 	public Signal[] absolute(Signal[] x) throws Exception {
 		Signal reachedOneSignal = SIGNAL_ZERO;
-		Signal[] result = zeroSignal(x.length);
+		Signal[] result = zeros(x.length);
 		for(int i = 0; i < x.length; ++i) {
 			Signal comp = eq(SIGNAL_ONE, x[i]);
 			result[i] = xor(x[i], reachedOneSignal);
@@ -122,14 +122,14 @@ public class IntegerLib extends CircuitLib {
 	//tested
 	public Signal[] divide(Signal[] x, Signal[] y) throws Exception {
 		Signal[] absoluteX = absolute(x);
-		Signal[] dividend = zeroSignal(x.length + y.length);
+		Signal[] dividend = zeros(x.length + y.length);
 		System.arraycopy(absoluteX, 0, dividend, 0, absoluteX.length);
 		Signal[] absoluteY = absolute(y);
-		Signal[] divisor = zeroSignal(x.length + y.length);
+		Signal[] divisor = zeros(x.length + y.length);
 		System.arraycopy(absoluteY, 0, divisor, x.length, absoluteY.length);
 
-		Signal[] quotient = zeroSignal(dividend.length);
-		Signal[] zero = zeroSignal(dividend.length);
+		Signal[] quotient = zeros(dividend.length);
+		Signal[] zero = zeros(dividend.length);
 		for(int i = 0; i < x.length+1; ++i) {
 			quotient = leftShift(quotient);
 
@@ -147,13 +147,13 @@ public class IntegerLib extends CircuitLib {
 	//tested
 	public Signal[] reminder(Signal[] x, Signal[] y) throws Exception {
 		Signal[] absoluteX = absolute(x);
-		Signal[] dividend = zeroSignal(x.length + y.length);
+		Signal[] dividend = zeros(x.length + y.length);
 		System.arraycopy(absoluteX, 0, dividend, 0, absoluteX.length);
 		Signal[] absoluteY = absolute(y);
-		Signal[] divisor = zeroSignal(x.length + y.length);
+		Signal[] divisor = zeros(x.length + y.length);
 		System.arraycopy(absoluteY, 0, divisor, x.length, absoluteY.length);
 
-		Signal[] zero = zeroSignal(dividend.length);
+		Signal[] zero = zeros(dividend.length);
 		for(int i = 0; i < x.length+1; ++i) {
 			Signal divisorIsLEQ = leq(divisor, dividend);
 			Signal[] temp = mux(zero, divisor, divisorIsLEQ);
@@ -176,11 +176,11 @@ public class IntegerLib extends CircuitLib {
 	}
 
 	final static Signal[][] B = {
-		getPublicSignal(0x55555555),
-		getPublicSignal(0x33333333),
-		getPublicSignal(0x0F0F0F0F),
-		getPublicSignal(0x00FF00FF),
-		getPublicSignal(0x0000FFFF)
+		toSignals(0x55555555),
+		toSignals(0x33333333),
+		toSignals(0x0F0F0F0F),
+		toSignals(0x00FF00FF),
+		toSignals(0x0000FFFF)
 	};
 
 	//tested
@@ -209,11 +209,11 @@ public class IntegerLib extends CircuitLib {
 	public Signal[] numberOfOnes(Signal[] x) throws Exception {
 		int length = ((x.length+31)/32) * 32;
 
-		Signal[] vec = zeroSignal(length);
+		Signal[] vec = zeros(length);
 		for(int i = 0; i < x.length; ++i)
 			vec[i] = x[i];
 
-		Signal[] result = zeroSignal(32);
+		Signal[] result = zeros(32);
 		for(int i = 0; i < length; i+=32) {
 			result = add(result, numberOfOnes32(Arrays.copyOfRange(vec, i, i+32)));
 		}
@@ -261,7 +261,7 @@ public class IntegerLib extends CircuitLib {
 		assert(x!= null && s < x.length) : "leftshift: bad inputs";
 
 		Signal res[] = new Signal[x.length];
-		System.arraycopy(zeroSignal(s), 0, res, 0, s);
+		System.arraycopy(zeros(s), 0, res, 0, s);
 		System.arraycopy(x, 0, res, s, x.length-s);
 
 		return res;
@@ -273,7 +273,7 @@ public class IntegerLib extends CircuitLib {
 
 		Signal res[] = new Signal[x.length];
 		System.arraycopy(x, s, res, 0, x.length-s);
-		System.arraycopy(zeroSignal(s), 0, res, x.length-s, s);//assume that this function is operated on 32bit word
+		System.arraycopy(zeros(s), 0, res, x.length-s, s);//assume that this function is operated on 32bit word
 
 		return res;
 	}
@@ -283,7 +283,7 @@ public class IntegerLib extends CircuitLib {
 		assert(x!= null && s < x.length) : "leftshift: bad inputs";
 
 		Signal res[] = new Signal[x.length];
-		System.arraycopy(mux(Arrays.copyOfRange(x, 0, s), zeroSignal(s), sign), 0, res, 0, s);
+		System.arraycopy(mux(Arrays.copyOfRange(x, 0, s), zeros(s), sign), 0, res, 0, s);
 		//System.arraycopy(sign, s, res, s, s);
 		System.arraycopy(mux(Arrays.copyOfRange(x, s, x.length), Arrays.copyOfRange(x, 0, x.length)
 				, sign), 0, res, s, x.length-s);
@@ -296,7 +296,7 @@ public class IntegerLib extends CircuitLib {
 
 		Signal res[] = new Signal[x.length];
 		System.arraycopy(mux(Arrays.copyOfRange(x, 0, x.length-s), Arrays.copyOfRange(x, s, x.length), sign), 0, res, 0, x.length-s);
-		System.arraycopy(mux(Arrays.copyOfRange(x, x.length-s, x.length), zeroSignal(s), sign), 0, res, x.length-s, s);
+		System.arraycopy(mux(Arrays.copyOfRange(x, x.length-s, x.length), zeros(s), sign), 0, res, x.length-s, s);
 		return res;
 	}
 
@@ -313,7 +313,7 @@ public class IntegerLib extends CircuitLib {
 				clear = or(clear, lengthToShift[i]);
 		}
 
-		return mux(res, zeroSignal(x.length), clear);
+		return mux(res, zeros(x.length), clear);
 	}
 
 	//tested
@@ -328,7 +328,7 @@ public class IntegerLib extends CircuitLib {
 				clear = or(clear, lengthToShift[i]);
 		}
 
-		return mux(res, zeroSignal(x.length), clear);
+		return mux(res, zeros(x.length), clear);
 	}
 	
 	Signal compare(Signal x, Signal y, Signal cin) throws Exception {
@@ -366,6 +366,16 @@ public class IntegerLib extends CircuitLib {
 		}
 
 		return res;
+	}
+	
+	public Signal[] twosComplement(Signal[] x) throws Exception {
+		Signal reachOne = SIGNAL_ZERO;
+		Signal[] result = new Signal[x.length];
+		for(int i = 0; i < x.length; ++i) {
+			result[i] = xor(x[i], reachOne);
+			reachOne = or(reachOne, x[i]);
+		}
+		return result;
 	}
 
 }

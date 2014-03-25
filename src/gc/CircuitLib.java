@@ -9,7 +9,7 @@ public class CircuitLib {
 		env = e;
 	}
 
-	public static Signal[] getPublicSignal(int a, int width) {
+	public static Signal[] toSignals(int a, int width) {
 		Signal[] result = new Signal[width];
 		for (int i = 0; i < width; ++i) {
 			if ((a & 1) == 1)
@@ -22,11 +22,11 @@ public class CircuitLib {
 	}
 
 	// Defaults to 32 bit constants.
-	public static Signal[] getPublicSignal(int value) {
-		return getPublicSignal(value, 32);
+	public static Signal[] toSignals(int value) {
+		return toSignals(value, 32);
 	}
 
-	public Signal[] zeroSignal(int length) {
+	public Signal[] zeros(int length) {
 		Signal[] result = new Signal[length];
 		for (int i = 0; i < length; ++i) {
 			result[i] = SIGNAL_ZERO;
@@ -34,7 +34,7 @@ public class CircuitLib {
 		return result;
 	}
 
-	public Signal[] oneSignal(int length) {
+	public Signal[] ones(int length) {
 		Signal[] result = new Signal[length];
 		for (int i = 0; i < length; ++i) {
 			result[i] = SIGNAL_ONE;

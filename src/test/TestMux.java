@@ -14,7 +14,7 @@ public class TestMux extends Test_2Input1Output{
 		int testCases = 10;
 
 		for (int i = 0; i < testCases; i++) {
-			test1Case(new Helper(0b1100, 0b1010) { // This particular pair of inputs exhausts 4 possible inputs, excluding selection signal 
+			runThreads(new Helper(0b1100, 0b1010) { // This particular pair of inputs exhausts 4 possible inputs, excluding selection signal 
 				Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
 					IntegerLib lib = new IntegerLib(e);
 					return lib.mux(Signala ,Signalb, CircuitLib.SIGNAL_ONE);}
@@ -25,7 +25,7 @@ public class TestMux extends Test_2Input1Output{
 		}
 		
 		for (int i = 0; i < testCases; i++) {
-			test1Case(new Helper(0b1100, 0b1010) { // This particular pair of inputs exhausts 4 possible inputs, excluding selection signal
+			runThreads(new Helper(0b1100, 0b1010) { // This particular pair of inputs exhausts 4 possible inputs, excluding selection signal
 				Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
 					IntegerLib lib = new IntegerLib(e);
 					return lib.mux(Signala ,Signalb, CircuitLib.SIGNAL_ZERO);}

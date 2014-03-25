@@ -18,7 +18,7 @@ public class TestRightPublicShift extends Test_1Input1Output{
 
 		for (int i = 0; i < testCases; i++) {
 			final int shift = Math.abs(rnd.nextInt()%32);
-			test1Case(
+			runThreads(
 				new Helper(rnd.nextInt(1<<30)) {
 					Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
 						return new IntegerLib(e).rightPublicShift(Signala, shift);

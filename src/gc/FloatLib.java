@@ -1,9 +1,7 @@
 package gc;
 
 import java.util.Arrays;
-
 import objects.Float.GCFloat;
-import gc.*;
 
 public class FloatLib extends IntegerLib {
 
@@ -12,26 +10,26 @@ public class FloatLib extends IntegerLib {
 	}
 	
 	private Signal[] padSignal(Signal[] a, int length) {
-		Signal[] res = zeroSignal(length);
+		Signal[] res = zeros(length);
 		for(int i = 0; i < a.length; ++i)
 			res[i] = a[i];
 		return res;
 	}
 	
-	public GCFloat makeFloatOne(GCFloat a) throws Exception {
-		Signal[] v = zeroSignal(a.v.length);
+	public GCFloat one(GCFloat a) throws Exception {
+		Signal[] v = zeros(a.v.length);
 		v[v.length-1] = SIGNAL_ONE;
 		
-		Signal[] p = zeroSignal(a.p.length);
-		p = sub(p, getPublicSignal(v.length-1, p.length));
+		Signal[] p = zeros(a.p.length);
+		p = sub(p, toSignals(v.length-1, p.length));
 		
 		GCFloat result = new GCFloat(SIGNAL_ZERO, p, v, SIGNAL_ZERO);
 		return result;
 	}
 	
-	public GCFloat makeFloatZero(GCFloat a) throws Exception {
-		Signal[] v = zeroSignal(a.v.length);
-		Signal[] p = zeroSignal(a.p.length);
+	public GCFloat zero(GCFloat a) throws Exception {
+		Signal[] v = zeros(a.v.length);
+		Signal[] p = zeros(a.p.length);
 		
 		GCFloat result = new GCFloat(SIGNAL_ZERO, p, v, SIGNAL_ONE);
 		return result;
@@ -49,9 +47,9 @@ public class FloatLib extends IntegerLib {
 		Signal[] Shifted = conditionalLeftPublicShift(a_multi_b, 1, toShift);
 		
 		Signal[] new_v = Arrays.copyOfRange(Shifted, a.v.length, a.v.length*2);
-		Signal[] new_p = add(a_add_b, getPublicSignal(a.v.length, a_add_b.length));
+		Signal[] new_p = add(a_add_b, toSignals(a.v.length, a_add_b.length));
 		
-		Signal[] decrement = zeroSignal(new_p.length);
+		Signal[] decrement = zeros(new_p.length);
 		decrement[0] = toShift;
 		new_p = sub(new_p, decrement);
 		return new GCFloat(new_s, new_p, new_v, new_z);
@@ -67,14 +65,14 @@ public class FloatLib extends IntegerLib {
 		Signal[] padded_av = padSignal(a.v, newLength);
 		Signal[] padded_bv = padSignal(b.v, newLength);
 		Signal[] shifted_av = leftPublicShift(padded_av, newLength-length-1);
-		Signal[] new_a_p = sub(a.p, getPublicSignal(newLength-length-1, a.p.length));
+		Signal[] new_a_p = sub(a.p, toSignals(newLength-length-1, a.p.length));
 		Signal[] a_div_b = divide(shifted_av, padded_bv);//length 2*NewLength
 		Signal[] a_sub_b = sub(new_a_p, b.p);
 		
 		Signal[] leadingzero = leadingZeros(a_div_b);
-		Signal[] ShiftAmount = sub( getPublicSignal(2*newLength-length), leadingzero);
+		Signal[] ShiftAmount = sub( toSignals(2*newLength-length), leadingzero);
 		Signal[] normalized_av = mux( rightPrivateShift(a_div_b, ShiftAmount), 
-		leftPrivateShift(a_div_b, TwoComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
+		leftPrivateShift(a_div_b, twosComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
 
 		Signal[] new_v = Arrays.copyOfRange(normalized_av, 0, length);
 		Signal[] new_p = add(a_sub_b, ShiftAmount);
@@ -82,17 +80,8 @@ public class FloatLib extends IntegerLib {
 		return new GCFloat(new_s, new_p, new_v, new_z);
 	}
 	
-	public Signal[] TwoComplement(Signal[] x) throws Exception {
-		Signal reachOne = SIGNAL_ZERO;
-		Signal[] result = new Signal[x.length];
-		for(int i = 0; i < x.length; ++i) {
-			result[i] = xor(x[i], reachOne);
-			reachOne = or(reachOne, x[i]);
-		}
-		return result;
-	}
 	
-	public GCFloat getPublicFloat(double d, int lengthV, int lengthP) {
+	public GCFloat publicFloat(double d, int lengthV, int lengthP) {
 		FloatFormat f = new FloatFormat(d, lengthV, lengthP);
 		Signal s = f.s? SIGNAL_ONE : SIGNAL_ZERO;
 		Signal z = f.z? SIGNAL_ONE : SIGNAL_ZERO;
@@ -114,15 +103,15 @@ public class FloatLib extends IntegerLib {
 		int lengthV = a.v.length;
 		int newLengthV = 3*a.v.length;
 		Signal[] diffab = sub(a.p, b.p);
-		Signal[] diffba = TwoComplement(diffab);//sub(b.p, a.p);
+		Signal[] diffba = twosComplement(diffab);//sub(b.p, a.p);
 		Signal aPGreater = diffba[diffba.length-1];
 		
 		
 		//make v signed
 		Signal[] signed_av = padSignal(a.v, newLengthV);
-		signed_av = mux(signed_av, TwoComplement(signed_av), a.s);
+		signed_av = mux(signed_av, twosComplement(signed_av), a.s);
 		Signal[] signed_bv = padSignal(b.v, newLengthV);
-		signed_bv = mux(signed_bv, TwoComplement(signed_bv), b.s);
+		signed_bv = mux(signed_bv, twosComplement(signed_bv), b.s);
 				
 		//shift them to have same p
 		Signal[] shifted_v =  leftPrivateShift(mux(signed_bv, signed_av, aPGreater), mux(diffba, diffab, aPGreater));
@@ -132,7 +121,7 @@ public class FloatLib extends IntegerLib {
 		
 		//change back to unsigned ver
 		Signal resultNeg = new_v[new_v.length-1];
-		new_v = mux(new_v, TwoComplement(new_v), resultNeg);
+		new_v = mux(new_v, twosComplement(new_v), resultNeg);
 		
 		//get new p, which is the smaller of the two
 		Signal[] new_p = Arrays.copyOf(mux(a.p, b.p, aPGreater), b.p.length);
@@ -140,9 +129,9 @@ public class FloatLib extends IntegerLib {
 		
 		//now do normalize
 		Signal[] leadingzero = leadingZeros(new_v);
-		Signal[] ShiftAmount = sub( getPublicSignal(newLengthV-lengthV), leadingzero);
+		Signal[] ShiftAmount = sub( toSignals(newLengthV-lengthV), leadingzero);
 		Signal[] normalized_av = mux( rightPrivateShift(new_v, ShiftAmount), 
-				leftPrivateShift(new_v, TwoComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
+				leftPrivateShift(new_v, twosComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
 
 		new_v = Arrays.copyOfRange(normalized_av, 0, lengthV);
 		new_p = add(new_p, ShiftAmount);
@@ -151,7 +140,7 @@ public class FloatLib extends IntegerLib {
 		//Signal[] absDiff = mux(diffba, diffab, aPGreater);
 		//Signal outBound = geq(absDiff, getPublicSignal(lengthV, absDiff.length));
 		//Signal[] result_v = mux(mux(a.v, b.v, aPGreater),outBound);
-		GCFloat result = new GCFloat(resultNeg, new_p, new_v, eq(new_v, zeroSignal(lengthV)));
+		GCFloat result = new GCFloat(resultNeg, new_p, new_v, eq(new_v, zeros(lengthV)));
 		return mux(mux(result,a,b.z),b,a.z);
 	}
 	

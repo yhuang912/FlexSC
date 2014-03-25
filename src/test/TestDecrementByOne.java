@@ -15,7 +15,7 @@ public class TestDecrementByOne extends Test_1Input1Output {
 		int testCases = 1000;
 
 		for (int i = 0; i < testCases; i++) {
-			test1Case(new Helper(rnd.nextInt(1 << 30)) {
+			runThreads(new Helper(rnd.nextInt(1 << 30)) {
 				Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e)
 						throws Exception {
 					return new IntegerLib(e).decrementByOne(Signala);

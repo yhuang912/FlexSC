@@ -18,7 +18,7 @@ public class TestFloatAdd extends TestFloat {
 		int testCases = 10;
 
 		for (int i = 0; i < testCases; i++) {
-			test1Case(new Helper(rng.nextDouble(), rng.nextDouble()) {
+			runThreads(new Helper(rng.nextDouble(), rng.nextDouble()) {
 				
 				@Override
 				GCFloat secureCompute(GCFloat a, GCFloat b, CompEnv<Signal> env) throws Exception {

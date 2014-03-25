@@ -17,7 +17,7 @@ public class TestLeftPrivaeShift extends Test_2Input1Output{
 
 		for (int i = 0; i < testCases; i++) {
 			int shift = rnd.nextInt(1<<5);
-			test1Case(new Helper(rnd.nextInt(1<<30), shift) {
+			runThreads(new Helper(rnd.nextInt(1<<30), shift) {
 				Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
 					return new IntegerLib(e).leftPrivateShift(Signala ,Signalb);}
 

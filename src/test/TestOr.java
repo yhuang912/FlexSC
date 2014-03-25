@@ -16,7 +16,7 @@ public class TestOr extends Test_2Input1Output{
 		int testCases = 1000;
 
 		for (int i = 0; i < testCases; i++) {
-			test1Case(new Helper(rnd.nextInt(1<<30), rnd.nextInt(1<<30)) {
+			runThreads(new Helper(rnd.nextInt(1<<30), rnd.nextInt(1<<30)) {
 				Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
 					return new IntegerLib(e).or(Signala ,Signalb);}
 

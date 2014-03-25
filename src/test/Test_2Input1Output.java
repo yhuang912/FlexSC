@@ -79,7 +79,7 @@ public class Test_2Input1Output {
 		}
 	}
 
-	public void test1Case(Helper h) throws Exception {
+	public void runThreads(Helper h) throws Exception {
 		GenRunnable gen = new GenRunnable(h);
 		EvaRunnable eva = new EvaRunnable(h);
 		Thread tGen = new Thread(gen);

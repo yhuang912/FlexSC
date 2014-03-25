@@ -14,7 +14,6 @@ public class Float {
 		public Signal z;
 		
 		public GCFloat(Signal sign, Signal[] p, Signal[] v, Signal zero) {
-			//assert(exponent.length == 8 && fraction.length == 23): "GCFloat.Con : bad inputs";
 			this.s = sign;
 			this.p = p;
 			this.v = v;

@@ -19,7 +19,7 @@ public class TestReminder extends Test_2Input1Output{
 		for (int i = 0; i < testCases; i++) {
 			int b = rnd.nextInt(1<<30);
 			b = (b == 0) ? 1 : b;
-			test1Case(new Helper(rnd.nextInt(1<<30), b){
+			runThreads(new Helper(rnd.nextInt(1<<30), b){
 				Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
 					return new IntegerLib(e).reminder(Signala ,Signalb);}
 

@@ -209,7 +209,7 @@ public class TestFloatMatrix {
 	    return rref;
 	}
 	@Test
-	public void testAllCases() throws Exception {
+	public void runThreads() throws Exception {
 		System.out.println("Testing ADD-ing numbers...");
 		Random rng = new Random();
 		
