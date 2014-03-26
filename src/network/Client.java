@@ -20,5 +20,6 @@ public class Client {
 		is.read(); // dummy write to prevent dropping connection earlier than
 				   // protocol payloads are received.
 		
-		sock.close(); }
+		sock.close(); 
+	}
 }

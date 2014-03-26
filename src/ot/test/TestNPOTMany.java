@@ -12,7 +12,7 @@ import ot.NPOTReceiver;
 import ot.NPOTSender;
 
 public class TestNPOTMany {
-	static int n = 500;
+	static int n = 00;
 	Signal[][] m;
 	boolean[] c;
 	Signal[] rcvd;
@@ -65,7 +65,7 @@ public class TestNPOTMany {
 		}
 	}
 
-	public void test1Case() throws Exception {
+	public void runThreads() throws Exception {
 		SenderRunnable sender = new SenderRunnable();
 		ReceiverRunnable receiver = new ReceiverRunnable();
 		Thread tSnd = new Thread(sender);
@@ -85,6 +85,6 @@ public class TestNPOTMany {
 	@Test
 	public void testAllCases() throws Exception {
 		System.out.println("Testing NPOT...");
-		test1Case();
+		runThreads();
 	}
 }

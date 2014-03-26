@@ -57,7 +57,7 @@ public class TestNPOT {
 		}
 	}
 
-	public void test1Case() throws Exception {
+	public void runThreads() throws Exception {
 		SenderRunnable sender = new SenderRunnable();
 		ReceiverRunnable receiver = new ReceiverRunnable();
 		Thread tSnd = new Thread(sender);
@@ -70,10 +70,10 @@ public class TestNPOT {
 		System.out.println(rcvd.toHexStr());
 		Assert.assertEquals(rcvd, m[c?1:0]);
 	}
-	
+
 	@Test
 	public void testAllCases() throws Exception {
 		System.out.println("Testing NPOT...");
-		test1Case();
+		runThreads();
 	}
 }
