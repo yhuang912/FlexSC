@@ -24,7 +24,7 @@ public class Signal {
 		assert (bs.length <= len) : "Losing entropy when constructing signals.";
 		byte[] b = new byte[len];
 		Arrays.fill(b, (byte) ((bs[0]<0)?0xff:0));
-		System.arraycopy(bs, 0, b, len-bs.length, bs.length);
+		System.arraycopy(bs, 0, b, len-Math.min(len, bs.length), Math.min(len, bs.length));
 		Arrays.copyOf(bs, len);
 		return new Signal(b);
 	}

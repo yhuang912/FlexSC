@@ -16,7 +16,7 @@ public class TestFloatDivide extends TestFloat {
 	@Test
 	public void testAllCases() throws Exception {
 		Random rng = new Random();
-		int testCases = 10;
+		int testCases = 100;
 
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble();
