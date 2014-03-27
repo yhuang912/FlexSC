@@ -1,7 +1,7 @@
 package ot.test;
 
 import java.security.SecureRandom;
-import java.util.Random;
+import java.util.Arrays;
 
 import gc.*;
 
@@ -12,18 +12,30 @@ import ot.NPOTReceiver;
 import ot.NPOTSender;
 
 public class TestNPOTMany {
-	static int n = 00;
+	static int n = 100;
 	Signal[][] m;
 	boolean[] c;
 	Signal[] rcvd;
 	
+	static SecureRandom rnd;
+	static {
+		try{
+			rnd = SecureRandom.getInstance("SHA1PRNG");
+			rnd.setSeed ("initial seed".getBytes ());
+			System.out.println(rnd.nextLong());
+		} catch (Exception e) { e.printStackTrace(); System.exit(1); }
+	}
+
 	class SenderRunnable extends network.Server implements Runnable {
 		NPOTSender snd;
 		SenderRunnable () {}
 		
 		public void run() {
-			SecureRandom rnd = new SecureRandom();
 			try {
+//				SecureRandom rnd = SecureRandom.getInstance("SHA1PRNG");
+//				rnd.setSeed ("initial seed".getBytes ());
+//				System.out.println(rnd.nextLong());
+
 				listen(54321);
 
 				m = new Signal[n][2];
@@ -52,7 +64,6 @@ public class TestNPOTMany {
 				
 				rcv = new NPOTReceiver(is, os);
 				c = new boolean[n];
-				Random rnd = new Random();
 				for (int i = 0; i < n; i++)
 					c[i] = rnd.nextBoolean();
 				rcvd = rcv.receive(c);
@@ -75,10 +86,16 @@ public class TestNPOTMany {
 		tSnd.join();
 
 		for (int i = 0; i < n; i++) {
-//		System.out.println(m[c?1:0].toHexStr());
-//		System.out.println(rcvd.toHexStr());
-			System.out.println(i);
-			Assert.assertEquals(rcvd[i], m[i][c[i]?1:0]);
+			try {
+				Assert.assertEquals(rcvd[i], m[i][c[i]?1:0]);
+			} catch (AssertionError e) {
+				System.out.println("rcvd[" + i + "]: " + rcvd[i].toHexStr());
+				System.out.println("m[" + i + "][c[" + i + "]]: " + m[i][c[i]?1:0].toHexStr());
+				
+				System.out.println("rcvd[" + i + "]: " + Arrays.toString(rcvd[i].bytes));
+				System.out.println("m[" + i + "][c[" + i + "]]: " + Arrays.toString(m[i][c[i]?1:0].bytes));
+				throw e;
+			}
 		}
 	}
 	

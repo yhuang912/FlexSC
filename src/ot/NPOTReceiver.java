@@ -7,12 +7,12 @@ import gc.Signal;
 import java.math.*;
 import java.io.*;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 
 public class NPOTReceiver extends OTReceiver {
     private static SecureRandom rnd = new SecureRandom();
 
-    private int msgBitLength;
     private BigInteger p, q, g, C;
     private BigInteger gr;
 
