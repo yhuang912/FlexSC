@@ -8,6 +8,7 @@ import java.math.*;
 //import java.util.*;
 import java.io.*;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 
 public class NPOTSender extends OTSender {
@@ -21,11 +22,8 @@ public class NPOTSender extends OTSender {
     private BigInteger p, q, g, C, r;
     private BigInteger Cr, gr;
     
-    int msgBitLength;
-//    BigInteger[][] msgPairs;
 	ObjectInputStream ois;
 	ObjectOutputStream oos;
-//	int numOfPairs;
 	
     public NPOTSender(int msgBitLength, InputStream is,
                       OutputStream os) throws Exception {

@@ -8,6 +8,7 @@ import java.util.*;
 public abstract class OTReceiver {
 	InputStream is;
 	OutputStream os;
+	int msgBitLength;
 
 	public OTReceiver (InputStream in, OutputStream out) {
 		is = in;
