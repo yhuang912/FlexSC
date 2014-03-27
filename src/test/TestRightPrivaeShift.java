@@ -15,7 +15,7 @@ public class TestRightPrivaeShift extends Test_2Input1Output{
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();
-		int testCases = 1000;
+		int testCases = 100;
 
 		for (int i = 0; i < testCases; i++) {
 			int shift = rnd.nextInt(1<<5);

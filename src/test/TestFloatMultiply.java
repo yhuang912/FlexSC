@@ -16,7 +16,7 @@ public class TestFloatMultiply extends TestFloat {
 	@Test
 	public void testAllCases() throws Exception {
 		Random rng = new Random();
-		int testCases = 10;
+		int testCases = 100;
 
 		for (int i = 0; i < testCases; i++) {
 			runThreads(new Helper(rng.nextDouble(), rng.nextDouble()) {

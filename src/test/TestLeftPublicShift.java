@@ -15,7 +15,7 @@ public class TestLeftPublicShift extends Test_1Input1Output{
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();
-		int testCases = 1000;
+		int testCases = 100;
 
 		for (int i = 0; i < testCases; i++) {
 			final int shift = Math.abs(rnd.nextInt()%32);
