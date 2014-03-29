@@ -13,13 +13,6 @@ public class FloatLib extends IntegerLib {
 		super(e);
 	}
 	
-	private Signal[] padSignal(Signal[] a, int length) {
-		Signal[] res = zeros(length);
-		for(int i = 0; i < a.length; ++i)
-			res[i] = a[i];
-		return res;
-	}
-	
 	public Represention one(Represention a) throws Exception {
 		Signal[] v = zeros(a.v.length);
 		v[v.length-1] = SIGNAL_ONE;

@@ -1,5 +1,7 @@
 package test;
 
+import java.math.BigInteger;
+
 public class Utils {
 	public static boolean[] fromInt(int value, int width) {
 		boolean[] res = new boolean[width];
@@ -40,4 +42,29 @@ public class Utils {
 	public static boolean[] fromFloat(float value) {
 		return fromInt(Float.floatToIntBits(value), 32);
 	}
+	
+	final static int[] mask = { 0b00000001, 0b00000010, 0b00000100, 0b00001000,
+			0b00010000, 0b00100000, 0b01000000, 0b10000000 };
+
+	public static boolean[] fromBigInteger(BigInteger bd, int length) {
+		byte[] b = bd.toByteArray();
+		boolean[] result = new boolean[length];
+		for (int i = 0; i < b.length; ++i) {
+			for (int j = 0; j < 8 && i * 8 + j < length; ++j)
+				result[i * 8 + j] = (((b[b.length - i - 1] & mask[j]) >> j) == 1);
+		}
+		return result;
+	}
+
+	public static BigInteger toBigInteger(boolean[] b) {
+		BigInteger res = new BigInteger("0");
+		BigInteger c = new BigInteger("1");
+		for (int i = 0; i < b.length; i++) {
+			if (b[i])
+				res = res.add(c);
+			c = c.multiply(new BigInteger("2"));
+		}
+		return res;
+	}
+
 }
