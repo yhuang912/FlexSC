@@ -7,6 +7,7 @@ import gc.Signal;
 
 import org.junit.Test;
 
+import test.harness.Test_1Input1Output;
 import circuits.CircuitLib;
 import circuits.IntegerLib;
 
@@ -22,24 +23,24 @@ public class TestConditionalLeftPublicShift extends Test_1Input1Output{
 			final int shift = Math.abs(rnd.nextInt()%32);
 			runThreads(
 				new Helper(rnd.nextInt(1<<30)) {
-					Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
+					public Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
 						IntegerLib lib = new IntegerLib(e);
 						return lib.conditionalLeftPublicShift(Signala, shift, CircuitLib.SIGNAL_ONE);
 					}
 
-					int plainCompute(int x) {
+					public int plainCompute(int x) {
 						return x << shift;
 					}
 				});
 			
 			runThreads(
 					new Helper(rnd.nextInt(1<<30)) {
-						Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
+						public Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
 							IntegerLib lib = new IntegerLib(e);
 							return lib.conditionalLeftPublicShift(Signala, shift, CircuitLib.SIGNAL_ZERO);
 						}
 
-						int plainCompute(int x) {
+						public int plainCompute(int x) {
 							return x;
 						}
 					});

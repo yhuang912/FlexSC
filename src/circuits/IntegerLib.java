@@ -209,22 +209,6 @@ public class IntegerLib extends CircuitLib {
 		return numberOfOnes(not(result));
 	}
 
-	public Signal[] numberOfOnes(Signal[] x) throws Exception {
-		int length = ((x.length+31)/32) * 32;
-
-		Signal[] vec = zeros(length);
-		for(int i = 0; i < x.length; ++i)
-			vec[i] = x[i];
-
-		Signal[] result = zeros(32);
-		for(int i = 0; i < length; i+=32) {
-			result = add(result, numberOfOnes32(Arrays.copyOfRange(vec, i, i+32)));
-		}
-
-		return result;
-
-	}
-
 	public Signal[] numberOfOnes32(Signal[] x) throws Exception {
 		assert(x!= null): "numberOfOnes : bad input";
 		assert(x.length == 32) : "numberOfOnes : input should be of length 32";
@@ -381,4 +365,55 @@ public class IntegerLib extends CircuitLib {
 		return result;
 	}
 
+	public Signal[] hammingDistance(Signal[] x, Signal[] y) throws Exception {
+		Signal[] a = xor(x, y);
+		return numberOfOnes(a);
+		//return a;
+	}
+
+	public Signal[] numberOfOnes(Signal[] t) throws Exception {
+		if(t.length == 0)
+			return new Signal[]{SIGNAL_ZERO};
+		if(t.length == 1) {
+			return t;
+		}
+		else {
+			int length = 1;
+			int w = 1;
+			while(length <= t.length){length<<=1;w++;}
+			length>>=1;
+			
+			Signal[] res1 = numberOfOnesN(Arrays.copyOfRange(t, 0, length));
+			Signal[] res2 = numberOfOnes(Arrays.copyOfRange(t, length, t.length));
+			return add(padSignal(res1, w), padSignal(res2, w));
+		}
+	}
+	public Signal[] numberOfOnesN(Signal[] t) throws Exception {
+		assert(t!= null): "numberOfOnes : bad input";
+
+		Signal[] x = Arrays.copyOf(t, t.length);
+		for(int width = 1; width < x.length; width*=2)
+			for(int i = 0; i < x.length; i+=(2*width)) {
+				Signal[] re = padSignal(unSignedAdd(Arrays.copyOfRange(x, i, i+width), 
+						Arrays.copyOfRange(x, i+width,i + 2*width)), 2*width);
+				System.arraycopy(re, 0, x, i, 2*width);
+			}
+
+		return x; 
+
+	}
+
+	public Signal[] unSignedAdd(Signal[] x, Signal[] y) throws Exception {
+		assert(x != null && y != null && x.length == y.length) : "add: bad inputs.";
+		Signal[] res = new Signal[x.length+1];
+
+		Signal[] t = add(x[0], y[0], new Signal(false));
+		res[0] = t[S];
+		for (int i = 0; i < x.length-1; i++) {
+			t = add(x[i+1], y[i+1], t[COUT]);
+			res[i+1] = t[S];
+		}
+		res[res.length-1] = t[COUT];
+		return res;
+	}
 }
