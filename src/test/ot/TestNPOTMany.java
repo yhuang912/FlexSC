@@ -87,7 +87,7 @@ public class TestNPOTMany {
 
 		for (int i = 0; i < n; i++) {
 			try {
-				Assert.assertEquals(rcvd[i], m[i][c[i]?1:0]);
+				Assert.assertEquals(m[i][c[i]?1:0], rcvd[i]);
 			} catch (AssertionError e) {
 				System.out.println("rcvd[" + i + "]: " + rcvd[i].toHexStr());
 				System.out.println("m[" + i + "][c[" + i + "]]: " + m[i][c[i]?1:0].toHexStr());

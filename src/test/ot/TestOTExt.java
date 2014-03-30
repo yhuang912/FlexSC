@@ -78,7 +78,7 @@ public class TestOTExt {
 //		System.out.println(m[c?1:0].toHexStr());
 //		System.out.println(rcvd.toHexStr());
 //			System.out.println(i);
-			Assert.assertEquals(rcvd, m[c?1:0]);
+			Assert.assertEquals(m[c?1:0], rcvd);
 //		}
 	}
 

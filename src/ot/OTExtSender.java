@@ -11,7 +11,7 @@ import java.security.SecureRandom;
 
 public class OTExtSender extends OTSender {
     static class SecurityParameter {
-    	private static final int numOfBaseOTs = 100;	// should be bigger than 80
+    	protected static final int numOfBaseOTs = 100;	// should be bigger than 80
 		public static final int k1 = 80;    // number of columns in T
 		public static final int k2 = k1 + numOfBaseOTs;	// number of rows in T (i.e., the string length in the base OT)
     }

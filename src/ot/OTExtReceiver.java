@@ -11,8 +11,6 @@ import java.security.SecureRandom;
 public class OTExtReceiver extends OTReceiver {
 	private static SecureRandom rnd = new SecureRandom();
 
-//	private int k1;
-//	private int k2;
 	private int msgBitLength;
 
 	private OTSender snder;
@@ -21,7 +19,6 @@ public class OTExtReceiver extends OTReceiver {
  
 	ObjectInputStream ois;
 	ObjectOutputStream oos;
-//	int numOfBaseOTs = 80;
 	
 	public OTExtReceiver(InputStream in, OutputStream out) throws Exception {
 		super(in, out);
@@ -80,7 +77,7 @@ public class OTExtReceiver extends OTReceiver {
 //		snder = new NPOTSender(k1, k2, ois, oos);
 		snder = new NPOTSender(OTExtSender.SecurityParameter.k2, is, os);
 
-		T = new BitMatrix(numOfBaseOTs, OTExtSender.SecurityParameter.k1);
+		T = new BitMatrix(OTExtSender.SecurityParameter.numOfBaseOTs, OTExtSender.SecurityParameter.k1);
 		T.initialize(rnd);
 
 		keyPairs = new Signal[OTExtSender.SecurityParameter.k1][2];

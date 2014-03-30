@@ -1,6 +1,7 @@
 package test.ot;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Random;
 
 import gc.*;
@@ -77,8 +78,17 @@ public class TestOTExtMany {
 		for (int i = 0; i < n; i++) {
 //		System.out.println(m[c?1:0].toHexStr());
 //		System.out.println(rcvd.toHexStr());
-			System.out.println(i);
-			Assert.assertEquals(rcvd[i], m[i][c[i]?1:0]);
+//			System.out.println(i);
+			try {
+				Assert.assertEquals(rcvd[i], m[i][c[i]?1:0]);
+			} catch (AssertionError e) {
+				System.out.println("rcvd[" + i + "]: " + rcvd[i].toHexStr());
+				System.out.println("m[" + i + "][c[" + i + "]]: " + m[i][c[i]?1:0].toHexStr());
+				
+				System.out.println("rcvd[" + i + "]: " + Arrays.toString(rcvd[i].bytes));
+				System.out.println("m[" + i + "][c[" + i + "]]: " + Arrays.toString(m[i][c[i]?1:0].bytes));
+				throw e;
+			}
 		}
 	}
 
