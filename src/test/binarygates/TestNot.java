@@ -8,7 +8,6 @@ import gc.Signal;
 import org.junit.Test;
 
 import test.harness.Test_1Input1Output;
-import test.harness.Test_1Input1Output.Helper;
 import circuits.CircuitLib;
 
 

@@ -1,14 +1,10 @@
 package test.binarygates;
 
 import java.util.Random;
-
 import flexsc.CompEnv;
 import gc.Signal;
-
 import org.junit.Test;
-
 import test.harness.Test_2Input1Output;
-import test.harness.Test_2Input1Output.Helper;
 import circuits.IntegerLib;
 
 

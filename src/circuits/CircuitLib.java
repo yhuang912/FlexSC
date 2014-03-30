@@ -136,7 +136,7 @@ public class CircuitLib {
 	
 	protected Signal[] padSignal(Signal[] a, int length) {
 		Signal[] res = zeros(length);
-		for(int i = 0; i < a.length; ++i)
+		for(int i = 0; i < a.length && i < length; ++i)
 			res[i] = a[i];
 		return res;
 	}

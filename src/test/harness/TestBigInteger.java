@@ -1,7 +1,6 @@
 package test.harness;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
@@ -12,21 +11,21 @@ import test.Utils;
 
 
 public class TestBigInteger {
-	final int LENGTH = 100;
-	final int RANGE = 100;
+	public final int LENGTH = 1000;
+	final int RANGE = 1000;
 	public abstract class Helper {
 		BigInteger intA, intB;
 		boolean[] a;
 		boolean[] b;
-		Helper(BigInteger aa, BigInteger bb) {
+		public Helper(BigInteger aa, BigInteger bb) {
 			intA = aa;
 			intB = bb;
 
 			a = Utils.fromBigInteger(aa, RANGE);
 			b = Utils.fromBigInteger(bb, RANGE);
 		}
-		abstract Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception;
-		abstract BigInteger plainCompute(BigInteger x, BigInteger y);
+		public abstract Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception;
+		public abstract BigInteger plainCompute(BigInteger x, BigInteger y);
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
@@ -78,7 +77,7 @@ public class TestBigInteger {
 				
 				eva.outputToGen(d);
 				os.flush();
-				System.out.println("numberofAnd:"+eva.numberOfAnd);
+				System.out.println("numberofAnd:"+eva.nonFreeGate);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -96,13 +95,13 @@ public class TestBigInteger {
 		tEva.start();
 		tGen.join();
 
-		System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
+		/*System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
 		h.intA+" "+h.intB+"\n");
 		System.out.println(Arrays.toString(h.a));
 		System.out.println(Arrays.toString(h.b));
 		System.out.println(Arrays.toString( Utils.fromBigInteger(h.plainCompute(h.intA, h.intB),gen.z.length)));
 		System.out.println(Arrays.toString(Utils.fromBigInteger(Utils.toBigInteger(gen.z),gen.z.length)));
-		
+		*/
 		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toBigInteger(gen.z));
 	}
 }
