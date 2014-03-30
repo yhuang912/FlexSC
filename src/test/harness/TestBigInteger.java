@@ -11,8 +11,8 @@ import test.Utils;
 
 
 public class TestBigInteger {
-	public final int LENGTH = 20;
-	final int RANGE = 20;
+	public final int LENGTH = 1000;
+	final int RANGE = 1000;
 	public abstract class Helper {
 		BigInteger intA, intB;
 		boolean[] a;

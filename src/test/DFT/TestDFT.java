@@ -10,6 +10,7 @@ import gc.GCEva;
 import gc.GCGen;
 import gc.Signal;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import circuits.DFTLib;
@@ -41,10 +42,12 @@ public class TestDFT {
 				GCGen gen = new GCGen(is, os);
 				Represention[] fgc1 =new Represention[h.a.length];
 				Represention[] fgc2 =new Represention[h.b.length];
+				
 				for(int i = 0; i < fgc1.length; ++i)
-					fgc1[i] = gen.inputOfGen(h.a[i], 10, 9);
+					fgc1[i] = gen.inputOfGen(h.a[i], 23, 9);
 				for(int i = 0; i < fgc2.length; ++i)
-					fgc2[i] = gen.inputOfEva(10, 9);
+					fgc2[i] = gen.inputOfEva(23, 9);
+				
 				h.secureCompute(fgc1, fgc2, gen);
 				os.flush();
 				
@@ -80,10 +83,9 @@ public class TestDFT {
 				Represention[] fgc1 = new Represention[h.a.length];
 				Represention[] fgc2 = new Represention[h.b.length];
 				for(int i = 0; i < fgc1.length; ++i)
-					fgc1[i] = eva.inputOfGen(10, 9);
-				
+					fgc1[i] = eva.inputOfGen(23, 9);
 				for(int i = 0; i < fgc2.length; ++i)
-					fgc2[i] = eva.inputOfEva(h.b[i], 10, 9);
+					fgc2[i] = eva.inputOfEva(h.b[i], 23, 9);
 				
 				h.secureCompute(fgc1, fgc2, eva);
 				
@@ -110,22 +112,34 @@ public class TestDFT {
 		tEva.start();
 		tGen.join();
 		
-		System.out.println(Arrays.toString(gen.z1));
-		
-		System.out.println(Arrays.toString(gen.z2));
-		
 		h.plainCompute(h.a, h.b);
-		System.out.println(Arrays.toString(h.a));
 		
-		System.out.println(Arrays.toString(h.b));
+		System.out.println("real secureCompute:"+Arrays.toString(gen.z1));
+		System.out.println("real plainCompute :"+Arrays.toString(h.a));
+		
+		System.out.println("img secureCompute:"+Arrays.toString(gen.z2));
+		System.out.println("img plainCompute :"+Arrays.toString(h.b));
+		
+		for(int i = 0; i < LENGTH; ++i)
+			Assert.assertTrue(Math.abs(gen.z1[i] - h.a[i]) < 1);
+		for(int i = 0; i < LENGTH; ++i)
+			Assert.assertTrue(Math.abs(gen.z2[i] - h.b[i]) < 1);
 	}
+	final int LENGTH = 8;
 	@Test
 	public void testAllCases() throws Exception {
 		Random rng = new Random();
+		
+		double[] real = new double[LENGTH];
+		double[] img = new double[LENGTH];
+		for(int i = 0; i < LENGTH; ++i) {
+			real[i] = rng.nextInt()%10000;
+			img[i] = 0;
+		}
 		int testCases = 1;
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(new double[]{1, 1, 1, 1, 0, 0, 0, 0}, new double[]{0, 0, 0, 0, 0, 0, 0, 0}) {
+			runThreads(new Helper(real, img) {
 
 				@Override
 				void secureCompute(Represention[] a, Represention[] b,
@@ -135,7 +149,7 @@ public class TestDFT {
 
 				@Override
 				void plainCompute(double[] a, double[] b) {
-					new DFT(8).fft(a, b);
+					new DFT(LENGTH).fft(a, b);
 				}
 			});
 		}

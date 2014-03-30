@@ -1,4 +1,4 @@
-package test;
+package test.binarygates;
 
 import gc.GCEva;
 import gc.GCGen;
