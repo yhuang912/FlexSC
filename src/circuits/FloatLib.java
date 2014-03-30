@@ -67,7 +67,7 @@ public class FloatLib extends IntegerLib {
 		Signal[] a_sub_b = sub(new_a_p, b.p);
 		
 		Signal[] leadingzero = leadingZeros(a_div_b);
-		Signal[] ShiftAmount = sub( toSignals(2*newLength-length), leadingzero);
+		Signal[] ShiftAmount = sub( toSignals(2*newLength-length), padSignal(leadingzero,32));
 		Signal[] normalized_av = mux( rightPrivateShift(a_div_b, ShiftAmount), 
 		leftPrivateShift(a_div_b, twosComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
 
@@ -126,7 +126,7 @@ public class FloatLib extends IntegerLib {
 		
 		//now do normalize
 		Signal[] leadingzero = leadingZeros(new_v);
-		Signal[] ShiftAmount = sub( toSignals(newLengthV-lengthV), leadingzero);
+		Signal[] ShiftAmount = sub( toSignals(newLengthV-lengthV), padSignal(leadingzero,32));
 		Signal[] normalized_av = mux( rightPrivateShift(new_v, ShiftAmount), 
 				leftPrivateShift(new_v, twosComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
 

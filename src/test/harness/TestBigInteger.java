@@ -12,21 +12,21 @@ import test.Utils;
 
 
 public class TestBigInteger {
-	final int LENGTH = 100;
+	public final int LENGTH = 100;
 	final int RANGE = 100;
 	public abstract class Helper {
 		BigInteger intA, intB;
 		boolean[] a;
 		boolean[] b;
-		Helper(BigInteger aa, BigInteger bb) {
+		public Helper(BigInteger aa, BigInteger bb) {
 			intA = aa;
 			intB = bb;
 
 			a = Utils.fromBigInteger(aa, RANGE);
 			b = Utils.fromBigInteger(bb, RANGE);
 		}
-		abstract Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception;
-		abstract BigInteger plainCompute(BigInteger x, BigInteger y);
+		public abstract Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception;
+		public abstract BigInteger plainCompute(BigInteger x, BigInteger y);
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
@@ -78,7 +78,7 @@ public class TestBigInteger {
 				
 				eva.outputToGen(d);
 				os.flush();
-				System.out.println("numberofAnd:"+eva.numberOfAnd);
+				//System.out.println("numberofAnd:"+eva.numberOfAnd);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

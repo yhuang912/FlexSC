@@ -27,8 +27,8 @@ public class GCGen implements CompEnv<Signal> {
 		R = Signal.freshLabel(rnd);
 		R.setLSB();
 
-//		snd = new NPOTSender(80, is, os);
-		snd = new FakeOTSender(80, is, os);
+		snd = new NPOTSender(80, is, os);
+//		snd = new FakeOTSender(80, is, os);
 		gb = new Garbler();
 	}
 
