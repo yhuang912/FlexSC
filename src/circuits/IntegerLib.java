@@ -87,7 +87,7 @@ public class IntegerLib extends CircuitLib {
 		Signal[] result = sub(x, y);
 		return not(result[result.length-1]);
 	}
-	
+
 	//tested
 	public Signal leq(Signal[] x, Signal[] y) throws Exception {
 		return geq(y, x);
@@ -121,7 +121,7 @@ public class IntegerLib extends CircuitLib {
 		return mux(x, result, x[x.length-1]);
 	}
 
-	
+
 	//tested
 	public Signal[] divide(Signal[] x, Signal[] y) throws Exception {
 		Signal[] absoluteX = absolute(x);
@@ -146,7 +146,7 @@ public class IntegerLib extends CircuitLib {
 		return addSign(quotient, xor(x[x.length-1], y[y.length-1]));
 	}
 
-	
+
 	//tested
 	public Signal[] reminder(Signal[] x, Signal[] y) throws Exception {
 		Signal[] absoluteX = absolute(x);
@@ -229,7 +229,7 @@ public class IntegerLib extends CircuitLib {
 
 		return leadingZeros(xor(x, y));
 	}
-	
+
 
 	/* Integer manipulation
 	 * */
@@ -317,7 +317,7 @@ public class IntegerLib extends CircuitLib {
 
 		return mux(res, zeros(x.length), clear);
 	}
-	
+
 	Signal compare(Signal x, Signal y, Signal cin) throws Exception {
 		Signal t1 = xor(x, cin);
 		Signal t2 = xor(y, cin);
@@ -354,7 +354,7 @@ public class IntegerLib extends CircuitLib {
 
 		return res;
 	}
-	
+
 	public Signal[] twosComplement(Signal[] x) throws Exception {
 		Signal reachOne = SIGNAL_ZERO;
 		Signal[] result = new Signal[x.length];
@@ -382,7 +382,7 @@ public class IntegerLib extends CircuitLib {
 			int w = 1;
 			while(length <= t.length){length<<=1;w++;}
 			length>>=1;
-			
+
 			Signal[] res1 = numberOfOnesN(Arrays.copyOfRange(t, 0, length));
 			Signal[] res2 = numberOfOnes(Arrays.copyOfRange(t, length, t.length));
 			return add(padSignal(res1, w), padSignal(res2, w));
@@ -416,7 +416,7 @@ public class IntegerLib extends CircuitLib {
 		res[res.length-1] = t[COUT];
 		return res;
 	}
-	
+
 	public Signal[] unSignedMultiply(Signal[] x, Signal[] y) throws Exception {
 		assert(x != null && y!= null) : "multiply: bad inputs";	
 
@@ -434,18 +434,16 @@ public class IntegerLib extends CircuitLib {
 	}
 
 	public Signal[] karatsubaMultiply(Signal[]x, Signal[]y) throws Exception {	
-		if(x.length <= 8)
+		if(x.length <= 18)
 			return unSignedMultiply(x, y);
-
 
 		int length = (x.length + y.length);
 
-		Signal[] xlo = Arrays.copyOfRange(x, 0, (x.length+1)/2);
+		Signal[] xlo = Arrays.copyOfRange(x, 0, x.length/2);
 		Signal[] xhi = Arrays.copyOfRange(x, x.length/2, x.length);
 		Signal[] ylo = Arrays.copyOfRange(y, 0, y.length/2);
 		Signal[] yhi = Arrays.copyOfRange(y, y.length/2, y.length);
-		Signal[] z0 = unSignedMultiply(xlo, ylo);
-		Signal[] z2 = unSignedMultiply(xhi, yhi);
+
 
 		int nextlength = Math.max(x.length/2, x.length-x.length/2);
 		//nextlength = nextlength/2+nextlength%2;
@@ -455,9 +453,13 @@ public class IntegerLib extends CircuitLib {
 		yhi = padSignal(yhi, nextlength);
 
 
+		Signal[] z0 = karatsubaMultiply(xlo, ylo);
+		Signal[] z2 = karatsubaMultiply(xhi, yhi);
+		//System.out.println(z0.length+" "+z2.length);
+
 		Signal[] z1 = sub(
 				padSignal(
-						unSignedMultiply(
+						karatsubaMultiply(
 								unSignedAdd(xlo, xhi),
 								unSignedAdd(ylo, yhi)
 								)
@@ -472,7 +474,7 @@ public class IntegerLib extends CircuitLib {
 
 		Signal[] z0Pad = padSignal(z0, length);
 		Signal[] z2Pad = padSignal(z2, length);
-		z2Pad = leftPublicShift(z2Pad, x.length);
+		z2Pad = leftPublicShift(z2Pad, 2*(x.length/2));
 		return add(add(z0Pad, z1), z2Pad);
 	}
 }

@@ -1,7 +1,6 @@
 package test.harness;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
@@ -12,8 +11,8 @@ import test.Utils;
 
 
 public class TestBigInteger {
-	public final int LENGTH = 100;
-	final int RANGE = 100;
+	public final int LENGTH = 20;
+	final int RANGE = 20;
 	public abstract class Helper {
 		BigInteger intA, intB;
 		boolean[] a;
@@ -78,7 +77,7 @@ public class TestBigInteger {
 				
 				eva.outputToGen(d);
 				os.flush();
-				//System.out.println("numberofAnd:"+eva.numberOfAnd);
+				System.out.println("numberofAnd:"+eva.nonFreeGate);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

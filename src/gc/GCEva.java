@@ -13,7 +13,7 @@ public class GCEva implements CompEnv<Signal> {
 	OutputStream os;
 	OTReceiver rcv;
 	Garbler gb;
-
+	public int nonFreeGate = 0;
 	long gid = 0;
 
 	public GCEva(InputStream is, OutputStream os) throws Exception {
@@ -108,6 +108,7 @@ public class GCEva implements CompEnv<Signal> {
 	}
 
 	public Signal and(Signal a, Signal b) {
+		++nonFreeGate;
 		if (a.isPublic() && b.isPublic())
 			return new Signal(a.v && b.v);
 		else if (a.isPublic())
