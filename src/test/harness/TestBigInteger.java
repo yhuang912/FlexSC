@@ -96,13 +96,13 @@ public class TestBigInteger {
 		tEva.start();
 		tGen.join();
 
-		System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
+		/*System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
 		h.intA+" "+h.intB+"\n");
 		System.out.println(Arrays.toString(h.a));
 		System.out.println(Arrays.toString(h.b));
 		System.out.println(Arrays.toString( Utils.fromBigInteger(h.plainCompute(h.intA, h.intB),gen.z.length)));
 		System.out.println(Arrays.toString(Utils.fromBigInteger(Utils.toBigInteger(gen.z),gen.z.length)));
-		
+		*/
 		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toBigInteger(gen.z));
 	}
 }
