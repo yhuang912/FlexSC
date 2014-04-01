@@ -7,6 +7,7 @@ import java.io.*;
 import circuits.FloatFormat;
 import flexsc.CompEnv;
 import ot.*;
+import test.Utils;
 
 public class GCEva implements CompEnv<Signal> {
 	InputStream is;
@@ -64,6 +65,23 @@ public class GCEva implements CompEnv<Signal> {
 		Signal[] p = inputOfGen(f.p);
 		
 		return new Represention(signalS, p, v, signalZ);
+	}
+	
+	public Represention inputOfEva(FloatFormat f, int widthV, int widthP) throws Exception {
+		Signal signalS = inputOfEva(f.s);
+		Signal signalZ = inputOfEva(f.z);
+		Signal[] v = inputOfEva(f.v);
+		Signal[] p = inputOfEva(f.p);
+		
+		return new Represention(signalS, p, v, signalZ);
+	}	
+	public Signal[] inputOfEvaFixPoint(double a, int width, int offset) throws Exception {
+		Signal[] result = inputOfEva(Utils.fromFixPoint(a,width,offset));
+		return result;
+	}
+	
+	public Signal[] inputOfGenFixPoint(int width, int offset) throws Exception {
+		return inputOfGen(new boolean[width]);
 	}
 	
 	public boolean outputToGen(Signal out) throws Exception {

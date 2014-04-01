@@ -19,6 +19,31 @@ public class Utils {
 		return res;
 	}
 	
+	public static long toUnSignedInt(boolean[] v) {
+		long result = 0;
+		for(int i = 0; i < v.length; ++i) {
+			if(v[i])
+				result += ((long)1<<i);
+		}
+		return result;
+	}
+	
+	public static long toSignedInt(boolean [] v) {
+		int i = 0;
+		if(v[v.length-1] == false) return toUnSignedInt(v);
+		
+		boolean[] c2 = new boolean[v.length];
+		while(v[i] != true){
+			c2[i] = v[i];
+			++i;
+		}
+		c2[i] = v[i];
+		++i;
+		for(; i < v.length; ++i)
+			c2[i] = !v[i];
+		return toUnSignedInt(c2)*-(long)(1);
+	}
+	
 	public static boolean[] fromLong(long value, int width) {
 		boolean[] res = new boolean[width];
 		for (int i = 0; i < width; i++)
@@ -65,6 +90,17 @@ public class Utils {
 			c = c.multiply(new BigInteger("2"));
 		}
 		return res;
+	}
+	
+	public static boolean[] fromFixPoint(double a, int width, int offset) {
+		a *= Math.pow(2, offset);
+		return Utils.fromLong( (long) a, width);
+	}
+	
+	public static double toFixPoint(boolean[] b, int width, int offset) {
+		double a = toSignedInt(b);
+		a /= Math.pow(2, offset);
+		return a;
 	}
 
 }

@@ -1,7 +1,7 @@
 package test.harness;
 
-import java.util.Arrays;
 
+import objects.Float.Represention;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
@@ -9,28 +9,22 @@ import gc.Signal;
 
 import org.junit.Assert;
 
-import test.Utils;
 
-
-public class Test_2Input1Output {
+public class TestFloat {
 	public abstract class Helper {
-		int intA, intB;
-		boolean[] a;
-		boolean[] b;
-		public Helper(int aa, int bb) {
-			intA = aa;
-			intB = bb;
-
-			a = Utils.fromInt(aa, 32);
-			b = Utils.fromInt(bb, 32);
+		double a,b;
+		public Helper(double a, double b) {
+			this.b = b;
+			this.a = a;
 		}
-		public abstract Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception;
-		public abstract int plainCompute(int x, int y);
+		public abstract Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception;
+		public abstract double plainCompute(double a, double b);
 	}
-
+	
 	class GenRunnable extends network.Server implements Runnable {
-		boolean[] z;
 		Helper h;
+		double z;
+
 		GenRunnable (Helper h) {
 			this.h = h;
 		}
@@ -40,13 +34,11 @@ public class Test_2Input1Output {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				Signal[] a = gen.inputOfGen(h.a);
-				Signal [] b = gen.inputOfEva(new boolean[32]);
-				
-				Signal[] d = h.secureCompute(a, b, gen);
-				os.flush();
-
-				z = gen.outputToGen(d);
+				Represention fgc1 = gen.inputOfGen(h.a, 23, 9);
+				Represention fgc2 = gen.inputOfEva(23, 9);
+				Represention re = h.secureCompute(fgc1, fgc2, gen);
+									
+				z = gen.outputToGen(re);
 
 				disconnect();
 			} catch (Exception e) {
@@ -58,24 +50,22 @@ public class Test_2Input1Output {
 
 	class EvaRunnable extends network.Client implements Runnable {
 		Helper h;
+
 		EvaRunnable (Helper h) {
 			this.h = h;
 		}
 
 		public void run() {
 			try {
-				connect("localhost", 54321);				
+				connect("localhost", 54321);	
 
 				GCEva eva = new GCEva(is, os);
+				Represention fgc1 = eva.inputOfGen(23, 9);
+				Represention fgc2 = eva.inputOfEva(h.b, 23, 9);
+				Represention re = h.secureCompute(fgc1, fgc2, eva);
+									
+				eva.outputToGen(re);
 				
-				Signal [] a = eva.inputOfGen(new boolean[32]);
-				Signal [] b = eva.inputOfEva(h.b);
-				
-				Signal[] d = h.secureCompute(a, b, eva);
-				
-				eva.outputToGen(d);
-				os.flush();
-
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -87,16 +77,15 @@ public class Test_2Input1Output {
 	public void runThreads(Helper h) throws Exception {
 		GenRunnable gen = new GenRunnable(h);
 		EvaRunnable eva = new EvaRunnable(h);
+
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
-		tGen.start(); Thread.sleep(5);
+		tGen.start(); Thread.sleep(1);
 		tEva.start();
 		tGen.join();
 
-		//System.out.println(Arrays.toString(gen.z));
-		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toSignedInt(gen.z));
+		if(Math.abs(h.plainCompute(h.a, h.b)-gen.z)>3E-6)
+			System.out.print(gen.z+" "+h.plainCompute(h.a, h.b)+" "+h.a+" "+h.b+"\n");
+		Assert.assertTrue(Math.abs(h.plainCompute(h.a, h.b)-gen.z)<=3E-6);
 	}
-
-	
-
 }

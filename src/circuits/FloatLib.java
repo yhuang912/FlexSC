@@ -32,12 +32,19 @@ public class FloatLib extends IntegerLib {
 		return result;
 	}
 	
+	public Represention zero(int lengthV, int lengthP) throws Exception {
+		Signal[] v = zeros(lengthV);
+		Signal[] p = zeros(lengthP);
+		Represention result = new Represention(SIGNAL_ZERO, p, v, SIGNAL_ONE);
+		return result;
+	}	
+	
 	public Represention multiply(Represention a, Represention b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
 		Signal new_z = or(a.z, b.z);
 		Signal new_s = mux(xor(a.s, b.s),SIGNAL_ONE,new_z);
-		Signal[] a_multi_b = multiply(a.v, b.v);//length 2*v.length
+		Signal[] a_multi_b = unSignedMultiply(a.v, b.v);//length 2*v.length
 		Signal[] a_add_b = add(a.p, b.p);
 				
 		Signal toShift = not(a_multi_b[a_multi_b.length-1]);
@@ -177,5 +184,13 @@ public class FloatLib extends IntegerLib {
 						mux(a.p, b.p, s), 
 						mux(a.v, b.v, s), 
 						mux(a.z, b.z, s));
+	}
+	
+	public Represention xor(Represention a, Represention b){
+		Signal[] v = xor(a.v, b.v);
+		Signal[] p = xor(a.p, b.p);
+		Signal z= xor(a.z, b.z);
+		Signal s= xor(a.s, b.s);
+		return new Represention(s, p, v, z);
 	}
 }

@@ -8,6 +8,7 @@ import gc.Signal;
 
 import org.junit.Test;
 
+import test.harness.TestFloat;
 import circuits.FloatLib;
 
 
@@ -22,12 +23,12 @@ public class TestFloatAdd extends TestFloat {
 			runThreads(new Helper(rng.nextDouble(), rng.nextDouble()) {
 				
 				@Override
-				Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception {
+				public Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception {
 					return new FloatLib(env).add(a, b);
 				}
 				
 				@Override
-				double plainCompute(double a, double b) {
+				public double plainCompute(double a, double b) {
 					return a+b;
 				}
 			});
