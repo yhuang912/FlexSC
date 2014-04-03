@@ -1,6 +1,5 @@
 package oramgc.trivialoram;
 
-import oramgc.OramParty;
 import oramgc.OramParty.BlockInBinary;
 import test.Utils;
 
@@ -17,6 +16,7 @@ public class TestTrivialOram {
 
 				TrivialOramClient client = new TrivialOramClient(is, os, 4, 10, 5);
 				
+
 				client.add(client.new BlockInBinary(Utils.fromInt(1, client.lengthOfIden), 
 						Utils.fromInt(1, client.lengthOfPos),
 						Utils.fromInt(1, client.lengthOfData)));
@@ -56,6 +56,7 @@ public class TestTrivialOram {
 				connect("localhost", 54321);				
 				TrivialOramServer server = new TrivialOramServer(is, os, 4, 10, 5);
 				System.out.flush();
+				
 				server.add();
 				server.add();
 				server.pop();

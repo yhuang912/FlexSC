@@ -4,9 +4,12 @@ import gc.Signal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import oramgc.Block;
 import oramgc.BucketLib;
 import oramgc.OramParty;
+import oramgc.OramParty.BlockInBinary;
+import test.Utils;
 
 public class TrivialOramServer extends OramParty {
 	BlockInBinary[] blocks;
@@ -18,13 +21,13 @@ public class TrivialOramServer extends OramParty {
 		this.capacity = capacity;
 		blocks = new BlockInBinary[capacity];
 		for(int i = 0; i < blocks.length; ++i)
-			blocks[i] = dummyBlock();
+			blocks[i] = getDummyBlock();
 		lib = new BucketLib(lengthOfIden, lengthOfPos, lengthOfData, eva);
 	}
-	
+
 	public void add() throws Exception{
 		BlockInBinary[] randomBucket = randomBucket(blocks.length);
-		Block scNewBlock = inputBlockOfClient(null);
+		Block scNewBlock = inputBlockOfClient(getDummyBlock());
 		Block[] scBucketServer = inputBucketOfServer(blocks);
 		Block[] scBucketClient = inputBucketOfClient(blocks);
 		Block[] scRandomBucket = inputBucketOfServer(randomBucket);

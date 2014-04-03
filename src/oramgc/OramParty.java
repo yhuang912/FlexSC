@@ -1,8 +1,12 @@
 package oramgc;
 
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
+
+import test.Utils;
 import gc.GCEva;
 import gc.GCGen;
 import gc.Signal;
@@ -11,8 +15,8 @@ public abstract class OramParty {
 
 	public class BlockInBinary {
 		public boolean[] iden;
-		boolean[] pos;
-		boolean[] data;
+		public boolean[] pos;
+		public boolean[] data;
 		public BlockInBinary(boolean[] iden, boolean[] pos, boolean[] data) {
 			this.iden = iden;
 			this.pos = pos;
@@ -24,11 +28,11 @@ public abstract class OramParty {
 	public int lengthOfIden;
 	public int lengthOfPos;
 	public int lengthOfData;
-	InputStream is;
+	protected InputStream is;
 	protected OutputStream os;
 	public GCGen gen;
 	public GCEva eva;
-	SecureRandom rng = new SecureRandom();
+	protected SecureRandom rng = new SecureRandom();
 	public enum Party { SERVER, CLIENT };
 	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p) throws Exception {
 		this.is = is;
@@ -36,7 +40,7 @@ public abstract class OramParty {
 		this.N = N;
 		this.dataSize = dataSize;
 		int a = 1;logN=1;
-		while(a <= N){
+		while(a < N){
 			a*=2;
 			++logN;
 		}
@@ -116,7 +120,7 @@ public abstract class OramParty {
 		return result;
 	}
 
-	public BlockInBinary dummyBlock(){
+	public BlockInBinary getDummyBlock(){
 		boolean[] iden = new boolean[lengthOfIden];
 		boolean[] pos = new boolean[lengthOfPos];
 		boolean[] data = new boolean[lengthOfData];
@@ -130,13 +134,14 @@ public abstract class OramParty {
 	}
 
 	public BlockInBinary randomBlock() {
-		BlockInBinary result = dummyBlock();
+		BlockInBinary result = getDummyBlock();
 		for(int i = 0; i < lengthOfIden; ++i)
 			result.iden[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfPos; ++i)
 			result.pos[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfData; ++i)
 			result.data[i] = rng.nextBoolean();
+		
 		return result;
 	}
 

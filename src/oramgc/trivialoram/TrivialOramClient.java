@@ -4,21 +4,23 @@ import gc.Signal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import oramgc.Block;
 import oramgc.BucketLib;
 import oramgc.OramParty;
+import oramgc.OramParty.BlockInBinary;
 
 public class TrivialOramClient extends OramParty {
 	BlockInBinary[] blocks;
-	int capcity;
+	int capacity;
 	BucketLib lib;
 	public TrivialOramClient(InputStream is, OutputStream os, int N,
 			int dataSize, int capacity) throws Exception {
 		super(is, os, N, dataSize, OramParty.Party.CLIENT);
 		blocks = new BlockInBinary[capacity];
-		this.capcity = capacity;
+		this.capacity = capacity;
 		for(int i = 0; i < blocks.length; ++i)
-			blocks[i] = dummyBlock();
+			blocks[i] = getDummyBlock();
 		lib = new BucketLib(lengthOfIden, lengthOfPos, lengthOfData, gen);
 	}
 	
