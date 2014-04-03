@@ -6,9 +6,9 @@ import test.Utils;
 import flexsc.CompEnv;
 import gc.Signal;
 
-public class FixPointLib extends IntegerLib {
+public class FixedPointLib extends IntegerLib {
 
-	public FixPointLib(CompEnv<Signal> e) {
+	public FixedPointLib(CompEnv<Signal> e) {
 		super(e);
 		// TODO Auto-generated constructor stub
 	}

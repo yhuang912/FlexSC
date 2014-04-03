@@ -10,7 +10,7 @@ import org.junit.Assert;
 import test.Utils;
 
 
-public class TestFixPoint {
+public class TestFixedPoint {
 	final int len = 32;
 	final int offset = 20;
 	public abstract class Helper {
