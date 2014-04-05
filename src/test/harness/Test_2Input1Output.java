@@ -1,5 +1,7 @@
 package test.harness;
 
+import java.util.Arrays;
+
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
@@ -91,7 +93,8 @@ public class Test_2Input1Output {
 		tEva.start();
 		tGen.join();
 
-		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toInt(gen.z));
+		//System.out.println(Arrays.toString(gen.z));
+		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toSignedInt(gen.z));
 	}
 
 	

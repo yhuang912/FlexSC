@@ -78,31 +78,6 @@ public class FloatFormat {
 		return res;
 	}
 	
-	private static long toUnSignedInt(boolean[] v) {
-		long result = 0;
-		for(int i = 0; i < v.length; ++i) {
-			if(v[i])
-				result += ((long)1<<i);
-		}
-		return result;
-	}
-	
-	private static long toSignedInt(boolean [] v) {
-		int i = 0;
-		if(v[v.length-1] == false) return toUnSignedInt(v);
-		
-		boolean[] c2 = new boolean[v.length];
-		while(v[i] != true){
-			c2[i] = v[i];
-			++i;
-		}
-		c2[i] = v[i];
-		++i;
-		for(; i < v.length; ++i)
-			c2[i] = !v[i];
-		return toUnSignedInt(c2)*-(long)(1);
-	}
-	
 	public double toDouble() {
 		return toDouble(this);
 	}
@@ -115,8 +90,8 @@ public class FloatFormat {
 		if(z)
 			return 0;
 		double result = s ? -1 : 1;
-		long value_v = toUnSignedInt(v);
-		long value_p = toSignedInt(p);
+		long value_v = Utils.toUnSignedInt(v);
+		long value_p = Utils.toSignedInt(p);
 		result = result * value_v;
 		result = result * Math.pow(2, value_p);
 		//int res = result * 100000;

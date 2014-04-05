@@ -20,7 +20,7 @@ public class TestMultiply extends Test_2Input1Output{
 		int testCases = 10;
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt(1<<15), rnd.nextInt(1<<15)) {
+			runThreads(new Helper(rnd.nextInt()%(1<<15), rnd.nextInt()%(1<<15)) {
 				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
 					return new IntegerLib(e).multiply(Signala ,Signalb);}
 

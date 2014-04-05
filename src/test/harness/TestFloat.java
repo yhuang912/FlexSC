@@ -1,4 +1,4 @@
-package test.floats;
+package test.harness;
 
 
 import objects.Float.Represention;
@@ -13,12 +13,12 @@ import org.junit.Assert;
 public class TestFloat {
 	public abstract class Helper {
 		double a,b;
-		Helper(double a, double b) {
+		public Helper(double a, double b) {
 			this.b = b;
 			this.a = a;
 		}
-		abstract Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception;
-		abstract double plainCompute(double a, double b);
+		public abstract Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception;
+		public abstract double plainCompute(double a, double b);
 	}
 	
 	class GenRunnable extends network.Server implements Runnable {
@@ -84,8 +84,8 @@ public class TestFloat {
 		tEva.start();
 		tGen.join();
 
-		if(Math.abs(h.plainCompute(h.a, h.b)-gen.z)>1E-6)
+		if(Math.abs(h.plainCompute(h.a, h.b)-gen.z)>3E-6)
 			System.out.print(gen.z+" "+h.plainCompute(h.a, h.b)+" "+h.a+" "+h.b+"\n");
-		Assert.assertTrue(Math.abs(h.plainCompute(h.a, h.b)-gen.z)<1E-6);
+		Assert.assertTrue(Math.abs(h.plainCompute(h.a, h.b)-gen.z)<=3E-6);
 	}
 }

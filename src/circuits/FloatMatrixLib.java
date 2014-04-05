@@ -44,6 +44,16 @@ public class FloatMatrixLib extends FloatLib {
 		return result;
 	}
 	
+	public Represention[][] xor(Represention[][] a, Represention[][] b){
+		int n = a.length;
+		int m = a[0].length;
+		Represention result[][] = new Represention[n][m];
+		for(int i = 0; i < a.length; ++i)
+			for(int j = 0; j < a[i].length; ++j)
+				result[i][j] = xor(a[i][j], b[i][j]);
+		return result;
+	}
+	
 	public Represention determinant(Represention[][] a) throws Exception{
 		if(a.length == 1)
 			return a[0][0];

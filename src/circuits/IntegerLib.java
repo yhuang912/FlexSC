@@ -106,7 +106,7 @@ public class IntegerLib extends CircuitLib {
 			res = add(res, mux(zero, longerX, y[i]));
 			longerX = leftShift(longerX);
 		}
-		return res;
+		return Arrays.copyOf(res, x.length);//res;
 	}
 
 	//tested
@@ -143,12 +143,17 @@ public class IntegerLib extends CircuitLib {
 
 			divisor = rightShift(divisor);
 		}
+		//return quotient;
 		return addSign(quotient, xor(x[x.length-1], y[y.length-1]));
 	}
 
 
 	//tested
 	public Signal[] reminder(Signal[] x, Signal[] y) throws Exception {
+		//can be better.
+		Signal[] q = divide(x, y);
+		return sub(x, multiply(y, q));
+		/*
 		Signal[] absoluteX = absolute(x);
 		Signal[] dividend = zeros(x.length + y.length);
 		System.arraycopy(absoluteX, 0, dividend, 0, absoluteX.length);
@@ -164,18 +169,23 @@ public class IntegerLib extends CircuitLib {
 			divisor = rightShift(divisor);
 		}
 
-		return dividend;
+		//return dividend;
+		return addSign(dividend, xor(x[x.length-1], y[y.length-1]));*/
 	}
 
-	public Signal[] addSign(Signal[] x, Signal sign) throws Exception {
-		Signal reachedOneSignal = SIGNAL_ZERO;
+	private Signal[] addSign(Signal[] x, Signal sign) throws Exception {
+
+		Signal[] reachedOneSignal = zeros(x.length);
 		Signal[] result = new Signal[x.length];
-		for(int i = x.length-1; i >=0; --i) {
-			Signal comp = eq(SIGNAL_ONE, x[i]);
-			result[i] = xor(x[i], reachedOneSignal);
-			reachedOneSignal = or(reachedOneSignal, comp);
+		for(int i = 0; i < x.length-1; ++i) {
+			//Signal comp = x[i];
+			reachedOneSignal[i+1] = or(reachedOneSignal[i], x[i]);
+			result[i] = xor(x[i], reachedOneSignal[i]);
 		}
+		result[x.length-1] = xor(x[x.length-1], reachedOneSignal[x.length-1]);
 		return mux(x, result, sign);
+		 
+		 
 	}
 
 	final static Signal[][] B = {

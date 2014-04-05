@@ -104,7 +104,7 @@ public class TestLeadingZeros {
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();
-		int testCases = 1000;
+		int testCases = 100;
 
 		for (int i = 0; i < testCases; i++) {
 			runThreads(

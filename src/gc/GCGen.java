@@ -7,6 +7,7 @@ import circuits.FloatFormat;
 import flexsc.CompEnv;
 import objects.Float.Represention;
 import ot.*;
+import test.Utils;
 
 public class GCGen implements CompEnv<Signal> {
 
@@ -75,6 +76,15 @@ public class GCGen implements CompEnv<Signal> {
 		return new Represention(signalS, p, v, signalZ);
 	}
 	
+	public Represention inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
+		Signal signalS = inputOfGen(f.s);
+		Signal signalZ = inputOfGen(f.z);
+		Signal[] v = inputOfGen(f.v);
+		Signal[] p = inputOfGen(f.p);
+		
+		return new Represention(signalS, p, v, signalZ);
+	}	
+	
 	public Represention inputOfEva(int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(0, widthV, widthP);
 		Signal signalS = inputOfEva(false);
@@ -85,6 +95,15 @@ public class GCGen implements CompEnv<Signal> {
 		return new Represention(signalS, p, v, signalZ);
 	}
 
+	public Signal[] inputOfGenFixPoint(double a, int width, int offset) throws Exception {
+		Signal[] result = inputOfGen(Utils.fromFixPoint(a,width,offset));
+		return result;
+	}
+	
+	public Signal[] inputOfEvaFixPoint(int width, int offset) throws Exception {
+		return inputOfEva(new boolean[width]);
+	}
+	
 	public boolean outputToGen(Signal out) throws Exception {
 		if (out.isPublic())
 			return out.v;

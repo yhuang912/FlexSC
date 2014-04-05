@@ -18,12 +18,12 @@ public class TestRemainder extends Test_2Input1Output{
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();
-		int testCases = 100;
+		int testCases = 10;
 
 		for (int i = 0; i < testCases; i++) {
-			int b = rnd.nextInt(1<<30);
+			int b = rnd.nextInt()%(1<<15);
 			b = (b == 0) ? 1 : b;
-			runThreads(new Helper(rnd.nextInt(1<<30), b){
+			runThreads(new Helper(rnd.nextInt()%(1<<15), b){
 				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
 					return new IntegerLib(e).reminder(Signala ,Signalb);}
 
