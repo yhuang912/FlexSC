@@ -62,7 +62,7 @@ public class TestTrivialOram {
 				server.pop();
 				server.add();
 				server.readAndRemove();
-				b = server.blocks;
+				b = server.bucket;
 
 				os.flush();
 

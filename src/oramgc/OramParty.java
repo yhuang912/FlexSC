@@ -23,8 +23,9 @@ public abstract class OramParty {
 			this.data = data;
 		}
 	}
-	int N, dataSize;
-	protected int logN;
+	public int N;
+	int dataSize;
+	public int logN;
 	public int lengthOfIden;
 	public int lengthOfPos;
 	public int lengthOfData;
@@ -32,29 +33,59 @@ public abstract class OramParty {
 	protected OutputStream os;
 	public GCGen gen;
 	public GCEva eva;
+	public Party role;
 	protected SecureRandom rng = new SecureRandom();
 	public enum Party { SERVER, CLIENT };
+	public BucketLib lib;
 	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p) throws Exception {
 		this.is = is;
 		this.os = os;
-		this.N = N;
+		
 		this.dataSize = dataSize;
 		int a = 1;logN=1;
 		while(a < N){
 			a*=2;
 			++logN;
 		}
+		//--logN;
+		this.N = 1<<logN;
 		lengthOfData = dataSize;
-		lengthOfIden = logN;
-		lengthOfPos = logN;
-		if(p == Party.SERVER)
+		lengthOfIden = logN-1;
+		lengthOfPos = logN-1;
+		role = p;
+		System.out.println(this.N+" "+this.logN+" "+lengthOfIden+" "+lengthOfPos);
+		if(p == Party.SERVER){
 			eva = new GCEva(is, os);
-		else
+			lib = new BucketLib(lengthOfIden, lengthOfPos, lengthOfData, eva);
+		}
+		else{
 			gen = new GCGen(is, os);
+			lib = new BucketLib(lengthOfIden, lengthOfPos, lengthOfData, gen);	
+		}
 	}
 
+	public Block[][] prepareBlocks(BlockInBinary[] clientBlock, BlockInBinary[] serverBlock, BlockInBinary[] randomBlock) throws Exception {
+		Block[] s = inputBucketOfServer(serverBlock);
+		Block[] c = inputBucketOfClient(clientBlock);
+		Block[] r = inputBucketOfServer(randomBlock);
+		
+		Block[] xor = lib.xor(s, c);
+		return new Block[][]{xor, r};
+	}
+	
+	public BlockInBinary[] prepareBlockInBinaries(Block[] blocks, Block[] randomBlock) throws Exception {
+		Block[] res = lib.xor(blocks, randomBlock);
+		BlockInBinary[] clientBlockInBinary = outputBucket(res);
+		
+		if(role == Party.SERVER) {
+			return null;
+		}
+		else{
+			return clientBlockInBinary;	
+		}
+	}
 	public Block inputBlockOfServer(BlockInBinary b) throws Exception {
-		if(eva != null) {
+		if(role == Party.SERVER) {
 			Signal[] iden = eva.inputOfEva(b.iden);
 			Signal[] pos = eva.inputOfEva(b.pos);
 			Signal[] data = eva.inputOfEva(b.data);

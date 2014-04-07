@@ -118,7 +118,8 @@ public class EstimateCost {
 			return  readAndRemove()
 					+ (stashSize + logN*capacity) * (lengthOfIden+(lengthOfIden*log(lengthOfIden)))  //compute deepeest level to push for each block
 					//+ logN*capacity*(stashSize+logN*capacity)*(eq(lengthOfIden)+mux(lengthOfData)+lengthOfPos+lengthOfIden)+mux(lengthOfIden)+
-					+2*sort(logN*capacity+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos);
+					+3*sort(2*logN*capacity+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos)
+					+ (2*logN*capacity+stashSize)*5;
 		}
 		public PathoramAdv newInstance(long n, long l){
 			return new PathoramAdv(n, l);
