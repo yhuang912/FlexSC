@@ -120,18 +120,19 @@ public class TestPathOramLib {
 		Random rnd = new Random();
 		int testCases = 1;
 
-		int[] ina = new int[]{4,4,4,4,4,3,3,3,3,1,1,1,0,0,0,0};
-		int[] inb = new int[]{4,4,4,4,4,3,3,3,3,1,1,1,0,0,0,0};
+		int[] ina = new int[]{3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0};
+		int[] inb = Arrays.copyOf(ina, ina.length);
 		int c = 0; int[]b = new int[ina.length];
 		b[0] = ina[0];
 		int level = 4;
-		for(int i = 0; i < ina.length; ++i){
+		for(int i = 0; i < ina.length; ++i) {
 			if(c==4 || ina[i]<level) {
 				level--;
 				c=1;
 				}
 			else c++;
 			level = level < ina[i] ? level: ina[i];
+			level = level < 0 ? 0 : level;
 			b[i] = level;
 		}
 		int[] bb = new int[ina.length];
@@ -145,6 +146,8 @@ public class TestPathOramLib {
 			else{
 				c=0;
 			}
+			if(b[i] == 0)
+				c=0;
 			bb[i]+=c;
 		}
 		int[]bbb = new int[2*ina.length];
@@ -164,9 +167,9 @@ public class TestPathOramLib {
 			runThreads(
 				new Helper(ina, inb) {
 					@Override
-					public Signal[][] secureCompute(Signal[][] Signala,Signal[][] Signalb,
+					public Signal[][] secureCompute(Signal[][] Signala, Signal[][] Signalb,
 							CompEnv<Signal> e) throws Exception {
-						PathOramLib lib = new PathOramLib(4, 4, 4, 4, e);
+						PathOramLib lib = new PathOramLib(3, 3, 3, 4, e);
 						return lib.pushDownHelp(Signala, Signalb);
 					}
 

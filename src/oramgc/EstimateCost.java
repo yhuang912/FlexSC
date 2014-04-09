@@ -52,7 +52,7 @@ public class EstimateCost {
 		}
 
 		public  long sort(long n, long lengthOfKey, long lengthOfData) {
-			return n*log(n)*(eq(lengthOfKey) + 2*mux(lengthOfData));
+			return n*log(n)*log(n)*(eq(lengthOfKey) + 2*mux(lengthOfData));
 		}
 
 		public  long log(long n) {
@@ -116,7 +116,7 @@ public class EstimateCost {
 
 		public long access() {
 			return  readAndRemove()
-					+ (stashSize + logN*capacity) * (lengthOfIden+(lengthOfIden*log(lengthOfIden)))  //compute deepeest level to push for each block
+					+ (stashSize + logN*capacity) * (lengthOfIden)  //compute deepeest level to push for each block
 					//+ logN*capacity*(stashSize+logN*capacity)*(eq(lengthOfIden)+mux(lengthOfData)+lengthOfPos+lengthOfIden)+mux(lengthOfIden)+
 					+3*sort(2*logN*capacity+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos)
 					+ (logN*capacity+stashSize)*2;
@@ -195,8 +195,8 @@ public class EstimateCost {
 	
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException {
 		EstimateCost e = new EstimateCost();
-		long N = 1<<20;
-		long dataSize = 32;
+		long N = 1<<10;
+		long dataSize = 8;
 		KaiminOram kaimin = e.new KaiminOram(N, dataSize);
 		Pathoram pathoram = e.new Pathoram(N, dataSize);
 		PathoramAdv pathoram2 = e.new PathoramAdv(N, dataSize);

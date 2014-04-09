@@ -132,6 +132,7 @@ public class KaiminOramServer extends KaiminOramParty {
 		fetch(pos, new boolean[lengthOfData]);
 		dequeue();
 		dequeue();
+		System.out.println(eva.nonFreeGate);
 	}
 
 }
