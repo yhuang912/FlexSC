@@ -1,9 +1,6 @@
 package oramgc;
 
-import java.util.Arrays;
-
 import circuits.BitonicSortLib;
-import circuits.IntegerLib;
 import flexsc.CompEnv;
 import gc.Signal;
 

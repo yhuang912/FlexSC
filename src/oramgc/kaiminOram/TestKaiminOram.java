@@ -3,24 +3,30 @@ package oramgc.kaiminOram;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import oramgc.OramParty.BlockInBinary;
 import oramgc.OramParty.Party;
 import test.Utils;
 
 
 public class TestKaiminOram {
-	final int N = 8;
-	final int capacity = 3;
-	int[] posMap = new int[N+3];
-	int writecount = 2*N;
+	final int N = 64;
+	final int nodeCapacity = 6;
+	final int leafCapacity = 6;
+	int[] posMap = new int[N];
+	int writecount = N*2;
 	int readcount = N;
-	int dataSize = 4;
+	int dataSize = 32;
 	public TestKaiminOram(){
+		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
-			posMap[i] = 0;
+			posMap[i] = rng.nextInt(N);
 	}
 	SecureRandom rng = new SecureRandom();
 	boolean breaksignal = false;
+	
 	class GenRunnable extends network.Server implements Runnable {
 		GenRunnable () {
 		}
@@ -31,8 +37,12 @@ public class TestKaiminOram {
 				listen(54321);
 
 				int data[] = new int[N+1];
-				KaiminOramClient client = new KaiminOramClient(is, os, N, dataSize, Party.CLIENT, capacity);
-				idens = new int[client.tree.length][capacity];
+				KaiminOramClient client = new KaiminOramClient(is, os, N, dataSize, Party.CLIENT, nodeCapacity, leafCapacity);
+				System.out.println("logN:"+client.logN+", N:"+client.N);
+				
+				idens = new int[client.tree.length][nodeCapacity];
+				for(int i = client.tree.length/2; i < client.tree.length; ++i)
+					idens[i] = new int[leafCapacity];
 				
 				for(int i = 0; i < writecount; ++i) {
 					int element = Math.abs(i % (N-1)) +1;
@@ -51,20 +61,23 @@ public class TestKaiminOram {
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					
 					BlockInBinary b = client.read(element, oldValue, newValue);
+					Assert.assertTrue(Utils.toInt(b.data) == data[element]);
 					if(Utils.toInt(b.data) != data[element]){
 						System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+posMap[element]);
-						breaksignal = true;
-						break;
 					}
 					posMap[element] = newValue;
 				}
 				
-				for(int j = 1; j < client.tree.length; ++j)
-					for(int i = 0; i < capacity; ++i)
-						idens[j][i]=Utils.toInt(client.tree[j][i].iden);
+				for(int j = 1; j < client.tree.length/2; ++j)
+					for(int i = 0; i < nodeCapacity; ++i)
+						idens[j][i]=Utils.toInt(client.tree[j][i].data);
+				for(int j = client.tree.length/2; j < client.tree.length; ++j)
+					for(int i = 0; i < leafCapacity; ++i)
+						idens[j][i]=Utils.toInt(client.tree[j][i].data);
+				
 				queue = new int[client.queueCapacity];
 				for(int j = 0; j < client.queueCapacity; ++j)
-						queue[j]=Utils.toInt(client.queue[j].iden);
+						queue[j]=Utils.toInt(client.queue[j].data);
 
 				os.flush();
 
@@ -86,28 +99,35 @@ public class TestKaiminOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				KaiminOramServer server = new KaiminOramServer(is, os, N, dataSize, Party.SERVER, capacity);
-				idens = new int[server.tree.length][capacity];
-				System.out.println("logN:"+server.logN+", N:"+server.N);
+				KaiminOramServer server= new KaiminOramServer(is, os, N, dataSize, Party.SERVER, nodeCapacity, leafCapacity);
+				
+				idens = new int[server.tree.length][nodeCapacity];
+				for(int i = server.tree.length/2; i < server.tree.length; ++i)
+					idens[i] = new int[leafCapacity];
+				
+				
 				for(int i = 0; i < writecount; ++i) {
 					int element = Math.abs(i % (N-1)) +1;
 					int oldValue = posMap[element];
-					System.out.println(element+" "+oldValue);
 					server.write(oldValue);
 				}
 
-				for(int i = 1; i < readcount && !breaksignal; ++i){
+				for(int i = 1; i < readcount; ++i){
 					int element = i;
 					int oldValue = posMap[element];
 					server.read(oldValue);
 				}
 				
-				for(int j = 1; j < server.tree.length; ++j)
-					for(int i = 0; i < capacity; ++i)
-						idens[j][i]=Utils.toInt(server.tree[j][i].iden);
+				for(int j = 1; j < server.tree.length/2; ++j)
+					for(int i = 0; i < nodeCapacity; ++i)
+						idens[j][i]=Utils.toInt(server.tree[j][i].data);
+				for(int j = server.tree.length/2; j < server.tree.length; ++j)
+					for(int i = 0; i < leafCapacity; ++i)
+						idens[j][i]=Utils.toInt(server.tree[j][i].data);
+
 				queue = new int[server.queueCapacity];
 				for(int j = 0; j < server.queueCapacity; ++j)
-					queue[j]=Utils.toInt(server.queue[j].iden);
+					queue[j]=Utils.toInt(server.queue[j].data);
 
 				
 				os.flush();
@@ -136,6 +156,7 @@ public class TestKaiminOram {
 		System.out.print("\nposmap:"+Arrays.toString(posMap));
 	}
 	
+	@Test
 	public void runThreads() throws Exception {
 		GenRunnable gen = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
@@ -164,13 +185,4 @@ public class TestKaiminOram {
 		return res;
 		
 	}
-	
-	public static void main(String [ ] args) throws Exception{
-		TestKaiminOram t = new TestKaiminOram();
-		
-		t.runThreads();
-	}
-
-	
-
 }

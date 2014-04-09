@@ -55,8 +55,8 @@ public class TestPathOram {
 					
 					BlockInBinary b = client.read(element, oldValue, newValue);
 					
-					//if(Utils.toInt(b.data) != data[element])
-					System.out.println("verify: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+Utils.toInt(b.iden));
+					if(Utils.toInt(b.data) != data[element])
+						System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+Utils.toInt(b.iden));
 					posMap[element] = newValue;
 				}
 

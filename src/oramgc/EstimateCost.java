@@ -143,12 +143,15 @@ public class EstimateCost {
 		public long flush() {
 			return (logN*capacity) * (lengthOfIden+(lengthOfIden*log(lengthOfIden)))  //compute deepeest level to push for each block
 			      + (logN-1)*(
-			    		  pop(capacity) + add(capacity) + add(capacity)+
+			    		  pop(capacity) + add(capacity) +
 			    		  //mux(lengthOfData+lengthOfIden+lengthOfPos)
-			    		  + add(4) // overflow
-			    		  +logN*logN//to count if there is overflow
+			    		  + add(5) // overflow
 			    		  
-			    		  );//+ sort(logN+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos);
+			    		  + logN*logN//to count if there is overflow
+			    		  
+			    		  )
+			    		  + 5 * add(stashSize);//+ sort(logN+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos);
+						//+sort(5+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos);
 			    		  //;//merge tmp logN cache to stash;;
 		}
 		

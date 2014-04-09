@@ -6,15 +6,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import oramgc.Block;
-import oramgc.treeoram.TreeOramLib;
 import test.Utils;
 
 public class KaiminOramClient extends KaiminOramParty {
-	TreeOramLib lib;
+	KaiminOramLib lib;
 	public KaiminOramClient(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int capacity) throws Exception {
-		super(is, os, N, dataSize, p, capacity);
-		lib = new TreeOramLib(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, gen);
+			Party p, int nodeCapacity, int leafCapacity) throws Exception {
+		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity);
+		lib = new KaiminOramLib(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, gen);
 	}
 	
 	public BlockInBinary fetch(boolean[] iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception{
@@ -61,25 +60,48 @@ public class KaiminOramClient extends KaiminOramParty {
 
 	@Override
 	public void flushOneTime(boolean[] pos) throws Exception {
+		Signal[] pathSignal = new Signal[pos.length];
+		for(int i = 0; i < pos.length; ++i)
+			pathSignal[i] = pos[i] ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
+		
 		int index = 1;
+		Block transit = lib.dummyBlock;
+		Block[] overflowedBlocks = new Block[tempStashSize];
+		for(int i = 0; i < tempStashSize; ++i)
+			overflowedBlocks[i] = lib.dummyBlock;
+		
 		for(int i = 1; i < logN; ++i) {
 			BlockInBinary[] top = tree[index];
-			BlockInBinary[] left = tree[index*2];
-			BlockInBinary[] right = tree[index*2+1];
-			
 			Block[][] scTop = prepareBlocks(top, top, top);
-			Block[][] scLeft = prepareBlocks(left, left, left);
-			Block[][] scRight = prepareBlocks(right, right, right);
 			
-			lib.evitUnit(scTop[0], scLeft[0], scRight[0], i);
-
+			transit = lib.flushUnit(scTop[0], transit, i, pathSignal, overflowedBlocks);
+			
 			tree[index] = prepareBlockInBinaries(scTop[0], scTop[1]);
-			tree[index*2] = prepareBlockInBinaries(scLeft[0], scLeft[1]);
-			tree[index*2+1] = prepareBlockInBinaries(scRight[0], scRight[1]);
 			index*=2;
-			if(pos[i-1])
+			if(pos[lengthOfPos-i])
 				++index;
 		}
+		//debug(overflowedBlocks);
+		BlockInBinary[] top = tree[index];
+		Block[][] scTop = prepareBlocks(top, top, top);
+		lib.add(scTop[0], transit);
+		tree[index] = prepareBlockInBinaries(scTop[0], scTop[1]);
+		
+		Block[][] scQueue = prepareBlocks(queue, queue, queue);
+		
+		if(DEBUG) {//veridy queue is not full
+			Signal full = lib.SIGNAL_ONE;
+			for(int i = 0; i <scQueue[0].length; ++i){
+				full = lib.and(full, lib.not(lib.eq(scQueue[0][i].iden, lib.zeros(lengthOfIden)) ));
+			}
+			boolean fullb = gen.outputToGen(full);
+			if(fullb)
+				System.out.println("queue Full!!");
+		}
+		
+		for(int i = 0; i < tempStashSize; ++i)
+			lib.add(scQueue[0], overflowedBlocks[i]);
+		queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
 	
 	public BlockInBinary read(int iden, int pos, int newPos) throws Exception {

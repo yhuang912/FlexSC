@@ -4,10 +4,7 @@ import gc.Signal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-
 import oramgc.Block;
-import oramgc.OramParty.BlockInBinary;
 import test.Utils;
 
 public class TreeOramClient extends TreeOramParty {

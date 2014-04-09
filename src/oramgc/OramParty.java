@@ -1,8 +1,6 @@
 package oramgc;
 
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -72,6 +70,27 @@ public abstract class OramParty {
 		
 		Block[] xor = lib.xor(s, c);
 		return new Block[][]{xor, r};
+	}
+
+	public Block[] prepareBlock(BlockInBinary clientBlock, BlockInBinary serverBlock, BlockInBinary randomBlock) throws Exception {
+		Block s = inputBlockOfServer(serverBlock);
+		Block c = inputBlockOfClient(clientBlock);
+		Block r = inputBlockOfServer(randomBlock);
+		
+		Block xor = lib.xor(s, c);
+		return new Block[]{xor, r};
+	}
+	
+	public BlockInBinary prepareBlockInBinary(Block blocks, Block randomBlock) throws Exception {
+		Block res = lib.xor(blocks, randomBlock);
+		BlockInBinary clientBlockInBinary = outputBlock(res);
+		
+		if(role == Party.SERVER) {
+			return null;
+		}
+		else{
+			return clientBlockInBinary;	
+		}
 	}
 	
 	public BlockInBinary[] prepareBlockInBinaries(Block[] blocks, Block[] randomBlock) throws Exception {

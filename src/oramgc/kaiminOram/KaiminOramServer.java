@@ -4,20 +4,16 @@ import gc.Signal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import oramgc.Block;
-import oramgc.OramParty.BlockInBinary;
-import oramgc.OramParty.Party;
-import oramgc.treeoram.TreeOramLib;
 import test.Utils;
 
 
 public class KaiminOramServer extends KaiminOramParty {
-	TreeOramLib lib;
+	KaiminOramLib lib;
 	public KaiminOramServer(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int capacity) throws Exception {
-		super(is, os, N, dataSize, p, capacity);
-		lib = new TreeOramLib(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, eva);
+			Party p, int nodeCapacity, int leafCapacity) throws Exception {
+		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity);
+		lib = new KaiminOramLib(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, eva);
 	}
 	
 	public void fetch(boolean[] pos, boolean[] data) throws Exception{
@@ -35,7 +31,7 @@ public class KaiminOramServer extends KaiminOramParty {
 		Block res = lib.readAndRemove(scPath[0], scIden);
 		Block res2 = lib.readAndRemove(scQueue[0], scIden);
 		Block finalRes = lib.mux(res, res2, lib.eq(res.iden, lib.zeros(lengthOfIden)));
-
+		
 		if(data == null)
 			scData = finalRes.data;
 		
@@ -53,7 +49,7 @@ public class KaiminOramServer extends KaiminOramParty {
 
 	public void dequeue() throws Exception{
 		BlockInBinary[] randomQueue = randomBucket(queueCapacity);
-		BlockInBinary[] randomBucket = randomBucket(capacity);
+		BlockInBinary[] randomBucket = randomBucket(nodeCapacity);
 		Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
 		Block[][] scTree1 = prepareBlocks(tree[1], tree[1], randomBucket);
 		
@@ -70,33 +66,52 @@ public class KaiminOramServer extends KaiminOramParty {
 
 	@Override
 	public void flushOneTime(boolean[] pos) throws Exception {
+		Signal[] pathSignal = new Signal[pos.length];
+		for(int i = 0; i < pos.length; ++i)
+			pathSignal[i] = pos[i] ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
+		
 		int index = 1;
+		Block transit = lib.dummyBlock;
+		Block[] overflowedBlocks = new Block[tempStashSize];
+		for(int i = 0; i < tempStashSize; ++i)
+			overflowedBlocks[i] = lib.dummyBlock;
 		for(int i = 1; i < logN; ++i){
 			BlockInBinary[] top = tree[index];
-			BlockInBinary[] left = tree[index*2];
-			BlockInBinary[] right = tree[index*2+1];
-			
-			BlockInBinary[] randomTop = randomBucket(capacity);
-			BlockInBinary[] randomLeft = randomBucket(capacity);
-			BlockInBinary[] randomRight = randomBucket(capacity);
-			
+			BlockInBinary[] randomTop = randomBucket(nodeCapacity);
+			//System.out.println(top.length);
 			Block[][] scTop = prepareBlocks(top, top, randomTop);
-			Block[][] scLeft = prepareBlocks(left, left, randomLeft);
-			Block[][] scRight = prepareBlocks(right, right, randomRight);
-			
-			lib.evitUnit(scTop[0], scLeft[0], scRight[0], i);
 
+			transit = lib.flushUnit(scTop[0], transit, i, pathSignal, overflowedBlocks);
 			tree[index] = randomTop;
 			prepareBlockInBinaries(scTop[0], scTop[1]);
-			tree[index*2] = randomLeft;
-			prepareBlockInBinaries(scLeft[0], scLeft[1]);
-			tree[index*2+1] = randomRight;
-			prepareBlockInBinaries(scRight[0], scRight[1]);
 			
 			index*=2;
-			if(pos[i-1])
+			if(pos[lengthOfPos-i])
 				++index;
 		}
+		//debug(overflowedBlocks);
+		BlockInBinary[] top = tree[index];
+		BlockInBinary[] randomTop = randomBucket(leafCapacity);
+		
+		Block[][] scTop = prepareBlocks(top, top, randomTop);
+		lib.add(scTop[0], transit);
+		tree[index] = randomTop;
+		prepareBlockInBinaries(scTop[0], scTop[1]);
+		
+		BlockInBinary[] randomQueue = randomBucket(queueCapacity);
+		Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
+		
+		if(DEBUG) {//veridy queue is not full
+			Signal full = lib.SIGNAL_ONE;
+			for(int i = 0; i <scQueue[0].length; ++i){
+				full = lib.and(full, lib.not(lib.eq(scQueue[0][i].iden, lib.zeros(lengthOfIden)) ));
+			}
+			eva.outputToGen(full);
+		}
+		for(int i = 0; i < tempStashSize; ++i)
+			lib.add(scQueue[0], overflowedBlocks[i]);
+		queue = randomQueue;
+		prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
 	
 	public void read(int pos) throws Exception {
