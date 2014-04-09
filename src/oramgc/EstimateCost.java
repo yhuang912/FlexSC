@@ -52,7 +52,7 @@ public class EstimateCost {
 		}
 
 		public  long sort(long n, long lengthOfKey, long lengthOfData) {
-			return n*log(n)*(eq(lengthOfKey) + 2*mux(lengthOfData))/4;
+			return n*log(n)*(eq(lengthOfKey) + 2*mux(lengthOfData));
 		}
 
 		public  long log(long n) {
@@ -118,7 +118,8 @@ public class EstimateCost {
 			return  readAndRemove()
 					+ (stashSize + logN*capacity) * (lengthOfIden+(lengthOfIden*log(lengthOfIden)))  //compute deepeest level to push for each block
 					//+ logN*capacity*(stashSize+logN*capacity)*(eq(lengthOfIden)+mux(lengthOfData)+lengthOfPos+lengthOfIden)+mux(lengthOfIden)+
-					+2*sort(logN*capacity+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos);
+					+3*sort(2*logN*capacity+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos)
+					+ (logN*capacity+stashSize)*2;
 		}
 		public PathoramAdv newInstance(long n, long l){
 			return new PathoramAdv(n, l);
@@ -132,7 +133,7 @@ public class EstimateCost {
 		}
 
 		public long readAndRemove() {
-			return super.readAndRemove()+readAndRemoveBucket(stashSize);//readand remove blocks from tree and stash
+			return super.readAndRemove()+readAndRemoveBucket(stashSize)+add(stashSize);//readand remove blocks from tree and stash
 		}
 		
 		public long putBack() {
@@ -142,11 +143,16 @@ public class EstimateCost {
 		public long flush() {
 			return (logN*capacity) * (lengthOfIden+(lengthOfIden*log(lengthOfIden)))  //compute deepeest level to push for each block
 			      + (logN-1)*(
-			    		  pop(capacity) + add(capacity)
-			    		  + add(logN) // overflow
-			    		  +logN*logN//to count if there is overflow
-			    		  + sort(logN+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos)//merge tmp logN cache to stash
-			    		  );
+			    		  pop(capacity) + add(capacity) +
+			    		  //mux(lengthOfData+lengthOfIden+lengthOfPos)
+			    		  + add(5) // overflow
+			    		  
+			    		  + logN*logN//to count if there is overflow
+			    		  
+			    		  )
+			    		  + 5 * add(stashSize);//+ sort(logN+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos);
+						//+sort(5+stashSize, lengthOfIden, lengthOfData+lengthOfIden+lengthOfPos);
+			    		  //;//merge tmp logN cache to stash;;
 		}
 		
 		public long dequeue() {
@@ -190,7 +196,7 @@ public class EstimateCost {
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException {
 		EstimateCost e = new EstimateCost();
 		long N = 1<<20;
-		long dataSize = 128;
+		long dataSize = 32;
 		KaiminOram kaimin = e.new KaiminOram(N, dataSize);
 		Pathoram pathoram = e.new Pathoram(N, dataSize);
 		PathoramAdv pathoram2 = e.new PathoramAdv(N, dataSize);

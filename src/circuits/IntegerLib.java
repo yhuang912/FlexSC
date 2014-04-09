@@ -487,4 +487,9 @@ public class IntegerLib extends CircuitLib {
 		z2Pad = leftPublicShift(z2Pad, 2*(x.length/2));
 		return add(add(z0Pad, z1), z2Pad);
 	}
+	
+	public Signal[] min(Signal[] x, Signal[] y) throws Exception {
+		Signal leq = leq(x, y);
+		return mux(y, x, leq);
+	}
 }

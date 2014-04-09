@@ -6,79 +6,59 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import oramgc.Block;
-import oramgc.BucketLib;
 import oramgc.OramParty;
-import oramgc.OramParty.BlockInBinary;
-import test.Utils;
 
 public class TrivialOramServer extends OramParty {
-	BlockInBinary[] blocks;
+	BlockInBinary[] bucket;
 	int capacity;
-	BucketLib lib;
 	public TrivialOramServer(InputStream is, OutputStream os, int N,
 			int dataSize, int capacity) throws Exception {
 		super(is, os, N, dataSize, OramParty.Party.SERVER);
 		this.capacity = capacity;
-		blocks = new BlockInBinary[capacity];
-		for(int i = 0; i < blocks.length; ++i)
-			blocks[i] = getDummyBlock();
-		lib = new BucketLib(lengthOfIden, lengthOfPos, lengthOfData, eva);
+		bucket = new BlockInBinary[capacity];
+		for(int i = 0; i < bucket.length; ++i)
+			bucket[i] = getDummyBlock();
 	}
-
-	public void add() throws Exception{
-		BlockInBinary[] randomBucket = randomBucket(blocks.length);
+	
+	public void add() throws Exception {
+		BlockInBinary[] randomBucket = randomBucket(capacity);
+		Block[][] result = prepareBlocks(bucket, bucket, randomBucket);
+		Block[] scBlocks = result[0];
+		Block[] scBlocksMask = result[1];
+		
 		Block scNewBlock = inputBlockOfClient(getDummyBlock());
-		Block[] scBucketServer = inputBucketOfServer(blocks);
-		Block[] scBucketClient = inputBucketOfClient(blocks);
-		Block[] scRandomBucket = inputBucketOfServer(randomBucket);
 		
-		Block[] bucket = lib.xor(scBucketServer,scBucketClient); 
-		
-		lib.add(bucket, scNewBlock);
-		
-		Block[] bucketForClient = lib.xor(scRandomBucket, bucket);
-		
-		blocks = randomBucket;
-		os.flush();
-		outputBucket(bucketForClient);
-		os.flush();
+		lib.add(scBlocks, scNewBlock);
+		bucket = randomBucket;
+		prepareBlockInBinaries(scBlocks, scBlocksMask);
 	}
 	
 	public BlockInBinary pop() throws Exception{
-		BlockInBinary[] randomBucket = randomBucket(blocks.length);
-		Block[] scBucketServer = inputBucketOfServer(blocks);
-		Block[] scBucketClient = inputBucketOfClient(blocks);
-		Block[] scRandomBucket = inputBucketOfServer(randomBucket);
-		Block[] bucket = lib.xor(scBucketServer,scBucketClient); 
+		BlockInBinary[] randomBucket = randomBucket(bucket.length);
+		Block[][] result = prepareBlocks(bucket, bucket, randomBucket);
+		Block[] scBlocks = result[0];
+		Block[] scBlocksMask = result[1];
+		 
+		Block res = lib.pop(scBlocks);
 		
-		Block res = lib.pop(bucket);
-		
-		Block[] bucketForClient = lib.xor(scRandomBucket, bucket);
-		blocks = randomBucket;
-		os.flush();
-		outputBucket(bucketForClient);
+		bucket = randomBucket;
+		prepareBlockInBinaries(scBlocks, scBlocksMask);
 		outputBlock(res);
-		os.flush();
 		return null;
 	}
 	
 	public BlockInBinary readAndRemove() throws Exception {
-		Block[] scBucketServer = inputBucketOfServer(blocks);
-		Block[] scBucketClient = inputBucketOfClient(blocks);
-		BlockInBinary[] randomBucket = randomBucket(blocks.length);
-		Block[] scRandomBucket = inputBucketOfServer(randomBucket);
-		Signal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		BlockInBinary[] randomBucket = randomBucket(bucket.length);
+		Block[][] result = prepareBlocks(bucket, bucket, randomBucket);
+		Block[] scBlocks = result[0];
+		Block[] scBlocksMask = result[1];
+		Signal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]); 
 		
-		Block[] bucket = lib.xor(scBucketServer,scBucketClient); 
+		Block res = lib.readAndRemove(scBlocks, scIden);
 		
-		Block res = lib.readAndRemove(bucket, scIden);
-		
-		Block[] bucketForClient = lib.xor(scRandomBucket, bucket);
-		blocks = randomBucket;
-		os.flush();
-		outputBucket(bucketForClient);
+		bucket = randomBucket;
+		prepareBlockInBinaries(scBlocks, scBlocksMask);
 		outputBlock(res);
-		os.flush();
 		return null;		
 	}
 	

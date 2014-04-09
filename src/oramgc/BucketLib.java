@@ -1,16 +1,20 @@
 package oramgc;
 
-import java.util.Arrays;
-
-import circuits.IntegerLib;
+import circuits.BitonicSortLib;
 import flexsc.CompEnv;
 import gc.Signal;
 
 
-public class BucketLib extends IntegerLib {
+public class BucketLib extends BitonicSortLib {
 	public Block dummyBlock;
+	protected int lengthOfIden;
+	protected int lengthOfPos;
+	protected int lengthOfData;
 	public BucketLib(int lengthOfIden, int lengthOfPos, int lengthOfData, CompEnv<Signal> e) {
 		super(e);
+		this.lengthOfData = lengthOfData;
+		this.lengthOfIden = lengthOfIden;
+		this.lengthOfPos = lengthOfPos;
 		dummyBlock = new Block(zeros(lengthOfIden), zeros(lengthOfPos), zeros(lengthOfData));
 	}
 
