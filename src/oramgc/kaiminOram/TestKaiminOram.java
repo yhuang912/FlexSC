@@ -1,4 +1,4 @@
-package oramgc.treeoram;
+package oramgc.kaiminOram;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -8,29 +8,33 @@ import oramgc.OramParty.Party;
 import test.Utils;
 
 
-public class TestTreeOram {
+public class TestKaiminOram {
 	final int N = 8;
-	final int capacity = 4;
+	final int capacity = 3;
 	int[] posMap = new int[N+3];
-	int ll = 20;
-	public TestTreeOram(){
+	int writecount = 2*N;
+	int readcount = N;
+	int dataSize = 4;
+	public TestKaiminOram(){
 		for(int i = 0; i < posMap.length; ++i)
-			posMap[i] = 1;
+			posMap[i] = 0;
 	}
 	SecureRandom rng = new SecureRandom();
+	boolean breaksignal = false;
 	class GenRunnable extends network.Server implements Runnable {
 		GenRunnable () {
 		}
 		public int[][] idens;
+		public int[] queue;
 		public void run() {
 			try {
 				listen(54321);
 
 				int data[] = new int[N+1];
-				TreeOramClient client = new TreeOramClient(is, os, N, 4, Party.CLIENT, capacity);
+				KaiminOramClient client = new KaiminOramClient(is, os, N, dataSize, Party.CLIENT, capacity);
 				idens = new int[client.tree.length][capacity];
 				
-				for(int i = 0; i < ll; ++i) {
+				for(int i = 0; i < writecount; ++i) {
 					int element = Math.abs(i % (N-1)) +1;
 
 					int oldValue = posMap[element];
@@ -41,20 +45,26 @@ public class TestTreeOram {
 					posMap[element] = newValue;
 				}
 
-				for(int i = 1; i < N; ++i){
+				for(int i = 1; i < readcount; ++i){
 					int element = i;
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					
 					BlockInBinary b = client.read(element, oldValue, newValue);
-					if(Utils.toInt(b.data) != data[element])
-						System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]);
+					if(Utils.toInt(b.data) != data[element]){
+						System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+posMap[element]);
+						breaksignal = true;
+						break;
+					}
 					posMap[element] = newValue;
 				}
 				
 				for(int j = 1; j < client.tree.length; ++j)
 					for(int i = 0; i < capacity; ++i)
 						idens[j][i]=Utils.toInt(client.tree[j][i].iden);
+				queue = new int[client.queueCapacity];
+				for(int j = 0; j < client.queueCapacity; ++j)
+						queue[j]=Utils.toInt(client.queue[j].iden);
 
 				os.flush();
 
@@ -69,31 +79,35 @@ public class TestTreeOram {
 	class EvaRunnable extends network.Client implements Runnable {
 
 		public int[][] idens;
+		public int[] queue;
 		EvaRunnable () {
 		}
 
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				TreeOramServer server = new TreeOramServer(is, os, N, 4, Party.SERVER, capacity);
+				KaiminOramServer server = new KaiminOramServer(is, os, N, dataSize, Party.SERVER, capacity);
 				idens = new int[server.tree.length][capacity];
 				System.out.println("logN:"+server.logN+", N:"+server.N);
-				for(int i = 0; i < ll; ++i) {
+				for(int i = 0; i < writecount; ++i) {
 					int element = Math.abs(i % (N-1)) +1;
 					int oldValue = posMap[element];
 					System.out.println(element+" "+oldValue);
-					server.access(oldValue);
+					server.write(oldValue);
 				}
 
-				for(int i = 1; i < N; ++i){
+				for(int i = 1; i < readcount && !breaksignal; ++i){
 					int element = i;
 					int oldValue = posMap[element];
-					server.access(oldValue);
+					server.read(oldValue);
 				}
 				
 				for(int j = 1; j < server.tree.length; ++j)
 					for(int i = 0; i < capacity; ++i)
 						idens[j][i]=Utils.toInt(server.tree[j][i].iden);
+				queue = new int[server.queueCapacity];
+				for(int j = 0; j < server.queueCapacity; ++j)
+					queue[j]=Utils.toInt(server.queue[j].iden);
 
 				
 				os.flush();
@@ -118,7 +132,8 @@ public class TestTreeOram {
 				}
 				++i;
 		}
-		System.out.print("\n");
+		System.out.print(Arrays.toString(xor(gen.queue, eva.queue)));
+		System.out.print("\nposmap:"+Arrays.toString(posMap));
 	}
 	
 	public void runThreads() throws Exception {
@@ -131,7 +146,7 @@ public class TestTreeOram {
 		tGen.join();
 		printTree(gen,eva);
 		System.out.print("\n");
-		System.out.println(Arrays.toString(posMap));
+		System.out.println();
 	}
 	
 	public boolean[] xor(boolean[]a, boolean[] b) {
@@ -151,7 +166,7 @@ public class TestTreeOram {
 	}
 	
 	public static void main(String [ ] args) throws Exception{
-		TestTreeOram t = new TestTreeOram();
+		TestKaiminOram t = new TestKaiminOram();
 		
 		t.runThreads();
 	}

@@ -16,7 +16,7 @@ public abstract class TreeBasedOramParty extends OramParty {
 		SecureRandom r = new SecureRandom();
 		r.nextBytes(seed);
 	}
-	protected final SecureRandom commenRandom = SecureRandom.getInstance("SHA1PRNG");
+	protected final SecureRandom commonRandom = SecureRandom.getInstance("SHA1PRNG");
 	
 	public TreeBasedOramParty(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int capacity) throws Exception {
@@ -29,7 +29,7 @@ public abstract class TreeBasedOramParty extends OramParty {
 				tree[i][j] = getDummyBlock();
 		}
 		
-		commenRandom.setSeed(seed);
+		commonRandom.setSeed(seed);
 	}
 	
 	public BlockInBinary[][] getAPath(boolean[] path) {

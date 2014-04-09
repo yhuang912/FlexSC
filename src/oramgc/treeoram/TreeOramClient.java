@@ -29,8 +29,7 @@ public class TreeOramClient extends TreeOramParty {
 	
 	public BlockInBinary readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
-		BlockInBinary[] randomBucket = randomBucket(blocks.length);
-		Block[][] scPath = prepareBlocks(blocks, blocks, randomBucket);
+		Block[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		
 		Signal[] scIden = gen.inputOfGen(iden);
 				

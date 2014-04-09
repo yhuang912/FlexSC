@@ -16,7 +16,7 @@ public abstract class TreeOramParty extends TreeBasedOramParty {
 			return 1;
 		
 		int left = 1<<(level-1);
-		return commenRandom.nextInt(left) + left;
+		return commonRandom.nextInt(left) + left;
 	}
 	
 	public void evict() throws Exception {

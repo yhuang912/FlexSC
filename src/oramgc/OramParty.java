@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import test.Utils;
 import gc.GCEva;
@@ -181,6 +182,31 @@ public abstract class OramParty {
 		for(int i = 0; i < length; ++i)
 			result[i] = randomBlock();
 		return result;
+	}
+	
+	public void debug(Block b) throws Exception{
+		if(eva != null)
+			outputBlock(b);
+		else {
+			System.out.print("DEBUG: ");
+			System.out.print(Utils.toInt(outputBlock(b).iden));
+			System.out.println(" ");
+		}
+	}
+	
+	public void debug(Block[] b) throws Exception{
+		if(eva!= null)
+			outputBucket(b);
+		else{
+			System.out.print("DEBUG: ");
+			BlockInBinary[] bib = outputBucket(b);
+			int[] idens = new int[b.length];
+			for(int i = 0; i < idens.length; ++i)
+				idens[i] = Utils.toInt(bib[i].iden);
+			System.out.print(Arrays.toString(idens));
+			System.out.println(" ");
+		}
+		
 	}
 
 }
