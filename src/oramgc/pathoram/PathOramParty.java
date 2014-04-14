@@ -2,15 +2,10 @@ package oramgc.pathoram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.SecureRandom;
-import java.util.Arrays;
-
-import oramgc.Block;
-import oramgc.OramParty;
 import oramgc.TreeBasedOramParty;
 
 public abstract class PathOramParty extends TreeBasedOramParty {
-	final int lengthOfStash = 10;//should be 89 with lambda is 80
+	final int lengthOfStash = 89;//should be 89 with lambda is 80
 	public BlockInBinary[] stash = new BlockInBinary[lengthOfStash];
 	final static int capacity = 4;
 	static byte[] seed = new byte[512];

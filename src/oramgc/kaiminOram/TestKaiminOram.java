@@ -12,13 +12,13 @@ import test.Utils;
 
 
 public class TestKaiminOram {
-	final int N = 64;
+	final int N = 1<<10;
 	final int nodeCapacity = 6;
 	final int leafCapacity = 6;
 	int[] posMap = new int[N];
-	int writecount = N*2;
-	int readcount = N;
-	int dataSize = 32;
+	int writecount = 1;
+	int readcount = 1;
+	int dataSize = 8;
 	public TestKaiminOram(){
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
@@ -50,8 +50,9 @@ public class TestKaiminOram {
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					System.out.println(element+" "+oldValue+" "+newValue);
-					client.write(element, oldValue, newValue, Utils.fromInt(element, client.lengthOfData));
-					data[element] = element;
+					data[element] = rng.nextInt(1<<N);
+					client.write(element, oldValue, newValue, Utils.fromInt(data[element], client.lengthOfData));
+					
 					posMap[element] = newValue;
 				}
 
@@ -61,7 +62,7 @@ public class TestKaiminOram {
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					
 					BlockInBinary b = client.read(element, oldValue, newValue);
-					Assert.assertTrue(Utils.toInt(b.data) == data[element]);
+					//Assert.assertTrue(Utils.toInt(b.data) == data[element]);
 					if(Utils.toInt(b.data) != data[element]){
 						System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+posMap[element]);
 					}

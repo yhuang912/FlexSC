@@ -3,6 +3,9 @@ package oramgc.pathoram;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import oramgc.OramParty.BlockInBinary;
 import oramgc.OramParty.Party;
 import test.Utils;
@@ -10,11 +13,12 @@ import test.Utils;
 
 public class TestPathOram {
 	
-	final int N = 8;
+	final int N = 1<<10;
 	final int capacity = 4;
-	int[] posMap = new int[N+3];
-	int ll = 0;
-	int llread = 8;
+	int[] posMap = new int[N+1];
+	int writeCount = 1;
+	int readCount = 1;
+	int dataSize = 8;
 	public TestPathOram(){
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
@@ -33,30 +37,32 @@ public class TestPathOram {
 				listen(54321);
 				int data[] = new int[N+1];
 
-				PathOramClient client = new PathOramClient(is, os, N, 4, Party.CLIENT);
+				PathOramClient client = new PathOramClient(is, os, N, dataSize, Party.CLIENT);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				
-				for(int i = 0; i < ll; ++i) {
+				for(int i = 0; i < writeCount; ++i) {
 					int element = Math.abs(i % (N-1)) +1;
 
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					System.out.println(element+" "+oldValue+" "+newValue);
-					client.write(element, oldValue, newValue, Utils.fromInt(element, client.lengthOfData));
 					data[element] = element;
+					client.write(element, oldValue, newValue, Utils.fromInt(data[element], client.lengthOfData));
 					posMap[element] = newValue;
 				}
 				
-				for(int i = 1; i < N; ++i) {
+				for(int i = 1; i < readCount; ++i) {
 					int element = i;
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					
 					BlockInBinary b = client.read(element, oldValue, newValue);
 					
+					Assert.assertTrue(Utils.toInt(b.data) == data[element]);
 					if(Utils.toInt(b.data) != data[element])
-						System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+Utils.toInt(b.iden));
+					System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+Utils.toInt(b.iden));
+
 					posMap[element] = newValue;
 				}
 
@@ -64,10 +70,10 @@ public class TestPathOram {
 				idens = new int[client.tree.length][PATHORAMCAPACITY];
 				for(int j = 1; j < client.tree.length; ++j)
 					for(int i = 0; i < PATHORAMCAPACITY; ++i)
-						idens[j][i]=Utils.toInt(client.tree[j][i].iden);
+						idens[j][i]=Utils.toInt(client.tree[j][i].data);
 				stash = new int[client.stash.length];
 				for(int j = 0; j < client.stash.length; ++j)
-						stash[j]=Utils.toInt(client.stash[j].iden);
+						stash[j]=Utils.toInt(client.stash[j].data);
 				
 				os.flush();
 
@@ -89,16 +95,16 @@ public class TestPathOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				PathOramServer server = new PathOramServer(is, os, N, 4, Party.SERVER);
+				PathOramServer server = new PathOramServer(is, os, N, dataSize, Party.SERVER);
 				
-				for(int i = 0; i < ll; ++i) {
+				for(int i = 0; i < writeCount; ++i) {
 					int element = Math.abs(i % (N-1)) +1;
 					int oldValue = posMap[element];
 					server.write(oldValue);
 				}
 				
 				
-				for(int i = 1; i < N; ++i){
+				for(int i = 1; i < readCount; ++i){
 					int element = i;
 					int oldValue = posMap[element];
 					server.read(oldValue);
@@ -107,11 +113,11 @@ public class TestPathOram {
 				idens = new int[server.tree.length][PATHORAMCAPACITY];
 				for(int j = 1; j < server.tree.length; ++j)
 					for(int i = 0; i < PATHORAMCAPACITY; ++i)
-						idens[j][i]=Utils.toInt(server.tree[j][i].iden);
+						idens[j][i]=Utils.toInt(server.tree[j][i].data);
 				
 				stash = new int[server.stash.length];
 				for(int j = 0; j < server.stash.length; ++j)
-					stash[j]=Utils.toInt(server.stash[j].iden);
+					stash[j]=Utils.toInt(server.stash[j].data);
 
 
 				os.flush();
@@ -125,6 +131,7 @@ public class TestPathOram {
 	}
 
 	
+	@Test
 	public void runThreads() throws Exception {
 		GenRunnable gen = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
@@ -146,8 +153,9 @@ public class TestPathOram {
 				}
 				++i;
 		}
+		System.out.println(Arrays.toString(xor(gen.stash, eva.stash)));
 		System.out.print("\n");
-		System.out.print(Arrays.toString(xor(gen.stash, eva.stash)));
+		System.out.println(Arrays.toString(posMap));
 		
 	}
 	
@@ -166,12 +174,4 @@ public class TestPathOram {
 		return res;
 		
 	}
-	
-	public static void main(String [ ] args) throws Exception{
-		TestPathOram t = new TestPathOram();
-		t.runThreads();
-	}
-
-	
-
 }

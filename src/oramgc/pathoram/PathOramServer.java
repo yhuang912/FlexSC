@@ -45,18 +45,18 @@ public class PathOramServer extends PathOramParty {
 		
 		//prepare newblock
 		Signal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
-		Signal[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
-		Signal[] scData = null;
+		Signal[] scPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		
+		Block res = lib.readAndRemove(scPath[0], scIden);
+		outputBlock(res);
+		Signal[] scData = res.data;
 		if(data != null)
 			scData = eva.inputOfGen(new boolean[lengthOfData]);
 		
-		Block res = lib.readAndRemove(scPath[0], scIden);
-		res.iden = scIden;
-		res.pos = scNewPos;
-		if(data != null)
-			res.data = scData;
+		Block scNewBlock = new Block(scIden, scPos, scData);
+
 		
-		lib.add(scStash[0], res);
+		lib.add(scStash[0], scNewBlock);
 		Signal[][] debug = lib.pushDown(scPath[0], scStash[0], pos);
 		
 		blocks = randomBucket;
@@ -64,9 +64,10 @@ public class PathOramServer extends PathOramParty {
 		prepareBlockInBinaries(scPath[0], scPath[1]);
 		prepareBlockInBinaries(scStash[0], scStash[1]);
 		putAPath(blocks, pos);
-		outputBlock(res);
 		
-		for(int i = 0; i < debug.length; ++i)
-			eva.outputToGen(debug[i]);
+		
+		//for(int i = 0; i < debug.length; ++i)
+		//	eva.outputToGen(debug[i]);
+		System.out.println(eva.nonFreeGate);
 	}
 }

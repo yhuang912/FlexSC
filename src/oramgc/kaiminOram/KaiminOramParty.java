@@ -9,7 +9,7 @@ import oramgc.TreeBasedOramParty;
 public abstract class KaiminOramParty extends TreeBasedOramParty {
 	final boolean DEBUG = true;
 	BlockInBinary[] queue;
-	final int queueCapacity = 10;
+	final int queueCapacity = 100;
 	final int tempStashSize = 5;
 	int leafCapacity;
 	int nodeCapacity;

@@ -77,10 +77,12 @@ public class KaiminOramLib extends BucketLib {
 		Signal rightOverflow = geq(rightCounter, toSignals(nodeCapacity/2, rightCounter.length));
 		
 		Signal[] toFetchIden = mux(zeros(lengthOfIden), left, leftOverflow);
-		toFetchIden = mux(toFetchIden, right, rightOverflow);
+		//toFetchIden = mux(toFetchIden, right, rightOverflow);
 		
 		add(tempStash, readAndRemove(top, toFetchIden));
 		
+		toFetchIden = mux(zeros(lengthOfIden), right, rightOverflow);
+		add(tempStash, readAndRemove(top, toFetchIden));
 		return block;
 	}
 }

@@ -208,7 +208,7 @@ public abstract class OramParty {
 			outputBlock(b);
 		else {
 			System.out.print("DEBUG: ");
-			System.out.print(Utils.toInt(outputBlock(b).iden));
+			System.out.print(Utils.toInt(outputBlock(b).data));
 			System.out.println(" ");
 		}
 	}
@@ -221,7 +221,7 @@ public abstract class OramParty {
 			BlockInBinary[] bib = outputBucket(b);
 			int[] idens = new int[b.length];
 			for(int i = 0; i < idens.length; ++i)
-				idens[i] = Utils.toInt(bib[i].iden);
+				idens[i] = Utils.toInt(bib[i].data);
 			System.out.print(Arrays.toString(idens));
 			System.out.println(" ");
 		}

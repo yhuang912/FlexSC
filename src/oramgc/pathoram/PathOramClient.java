@@ -4,8 +4,6 @@ import gc.Signal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-
 import oramgc.Block;
 import test.Utils;
 
@@ -37,37 +35,40 @@ public class PathOramClient extends PathOramParty {
 	public void write(boolean[] iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception {
 		access(iden, pos, newPos, data);
 	}
+
 	
 	public BlockInBinary access(boolean[] iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		Block[][] scStash = prepareBlocks(stash, stash, stash);
-
 		Signal[] scIden = gen.inputOfGen(iden);
-		Signal[] scNewPos = gen.inputOfGen(newPos);
+		Signal[] scPos = gen.inputOfGen(newPos);
 		
-		Signal[] scData = null;
+		
+		Block res = lib.readAndRemove(scPath[0], scIden);
+
+		BlockInBinary r =  outputBlock(res);
+		
+		Signal[] scData = res.data;
 		if(data != null)
 			scData = gen.inputOfGen(data);
 		
-		Block res = lib.readAndRemove(scPath[0], scIden);
-		res.iden = scIden;
-		res.pos = scNewPos;
-		if(data != null)
-			res.data = scData;
-		lib.add(scStash[0], res);
+		Block scNewBlock = new Block(scIden, scPos, scData);
+		
+		lib.add(scStash[0], scNewBlock);
+		
 		Signal[][] debug = lib.pushDown(scPath[0], scStash[0], pos);
 		
 		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
 		stash = prepareBlockInBinaries(scStash[0], scStash[1]);
 		putAPath(blocks, pos);
-		BlockInBinary r =  outputBlock(res);
 		
-		int [] re = new int[debug.length];
+		/*int [] re = new int[debug.length];
 		for(int i = 0; i < debug.length; ++i)
 			re[i] = Utils.toInt( gen.outputToGen(debug[i]));
 		
-		//System.out.print(Arrays.toString(re));
+		System.out.println(Arrays.toString(re));
+		*/
 		return r;
 	}
 }
