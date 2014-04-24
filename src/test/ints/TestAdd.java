@@ -27,6 +27,8 @@ public class TestAdd extends Test_2Input1Output{
 				public int plainCompute(int x, int y) {
 					return x+y;}
 			});
+			
+			System.out.println(i);
 		}		
 	}
 }

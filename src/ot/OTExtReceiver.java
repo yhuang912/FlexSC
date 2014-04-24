@@ -22,12 +22,16 @@ public class OTExtReceiver extends OTReceiver {
 	ObjectInputStream ois;
 	ObjectOutputStream oos;
 	
+	Cipher cipher;
+	
 	public OTExtReceiver(InputStream in, OutputStream out) throws Exception {
 		super(in, out);
 
     	oos = new ObjectOutputStream(os);
     	ois = new ObjectInputStream(is);
 
+    	cipher = new Cipher();
+    	
 		initialize();
 	}
 
@@ -38,7 +42,7 @@ public class OTExtReceiver extends OTReceiver {
 		for (int i = SecurityParameter.k1; i < c.length; i++) 
 			c[i] = choices[i-SecurityParameter.k1];
 		
-		Signal[] received = reverseAndExtend(keyPairs, c, msgBitLength, ois, oos);
+		Signal[] received = reverseAndExtend(keyPairs, c, msgBitLength, ois, oos, cipher);
 		
 		Signal[] keys = new Signal[SecurityParameter.k1];
 		boolean[] s = new boolean[SecurityParameter.k1];
@@ -50,14 +54,14 @@ public class OTExtReceiver extends OTReceiver {
 			keyPairs[i][0] = Signal.freshLabel(rnd);
 			keyPairs[i][1] = Signal.freshLabel(rnd);
 		}
-		OTExtSender.reverseAndExtend(s, keys, msgBitLength, keyPairs, ois, oos);
+		OTExtSender.reverseAndExtend(s, keys, msgBitLength, keyPairs, ois, oos, cipher);
 		
 		return Arrays.copyOfRange(received, SecurityParameter.k1, received.length);
 	}
 
 	static Signal[] reverseAndExtend(Signal[][] keyPairs, 
 			boolean[] choices, int msgBitLength, 
-			ObjectInputStream ois, ObjectOutputStream oos) throws Exception {
+			ObjectInputStream ois, ObjectOutputStream oos, Cipher cipher) throws Exception {
 		
 		BigInteger[][] msgPairs = new BigInteger[SecurityParameter.k1][2];
 		BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
@@ -70,9 +74,9 @@ public class OTExtReceiver extends OTReceiver {
 			msgPairs[i][0] = T.data[i];
 			msgPairs[i][1] = T.data[i].xor(biChoices);
 
-			cphPairs[i][0] = Cipher.encrypt(new BigInteger(keyPairs[i][0].bytes), msgPairs[i][0],
+			cphPairs[i][0] = cipher.encrypt(new BigInteger(keyPairs[i][0].bytes), msgPairs[i][0],
 					choices.length);
-			cphPairs[i][1] = Cipher.encrypt(new BigInteger(keyPairs[i][1].bytes), msgPairs[i][1],
+			cphPairs[i][1] = cipher.encrypt(new BigInteger(keyPairs[i][1].bytes), msgPairs[i][1],
 					choices.length);
 		}
 
@@ -91,7 +95,7 @@ public class OTExtReceiver extends OTReceiver {
 
 		for (int i = 0; i < choices.length; i++) {
 			int sigma = choices[i] ? 1 : 0;
-			res[i] = Signal.newInstance(Cipher.decrypt(i, tT.data[i],
+			res[i] = Signal.newInstance(cipher.decrypt(i, tT.data[i],
 					y[i][sigma], msgBitLength).toByteArray());
 		}
 		return res;

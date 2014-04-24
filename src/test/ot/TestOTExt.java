@@ -12,17 +12,19 @@ import ot.OTExtReceiver;
 import ot.OTExtSender;
 
 public class TestOTExt {
-	static int n = 12500;
+	static int n = 100000;
 	Signal[][] m;
 	boolean[] c;
 	Signal[] rcvd;
+	
+	static SecureRandom rnd = new SecureRandom("abc".getBytes());
 	
 	class SenderRunnable extends network.Server implements Runnable {
 		OTExtSender snd;
 		SenderRunnable () {}
 		
 		public void run() {
-			SecureRandom rnd = new SecureRandom();
+			
 			try {
 				listen(54321);
 
@@ -53,7 +55,6 @@ public class TestOTExt {
 				rcv = new OTExtReceiver(is, os);
 				c = new boolean[n];
 				rcvd = new Signal[n];
-				Random rnd = new Random();
 				for (int i = 0; i < n; i++) {
 					c[i] = rnd.nextBoolean();
 					rcvd[i] = rcv.receive(c[i]);

@@ -14,7 +14,6 @@ public class OTExtSender extends OTSender {
 	
     static class SecurityParameter {
 		public static final int k1 = 80;    // number of columns in T
-//		public static final int k2 = k1 + OTPerBatch;	// number of rows in T (i.e., the string length in the base OT)
     }
 
     private static SecureRandom rnd = new SecureRandom();
@@ -24,7 +23,8 @@ public class OTExtSender extends OTSender {
     
     ObjectInputStream ois;
 	ObjectOutputStream oos;
-//	int numOfPairs;
+	
+	Cipher cipher;
 	
     public OTExtSender(int msgBitLength, InputStream in, OutputStream out) throws Exception {
     	super(msgBitLength, in, out);
@@ -32,6 +32,8 @@ public class OTExtSender extends OTSender {
     	ois = new ObjectInputStream(is);
     	oos = new ObjectOutputStream(os);
 
+    	cipher = new Cipher();
+    	
     	initialize();
     }
 
@@ -63,7 +65,7 @@ public class OTExtSender extends OTSender {
     		pairs[i][1] = msgPairs[i-SecurityParameter.k1][1];
     	}
     	
-    	reverseAndExtend(s, keys, msgBitLength, pairs, ois, oos);
+    	reverseAndExtend(s, keys, msgBitLength, pairs, ois, oos, cipher);
     	
     	Signal[][] keyPairs = new Signal[SecurityParameter.k1][2];
     	for (int i = 0; i < SecurityParameter.k1; i++) {
@@ -72,14 +74,14 @@ public class OTExtSender extends OTSender {
     	}
     	for (int i = 0; i < s.length; i++)
 			s[i] = rnd.nextBoolean();
-    	keys = OTExtReceiver.reverseAndExtend(keyPairs, s, SecurityParameter.k1, ois, oos);
+    	keys = OTExtReceiver.reverseAndExtend(keyPairs, s, SecurityParameter.k1, ois, oos, cipher);
     }
 
 	// Given s and keys, obliviously sends msgPairs which contains 'numOfPairs'
 	// pair of strings, each of length 'msgBitLength' bits.  
     static void reverseAndExtend(boolean[] s, Signal[] keys, 
     		int msgBitLength, Signal[][] msgPairs,
-    		ObjectInputStream ois, ObjectOutputStream oos) throws Exception {
+    		ObjectInputStream ois, ObjectOutputStream oos, Cipher cipher) throws Exception {
     	BigInteger[][] cphPairs = (BigInteger[][]) ois.readObject();
     	int numOfPairs = msgPairs.length;
 
@@ -87,9 +89,9 @@ public class OTExtSender extends OTSender {
 
 		for (int i = 0; i < SecurityParameter.k1; i++) {
 		    if (s[i])
-				Q.data[i] = Cipher.decrypt(new BigInteger(keys[i].bytes), cphPairs[i][1], numOfPairs);
+				Q.data[i] = cipher.decrypt(new BigInteger(keys[i].bytes), cphPairs[i][1], numOfPairs);
 			else
-				Q.data[i] = Cipher.decrypt(new BigInteger(keys[i].bytes), cphPairs[i][0], numOfPairs);
+				Q.data[i] = cipher.decrypt(new BigInteger(keys[i].bytes), cphPairs[i][0], numOfPairs);
 		}
 
 		BitMatrix tQ = Q.transpose();
@@ -97,8 +99,8 @@ public class OTExtSender extends OTSender {
 		BigInteger biS = fromBoolArray(s);
 		BigInteger[][] y = new BigInteger[numOfPairs][2];
 		for (int i = 0; i < numOfPairs; i++) {
-		    y[i][0] = Cipher.encrypt(i, tQ.data[i],          new BigInteger(msgPairs[i][0].bytes), msgBitLength);
-		    y[i][1] = Cipher.encrypt(i, tQ.data[i].xor(biS), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
+		    y[i][0] = cipher.encrypt(i, tQ.data[i],          new BigInteger(msgPairs[i][0].bytes), msgBitLength);
+		    y[i][1] = cipher.encrypt(i, tQ.data[i].xor(biS), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
 		}
 	
 		for (int i = 0; i < numOfPairs; i++) {

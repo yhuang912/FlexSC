@@ -22,10 +22,14 @@ public class NPOTReceiver extends OTReceiver {
 	ObjectInputStream ois;
 	ObjectOutputStream oos;
 
+	Cipher cipher;
+	
     public NPOTReceiver(InputStream in, OutputStream out) throws Exception {
     	super(in, out);
     	oos = new ObjectOutputStream(out);
     	ois = new ObjectInputStream(in);
+    	
+    	cipher = new Cipher();
 
         initialize();
     }
@@ -76,7 +80,7 @@ public class NPOTReceiver extends OTReceiver {
         Signal[] data = new Signal[choices.length];
         for (int i = 0; i < choices.length; i++) {
             int sigma = choices[i] ? 1 : 0;
-			data[i] = Signal.newInstance(Cipher.decrypt(keys[i], msg[i][sigma],
+			data[i] = Signal.newInstance(cipher.decrypt(keys[i], msg[i][sigma],
 					msgBitLength).toByteArray());
         }
         return data;

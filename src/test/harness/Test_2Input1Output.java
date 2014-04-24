@@ -92,6 +92,7 @@ public class Test_2Input1Output {
 		tGen.start(); Thread.sleep(5);
 		tEva.start();
 		tGen.join();
+		tEva.join();
 
 		//System.out.println(Arrays.toString(gen.z));
 		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toSignedInt(gen.z));

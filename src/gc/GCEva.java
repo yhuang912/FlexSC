@@ -21,7 +21,8 @@ public class GCEva implements CompEnv<Signal> {
 		this.is = is;
 		this.os = os;
 
-		rcv = new NPOTReceiver(is, os);
+		rcv = new OTExtReceiver(is, os);
+//		rcv = new NPOTReceiver(is, os);
 //		rcv = new FakeOTReceiver(is, os);
 		gb = new Garbler();
 	}
