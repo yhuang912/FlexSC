@@ -12,10 +12,10 @@ import ot.OTExtReceiver;
 import ot.OTExtSender;
 
 public class TestOTExt {
-//	static int n = 100;
-	Signal[] m;
-	boolean c;
-	Signal rcvd;
+	static int n = 12500;
+	Signal[][] m;
+	boolean[] c;
+	Signal[] rcvd;
 	
 	class SenderRunnable extends network.Server implements Runnable {
 		OTExtSender snd;
@@ -26,13 +26,13 @@ public class TestOTExt {
 			try {
 				listen(54321);
 
-				m = new Signal[2];
-//				for (int i = 0; i < n; i++) {
-					m[0] = Signal.freshLabel(rnd);
-					m[1] = Signal.freshLabel(rnd);
-//				}
 				snd = new OTExtSender(80, is, os);
-				snd.send(m);
+				m = new Signal[n][2];
+				for (int i = 0; i < n; i++) {
+					m[i][0] = Signal.freshLabel(rnd);
+					m[i][1] = Signal.freshLabel(rnd);
+					snd.send(m[i]);
+				}
 				
 				disconnect();
 			} catch (Exception e) {
@@ -51,11 +51,13 @@ public class TestOTExt {
 				connect("localhost", 54321);
 				
 				rcv = new OTExtReceiver(is, os);
-//				c = new boolean[n];
+				c = new boolean[n];
+				rcvd = new Signal[n];
 				Random rnd = new Random();
-//				for (int i = 0; i < n; i++)
-					c = rnd.nextBoolean();
-				rcvd = rcv.receive(c);
+				for (int i = 0; i < n; i++) {
+					c[i] = rnd.nextBoolean();
+					rcvd[i] = rcv.receive(c[i]);
+				}
 				
 				disconnect();
 			} catch (Exception e) {
@@ -74,12 +76,8 @@ public class TestOTExt {
 		tRcv.start(); 
 		tSnd.join();
 
-//		for (int i = 0; i < n; i++) {
-//		System.out.println(m[c?1:0].toHexStr());
-//		System.out.println(rcvd.toHexStr());
-//			System.out.println(i);
-			Assert.assertEquals(m[c?1:0], rcvd);
-//		}
+		for (int i = 0; i < n; i++)
+			Assert.assertEquals(m[i][c[i]?1:0], rcvd[i]);
 	}
 
 	@Test

@@ -33,7 +33,7 @@ public class Signal {
 	
 	public boolean isPublic () { return bytes == null; }
 	
-	Signal xor(Signal lb) {
+	public Signal xor(Signal lb) {
 		byte[] nb = new byte[len];
 		for (int i = 0; i < len; i++)
 			nb[i] = (byte) (bytes[i] ^ lb.bytes[i]);
