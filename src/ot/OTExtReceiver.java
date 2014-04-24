@@ -78,15 +78,11 @@ public class OTExtReceiver extends OTReceiver {
 
 		oos.writeObject(cphPairs);
 		oos.flush();
-//		int bytelength;
 
 		BitMatrix tT = T.transpose();
 
 		BigInteger[][] y = new BigInteger[choices.length][2];
-//		bytelength = (msgBitLength - 1) / 8 + 1;
 		for (int i = 0; i < choices.length; i++) {
-//			y[i][0] = Utils.readBigInteger(bytelength, ois);
-//			y[i][1] = Utils.readBigInteger(bytelength, ois);
 			y[i][0] = (BigInteger) ois.readObject();
 			y[i][1] = (BigInteger) ois.readObject();
 		}

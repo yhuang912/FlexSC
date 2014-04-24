@@ -82,7 +82,6 @@ public class OTExtSender extends OTSender {
     		ObjectInputStream ois, ObjectOutputStream oos) throws Exception {
     	BigInteger[][] cphPairs = (BigInteger[][]) ois.readObject();
     	int numOfPairs = msgPairs.length;
-//    	int bytelength;
 
     	BitMatrix Q = new BitMatrix(numOfPairs, SecurityParameter.k1);
 
@@ -102,10 +101,7 @@ public class OTExtSender extends OTSender {
 		    y[i][1] = Cipher.encrypt(i, tQ.data[i].xor(biS), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
 		}
 	
-//		bytelength = (msgBitLength-1)/8 + 1;
 		for (int i = 0; i < numOfPairs; i++) {
-//		    Utils.writeBigInteger(y[i][0], bytelength, oos);
-//		    Utils.writeBigInteger(y[i][1], bytelength, oos);
 			oos.writeObject(y[i][0]);
 			oos.writeObject(y[i][1]);
 		}
