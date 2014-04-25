@@ -4,7 +4,9 @@ import gc.Signal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import oramgc.Block;
+import oramgc.OramParty.BlockInBinary;
 import test.Utils;
 
 
@@ -30,7 +32,7 @@ public class KaiminOramServer extends KaiminOramParty {
 		
 		Block res = lib.readAndRemove(scPath[0], scIden);
 		Block res2 = lib.readAndRemove(scQueue[0], scIden);
-		Block finalRes = lib.mux(res, res2, lib.eq(res.iden, lib.zeros(lengthOfIden)));
+		Block finalRes = lib.mux(res, res2, res.isDummy);
 		
 		if(data == null)
 			scData = finalRes.data;
@@ -48,17 +50,17 @@ public class KaiminOramServer extends KaiminOramParty {
 
 
 	public void dequeue() throws Exception{
-		BlockInBinary[] randomQueue = randomBucket(queueCapacity);
+		//BlockInBinary[] randomQueue = randomBucket(queueCapacity);
 		BlockInBinary[] randomBucket = randomBucket(nodeCapacity);
-		Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
+		//Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
 		Block[][] scTree1 = prepareBlocks(tree[1], tree[1], randomBucket);
 		
 		Block b = lib.pop(scQueue[0]);
 		lib.add(scTree1[0], b);
 		
-		queue = randomQueue;
+		//queue = randomQueue;
 		tree[1] = randomBucket;
-		prepareBlockInBinaries(scQueue[0], scQueue[1]);
+		//prepareBlockInBinaries(scQueue[0], scQueue[1]);
 		prepareBlockInBinaries(scTree1[0], scTree1[1]);
 		
 		flush();
@@ -114,25 +116,50 @@ public class KaiminOramServer extends KaiminOramParty {
 		prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
 	
-	public void read(int pos) throws Exception {
-		read(Utils.fromInt(pos, lengthOfPos));
-	}
-
-	public void write(int pos) throws Exception {
-		write(Utils.fromInt(pos, lengthOfPos));
-	}
-
-	public void read(boolean[] pos) throws Exception {
-		fetch(pos, null);
-		dequeue();
-		dequeue();
+	Block[][] scQueue;
+	Signal[] scIden;
+	BlockInBinary[] randomQueue;
+	public void readAndRemove(boolean[] pos) throws Exception {
+		BlockInBinary[] blocks = flatten(getAPath(pos));
+		BlockInBinary[] randomPath = randomBucket(blocks.length);
+		randomQueue = randomBucket(queueCapacity);
+		Block[][] scPath = prepareBlocks(blocks, blocks, randomPath);
+		scQueue = prepareBlocks(queue, queue, randomQueue);
+		scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		
+		Block res = lib.readAndRemove(scPath[0], scIden);
+		Block res2 = lib.readAndRemove(scQueue[0], scIden);
+		Block finalRes = lib.mux(res, res2, res.isDummy);
+		
+		blocks = randomPath;
+		prepareBlockInBinaries(scPath[0], scPath[1]);
+		putAPath(blocks, pos);
+		outputBlock(finalRes);
 	}
 	
-	public void write(boolean[] pos) throws Exception {
-		fetch(pos, new boolean[lengthOfData]);
+	public void putBack() throws Exception {		
+		Signal[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		Signal[] scData = eva.inputOfGen(new boolean[lengthOfData]);
+				
+		Block b = new Block(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
+
+		lib.add(scQueue[0], b);
+		
 		dequeue();
 		dequeue();
-		System.out.println(eva.nonFreeGate);
+		queue = randomQueue;
+		prepareBlockInBinaries(scQueue[0], scQueue[1]);
+		//queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
+	}	
+	
+	public void access(int pos) throws Exception {
+		readAndRemove(Utils.fromInt(pos, lengthOfPos));
+		putBack();
 	}
+	
+	public void access(boolean[] pos) throws Exception {
+		access(Utils.toInt(pos));
+	}
+
 
 }

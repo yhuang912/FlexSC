@@ -3,16 +3,14 @@ package oramgc.kaiminOram;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-
 import oramgc.Block;
 import oramgc.TreeBasedOramParty;
-import oramgc.OramParty.BlockInBinary;
 
 public abstract class KaiminOramParty extends TreeBasedOramParty {
 	final boolean DEBUG = true;
 	BlockInBinary[] queue;
-	final int queueCapacity = 22;
-	final int tempStashSize = 4;
+	final int queueCapacity = 29;
+	final int tempStashSize = 7;
 	int leafCapacity;
 	int nodeCapacity;
 	public KaiminOramParty(InputStream is, OutputStream os, int N, int dataSize,
@@ -20,11 +18,6 @@ public abstract class KaiminOramParty extends TreeBasedOramParty {
 		super(is, os, N, dataSize, p, nodeCapacity);
 		this.leafCapacity = leafCapacity;
 		this.nodeCapacity = nodeCapacity;
-//		for(int i = this.N/2; i < this.N; ++i) {
-//			tree[i] = new BlockInBinary[leafCapacity];
-//			for(int j = 0; j < leafCapacity; ++j)
-//				tree[i][j] = getDummyBlock();
-//		}
 		
 		if(gen != null) {
 			for(int i = this.N/2; i < this.N; ++i) {

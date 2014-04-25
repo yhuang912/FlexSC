@@ -28,7 +28,7 @@ public class KaiminOramClient extends KaiminOramParty {
 		
 		Block res = lib.readAndRemove(scPath[0], scIden);
 		Block res2 = lib.readAndRemove(scQueue[0], scIden);
-		Block finalRes = lib.mux(res, res2, lib.eq(res.iden, lib.zeros(lengthOfIden)));
+		Block finalRes = lib.mux(res, res2, res.isDummy);
 
 		if(data == null)
 			scData = finalRes.data;
@@ -46,13 +46,13 @@ public class KaiminOramClient extends KaiminOramParty {
 	} 
 
 	public void dequeue() throws Exception{
-		Block[][] scQueue = prepareBlocks(queue, queue, queue);
+		//Block[][] scQueue = prepareBlocks(queue, queue, queue);
 		Block[][] scTree1 = prepareBlocks(tree[1], tree[1], tree[1]);
 		
 		Block b = lib.pop(scQueue[0]);
 		lib.add(scTree1[0], b);
 		
-		queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
+		//queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
 		tree[1] = prepareBlockInBinaries(scTree1[0], scTree1[1]);
 		
 		flush();
@@ -104,25 +104,64 @@ public class KaiminOramClient extends KaiminOramParty {
 		queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
 	
-	public BlockInBinary read(int iden, int pos, int newPos) throws Exception {
-		return read(Utils.fromInt(iden, lengthOfIden), Utils.fromInt(pos, lengthOfPos), Utils.fromInt(newPos, lengthOfPos));
-	}
+	Block[][] scQueue;
+	Signal[] scIden;
+	public boolean[] readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
+		BlockInBinary[] blocks = flatten(getAPath(pos));
+		Block[][] scPath = prepareBlocks(blocks, blocks, blocks);
+		scQueue = prepareBlocks(queue, queue, queue);
+		scIden = gen.inputOfGen(iden);
+		
+		Block res = lib.readAndRemove(scPath[0], scIden);
+		Block res2 = lib.readAndRemove(scQueue[0], scIden);
+		Block finalRes = lib.mux(res, res2, res.isDummy);
 
-	public void write(int iden, int pos, int newPos, boolean[] data) throws Exception {
-		write(Utils.fromInt(iden, lengthOfIden), Utils.fromInt(pos, lengthOfPos), Utils.fromInt(newPos, lengthOfPos),data);
-	}
-
-	public BlockInBinary read(boolean[] iden, boolean[] pos, boolean[] newPos) throws Exception {
-		BlockInBinary result = fetch(iden, pos, newPos, null);
-		dequeue();
-		dequeue();
-		return result;
+		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
+		
+		putAPath(blocks, pos);
+		
+		BlockInBinary r = outputBlock(finalRes);
+		return r.data;
 	}
 	
-	public void write(boolean[] iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception {
-		fetch(iden, pos, newPos, data);
+	public void putBack(boolean[] iden, boolean[] newPos, boolean[] data) throws Exception {
+		Signal[] scNewPos = gen.inputOfGen(newPos);
+		Signal[] scData = gen.inputOfGen(data);
+		Block b = new Block(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
+
+		lib.add(scQueue[0], b);
+		
 		dequeue();
 		dequeue();
+		queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
+	
+	public boolean[] readAndRemove(int iden, boolean[] pos) throws Exception {
+		return readAndRemove(Utils.fromInt(iden, lengthOfIden), pos);
+	}
+	
+	public void putBack(int iden, boolean[] pos, boolean[] data) throws Exception {
+		putBack(Utils.fromInt(iden, lengthOfIden), pos, data);
+	}
+	
+	public boolean[] read(int iden, int pos, int newPos) throws Exception {
+		return read(iden, Utils.fromInt(pos, lengthOfPos), Utils.fromInt(newPos, lengthOfPos));
+	}
+	
+	public void write(int iden, int pos, int newPos, boolean[] data) throws Exception {
+		write(iden, Utils.fromInt(pos, lengthOfPos), Utils.fromInt(newPos, lengthOfPos), data);
+	}
+	
+	public boolean[] read(int iden, boolean[] pos, boolean[] newPos) throws Exception {
+		boolean[] r = readAndRemove(iden, pos);
+		putBack(iden, newPos, r);
+		return r;
+	}
+	
+	public void write(int iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception {
+		readAndRemove(iden, pos);
+		putBack(iden, newPos, data);
+	}
+
 
 }

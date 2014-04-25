@@ -97,7 +97,7 @@ public class TestTrivialOram {
 		tGen.start(); Thread.sleep(10);
 		tEva.start();
 		tGen.join();
-		printTree(gen, eva);
+		//printTree(gen, eva);
 	}
 	
 	public int xor(int a, int b) {

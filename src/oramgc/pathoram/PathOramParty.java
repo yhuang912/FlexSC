@@ -7,7 +7,7 @@ import oramgc.TreeBasedOramParty;
 
 
 public abstract class PathOramParty extends TreeBasedOramParty {
-	final int lengthOfStash = 10;//should be 89 with lambda is 80
+	final int lengthOfStash = 20;//should be 89 with lambda is 80
 	public BlockInBinary[] stash = new BlockInBinary[lengthOfStash];
 	final static int capacity = 4;
 	static byte[] seed = new byte[512];

@@ -3,8 +3,6 @@ package oramgc.kaiminOram;
 import java.security.SecureRandom;
 import org.junit.Assert;
 import org.junit.Test;
-
-import oramgc.OramParty.BlockInBinary;
 import oramgc.OramParty.Party;
 import test.Utils;
 
@@ -14,9 +12,9 @@ public class TestKaiminOram {
 	final int nodeCapacity = 6;
 	final int leafCapacity = 6;
 	int[] posMap = new int[N];
-	int writecount = 1;
-	int readcount = 1;
-	int dataSize = 8;
+	int writecount = N*2;
+	int readcount = N*2;
+	int dataSize = 7;
 	public TestKaiminOram(){
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
@@ -45,26 +43,26 @@ public class TestKaiminOram {
 					idens[i] = new int[leafCapacity];
 				
 				for(int i = 0; i < writecount; ++i) {
-					int element = Math.abs(i % (N-1)) +1;
+					int element = i%N;
 
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					System.out.println(element+" "+oldValue+" "+newValue);
-					data[element] = element;//rng.nextInt(1<<N);
+					data[element] = 2*element+1;
 					client.write(element, oldValue, newValue, Utils.fromInt(data[element], client.lengthOfData));
 					
 					posMap[element] = newValue;
 				}
 
-				for(int i = 1; i < readcount; ++i){
-					int element = i;
+				for(int i = 0; i < readcount; ++i){
+					int element = i%N;
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					
-					BlockInBinary b = client.read(element, oldValue, newValue);
+					boolean[] b = client.read(element, oldValue, newValue);
 					//Assert.assertTrue(Utils.toInt(b.data) == data[element]);
-					if(Utils.toInt(b.data) != data[element]){
-						System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+posMap[element]);
+					if(Utils.toInt(b) != data[element]){
+						System.out.println("inconsistent: "+element+" "+Utils.toInt(b) + " "+data[element]+" "+posMap[element]);
 					}
 					posMap[element] = newValue;
 				}
@@ -114,15 +112,15 @@ public class TestKaiminOram {
 				
 				
 				for(int i = 0; i < writecount; ++i) {
-					int element = Math.abs(i % (N-1)) +1;
+					int element = i%N;
 					int oldValue = posMap[element];
-					server.write(oldValue);
+					server.access(oldValue);
 				}
 
-				for(int i = 1; i < readcount; ++i){
-					int element = i;
+				for(int i = 0; i < readcount; ++i){
+					int element = i%N;
 					int oldValue = posMap[element];
-					server.read(oldValue);
+					server.access(oldValue);
 				}
 				
 				for(int j = 1; j < server.tree.length/2; ++j)

@@ -4,7 +4,6 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
-import oramgc.OramParty.BlockInBinary;
 import oramgc.OramParty.Party;
 import test.Utils;
 
@@ -14,8 +13,8 @@ public class TestPathOram {
 	final int N = 1<<4;
 	final int capacity = 4;
 	int[] posMap = new int[N+1];
-	int writeCount = N;
-	int readCount = 0;//N*2;
+	int writeCount = N*2;
+	int readCount = N*2;
 	int dataSize = 8;
 	public TestPathOram(){
 		SecureRandom rng = new SecureRandom();
@@ -58,7 +57,7 @@ public class TestPathOram {
 					
 					boolean[] b = client.read(element, oldValue, newValue);
 					
-					//Assert.assertTrue(Utils.toInt(b.data) == data[element]);
+					Assert.assertTrue(Utils.toInt(b) == data[element]);
 					if(Utils.toInt(b) != data[element])
 					System.out.println("inconsistent: "+element+" "+Utils.toInt(b) + " "+data[element]+" "+Utils.toInt(b));
 

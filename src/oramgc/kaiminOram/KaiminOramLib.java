@@ -43,8 +43,8 @@ public class KaiminOramLib extends BucketLib {
 		for(int i = 0; i < nodeCapacity; ++i)
 			deepest[i] = deepestLevel(top[i].pos, path, top[i].isDummy);
 		
-		Signal[] maxIden = zeros(lengthOfIden);
-		Signal[] maxdepth = zeros(deepest[0].length);
+		Signal[] maxIden = top[0].iden;
+		Signal[] maxdepth = deepest[0];
 		for(int i = 1; i < nodeCapacity; ++i) {
 			Signal greater = geq(deepest[i], maxdepth);
 			maxIden = mux(maxIden, top[i].iden, greater);
@@ -52,8 +52,6 @@ public class KaiminOramLib extends BucketLib {
 		}
 		
 		Signal cannotPush = leq(maxdepth, toSignals(level-1, maxdepth.length));// deepestlevel is in fact the real depth-1, so we also -1 here.
-		//Signal 
-		//maxIden = mux(maxIden, zeros(lengthOfIden), cannotPush);
 		
 		Block block = conditionalReadAndRemove(top, maxIden, not(cannotPush));
 		
@@ -72,16 +70,13 @@ public class KaiminOramLib extends BucketLib {
 		Signal[] leftCounter = numberOfOnes(leftVector);
 		Signal[] rightCounter = numberOfOnes(rightVector);
 		
-		Signal leftOverflow = geq(leftCounter, toSignals(nodeCapacity/2, leftCounter.length));
-		Signal rightOverflow = geq(rightCounter, toSignals(nodeCapacity/2, rightCounter.length));
+		Signal leftOverflow = not(leq(leftCounter, toSignals(nodeCapacity/2, leftCounter.length)));
+		Signal rightOverflow = not(leq(rightCounter, toSignals(nodeCapacity/2, rightCounter.length)));
+		Signal overflow = or(leftOverflow, rightOverflow);
 		
-		Signal[] toFetchIden = mux(zeros(lengthOfIden), left, leftOverflow);
-		//toFetchIden = mux(toFetchIden, right, rightOverflow);
-		
-		add(tempStash, readAndRemove(top, toFetchIden));
-		
-		toFetchIden = mux(zeros(lengthOfIden), right, rightOverflow);
-		add(tempStash, readAndRemove(top, toFetchIden));
+		Signal[] toFetchIden = mux(right, left, leftOverflow);
+
+		conditionalAdd(tempStash, conditionalReadAndRemove(top, toFetchIden, overflow), overflow);
 		return block;
 	}
 }

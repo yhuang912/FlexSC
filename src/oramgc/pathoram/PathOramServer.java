@@ -68,7 +68,7 @@ public class PathOramServer extends PathOramParty {
 		
 		//for(int i = 0; i < debug.length; ++i)
 		//	eva.outputToGen(debug[i]);
-		System.out.println(eva.nonFreeGate);
+		//System.out.println(eva.nonFreeGate);
 	}
 	BlockInBinary[] randomBucketStash;
 	Block[][] scStash;
@@ -114,7 +114,7 @@ public class PathOramServer extends PathOramParty {
 		
 		//for(int i = 0; i < debug.length; ++i)
 		//	eva.outputToGen(debug[i]);
-		System.out.println(eva.nonFreeGate);
+		//System.out.println(eva.nonFreeGate);
 	}
 	
 	public void access(int pos) throws Exception {

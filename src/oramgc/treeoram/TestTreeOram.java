@@ -11,7 +11,7 @@ import test.Utils;
 
 public class TestTreeOram {
 	final int N =7;
-	final int capacity = 4;
+	final int capacity = 10;
 	int[] posMap = new int[N+1];
 	int writeCount = N*2;
 	int readCount = N*2;
