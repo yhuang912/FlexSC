@@ -7,17 +7,25 @@ import java.io.OutputStream;
 
 import oramgc.Block;
 import oramgc.OramParty;
+import oramgc.OramParty.BlockInBinary;
+import test.Utils;
 
 public class TrivialOramServer extends OramParty {
 	BlockInBinary[] bucket;
 	int capacity;
 	public TrivialOramServer(InputStream is, OutputStream os, int N,
-			int dataSize, int capacity) throws Exception {
-		super(is, os, N, dataSize, OramParty.Party.SERVER);
-		this.capacity = capacity;
+			int dataSize) throws Exception {
+		super(is, os, N, dataSize, OramParty.Party.SERVER, 1);
+		this.capacity = N;
 		bucket = new BlockInBinary[capacity];
-		for(int i = 0; i < bucket.length; ++i)
-			bucket[i] = getDummyBlock();
+		
+		for(int i = 0; i < bucket.length; ++i){
+			bucket[i] = getDummyBlock2();
+		}
+		BlockInBinary[] randomBucket = randomBucket(capacity);
+		Block[][] result = prepareBlocks(bucket, bucket, randomBucket);
+		bucket = randomBucket;
+		prepareBlockInBinaries(result[0], result[1]);
 	}
 	
 	public void add() throws Exception {
@@ -53,7 +61,6 @@ public class TrivialOramServer extends OramParty {
 		Block[] scBlocks = result[0];
 		Block[] scBlocksMask = result[1];
 		Signal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]); 
-		
 		Block res = lib.readAndRemove(scBlocks, scIden);
 		
 		bucket = randomBucket;
@@ -62,7 +69,11 @@ public class TrivialOramServer extends OramParty {
 		return null;		
 	}
 	
-	
-	
-
+	public void access() throws Exception {
+		readAndRemove();
+		add();
+	}
+	public void putBack() throws Exception{
+		add();
+	}
 }

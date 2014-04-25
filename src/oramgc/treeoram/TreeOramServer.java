@@ -4,7 +4,9 @@ import gc.Signal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import oramgc.Block;
+import oramgc.OramParty.BlockInBinary;
 import test.Utils;
 
 public class TreeOramServer extends TreeOramParty {
@@ -69,6 +71,11 @@ public class TreeOramServer extends TreeOramParty {
 	
 	public void access(boolean[] pos) throws Exception {
 		readAndRemove(pos);
+		putBack();
+	}
+	
+	
+	public void putBack() throws Exception {
 		add();
 		evict();
 		evict();

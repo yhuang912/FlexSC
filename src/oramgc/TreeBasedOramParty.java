@@ -11,27 +11,46 @@ public abstract class TreeBasedOramParty extends OramParty {
 	public BlockInBinary[][] tree;
 	protected int capacity;
 	static byte[] seed = new byte[512];
-	
+
 	static {
 		SecureRandom r = new SecureRandom();
 		r.nextBytes(seed);
 	}
 	protected final SecureRandom commonRandom = SecureRandom.getInstance("SHA1PRNG");
-	
+
 	public TreeBasedOramParty(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int capacity) throws Exception {
 		super(is, os, N, dataSize, p);
 		this.capacity = capacity;
-		
+
 		tree  = new BlockInBinary[this.N][capacity];
-		for(int i = 0; i < this.N; ++i) {
-			for(int j = 0; j < capacity; ++j)
-				tree[i][j] = getDummyBlock();
+
+		if(gen != null) {
+
+			for(int i = 0; i < this.N; ++i) {
+				for(int j = 0; j < capacity; ++j)
+					tree[i][j] = getDummyBlock();
+
+				Block[][] result = prepareBlocks(tree[i], tree[i], tree[i]);
+				tree[i] = prepareBlockInBinaries(result[0], result[1]);
+			}
 		}
-		
+		else {
+			for(int i = 0; i < this.N; ++i) {
+				for(int j = 0; j < capacity; ++j)
+					tree[i][j] = getDummyBlock2();
+				
+				BlockInBinary[] randomBucket = randomBucket(capacity);
+				Block[][] result = prepareBlocks(tree[i], tree[i], randomBucket);
+				tree[i] = randomBucket;
+				prepareBlockInBinaries(result[0], result[1]);
+			}
+
+		}
+
 		commonRandom.setSeed(seed);
 	}
-	
+
 	public BlockInBinary[][] getAPath(boolean[] path) {
 		BlockInBinary[][] result = new BlockInBinary[logN][capacity];
 		int index = 1;
@@ -44,7 +63,7 @@ public abstract class TreeBasedOramParty extends OramParty {
 		}
 		return result;
 	}
-	
+
 	public void putAPath(BlockInBinary[] blocks, boolean[] path){
 		int index = 1;
 		tree[index] = Arrays.copyOfRange(blocks, 0, capacity);
@@ -55,7 +74,7 @@ public abstract class TreeBasedOramParty extends OramParty {
 			tree[index] = Arrays.copyOfRange(blocks, i*capacity, (i+1)*capacity);
 		}
 	}
-	
+
 	public Block[] flatten(Block[][] path) {
 		Block[] result = new Block[path.length * path[0].length];
 		int counter = 0;
@@ -64,7 +83,7 @@ public abstract class TreeBasedOramParty extends OramParty {
 				result[counter++] = path[i][j];
 		return result;
 	}
-	
+
 	public BlockInBinary[] flatten(BlockInBinary[][] path) {
 		BlockInBinary[] result = new BlockInBinary[path.length * path[0].length];
 		int counter = 0;

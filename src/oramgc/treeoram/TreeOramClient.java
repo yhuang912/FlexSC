@@ -4,6 +4,7 @@ import gc.Signal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import oramgc.Block;
 import test.Utils;
 
@@ -51,28 +52,45 @@ public class TreeOramClient extends TreeOramParty {
 		tree[index*2] = prepareBlockInBinaries(left[0], left[1]);
 		tree[index*2+1] =prepareBlockInBinaries(right[0], right[1]);
 	}
-	
-	public BlockInBinary read(int iden, int pos, int newPos) throws Exception {
-		return read(Utils.fromInt(iden, lengthOfIden), Utils.fromInt(pos, lengthOfPos), Utils.fromInt(newPos, lengthOfPos));
-	}
 
+	public boolean[] read(int iden, boolean[] pos, boolean[] newPos) throws Exception {
+		boolean[] r = readAndRemove(iden, pos);
+		putBack(iden, newPos, r);
+		return r;
+	}
+	
+	public void write(int iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception {
+		readAndRemove(iden, pos);
+		putBack(iden, newPos, data);
+	}
+	
+	public boolean[] readAndRemove(int iden, boolean[] pos) throws Exception {
+		return readAndRemove(Utils.fromInt(iden, lengthOfIden), pos).data;
+	}
+	
+	public void putBack(int iden, boolean[] pos, boolean[] data) throws Exception {
+		add(new BlockInBinary(Utils.fromInt(iden, lengthOfIden), pos, data, false));
+		evict();
+		evict();
+	}
+	
+	public boolean[] read(int iden, int pos, int newPos) throws Exception {
+		boolean[] r = readAndRemove(iden, pos);
+		putBack(iden, newPos, r);
+		return r;
+	}
+	
 	public void write(int iden, int pos, int newPos, boolean[] data) throws Exception {
-		write(Utils.fromInt(iden, lengthOfIden), Utils.fromInt(pos, lengthOfPos), Utils.fromInt(newPos, lengthOfPos),data);
-	}
-
-	public BlockInBinary read(boolean[] iden, boolean[] pos, boolean[] newPos) throws Exception {
-		BlockInBinary result = readAndRemove(iden, pos);
-		result.pos = newPos;
-		add(result);
-		evict();
-		evict();
-		return result;
+		readAndRemove(iden, pos);
+		putBack(iden, newPos, data);
 	}
 	
-	public void write(boolean[] iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception {
-		BlockInBinary result = readAndRemove(iden, pos);
-		result = new BlockInBinary(iden, newPos, data);
-		add(result);
+	public boolean[] readAndRemove(int iden, int pos) throws Exception {
+		return readAndRemove(Utils.fromInt(iden, lengthOfIden), Utils.fromInt(pos, lengthOfPos)).data;
+	}
+	
+	public void putBack(int iden, int pos, boolean[] data) throws Exception {
+		add(new BlockInBinary(Utils.fromInt(iden, lengthOfIden), Utils.fromInt(pos, lengthOfPos), data, false));
 		evict();
 		evict();
 	}

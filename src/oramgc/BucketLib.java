@@ -15,16 +15,18 @@ public class BucketLib extends BitonicSortLib {
 		this.lengthOfData = lengthOfData;
 		this.lengthOfIden = lengthOfIden;
 		this.lengthOfPos = lengthOfPos;
-		dummyBlock = new Block(zeros(lengthOfIden), zeros(lengthOfPos), zeros(lengthOfData));
+		dummyBlock = new Block(zeros(lengthOfIden), zeros(lengthOfPos), zeros(lengthOfData), SIGNAL_ONE);
 	}
+
 
 	public Block conditionalReadAndRemove(Block[] bucket, Signal[] iden, Signal condition) throws Exception {
 		Block result = dummyBlock;
-		Signal[] targetIden = mux(dummyBlock.iden, iden, condition);
 		for(int i = 0; i < bucket.length; ++i) {
-			Signal match = eq(targetIden, bucket[i].iden);
+			Signal match = eq(iden, bucket[i].iden);
+			match = and(match, not(bucket[i].isDummy));
+			match = and(match, condition);
 			result = mux(result, bucket[i], match);
-			bucket[i] = mux(bucket[i], dummyBlock, match);
+			bucket[i].isDummy = mux(bucket[i].isDummy, SIGNAL_ONE, match);
 		}
 		return result;
 	}
@@ -36,10 +38,11 @@ public class BucketLib extends BitonicSortLib {
 	public void conditionalAdd(Block[] bucket, Block newBlock, Signal condition) throws Exception {
 		Signal added = not(condition);
 		for(int i = 0; i < bucket.length; ++i) {
-			added = or(eq(newBlock.iden, bucket[i].iden), added);
+			Signal match = and( not(bucket[i].isDummy), eq(newBlock.iden, bucket[i].iden) );
+			added = or(match, added);
 		}
 		for(int i = 0; i < bucket.length; ++i) {
-			Signal match = eq(bucket[i].iden, dummyBlock.iden);
+			Signal match = bucket[i].isDummy;
 			Signal shouldAdd = and(not(added), match);
 			added = or(added, shouldAdd);
 			bucket[i] = mux(bucket[i], newBlock, shouldAdd);
@@ -58,59 +61,31 @@ public class BucketLib extends BitonicSortLib {
 		Block result = dummyBlock;
 		Signal poped = not(condition);// condition=T => shouldpop => set to poped;
 		for(int i = 0; i < bucket.length; ++i) {
-			Signal match = not(eq(bucket[i].iden, dummyBlock.iden));
-			Signal shouldPop = and(not(poped), match);
+			Signal notDummy = not(bucket[i].isDummy);
+			Signal shouldPop = and(not(poped), notDummy);
 			poped = or(poped, shouldPop);
 			result = mux(result, bucket[i], shouldPop);
 
-			bucket[i] = mux(bucket[i], dummyBlock, shouldPop);
+			//bucket[i] = mux(bucket[i], dummyBlock, shouldPop);
+			bucket[i].isDummy = mux(bucket[i].isDummy, SIGNAL_ONE, shouldPop);
 		}
 		return result;
 	}
-
-/*	public Block prepareBlock(Block block, Signal[] key, Signal[] nouce) {
-		Signal[] res = AESEnc(nouce, key, dummyBlock.pos.length + dummyBlock.data.length+dummyBlock.iden.length);
-		Block nouceBlock = new Block(Arrays.copyOfRange(res, 0, dummyBlock.iden.length),
-				Arrays.copyOfRange(res, dummyBlock.iden.length, dummyBlock.iden.length+dummyBlock.pos.length),
-				Arrays.copyOfRange(res, dummyBlock.iden.length+dummyBlock.pos.length, 
-						dummyBlock.iden.length+dummyBlock.pos.length+dummyBlock.data.length));
-		return xor(block, nouceBlock);
-	}
-
-	public Block[] prepareBucket(Block[] bucket, Signal[] key, Signal[][] nouce) {
-		Block[] newBucket = new Block[bucket.length];
-		for(int i = 0; i < bucket.length; ++i)
-			newBucket[i] = prepareBlock(bucket[i], key, nouce[i]);
-		return newBucket;
-	}
-
-	void writeBackBlock(Block block, Signal[] nouce, Signal[] key, Block newBlock) {
-		nouce = getRandom(80);
-		Signal[] res = AESEnc(nouce, key, dummyBlock.pos.length + dummyBlock.data.length+dummyBlock.iden.length);
-		Block nouceBlock = new Block(Arrays.copyOfRange(res, 0, dummyBlock.iden.length),
-				Arrays.copyOfRange(res, dummyBlock.iden.length, dummyBlock.iden.length+dummyBlock.pos.length),
-				Arrays.copyOfRange(res, dummyBlock.iden.length+dummyBlock.pos.length, 
-						dummyBlock.iden.length+dummyBlock.pos.length+dummyBlock.data.length));
-		block = xor(newBlock, nouceBlock);
-	}
-	
-	void writeBackBucket(Block[] bucket, Signal[][]nouce, Signal[] key, Block[] newBucket) {
-		for(int i = 0; i < bucket.length; ++i)
-			writeBackBlock(bucket[i], nouce[i], key, newBucket[i]);
-	}*/
 
 	public Block mux(Block a, Block b, Signal choose) throws Exception {
 		Signal[] iden = mux(a.iden, b.iden, choose);
 		Signal[] pos = mux(a.pos, b.pos, choose);
 		Signal[] data = mux(a.data, b.data, choose);
-		return new Block(iden, pos, data);
+		Signal isDummy = mux(a.isDummy, b.isDummy, choose);
+		return new Block(iden, pos, data, isDummy);
 	}
 
 	public Block xor(Block a, Block b) {
 		Signal[] iden = xor(a.iden, b.iden);
 		Signal[] pos = xor(a.pos, b.pos);
 		Signal[] data = xor(a.data, b.data);
-		return new Block(iden, pos, data);
+		Signal isDummy = xor(a.isDummy, b.isDummy);
+		return new Block(iden, pos, data, isDummy);
 	}
 	
 	public Block[] xor(Block[] a, Block[] b) {
@@ -120,5 +95,4 @@ public class BucketLib extends BitonicSortLib {
 			result[i] = xor(a[i], b[i]);
 		return result;
 	}
-
 }

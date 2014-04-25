@@ -2,10 +2,8 @@ package oramgc.pathoram;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Test;
-
 import oramgc.OramParty.BlockInBinary;
 import oramgc.OramParty.Party;
 import test.Utils;
@@ -13,11 +11,11 @@ import test.Utils;
 
 public class TestPathOram {
 	
-	final int N = 1<<10;
+	final int N = 1<<4;
 	final int capacity = 4;
 	int[] posMap = new int[N+1];
-	int writeCount = 1;
-	int readCount = 1;
+	int writeCount = N;
+	int readCount = 0;//N*2;
 	int dataSize = 8;
 	public TestPathOram(){
 		SecureRandom rng = new SecureRandom();
@@ -31,6 +29,7 @@ public class TestPathOram {
 		GenRunnable () {
 		}
 		public int[][] idens;
+		public boolean[][] du;
 		public int[] stash;
 		public void run() {
 			try {
@@ -42,7 +41,7 @@ public class TestPathOram {
 				
 				
 				for(int i = 0; i < writeCount; ++i) {
-					int element = Math.abs(i % (N-1)) +1;
+					int element = i%N;
 
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
@@ -53,27 +52,33 @@ public class TestPathOram {
 				}
 				
 				for(int i = 1; i < readCount; ++i) {
-					int element = i;
+					int element = i%N;
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					
-					BlockInBinary b = client.read(element, oldValue, newValue);
+					boolean[] b = client.read(element, oldValue, newValue);
 					
-					Assert.assertTrue(Utils.toInt(b.data) == data[element]);
-					if(Utils.toInt(b.data) != data[element])
-					System.out.println("inconsistent: "+element+" "+Utils.toInt(b.data) + " "+data[element]+" "+Utils.toInt(b.iden));
+					//Assert.assertTrue(Utils.toInt(b.data) == data[element]);
+					if(Utils.toInt(b) != data[element])
+					System.out.println("inconsistent: "+element+" "+Utils.toInt(b) + " "+data[element]+" "+Utils.toInt(b));
 
 					posMap[element] = newValue;
 				}
 
 				
 				idens = new int[client.tree.length][PATHORAMCAPACITY];
+				du = new boolean[client.tree.length][PATHORAMCAPACITY];
 				for(int j = 1; j < client.tree.length; ++j)
 					for(int i = 0; i < PATHORAMCAPACITY; ++i)
-						idens[j][i]=Utils.toInt(client.tree[j][i].data);
+						idens[j][i]=Utils.toInt(client.tree[j][i].iden);
+				
+				for(int j = 1; j < client.tree.length; ++j)
+					for(int i = 0; i < PATHORAMCAPACITY; ++i)
+						du[j][i]=client.tree[j][i].isDummy;
+				
 				stash = new int[client.stash.length];
 				for(int j = 0; j < client.stash.length; ++j)
-						stash[j]=Utils.toInt(client.stash[j].data);
+						stash[j]=Utils.toInt(client.stash[j].iden);
 				
 				os.flush();
 
@@ -88,6 +93,7 @@ public class TestPathOram {
 	class EvaRunnable extends network.Client implements Runnable {
 
 		public int[][] idens;
+		public boolean[][] du;
 		public int[] stash;
 		EvaRunnable () {
 		}
@@ -98,26 +104,31 @@ public class TestPathOram {
 				PathOramServer server = new PathOramServer(is, os, N, dataSize, Party.SERVER);
 				
 				for(int i = 0; i < writeCount; ++i) {
-					int element = Math.abs(i % (N-1)) +1;
+					int element = i%N;
 					int oldValue = posMap[element];
-					server.write(oldValue);
+					server.access(oldValue);
 				}
 				
 				
 				for(int i = 1; i < readCount; ++i){
-					int element = i;
+					int element = i%N;
 					int oldValue = posMap[element];
-					server.read(oldValue);
+					server.access(oldValue);
 				}
 				
 				idens = new int[server.tree.length][PATHORAMCAPACITY];
+				du = new boolean[server.tree.length][PATHORAMCAPACITY];
 				for(int j = 1; j < server.tree.length; ++j)
 					for(int i = 0; i < PATHORAMCAPACITY; ++i)
-						idens[j][i]=Utils.toInt(server.tree[j][i].data);
+						idens[j][i]=Utils.toInt(server.tree[j][i].iden);
+				
+				for(int j = 1; j < server.tree.length; ++j)
+					for(int i = 0; i < PATHORAMCAPACITY; ++i)
+						du[j][i]=server.tree[j][i].isDummy;
 				
 				stash = new int[server.stash.length];
 				for(int j = 0; j < server.stash.length; ++j)
-					stash[j]=Utils.toInt(server.stash[j].data);
+					stash[j]=Utils.toInt(server.stash[j].iden);
 
 
 				os.flush();
@@ -130,6 +141,28 @@ public class TestPathOram {
 		}
 	}
 
+	public void printTree(GenRunnable gen, EvaRunnable eva) {
+		int k = 1;
+		int i = 1;
+		for(int j = 1; j < gen.idens.length; ++j){
+			System.out.print("[");
+			int[] a = xor(gen.idens[j], eva.idens[j]);
+			boolean[] bb = xor(gen.du[j], eva.du[j]);
+			for(int p = 0; p < eva.idens[j].length; ++p)
+				if(bb[p])
+					System.out.print("d,");
+				else
+					System.out.print(a[p]+",");
+			System.out.print("]");
+			if(i == k ){
+				k = k*2;
+				i = 0;
+				System.out.print("\n");
+			}
+			++i;
+		}
+		System.out.print("\n");
+	}
 	
 	@Test
 	public void runThreads() throws Exception {
@@ -141,18 +174,7 @@ public class TestPathOram {
 		tEva.start();
 		tGen.join();
 		
-		System.out.println(" ");
-		int k = 1;
-		int i = 1;
-		for(int j = 1; j < gen.idens.length; ++j){
-				System.out.print(Arrays.toString(xor(gen.idens[j], eva.idens[j])));
-				if(i == k ){
-					k = k*2;
-					i = 0;
-					System.out.print("\n");
-				}
-				++i;
-		}
+		printTree(gen,eva);
 		System.out.println(Arrays.toString(xor(gen.stash, eva.stash)));
 		System.out.print("\n");
 		System.out.println(Arrays.toString(posMap));

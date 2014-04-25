@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import oramgc.Block;
+import oramgc.OramParty.BlockInBinary;
 import test.Utils;
 
 
@@ -53,11 +54,11 @@ public class PathOramServer extends PathOramParty {
 		if(data != null)
 			scData = eva.inputOfGen(new boolean[lengthOfData]);
 		
-		Block scNewBlock = new Block(scIden, scPos, scData);
-
+		Block scNewBlock = new Block(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		
 		lib.add(scStash[0], scNewBlock);
-		Signal[][] debug = lib.pushDown(scPath[0], scStash[0], pos);
+		//Signal[][] debug = 
+				lib.pushDown(scPath[0], scStash[0], pos);
 		
 		blocks = randomBucket;
 		stash = randomBucketStash;
@@ -65,9 +66,63 @@ public class PathOramServer extends PathOramParty {
 		prepareBlockInBinaries(scStash[0], scStash[1]);
 		putAPath(blocks, pos);
 		
+		//for(int i = 0; i < debug.length; ++i)
+		//	eva.outputToGen(debug[i]);
+		System.out.println(eva.nonFreeGate);
+	}
+	BlockInBinary[] randomBucketStash;
+	Block[][] scStash;
+	Block[][] scPath;
+	BlockInBinary[] randomBucket;
+	Signal[] scIden;
+	Signal[] scPos;
+	boolean[] WorkingPos;
+	public void readAndRemove(boolean[] pos) throws Exception {
+		WorkingPos = pos;
+		//prepare path
+		BlockInBinary[] blocks = flatten(getAPath(pos));
+		randomBucket = randomBucket(blocks.length);
+		scPath = prepareBlocks(blocks, blocks, randomBucket);
+		
+		//prepare stash
+		randomBucketStash = randomBucket(stash.length);
+		scStash = prepareBlocks(stash, stash, randomBucketStash);
+		
+		//prepare newblock
+		scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		
+		Block res = lib.readAndRemove(scPath[0], scIden);
+		outputBlock(res);
+	}
+	
+	public void putBack() throws Exception {
+		boolean[] pos = WorkingPos;
+		scPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		Signal[] scData = eva.inputOfGen(new boolean[lengthOfData]);
+		
+		Block scNewBlock = new Block(scIden, scPos, scData, lib.SIGNAL_ZERO);
+		
+		lib.add(scStash[0], scNewBlock);
+		//Signal[][] debug = 
+				lib.pushDown(scPath[0], scStash[0], pos);
+		
+		BlockInBinary[] blocks = randomBucket;
+		stash = randomBucketStash;
+		prepareBlockInBinaries(scPath[0], scPath[1]);
+		prepareBlockInBinaries(scStash[0], scStash[1]);
+		putAPath(blocks, pos);
 		
 		//for(int i = 0; i < debug.length; ++i)
 		//	eva.outputToGen(debug[i]);
 		System.out.println(eva.nonFreeGate);
+	}
+	
+	public void access(int pos) throws Exception {
+		readAndRemove(Utils.fromInt(pos, lengthOfPos));
+		putBack();
+	}
+	
+	public void access(boolean[] pos) throws Exception {
+		access(Utils.toInt(pos));
 	}
 }

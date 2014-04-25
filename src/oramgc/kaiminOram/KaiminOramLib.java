@@ -25,10 +25,9 @@ public class KaiminOramLib extends BucketLib {
 		return leadingZeros(xored);//incrementByOne(leadingZeros(xored)); 
 	}
 	
-	public Signal[] deepestLevel(Signal[] pos, Signal[] path, Signal[] iden) throws Exception {
+	public Signal[] deepestLevel(Signal[] pos, Signal[] path, Signal isDummy) throws Exception {
 		Signal[] deep = deepestLevel(pos, path);
-		Signal e = eq(iden, zeros(lengthOfIden));
-		return mux(deep, zeros(deep.length), e);
+		return mux(deep, zeros(deep.length), isDummy);
 	}
 	
 	public Block readAndRemove(Block[] path, Signal[] iden) throws Exception {
@@ -42,7 +41,7 @@ public class KaiminOramLib extends BucketLib {
 		//find deepest
 		Signal[][] deepest = new Signal[nodeCapacity][];
 		for(int i = 0; i < nodeCapacity; ++i)
-			deepest[i] = deepestLevel(top[i].pos, path, top[i].iden);
+			deepest[i] = deepestLevel(top[i].pos, path, top[i].isDummy);
 		
 		Signal[] maxIden = zeros(lengthOfIden);
 		Signal[] maxdepth = zeros(deepest[0].length);
@@ -54,16 +53,16 @@ public class KaiminOramLib extends BucketLib {
 		
 		Signal cannotPush = leq(maxdepth, toSignals(level-1, maxdepth.length));// deepestlevel is in fact the real depth-1, so we also -1 here.
 		//Signal 
-		maxIden = mux(maxIden, zeros(lengthOfIden), cannotPush);
+		//maxIden = mux(maxIden, zeros(lengthOfIden), cannotPush);
 		
-		Block block = readAndRemove(top, maxIden);
+		Block block = conditionalReadAndRemove(top, maxIden, not(cannotPush));
 		
 		Signal[] leftVector = zeros(nodeCapacity);
 		Signal[] rightVector = zeros(nodeCapacity);
 		Signal[] left = zeros(lengthOfIden);
 		Signal[] right = zeros(lengthOfIden);
 		for(int i = 0; i < nodeCapacity; ++i) {
-			Signal isDummy = eq(top[i].iden, zeros(lengthOfIden));
+			Signal isDummy = top[i].isDummy;
 			leftVector[i] = and(top[i].pos[lengthOfPos-level], not(isDummy));
 			rightVector[i] = and(not(top[i].pos[lengthOfPos-level]), not(isDummy));
 			left = mux(left, top[i].iden, leftVector[i]);

@@ -1,12 +1,17 @@
 package oramgc.trivialoram;
 
-import oramgc.OramParty.BlockInBinary;
+import org.junit.Assert;
+import org.junit.Test;
 import test.Utils;
 
 
 public class TestTrivialOram {
+	int N = 31;
+	int dataSize = 8;
+	int writeCount = N*2;
+	int readCount = N*2;
 	class GenRunnable extends network.Server implements Runnable {
-		BlockInBinary[] b;
+		public int[] idens;
 		GenRunnable () {
 		}
 
@@ -14,28 +19,26 @@ public class TestTrivialOram {
 			try {
 				listen(54321);
 
-				TrivialOramClient client = new TrivialOramClient(is, os, 4, 10, 5);
+				TrivialOramClient client = new TrivialOramClient(is, os, N, dataSize);
 				
 
-				client.add(client.new BlockInBinary(Utils.fromInt(1, client.lengthOfIden), 
-						Utils.fromInt(1, client.lengthOfPos),
-						Utils.fromInt(1, client.lengthOfData)));
+				for(int i = 0; i < writeCount; ++i) {
+					int element = i%N;
+					client.write(element, Utils.fromInt(2*element, client.lengthOfData));
+				}
 
-				client.add(client.new BlockInBinary(Utils.fromInt(2, client.lengthOfIden), 
-						Utils.fromInt(1, client.lengthOfPos),
-						Utils.fromInt(1, client.lengthOfData)));
+				for(int i = 1; i < readCount; ++i){
+					int element = i%N;
+					boolean[] b = client.read(element);
+					Assert.assertTrue(Utils.toInt(b) == 2*element);
+					if(Utils.toInt(b) != 2*element)
+						System.out.println("inconsistent: "+element+" "+Utils.toInt(b));
+				}
+
+				idens = new int[N];
+				for(int i = 0; i < N; ++i)
+					idens[i]=Utils.toInt( new boolean[]{client.bucket[i].isDummy});
 				
-				BlockInBinary r = client.pop();
-				System.out.println("poped:"+Utils.toInt(r.iden));
-				
-				client.add(client.new BlockInBinary(Utils.fromInt(3, client.lengthOfIden), 
-						Utils.fromInt(1, client.lengthOfPos),
-						Utils.fromInt(1, client.lengthOfData)));
-				
-				 r = client.readAndRemove(Utils.fromInt(3, client.lengthOfIden));
-				System.out.println("readandremove:"+Utils.toInt(r.iden));
-				
-				b = client.blocks;
 				os.flush();
 
 				disconnect();
@@ -47,22 +50,27 @@ public class TestTrivialOram {
 	}
 
 	class EvaRunnable extends network.Client implements Runnable {
-		BlockInBinary[] b;
+		public int[] idens;
 		EvaRunnable () {
 		}
 
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				TrivialOramServer server = new TrivialOramServer(is, os, 4, 10, 5);
+				TrivialOramServer server = new TrivialOramServer(is, os, N, dataSize);
 				System.out.flush();
 				
-				server.add();
-				server.add();
-				server.pop();
-				server.add();
-				server.readAndRemove();
-				b = server.bucket;
+				for(int i = 0; i < writeCount; ++i) {
+					server.access();
+				}
+
+				for(int i = 1; i < readCount; ++i){
+					server.access();
+				}
+
+				idens = new int[N];
+				for(int i = 0; i < N; ++i)
+					idens[i]=Utils.toInt( new boolean[]{server.bucket[i].isDummy});
 
 				os.flush();
 
@@ -74,7 +82,13 @@ public class TestTrivialOram {
 		}
 	}
 
-	
+	public void printTree(GenRunnable gen, EvaRunnable eva) {
+		for(int j = 1; j < gen.idens.length; ++j){
+			System.out.print(xor(gen.idens[j], eva.idens[j]));
+		}
+		System.out.print("\n");
+	}
+	@Test
 	public void runThreads() throws Exception {
 		GenRunnable gen = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
@@ -83,26 +97,12 @@ public class TestTrivialOram {
 		tGen.start(); Thread.sleep(10);
 		tEva.start();
 		tGen.join();
-
-		for(int i = 0; i < gen.b.length; ++i) {
-			boolean[] tmp = xor(gen.b[i].iden, eva.b[i].iden);
-			System.out.println(Utils.toInt(tmp));
-		}
+		printTree(gen, eva);
 	}
 	
-	public boolean[] xor(boolean[]a, boolean[] b) {
-		boolean[] res = new boolean[a.length];
-		for(int i = 0; i <res.length; ++i)
-			res[i] = a[i]^b[i];
-		return res;
+	public int xor(int a, int b) {
+		return a ^ b;
 		
 	}
-	
-	public static void main(String [ ] args) throws Exception{
-		TestTrivialOram t = new TestTrivialOram();
-		t.runThreads();
-	}
-
-	
 
 }

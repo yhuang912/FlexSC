@@ -3,14 +3,16 @@ package oramgc.kaiminOram;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+
 import oramgc.Block;
 import oramgc.TreeBasedOramParty;
+import oramgc.OramParty.BlockInBinary;
 
 public abstract class KaiminOramParty extends TreeBasedOramParty {
 	final boolean DEBUG = true;
 	BlockInBinary[] queue;
-	final int queueCapacity = 100;
-	final int tempStashSize = 5;
+	final int queueCapacity = 22;
+	final int tempStashSize = 4;
 	int leafCapacity;
 	int nodeCapacity;
 	public KaiminOramParty(InputStream is, OutputStream os, int N, int dataSize,
@@ -18,14 +20,51 @@ public abstract class KaiminOramParty extends TreeBasedOramParty {
 		super(is, os, N, dataSize, p, nodeCapacity);
 		this.leafCapacity = leafCapacity;
 		this.nodeCapacity = nodeCapacity;
-		for(int i = this.N/2; i < this.N; ++i) {
-			tree[i] = new BlockInBinary[leafCapacity];
-			for(int j = 0; j < leafCapacity; ++j)
-				tree[i][j] = getDummyBlock();
+//		for(int i = this.N/2; i < this.N; ++i) {
+//			tree[i] = new BlockInBinary[leafCapacity];
+//			for(int j = 0; j < leafCapacity; ++j)
+//				tree[i][j] = getDummyBlock();
+//		}
+		
+		if(gen != null) {
+			for(int i = this.N/2; i < this.N; ++i) {
+				tree[i] = new BlockInBinary[leafCapacity];
+				for(int j = 0; j < leafCapacity; ++j)
+					tree[i][j] = getDummyBlock();
+				
+				Block[][] result = prepareBlocks(tree[i], tree[i], tree[i]);
+				tree[i] = prepareBlockInBinaries(result[0], result[1]);
+			}
 		}
+		else {
+			for(int i = this.N/2; i < this.N; ++i) {
+				tree[i] = new BlockInBinary[leafCapacity];
+				for(int j = 0; j < leafCapacity; ++j)
+					tree[i][j] = getDummyBlock2();
+				
+				BlockInBinary[] randomBucket = randomBucket(leafCapacity);
+				Block[][] result = prepareBlocks(tree[i], tree[i], randomBucket);
+				tree[i] = randomBucket;
+				prepareBlockInBinaries(result[0], result[1]);			
+			}
+
+		}
+		
 		queue = new BlockInBinary[queueCapacity];
-		for(int i = 0; i < queueCapacity; ++i)
-			queue[i] = getDummyBlock();
+		if(gen != null) {
+			for(int i = 0; i < queue.length; ++i) 
+				queue[i] = getDummyBlock();
+				Block[][] result = prepareBlocks(queue, queue, queue);
+				queue = prepareBlockInBinaries(result[0], result[1]);
+		}
+		else {
+			for(int i = 0; i < queue.length; ++i) 
+				queue[i] = getDummyBlock2();	
+				BlockInBinary[] randomBucket = randomBucket(queueCapacity);
+				Block[][] result = prepareBlocks(queue, queue, randomBucket);
+				queue = randomBucket;
+				prepareBlockInBinaries(result[0], result[1]);
+		}
 	}
 	
 	public void flush() throws Exception{

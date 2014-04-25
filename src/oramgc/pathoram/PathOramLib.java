@@ -2,6 +2,7 @@ package oramgc.pathoram;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
+
 import oramgc.Block;
 import oramgc.BucketLib;
 import flexsc.CompEnv;
@@ -21,23 +22,17 @@ public class PathOramLib extends BucketLib {
 	
 	public Signal[] deepestLevel(Signal[] pos, Signal[] path) throws Exception {
 		Signal[] xored = xor(pos, path);
-		/*return padSignal(
-				incrementByOne(
-				leadingZeros(xored))
-				, lengthOfPos+1);
-				*/
 		
 		return padSignal(
 				leadingZeros(padSignal(xored, xored.length+1))
 				, lengthOfPos+1);
 		
 	}
-	
-	public Signal[] deepestLevel(Signal[] pos, Signal[] path, Signal[] iden) throws Exception {
+		
+	public Signal[] deepestLevel(Signal[] pos, Signal[] path, Signal isDummy) throws Exception {
 		Signal[] depth = deepestLevel(pos, path);
-		Signal e = eq(iden, zeros(lengthOfIden));
-		return mux(depth, zeros(depth.length), e);
-	}
+		return mux(depth, zeros(depth.length), isDummy);
+	}	
 	
 	public Block readAndRemove(Block[] path, Signal[] iden) throws Exception {
 		return super.readAndRemove(path, iden);
@@ -45,14 +40,17 @@ public class PathOramLib extends BucketLib {
 	public Block toBlock(Signal[] b){
 		return new Block(Arrays.copyOfRange(b, 0, lengthOfIden), 
 				Arrays.copyOfRange(b, lengthOfIden, lengthOfIden+lengthOfPos),
-				Arrays.copyOfRange(b, lengthOfIden+lengthOfPos, lengthOfIden+lengthOfPos+lengthOfData));
+				Arrays.copyOfRange(b, lengthOfIden+lengthOfPos, lengthOfIden+lengthOfPos+lengthOfData),
+				b[b.length-1]
+				);
 	}
 	
 	public Signal[] toSignals(Block b) {
-		Signal[] res = new Signal[lengthOfIden+lengthOfPos+b.data.length];
+		Signal[] res = new Signal[lengthOfIden+lengthOfPos+b.data.length+1];
 		System.arraycopy(b.iden, 0, res, 0, lengthOfIden);
 		System.arraycopy(b.pos, 0, res, lengthOfIden, lengthOfPos);
 		System.arraycopy(b.data, 0, res, lengthOfIden+lengthOfPos,lengthOfData);
+		res[res.length-1] = b.isDummy;
 		return res;
 	}
 	
@@ -88,7 +86,7 @@ public class PathOramLib extends BucketLib {
 			deepestLevel[i] = deepestLevel(
 						Arrays.copyOfRange(blockInSignal[i], lengthOfIden, lengthOfIden + lengthOfPos),
 						posInSignal,
-						Arrays.copyOfRange(blockInSignal[i], 0, lengthOfIden) );
+						blockInSignal[i][blockInSignal[i].length-1] );
 		
 		sortWithPayload(deepestLevel, blockInSignal, SIGNAL_ZERO);
 		blockInSignal = pushDownHelp(deepestLevel, blockInSignal);
@@ -103,8 +101,10 @@ public class PathOramLib extends BucketLib {
 		
 		Signal[][] extended = new Signal[blockInSignal.length+capacity*logN][blockInSignal[0].length];
 		System.arraycopy(blockInSignal, 0, extended, 0, blockInSignal.length);
-		for(int i = 0; i < capacity*logN; ++i)
+		for(int i = 0; i < capacity*logN; ++i){
 			extended[blockInSignal.length+i] = zeros(blockInSignal[0].length);
+			extended[blockInSignal.length+i][extended[blockInSignal.length+i].length-1] = SIGNAL_ONE;
+		}
 		
 		Signal[][] extendedKey = new Signal[blockInSignal.length+capacity*logN][];
 		System.arraycopy(key, 0, extendedKey, 0, blockInSignal.length);
@@ -116,7 +116,7 @@ public class PathOramLib extends BucketLib {
 		
 		for(int i = 0; i < extendedKey.length-1; ++i) {
 			Signal eqSignal = eq(extendedKey[i], extendedKey[i+1]);
-			Signal iIsDummy = eq(Arrays.copyOfRange(extended[i], 0, lengthOfIden), zeros(lengthOfIden));
+			Signal iIsDummy = extended[i][extended[i].length-1];//eq(Arrays.copyOfRange(extended[i], 0, lengthOfIden), zeros(lengthOfIden));
 			extendedKey[i] = mux(extendedKey[i], zeros(width+2), and(eqSignal, iIsDummy));
 			extendedKey[i+1] = mux(extendedKey[i+1], zeros(width+2), and(eqSignal, not(iIsDummy)));
 		}

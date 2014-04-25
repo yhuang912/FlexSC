@@ -35,7 +35,7 @@ public class KaiminOramServer extends KaiminOramParty {
 		if(data == null)
 			scData = finalRes.data;
 		
-		Block b = new Block(scIden, scNewPos, scData);
+		Block b = new Block(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 
 		lib.add(scQueue[0], b);
 		blocks = randomPath;
