@@ -1,15 +1,13 @@
 package oramgc;
 
-import gc.GCSignal;
+public class Block<T> {
 
-public class Block {
-
-	public GCSignal[] iden;
-	public GCSignal[] pos;
-	public GCSignal[] data;
-	public GCSignal isDummy;
+	public T[] iden;
+	public T[] pos;
+	public T[] data;
+	public T isDummy;
 	
-	public Block(GCSignal[] iden, GCSignal[] pos, GCSignal[] data, GCSignal isDummy) {
+	public Block(T[] iden, T[] pos, T[] data, T isDummy) {
 		this.iden = iden;
 		this.pos = pos;
 		this.data = data;

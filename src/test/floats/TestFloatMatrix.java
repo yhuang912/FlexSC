@@ -5,6 +5,7 @@ import java.util.Random;
 import objects.Float.Representation;
 import gc.GCEva;
 import gc.GCGen;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -27,8 +28,8 @@ public class TestFloatMatrix {
 			try {
 				listen(54321);
 				GCGen gen = new GCGen(is, os);
-				
-				Representation[][] m = new Representation[f.length][f[0].length];
+				FloatMatrixLib<GCSignal> lib = new FloatMatrixLib<GCSignal>(gen);
+				Representation<GCSignal>[][] m = lib.representationMatrix(f.length, f[0].length);
 				
 				for(int i = 0; i < f.length; ++i){
 					for(int j = 0; j < f[0].length; ++j)
@@ -38,31 +39,8 @@ public class TestFloatMatrix {
 							m[i][j] = gen.inputOfEva(lengthv, lengthp);
 							
 				}
-								
-//				GCFloat[][] m2 = new GCFloat[f.length][f[0].length];
-//				for(int i = 0; i < f.length; ++i)
-//					for(int j = 0; j < f[0].length; ++j)
-//						m2[i][j] = m[i][j].toGCFloat();
-//				
 				
-				/*
-				GCFloat res = new FloatMatrixLib(gen).determinant(m);//createSubMatrix(m, 0, 0);
-				os.flush();
-				
-				boolean[] bv = new boolean[res.v.length];
-				boolean[] bp = new boolean[res.p.length];
-				for (int i = 0; i < lengthv; i++)
-					bv[i] = gen.outputToGen(res.v[i]);
-				for (int i = 0; i < lengthp; i++)
-					bp[i] = gen.outputToGen(res.p[i]);
-				boolean bs = gen.outputToGen(res.s);
-				boolean bz = gen.outputToGen(res.z);		
-		
-				Float result = new Float(bv,bp,bs,bz);
-				System.out.print(result.toDouble()+" ");
-				*/
-				
-				Representation[][] res = new FloatMatrixLib(gen).rref(m);	//createSubMatrix(m, 0, 0);
+				Representation<GCSignal>[][] res = lib.rref(m);	//createSubMatrix(m, 0, 0);
 				double[][] r = new double[res.length][res[0].length];
 				for(int i = 0 ; i < r.length; ++i)
 					for(int j = 0; j < r[0].length; ++j)
@@ -97,7 +75,9 @@ public class TestFloatMatrix {
 			try {
 				connect("localhost", 54321);
 				GCEva eva = new GCEva(is, os);
-				Representation[][] m = new Representation[f.length][f[0].length];
+				FloatMatrixLib<GCSignal> lib = new FloatMatrixLib<GCSignal>(eva);
+				Representation<GCSignal>[][] m = lib.representationMatrix(f.length, f[0].length);
+
 				
 				for(int i = 0; i < f.length; ++i){
 					for(int j = 0; j < f[0].length; ++j)
@@ -107,25 +87,8 @@ public class TestFloatMatrix {
 							m[i][j] = eva.inputOfGen(lengthv, lengthp);
 							
 				}
-				
-				/*
-				GCFloat res = new FloatMatrixLib(gen).determinant(m);//createSubMatrix(m, 0, 0);
-				os.flush();
-				
-				boolean[] bv = new boolean[res.v.length];
-				boolean[] bp = new boolean[res.p.length];
-				for (int i = 0; i < lengthv; i++)
-					bv[i] = gen.outputToGen(res.v[i]);
-				for (int i = 0; i < lengthp; i++)
-					bp[i] = gen.outputToGen(res.p[i]);
-				boolean bs = gen.outputToGen(res.s);
-				boolean bz = gen.outputToGen(res.z);		
-		
-				Float result = new Float(bv,bp,bs,bz);
-				System.out.print(result.toDouble()+" ");
-				*/
-				
-				Representation[][] res = new FloatMatrixLib(eva).rref(m);  //createSubMatrix(m, 0, 0);
+
+				Representation<GCSignal>[][] res = lib.rref(m);  //createSubMatrix(m, 0, 0);
 				
 				for(int i = 0 ; i < res.length; ++i)
 					for(int j = 0; j < res[0].length; ++j)

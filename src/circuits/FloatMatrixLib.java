@@ -9,10 +9,19 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		super(e);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public Representation<T>[] representationArray(int len) {
+		return new Representation[len];
+	}
+	
+	public Representation<T>[][] representationMatrix(int len1, int len2) {
+		return new Representation[len1][len2];
+	}
+	
 	public Representation<T>[][] add(Representation<T>[][] a, Representation<T>[][] b) throws Exception {
 		int n = a.length;
 		int m = a[0].length;
-		Representation<T> result[][] = new Representation<T>[n][m];
+		Representation<T> result[][] = representationMatrix(n, m);//new Representation[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j)
 				result[i][j] = add(a[i][j], b[i][j]);
@@ -23,7 +32,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		int n = a.length;
 		int m = a[0].length;
 		int l = b[0].length;
-		Representation<T> result[][] = new Representation<T>[n][m];
+		Representation<T> result[][] = representationMatrix(n, m);
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < l; ++l) {
 				result[i][j] = multiply(a[i][0], b[0][l]);
@@ -36,7 +45,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 	public Representation<T>[][] transpose(Representation<T>[][] a){
 		int n = a.length;
 		int m = a[0].length;
-		Representation<T> result[][] = new Representation<T>[n][m];
+		Representation<T> result[][] = representationMatrix(n, m);
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j)
 				result[i][j] = a[j][i];
@@ -46,7 +55,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 	public Representation<T>[][] xor(Representation<T>[][] a, Representation<T>[][] b){
 		int n = a.length;
 		int m = a[0].length;
-		Representation<T> result[][] = new Representation<T>[n][m];
+		Representation<T> result[][] = representationMatrix(n, m);
 		for(int i = 0; i < a.length; ++i)
 			for(int j = 0; j < a[i].length; ++j)
 				result[i][j] = xor(a[i][j], b[i][j]);
@@ -76,7 +85,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		int n = a.length;
 		int m = a[0].length;
 		int r = -1;
-		Representation<T> result[][] = new Representation<T>[n-1][m-1];
+		Representation<T> result[][] = representationMatrix(n, m);
 		for(int i = 0; i < n; ++i){
 			if(i == row)continue;
 			
@@ -105,7 +114,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 	public Representation<T>[][] cofactor(Representation<T>[][] a) throws Exception  {
 		int n = a.length;
 		int m = a[0].length;
-		Representation<T>[][] result = new Representation<T>[n][m];
+		Representation<T> result[][] = representationMatrix(n, m);
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j){
 				Representation<T> tmp = determinant(createSubMatrix(a, i, j));
@@ -118,7 +127,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 	
 	public Representation<T>[][] fastInverse(Representation<T>[][] m) throws Exception {
 		int dimension = m.length;
-		Representation<T>[][] extended = new Representation<T>[dimension][2*dimension];
+		Representation<T>[][] extended = representationMatrix(dimension, 2*dimension);
 		Representation<T> zeroFloat = publicFloat(0, m[0][0].v.length, m[0][0].p.length);
 		Representation<T> oneFloat = publicFloat(1, m[0][0].v.length, m[0][0].p.length);
 		for(int i = 0 ; i < dimension; ++i){
@@ -129,7 +138,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 			extended[i][dimension+i] = oneFloat;
 		}
 		extended = rref(extended);
-		Representation<T>[][] result = new Representation<T>[dimension][dimension];
+		Representation<T>[][] result = representationMatrix(dimension, dimension);
 		for(int i = 0 ; i < dimension; ++i) {
 			for(int j = 0; j < dimension; ++j)
 				result[i][j] = extended[i][dimension+j];
@@ -138,7 +147,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 	}
 	
 	public Representation<T>[][] rref(Representation<T>[][] m) throws Exception {
-		Representation<T>[][] result = new Representation<T>[m.length][m[0].length];
+		Representation<T>[][] result = representationMatrix(m.length, m[0].length);
 		for (int r = 0; r < m.length; ++r)
 	        for (int c = 0; c < m[r].length; ++c)
 	            result[r][c] = m[r][c];

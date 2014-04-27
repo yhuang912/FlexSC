@@ -40,8 +40,8 @@ public class TestDFT {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				Representation<GCSignal>[] fgc1 =new Representation<GCSignal>[h.a.length];
-				Representation<GCSignal>[] fgc2 =new Representation<GCSignal>[h.b.length];
+				Representation<GCSignal>[] fgc1 = new Representation[h.a.length];
+				Representation<GCSignal>[] fgc2 = new Representation[h.b.length];
 				
 				for(int i = 0; i < fgc1.length; ++i)
 					fgc1[i] = gen.inputOfGen(h.a[i], 23, 9);
@@ -80,8 +80,8 @@ public class TestDFT {
 
 				GCEva eva = new GCEva(is, os);
 
-				Representation<GCSignal>[] fgc1 = new Representation<GCSignal>[h.a.length];
-				Representation<GCSignal>[] fgc2 = new Representation<GCSignal>[h.b.length];
+				Representation<GCSignal>[] fgc1 = new Representation[h.a.length];
+				Representation<GCSignal>[] fgc2 = new Representation[h.b.length];
 				for(int i = 0; i < fgc1.length; ++i)
 					fgc1[i] = eva.inputOfGen(23, 9);
 				for(int i = 0; i < fgc2.length; ++i)

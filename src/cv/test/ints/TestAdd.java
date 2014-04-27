@@ -1,12 +1,7 @@
 package cv.test.ints;
 
 import java.util.Random;
-
-import flexsc.CompEnv;
-
 import org.junit.Test;
-
-import test.Utils;
 import cv.CVCompEnv;
 import cv.test.harness.Test_2Input1Output;
 import circuits.IntegerLib;

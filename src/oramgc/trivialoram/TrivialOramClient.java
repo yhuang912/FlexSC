@@ -21,7 +21,7 @@ public class TrivialOramClient extends OramParty {
 		for(int i = 0; i < bucket.length; ++i){
 			bucket[i] = getDummyBlock();
 		}
-		Block[][] result = prepareBlocks(bucket, bucket, bucket);
+		Block<GCSignal>[][] result = prepareBlocks(bucket, bucket, bucket);
 		bucket = prepareBlockInBinaries(result[0], result[1]);
 	}
 	
