@@ -110,7 +110,7 @@ public class TestLeadingZeros {
 			runThreads(
 				new Helper(rnd.nextLong()) {
 					GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
-						return new IntegerLib(e).leadingZeros(Signala);
+						return new IntegerLib<GCSignal>(e).leadingZeros(Signala);
 					}
 
 					int plainCompute(long x) {

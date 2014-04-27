@@ -24,7 +24,7 @@ public class TestBigIntegerKaratsubaMultiply extends TestBigInteger {
 				//System.out.println(b);
 				runThreads(new Helper(a, b ) {
 					public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
-						return new IntegerLib(e).karatsubaMultiply(Signala ,Signalb);}
+						return new IntegerLib<GCSignal>(e).karatsubaMultiply(Signala ,Signalb);}
 
 					@Override
 					public BigInteger plainCompute(BigInteger x, BigInteger y) {

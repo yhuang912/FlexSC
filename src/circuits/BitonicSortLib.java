@@ -1,19 +1,18 @@
 package circuits;
 
 import flexsc.CompEnv;
-import gc.GCSignal;
 
-public class BitonicSortLib extends IntegerLib
+public class BitonicSortLib<T> extends IntegerLib<T>
 {
-    public BitonicSortLib(CompEnv<GCSignal> e) {
+    public BitonicSortLib(CompEnv<T> e) {
 		super(e);
 	}
 
-    public void sortWithPayload(GCSignal[][] a, GCSignal[][] data, GCSignal isAscending) throws Exception {
+    public void sortWithPayload(T[][] a, T[][] data, T isAscending) throws Exception {
         bitonicSortWithPayload(a, data, 0, a.length, isAscending);
     }
 
-    private void bitonicSortWithPayload(GCSignal[][]key, GCSignal[][] data, int lo, int n, GCSignal dir) throws Exception {
+    private void bitonicSortWithPayload(T[][]key, T[][] data, int lo, int n, T dir) throws Exception {
         if (n > 1) {
             int m=n/2;
             bitonicSortWithPayload(key, data, lo, m, not(dir));
@@ -22,7 +21,7 @@ public class BitonicSortLib extends IntegerLib
         }
     }
 
-    private void bitonicMergeWithPayload(GCSignal[][] key, GCSignal[][] data, int lo, int n, GCSignal dir) throws Exception {
+    private void bitonicMergeWithPayload(T[][] key, T[][] data, int lo, int n, T dir) throws Exception {
         if (n > 1) {
             int m=greatestPowerOfTwoLessThan(n);
             for (int i = lo; i < lo + n - m; i++)
@@ -32,26 +31,26 @@ public class BitonicSortLib extends IntegerLib
         }
     }
 
-    private void compareWithPayload(GCSignal[][] key, GCSignal[][] data, int i, int j, GCSignal dir) throws Exception {
-    	GCSignal greater = not(leq(key[i], key[j]));
-    	GCSignal swap = eq(greater, dir);
-    	GCSignal[] ki = mux(key[i], key[j], swap);
-    	GCSignal[] kj = mux(key[j], key[i], swap);
+    private void compareWithPayload(T[][] key, T[][] data, int i, int j, T dir) throws Exception {
+    	T greater = not(leq(key[i], key[j]));
+    	T swap = eq(greater, dir);
+    	T[] ki = mux(key[i], key[j], swap);
+    	T[] kj = mux(key[j], key[i], swap);
     	key[i] = ki;
     	key[j] = kj;
     	
-    	GCSignal[] di = mux(data[i], data[j], swap);
-    	GCSignal[] dj = mux(data[j], data[i], swap);
+    	T[] di = mux(data[i], data[j], swap);
+    	T[] dj = mux(data[j], data[i], swap);
     	data[i] = di;
     	data[j] = dj;
     }
  
     
-    public void sort(GCSignal[][] a, GCSignal isAscending) throws Exception {
+    public void sort(T[][] a, T isAscending) throws Exception {
         bitonicSort(a, 0, a.length, isAscending);
     }
 
-    private void bitonicSort(GCSignal[][]key, int lo, int n, GCSignal dir) throws Exception {
+    private void bitonicSort(T[][]key, int lo, int n, T dir) throws Exception {
         if (n > 1) {
             int m=n/2;
             bitonicSort(key, lo, m, not(dir));
@@ -60,7 +59,7 @@ public class BitonicSortLib extends IntegerLib
         }
     }
 
-    private void bitonicMerge(GCSignal[][] key, int lo, int n, GCSignal dir) throws Exception {
+    private void bitonicMerge(T[][] key, int lo, int n, T dir) throws Exception {
         if (n > 1) {
             int m=greatestPowerOfTwoLessThan(n);
             for (int i = lo; i < lo + n - m; i++)
@@ -70,11 +69,11 @@ public class BitonicSortLib extends IntegerLib
         }
     }
 
-    private void compare(GCSignal[][] key, int i, int j, GCSignal dir) throws Exception {
-    	GCSignal greater = not(leq(key[i], key[j]));
-    	GCSignal swap = eq(greater, dir);
-    	GCSignal[] ki = mux(key[i], key[j], swap);
-    	GCSignal[] kj = mux(key[j], key[i], swap);
+    private void compare(T[][] key, int i, int j, T dir) throws Exception {
+    	T greater = not(leq(key[i], key[j]));
+    	T swap = eq(greater, dir);
+    	T[] ki = mux(key[i], key[j], swap);
+    	T[] kj = mux(key[j], key[i], swap);
     	key[i] = ki;
     	key[j] = kj;
     }

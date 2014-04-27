@@ -6,7 +6,6 @@ import flexsc.CompEnv;
 import gc.GCSignal;
 import org.junit.Test;
 import test.harness.TestFixedPoint;
-import test.harness.TestFloat;
 import circuits.FixedPointLib;
 
 
@@ -24,7 +23,7 @@ public class TestFixedPointDivide extends TestFixedPoint {
 				
 				@Override
 				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b, int offset, CompEnv<GCSignal> env) throws Exception {
-					return new FixedPointLib(env).divide(a, b, offset);
+					return new FixedPointLib<GCSignal>(env).divide(a, b, offset);
 				}
 				
 				@Override

@@ -23,7 +23,7 @@ public class TestDFT {
 			this.b = b;
 			this.a = a;
 		}
-		abstract void secureCompute(Representation[] a, Representation[] b, CompEnv<GCSignal> env) throws Exception;
+		abstract void secureCompute(Representation<GCSignal>[] a, Representation<GCSignal>[] b, CompEnv<GCSignal> env) throws Exception;
 		abstract void plainCompute(double a[], double b[]);
 	}
 	
@@ -40,8 +40,8 @@ public class TestDFT {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				Representation[] fgc1 =new Representation[h.a.length];
-				Representation[] fgc2 =new Representation[h.b.length];
+				Representation<GCSignal>[] fgc1 =new Representation<GCSignal>[h.a.length];
+				Representation<GCSignal>[] fgc2 =new Representation<GCSignal>[h.b.length];
 				
 				for(int i = 0; i < fgc1.length; ++i)
 					fgc1[i] = gen.inputOfGen(h.a[i], 23, 9);
@@ -80,8 +80,8 @@ public class TestDFT {
 
 				GCEva eva = new GCEva(is, os);
 
-				Representation[] fgc1 = new Representation[h.a.length];
-				Representation[] fgc2 = new Representation[h.b.length];
+				Representation<GCSignal>[] fgc1 = new Representation<GCSignal>[h.a.length];
+				Representation<GCSignal>[] fgc2 = new Representation<GCSignal>[h.b.length];
 				for(int i = 0; i < fgc1.length; ++i)
 					fgc1[i] = eva.inputOfGen(23, 9);
 				for(int i = 0; i < fgc2.length; ++i)
@@ -142,9 +142,9 @@ public class TestDFT {
 			runThreads(new Helper(real, img) {
 
 				@Override
-				void secureCompute(Representation[] a, Representation[] b,
+				void secureCompute(Representation<GCSignal>[] a, Representation<GCSignal>[] b,
 						CompEnv<GCSignal> env) throws Exception {
-					new DFTLib(env).FFT(a, b);
+					new DFTLib<GCSignal>(env).FFT(a, b);
 				}
 
 				@Override

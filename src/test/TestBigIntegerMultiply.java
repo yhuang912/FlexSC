@@ -23,7 +23,7 @@ public class TestBigIntegerMultiply extends TestBigInteger{
 				
 				runThreads(new Helper(a, b ) {
 					public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
-						return new IntegerLib(e).unSignedMultiply(Signala ,Signalb);}
+						return new IntegerLib<GCSignal>(e).unSignedMultiply(Signala ,Signalb);}
 
 					@Override
 					public BigInteger plainCompute(BigInteger x, BigInteger y) {

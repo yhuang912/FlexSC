@@ -150,7 +150,7 @@ public class DFT {
 
 		DFT fft = new DFT(N);
 
-		double[] window = fft.getWindow();
+		//double[] window = fft.getWindow();
 		double[] re = new double[N];
 		double[] im = new double[N];
 

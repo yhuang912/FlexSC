@@ -1,14 +1,10 @@
 package test.ints;
 
 import java.util.Random;
-
 import flexsc.CompEnv;
 import gc.GCSignal;
-
 import org.junit.Test;
-
 import test.harness.Test_1Input1Output;
-import test.harness.Test_1Input1Output.Helper;
 import circuits.IntegerLib;
 
 
@@ -24,7 +20,7 @@ public class TestLeftPublicShift extends Test_1Input1Output{
 			runThreads(
 				new Helper(rnd.nextInt(1<<30)) {
 					public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
-						return new IntegerLib(e).leftPublicShift(Signala, shift);
+						return new IntegerLib<GCSignal>(e).leftPublicShift(Signala, shift);
 					}
 
 					public int plainCompute(int x) {

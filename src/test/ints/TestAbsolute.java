@@ -4,11 +4,8 @@ import java.util.Random;
 
 import flexsc.CompEnv;
 import gc.GCSignal;
-
 import org.junit.Test;
-
 import test.harness.Test_1Input1Output;
-import test.harness.Test_1Input1Output.Helper;
 import circuits.IntegerLib;
 
 

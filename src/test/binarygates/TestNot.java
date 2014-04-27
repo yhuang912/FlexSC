@@ -22,7 +22,7 @@ public class TestNot extends Test_1Input1Output{
 			runThreads(
 				new Helper(rnd.nextInt(1<<30)) {
 					public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
-						return new CircuitLib(e).not(Signala);
+						return new CircuitLib<GCSignal>(e).not(Signala);
 					}
 
 					public int plainCompute(int x) {

@@ -1,7 +1,6 @@
 package test.ints;
 
 import org.junit.Test;
-
 import test.harness.Test_2Input1Output;
 import circuits.CircuitLib;
 import flexsc.CompEnv;

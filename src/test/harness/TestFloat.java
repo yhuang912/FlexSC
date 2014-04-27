@@ -1,13 +1,10 @@
 package test.harness;
 
-
 import objects.Float.Representation;
 import flexsc.CompEnv;
-import flexsc.Signal;
 import gc.GCEva;
 import gc.GCGen;
 import gc.GCSignal;
-
 import org.junit.Assert;
 
 

@@ -21,7 +21,7 @@ public class TestAnd extends Test_2Input1Output{
 		for (int i = 0; i < testCases; i++) {
 			runThreads(new Helper(rnd.nextInt(1<<30), rnd.nextInt(1<<30)) {
 				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
-					return new IntegerLib(e).and(Signala ,Signalb);}
+					return new IntegerLib<GCSignal>(e).and(Signala ,Signalb);}
 
 				public int plainCompute(int x, int y) {
 					return x&y;}

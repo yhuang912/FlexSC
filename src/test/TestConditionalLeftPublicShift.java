@@ -1,14 +1,10 @@
 package test;
 
 import java.util.Random;
-
 import flexsc.CompEnv;
 import gc.GCSignal;
-
 import org.junit.Test;
-
 import test.harness.Test_1Input1Output;
-import circuits.CircuitLib;
 import circuits.IntegerLib;
 
 
@@ -24,8 +20,8 @@ public class TestConditionalLeftPublicShift extends Test_1Input1Output{
 			runThreads(
 				new Helper(rnd.nextInt(1<<30)) {
 					public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
-						IntegerLib lib = new IntegerLib(e);
-						return lib.conditionalLeftPublicShift(Signala, shift, CircuitLib.SIGNAL_ONE);
+						IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(e);
+						return lib.conditionalLeftPublicShift(Signala, shift, lib.SIGNAL_ONE);
 					}
 
 					public int plainCompute(int x) {
@@ -36,8 +32,8 @@ public class TestConditionalLeftPublicShift extends Test_1Input1Output{
 			runThreads(
 					new Helper(rnd.nextInt(1<<30)) {
 						public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
-							IntegerLib lib = new IntegerLib(e);
-							return lib.conditionalLeftPublicShift(Signala, shift, CircuitLib.SIGNAL_ZERO);
+							IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(e);
+							return lib.conditionalLeftPublicShift(Signala, shift, lib.SIGNAL_ZERO);
 						}
 
 						public int plainCompute(int x) {

@@ -116,8 +116,8 @@ public class TestSort {
 			
 			runThreads(new Helper(a) {
 				GCSignal[][] secureCompute(GCSignal[][] Signala, CompEnv<GCSignal> e) throws Exception {
-					BitonicSortLib lib =  new BitonicSortLib(e);
-					lib.sort(Signala, BitonicSortLib.SIGNAL_ONE);
+					BitonicSortLib<GCSignal> lib =  new BitonicSortLib<GCSignal>(e);
+					lib.sort(Signala, lib.SIGNAL_ONE);
 					return Signala;
 				}
 				

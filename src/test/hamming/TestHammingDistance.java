@@ -21,7 +21,7 @@ public class TestHammingDistance extends TestBigInteger{
 			BigInteger b = new BigInteger(LENGTH, rnd);
 			runThreads(new Helper(a, b) {
 				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
-					return new IntegerLib(e).hammingDistance(Signala, Signalb);}
+					return new IntegerLib<GCSignal>(e).hammingDistance(Signala, Signalb);}
 
 				public BigInteger plainCompute(BigInteger x, BigInteger y) {
 					BigInteger rb = x.xor(y);
