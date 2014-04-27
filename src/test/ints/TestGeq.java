@@ -3,7 +3,7 @@ package test.ints;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -22,8 +22,8 @@ public class TestGeq extends Test_2Input1Output{
 
 		for (int i = 0; i < testCases; i++) {
 			runThreads(new Helper(rnd.nextInt()%(1<<30), rnd.nextInt()%(1<<30)) {
-				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
-					return new Signal[]{new IntegerLib(e).geq(Signala ,Signalb)}; }
+				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
+					return new GCSignal[]{new IntegerLib(e).geq(Signala ,Signalb)}; }
 
 				public int plainCompute(int x, int y) {
 					return (int) Utils.toSignedInt(new boolean[]{(x>=y)});}
@@ -33,8 +33,8 @@ public class TestGeq extends Test_2Input1Output{
 		for (int i = 0; i < testCases; i++) {
 			int a = rnd.nextInt()%(1<<30);
 			runThreads(new Helper(a, a) {
-				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
-					return new Signal[]{new IntegerLib(e).geq(Signala ,Signalb)}; }
+				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
+					return new GCSignal[]{new IntegerLib(e).geq(Signala ,Signalb)}; }
 
 				public int plainCompute(int x, int y) {
 					return (int) Utils.toSignedInt(new boolean[]{(x>=y)});}

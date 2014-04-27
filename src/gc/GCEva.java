@@ -1,15 +1,14 @@
 package gc;
 
-import objects.Float.Represention;
+import objects.Float.Representation;
 
 import java.io.*;
 
 import circuits.FloatFormat;
-import flexsc.CompEnv;
 import ot.*;
 import test.Utils;
 
-public class GCEva implements CompEnv<Signal> {
+public class GCEva extends GCCompEnv {
 	InputStream is;
 	OutputStream os;
 	OTReceiver rcv;
@@ -27,71 +26,71 @@ public class GCEva implements CompEnv<Signal> {
 		gb = new Garbler();
 	}
 
-	public Signal inputOfGen(boolean in) throws Exception {
-		return Signal.receive(is);
+	public GCSignal inputOfGen(boolean in) throws Exception {
+		return GCSignal.receive(is);
 	}
 
-	public Signal inputOfEva(boolean in) throws Exception {
+	public GCSignal inputOfEva(boolean in) throws Exception {
 		return rcv.receive(in);
 	}
 
-	public Signal[] inputOfEva(boolean[] x) throws Exception {
-		Signal[] result = new Signal[x.length];
+	public GCSignal[] inputOfEva(boolean[] x) throws Exception {
+		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
 			result[i] = inputOfEva(x[i]);
 		return result;
 	}
 
-	public Signal[] inputOfGen(boolean[] x) throws Exception {
-		Signal[] result = new Signal[x.length];
+	public GCSignal[] inputOfGen(boolean[] x) throws Exception {
+		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
 			result[i] = inputOfGen(false);
 		return result;
 	}
 	
-	public Represention inputOfEva(double d, int widthV, int widthP) throws Exception {
+	public Representation<GCSignal> inputOfEva(double d, int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(d, widthV, widthP);
-		Signal signalS = inputOfEva(f.s);
-		Signal signalZ = inputOfEva(f.z);
-		Signal[] v = inputOfEva(f.v);
-		Signal[] p = inputOfEva(f.p);
-		return new Represention(signalS, p, v, signalZ);
+		GCSignal signalS = inputOfEva(f.s);
+		GCSignal signalZ = inputOfEva(f.z);
+		GCSignal[] v = inputOfEva(f.v);
+		GCSignal[] p = inputOfEva(f.p);
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 	
-	public Represention inputOfGen(int widthV, int widthP) throws Exception {
+	public Representation<GCSignal> inputOfGen(int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(0, widthV, widthP);
-		Signal signalS = inputOfGen(f.s);
-		Signal signalZ = inputOfGen(f.z);
-		Signal[] v = inputOfGen(f.v);
-		Signal[] p = inputOfGen(f.p);
+		GCSignal signalS = inputOfGen(f.s);
+		GCSignal signalZ = inputOfGen(f.z);
+		GCSignal[] v = inputOfGen(f.v);
+		GCSignal[] p = inputOfGen(f.p);
 		
-		return new Represention(signalS, p, v, signalZ);
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 	
-	public Represention inputOfEva(FloatFormat f, int widthV, int widthP) throws Exception {
-		Signal signalS = inputOfEva(f.s);
-		Signal signalZ = inputOfEva(f.z);
-		Signal[] v = inputOfEva(f.v);
-		Signal[] p = inputOfEva(f.p);
+	public Representation<GCSignal> inputOfEva(FloatFormat f, int widthV, int widthP) throws Exception {
+		GCSignal signalS = inputOfEva(f.s);
+		GCSignal signalZ = inputOfEva(f.z);
+		GCSignal[] v = inputOfEva(f.v);
+		GCSignal[] p = inputOfEva(f.p);
 		
-		return new Represention(signalS, p, v, signalZ);
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}	
-	public Signal[] inputOfEvaFixPoint(double a, int width, int offset) throws Exception {
-		Signal[] result = inputOfEva(Utils.fromFixPoint(a,width,offset));
+	public GCSignal[] inputOfEvaFixPoint(double a, int width, int offset) throws Exception {
+		GCSignal[] result = inputOfEva(Utils.fromFixPoint(a,width,offset));
 		return result;
 	}
 	
-	public Signal[] inputOfGenFixPoint(int width, int offset) throws Exception {
+	public GCSignal[] inputOfGenFixPoint(int width, int offset) throws Exception {
 		return inputOfGen(new boolean[width]);
 	}
 	
-	public boolean outputToGen(Signal out) throws Exception {
+	public boolean outputToGen(GCSignal out) throws Exception {
 		if (!out.isPublic())
 			out.send(os);
 		return false;
 	}
 
-	public boolean[] outputToGen(Signal[] out) throws Exception {
+	public boolean[] outputToGen(GCSignal[] out) throws Exception {
 		boolean [] result = new boolean[out.length];
 		for(int i = 0; i < result.length; ++i) {
 			result[i] = outputToGen(out[i]);
@@ -99,7 +98,7 @@ public class GCEva implements CompEnv<Signal> {
 		return result;
 	}
 
-	public double outputToGen(Represention gcf) throws Exception {
+	public double outputToGen(Representation<GCSignal> gcf) throws Exception {
 		boolean s = outputToGen(gcf.s);
 		boolean z = outputToGen(gcf.z);
 		boolean[] v = outputToGen(gcf.v);
@@ -112,35 +111,35 @@ public class GCEva implements CompEnv<Signal> {
 	//
 	// }
 
-	private Signal[][] gtt = new Signal[2][2];
+	private GCSignal[][] gtt = new GCSignal[2][2];
 
 	private void receiveGTT() {
 		try {
-			gtt[0][0] = Signal.ZERO;
-			gtt[0][1] = Signal.receive(is);
-			gtt[1][0] = Signal.receive(is);
-			gtt[1][1] = Signal.receive(is);
+			gtt[0][0] = GCSignal.ZERO;
+			gtt[0][1] = GCSignal.receive(is);
+			gtt[1][0] = GCSignal.receive(is);
+			gtt[1][1] = GCSignal.receive(is);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 	}
 
-	public Signal and(Signal a, Signal b) {
+	public GCSignal and(GCSignal a, GCSignal b) {
 		++nonFreeGate;
 		if (a.isPublic() && b.isPublic())
-			return new Signal(a.v && b.v);
+			return new GCSignal(a.v && b.v);
 		else if (a.isPublic())
-			return a.v ? b : new Signal(false);
+			return a.v ? b : new GCSignal(false);
 		else if (b.isPublic())
-			return b.v ? a : new Signal(false);
+			return b.v ? a : new GCSignal(false);
 		else {
 			receiveGTT();
 
 			int i0 = a.getLSB() ? 1 : 0;
 			int i1 = b.getLSB() ? 1 : 0;
 
-			Signal out = gb.dec(a, b, gid, gtt[i0][i1]);
+			GCSignal out = gb.dec(a, b, gid, gtt[i0][i1]);
 			gid++;
 			return out;
 		}
@@ -154,23 +153,23 @@ public class GCEva implements CompEnv<Signal> {
 	// return zero;
 	// }
 	//
-	public Signal xor(Signal a, Signal b) {
+	public GCSignal xor(GCSignal a, GCSignal b) {
 		if (a.isPublic() && b.isPublic())
-			return new Signal(a.v ^ b.v);
+			return new GCSignal(a.v ^ b.v);
 		else if (a.isPublic())
-			return a.v ? not(b) : new Signal(b);
+			return a.v ? not(b) : new GCSignal(b);
 		else if (b.isPublic())
-			return b.v ? not(a) : new Signal(a);
+			return b.v ? not(a) : new GCSignal(a);
 		else {
 			return a.xor(b);
 		}
 	}
 
-	public Signal not(Signal a) {
+	public GCSignal not(GCSignal a) {
 		if (a.isPublic())
-			return new Signal(!a.v);
+			return new GCSignal(!a.v);
 		else {
-			return new Signal(a);
+			return new GCSignal(a);
 		}
 	}
 }

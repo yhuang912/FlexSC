@@ -1,6 +1,6 @@
 package oramgc.trivialoram;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,7 +50,7 @@ public class TrivialOramClient extends OramParty {
 		Block[][] result = prepareBlocks(bucket, bucket, bucket);
 		Block[] scBlocks = result[0];
 		Block[] scBlocksMask = result[1];
-		Signal[] scIden = gen.inputOfGen(iden);
+		GCSignal[] scIden = gen.inputOfGen(iden);
 		
 		Block res = lib.readAndRemove(scBlocks, scIden);
 

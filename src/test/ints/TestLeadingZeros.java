@@ -5,7 +5,7 @@ import java.util.Random;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class TestLeadingZeros {
 			intA = aa;
 			a = Utils.fromLong(aa, 64);
 		}
-		abstract Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception;
+		abstract GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception;
 		abstract int plainCompute(long x);
 	}
 
@@ -36,8 +36,8 @@ public class TestLeadingZeros {
 		public void run() {
 			try {
 				listen(54321);
-				Signal[] a = new Signal[h.a.length];
-				Signal[] d = null;
+				GCSignal[] a = new GCSignal[h.a.length];
+				GCSignal[] d = null;
 
 				GCGen gen = new GCGen(is, os);
 				for (int i = 0; i < a.length; i++) 	
@@ -68,8 +68,8 @@ public class TestLeadingZeros {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				Signal[] a = new Signal[h.a.length];
-				Signal[] d = null;
+				GCSignal[] a = new GCSignal[h.a.length];
+				GCSignal[] d = null;
 
 				GCEva eva = new GCEva(is, os);
 				for(int i = 0; i < a.length; ++i)
@@ -109,7 +109,7 @@ public class TestLeadingZeros {
 		for (int i = 0; i < testCases; i++) {
 			runThreads(
 				new Helper(rnd.nextLong()) {
-					Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
+					GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
 						return new IntegerLib(e).leadingZeros(Signala);
 					}
 

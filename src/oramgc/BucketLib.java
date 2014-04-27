@@ -2,7 +2,7 @@ package oramgc;
 
 import circuits.BitonicSortLib;
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 
 public class BucketLib extends BitonicSortLib {
@@ -10,7 +10,7 @@ public class BucketLib extends BitonicSortLib {
 	protected int lengthOfIden;
 	protected int lengthOfPos;
 	protected int lengthOfData;
-	public BucketLib(int lengthOfIden, int lengthOfPos, int lengthOfData, CompEnv<Signal> e) {
+	public BucketLib(int lengthOfIden, int lengthOfPos, int lengthOfData, CompEnv<GCSignal> e) {
 		super(e);
 		this.lengthOfData = lengthOfData;
 		this.lengthOfIden = lengthOfIden;
@@ -19,10 +19,10 @@ public class BucketLib extends BitonicSortLib {
 	}
 
 
-	public Block conditionalReadAndRemove(Block[] bucket, Signal[] iden, Signal condition) throws Exception {
+	public Block conditionalReadAndRemove(Block[] bucket, GCSignal[] iden, GCSignal condition) throws Exception {
 		Block result = dummyBlock;
 		for(int i = 0; i < bucket.length; ++i) {
-			Signal match = eq(iden, bucket[i].iden);
+			GCSignal match = eq(iden, bucket[i].iden);
 			match = and(match, not(bucket[i].isDummy));
 			match = and(match, condition);
 			result = mux(result, bucket[i], match);
@@ -31,19 +31,19 @@ public class BucketLib extends BitonicSortLib {
 		return result;
 	}
 
-	public Block readAndRemove(Block[] bucket, Signal[] iden) throws Exception {
+	public Block readAndRemove(Block[] bucket, GCSignal[] iden) throws Exception {
 		return conditionalReadAndRemove(bucket, iden, SIGNAL_ONE);
 	}
 
-	public void conditionalAdd(Block[] bucket, Block newBlock, Signal condition) throws Exception {
-		Signal added = not(condition);
+	public void conditionalAdd(Block[] bucket, Block newBlock, GCSignal condition) throws Exception {
+		GCSignal added = not(condition);
 		for(int i = 0; i < bucket.length; ++i) {
-			Signal match = and( not(bucket[i].isDummy), eq(newBlock.iden, bucket[i].iden) );
+			GCSignal match = and( not(bucket[i].isDummy), eq(newBlock.iden, bucket[i].iden) );
 			added = or(match, added);
 		}
 		for(int i = 0; i < bucket.length; ++i) {
-			Signal match = bucket[i].isDummy;
-			Signal shouldAdd = and(not(added), match);
+			GCSignal match = bucket[i].isDummy;
+			GCSignal shouldAdd = and(not(added), match);
 			added = or(added, shouldAdd);
 			bucket[i] = mux(bucket[i], newBlock, shouldAdd);
 		}
@@ -57,12 +57,12 @@ public class BucketLib extends BitonicSortLib {
 		return conditionalPop(bucket, SIGNAL_ONE);
 	}
 
-	public Block conditionalPop(Block[] bucket, Signal condition) throws Exception {
+	public Block conditionalPop(Block[] bucket, GCSignal condition) throws Exception {
 		Block result = dummyBlock;
-		Signal poped = not(condition);// condition=T => shouldpop => set to poped;
+		GCSignal poped = not(condition);// condition=T => shouldpop => set to poped;
 		for(int i = 0; i < bucket.length; ++i) {
-			Signal notDummy = not(bucket[i].isDummy);
-			Signal shouldPop = and(not(poped), notDummy);
+			GCSignal notDummy = not(bucket[i].isDummy);
+			GCSignal shouldPop = and(not(poped), notDummy);
 			poped = or(poped, shouldPop);
 			result = mux(result, bucket[i], shouldPop);
 
@@ -72,19 +72,19 @@ public class BucketLib extends BitonicSortLib {
 		return result;
 	}
 
-	public Block mux(Block a, Block b, Signal choose) throws Exception {
-		Signal[] iden = mux(a.iden, b.iden, choose);
-		Signal[] pos = mux(a.pos, b.pos, choose);
-		Signal[] data = mux(a.data, b.data, choose);
-		Signal isDummy = mux(a.isDummy, b.isDummy, choose);
+	public Block mux(Block a, Block b, GCSignal choose) throws Exception {
+		GCSignal[] iden = mux(a.iden, b.iden, choose);
+		GCSignal[] pos = mux(a.pos, b.pos, choose);
+		GCSignal[] data = mux(a.data, b.data, choose);
+		GCSignal isDummy = mux(a.isDummy, b.isDummy, choose);
 		return new Block(iden, pos, data, isDummy);
 	}
 
 	public Block xor(Block a, Block b) {
-		Signal[] iden = xor(a.iden, b.iden);
-		Signal[] pos = xor(a.pos, b.pos);
-		Signal[] data = xor(a.data, b.data);
-		Signal isDummy = xor(a.isDummy, b.isDummy);
+		GCSignal[] iden = xor(a.iden, b.iden);
+		GCSignal[] pos = xor(a.pos, b.pos);
+		GCSignal[] data = xor(a.data, b.data);
+		GCSignal isDummy = xor(a.isDummy, b.isDummy);
 		return new Block(iden, pos, data, isDummy);
 	}
 	

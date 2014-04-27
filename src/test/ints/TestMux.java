@@ -3,11 +3,9 @@ package test.ints;
 import org.junit.Test;
 
 import test.harness.Test_2Input1Output;
-import test.harness.Test_2Input1Output.Helper;
 import circuits.CircuitLib;
-import circuits.IntegerLib;
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 public class TestMux extends Test_2Input1Output{
 
@@ -17,9 +15,9 @@ public class TestMux extends Test_2Input1Output{
 
 		for (int i = 0; i < testCases; i++) {
 			runThreads(new Helper(0b1100, 0b1010) { // This particular pair of inputs exhausts 4 possible inputs, excluding selection signal 
-				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
-					IntegerLib lib = new IntegerLib(e);
-					return lib.mux(Signala ,Signalb, CircuitLib.SIGNAL_ONE);}
+				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b, CompEnv<GCSignal> e) throws Exception {
+					CircuitLib<GCSignal> lib = new CircuitLib<GCSignal>(e);
+					return lib.mux(a, b, lib.SIGNAL_ONE);}
 
 				public int plainCompute(int x, int y) {
 					return y;}
@@ -28,9 +26,9 @@ public class TestMux extends Test_2Input1Output{
 		
 		for (int i = 0; i < testCases; i++) {
 			runThreads(new Helper(0b1100, 0b1010) { // This particular pair of inputs exhausts 4 possible inputs, excluding selection signal
-				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
-					IntegerLib lib = new IntegerLib(e);
-					return lib.mux(Signala ,Signalb, CircuitLib.SIGNAL_ZERO);}
+				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b, CompEnv<GCSignal> e) throws Exception {
+					CircuitLib<GCSignal> lib = new CircuitLib<GCSignal>(e);
+					return lib.mux(a, b, lib.SIGNAL_ZERO);}
 
 				public int plainCompute(int x, int y) {
 					return x;}

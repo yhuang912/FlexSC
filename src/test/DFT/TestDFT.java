@@ -4,11 +4,11 @@ package test.DFT;
 import java.util.Arrays;
 import java.util.Random;
 
-import objects.Float.Represention;
+import objects.Float.Representation;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class TestDFT {
 			this.b = b;
 			this.a = a;
 		}
-		abstract void secureCompute(Represention[] a, Represention[] b, CompEnv<Signal> env) throws Exception;
+		abstract void secureCompute(Representation[] a, Representation[] b, CompEnv<GCSignal> env) throws Exception;
 		abstract void plainCompute(double a[], double b[]);
 	}
 	
@@ -40,8 +40,8 @@ public class TestDFT {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				Represention[] fgc1 =new Represention[h.a.length];
-				Represention[] fgc2 =new Represention[h.b.length];
+				Representation[] fgc1 =new Representation[h.a.length];
+				Representation[] fgc2 =new Representation[h.b.length];
 				
 				for(int i = 0; i < fgc1.length; ++i)
 					fgc1[i] = gen.inputOfGen(h.a[i], 23, 9);
@@ -80,8 +80,8 @@ public class TestDFT {
 
 				GCEva eva = new GCEva(is, os);
 
-				Represention[] fgc1 = new Represention[h.a.length];
-				Represention[] fgc2 = new Represention[h.b.length];
+				Representation[] fgc1 = new Representation[h.a.length];
+				Representation[] fgc2 = new Representation[h.b.length];
 				for(int i = 0; i < fgc1.length; ++i)
 					fgc1[i] = eva.inputOfGen(23, 9);
 				for(int i = 0; i < fgc2.length; ++i)
@@ -142,8 +142,8 @@ public class TestDFT {
 			runThreads(new Helper(real, img) {
 
 				@Override
-				void secureCompute(Represention[] a, Represention[] b,
-						CompEnv<Signal> env) throws Exception {
+				void secureCompute(Representation[] a, Representation[] b,
+						CompEnv<GCSignal> env) throws Exception {
 					new DFTLib(env).FFT(a, b);
 				}
 

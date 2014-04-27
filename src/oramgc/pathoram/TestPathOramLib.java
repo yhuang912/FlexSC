@@ -9,7 +9,7 @@ import circuits.IntegerLib;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 import test.Utils;
 
 
@@ -30,7 +30,7 @@ public class TestPathOramLib {
 			for(int i = 0; i < bb.length; ++i)
 				b[i] = Utils.fromInt(bb[i], 6);
 		}
-		public abstract Signal[][] secureCompute(Signal[][] Signala, Signal[][] Signalb, CompEnv<Signal> e) throws Exception;
+		public abstract GCSignal[][] secureCompute(GCSignal[][] Signala, GCSignal[][] Signalb, CompEnv<GCSignal> e) throws Exception;
 		public abstract int[] plainCompute(int[] x);
 	}
 
@@ -46,15 +46,15 @@ public class TestPathOramLib {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				Signal [][] a = new Signal[16][];
+				GCSignal [][] a = new GCSignal[16][];
 				for(int i = 0; i < N; ++i)
 					a[i] = gen.inputOfGen(h.a[i]);
 				
-				Signal [][] b = new Signal[16][];
+				GCSignal [][] b = new GCSignal[16][];
 				for(int i = 0; i < N; ++i)
 					b[i] = gen.inputOfGen(h.b[i]);
 				
-				Signal[][] d = h.secureCompute(a, b, gen);
+				GCSignal[][] d = h.secureCompute(a, b, gen);
 				os.flush();
 
 				z = new int[d.length];
@@ -81,15 +81,15 @@ public class TestPathOramLib {
 
 				
 				GCEva eva = new GCEva(is, os);
-				Signal [][] a = new Signal[16][];
+				GCSignal [][] a = new GCSignal[16][];
 				for(int i = 0; i < N; ++i)
 					a[i] = eva.inputOfGen(h.a[i]);
 				
-				Signal [][] b = new Signal[16][];
+				GCSignal [][] b = new GCSignal[16][];
 				for(int i = 0; i < N; ++i)
 					b[i] = eva.inputOfGen(h.b[i]);
 
-				Signal[][] d = h.secureCompute(a, b, eva);
+				GCSignal[][] d = h.secureCompute(a, b, eva);
 				os.flush();
 
 				for(int i = 0; i < d.length; ++i)
@@ -167,8 +167,8 @@ public class TestPathOramLib {
 			runThreads(
 				new Helper(ina, inb) {
 					@Override
-					public Signal[][] secureCompute(Signal[][] Signala, Signal[][] Signalb,
-							CompEnv<Signal> e) throws Exception {
+					public GCSignal[][] secureCompute(GCSignal[][] Signala, GCSignal[][] Signalb,
+							CompEnv<GCSignal> e) throws Exception {
 						PathOramLib lib = new PathOramLib(3, 3, 3, 4, e);
 						return lib.pushDownHelp(Signala, Signalb);
 					}

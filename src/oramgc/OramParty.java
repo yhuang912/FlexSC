@@ -8,7 +8,7 @@ import java.util.Arrays;
 import test.Utils;
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 
 public abstract class OramParty {
 
@@ -137,34 +137,34 @@ public abstract class OramParty {
 	}
 	public Block inputBlockOfServer(BlockInBinary b) throws Exception {
 		if(role == Party.SERVER) {
-			Signal[] iden = eva.inputOfEva(b.iden);
-			Signal[] pos = eva.inputOfEva(b.pos);
-			Signal[] data = eva.inputOfEva(b.data);
-			Signal isDummy = eva.inputOfEva(b.isDummy);
+			GCSignal[] iden = eva.inputOfEva(b.iden);
+			GCSignal[] pos = eva.inputOfEva(b.pos);
+			GCSignal[] data = eva.inputOfEva(b.data);
+			GCSignal isDummy = eva.inputOfEva(b.isDummy);
 			return new Block(iden, pos, data, isDummy);
 		}
 		else {
-			Signal[] iden = gen.inputOfEva(new boolean[lengthOfIden]);
-			Signal[] pos = gen.inputOfEva(new boolean[lengthOfPos]);
-			Signal[] data = gen.inputOfEva(new boolean[lengthOfData]);
-			Signal isDummy = gen.inputOfEva(false);
+			GCSignal[] iden = gen.inputOfEva(new boolean[lengthOfIden]);
+			GCSignal[] pos = gen.inputOfEva(new boolean[lengthOfPos]);
+			GCSignal[] data = gen.inputOfEva(new boolean[lengthOfData]);
+			GCSignal isDummy = gen.inputOfEva(false);
 			return new Block(iden, pos, data, isDummy);
 		}
 	}
 
 	public Block inputBlockOfClient(BlockInBinary b) throws Exception {
 		if(eva != null) {
-			Signal[] iden = eva.inputOfGen(new boolean[lengthOfIden]);
-			Signal[] pos = eva.inputOfGen(new boolean[lengthOfPos]);
-			Signal[] data = eva.inputOfGen(new boolean[lengthOfData]);
-			Signal isDummy = eva.inputOfGen(false);
+			GCSignal[] iden = eva.inputOfGen(new boolean[lengthOfIden]);
+			GCSignal[] pos = eva.inputOfGen(new boolean[lengthOfPos]);
+			GCSignal[] data = eva.inputOfGen(new boolean[lengthOfData]);
+			GCSignal isDummy = eva.inputOfGen(false);
 			return new Block(iden, pos, data, isDummy);
 		}
 		else {
-			Signal[] iden = gen.inputOfGen(b.iden);
-			Signal[] pos = gen.inputOfGen(b.pos);
-			Signal[] data = gen.inputOfGen(b.data);
-			Signal isDummy = gen.inputOfGen(b.isDummy);
+			GCSignal[] iden = gen.inputOfGen(b.iden);
+			GCSignal[] pos = gen.inputOfGen(b.pos);
+			GCSignal[] data = gen.inputOfGen(b.data);
+			GCSignal isDummy = gen.inputOfGen(b.isDummy);
 			return new Block(iden, pos, data, isDummy);
 		}
 	}

@@ -2,7 +2,7 @@
 
 package ot;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.math.*;
 import java.io.*;
@@ -35,11 +35,11 @@ public class NPOTReceiver extends OTReceiver {
     }
 
     @Override
-    public Signal receive(boolean c) throws Exception {
+    public GCSignal receive(boolean c) throws Exception {
     	return receive(new boolean[]{c})[0];
     }
 
-    public Signal[] receive(boolean[] choices) throws Exception {
+    public GCSignal[] receive(boolean[] choices) throws Exception {
         step1(choices);
         return step2(choices);
     }
@@ -74,13 +74,13 @@ public class NPOTReceiver extends OTReceiver {
         oos.flush();
     }
 
-    private Signal[] step2(boolean[] choices) throws Exception {
+    private GCSignal[] step2(boolean[] choices) throws Exception {
         BigInteger[][] msg = (BigInteger[][]) ois.readObject();
 
-        Signal[] data = new Signal[choices.length];
+        GCSignal[] data = new GCSignal[choices.length];
         for (int i = 0; i < choices.length; i++) {
             int sigma = choices[i] ? 1 : 0;
-			data[i] = Signal.newInstance(cipher.decrypt(keys[i], msg[i][sigma],
+			data[i] = GCSignal.newInstance(cipher.decrypt(keys[i], msg[i][sigma],
 					msgBitLength).toByteArray());
         }
         return data;

@@ -3,7 +3,7 @@ package test.ints;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class TestIncrementByOne extends Test_1Input1Output{
 		for (int i = 0; i < testCases; i++) {
 			runThreads(
 				new Helper(rnd.nextInt(1<<30)) {
-					public Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
+					public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
 						return new IntegerLib(e).incrementByOne(Signala);
 					}
 

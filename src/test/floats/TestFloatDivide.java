@@ -2,9 +2,9 @@ package test.floats;
 
 import java.util.Random;
 
-import objects.Float.Represention;
+import objects.Float.Representation;
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -25,8 +25,8 @@ public class TestFloatDivide extends TestFloat {
 			runThreads(new Helper(rng.nextDouble(), a) {
 				
 				@Override
-				public Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception {
-					return new FloatLib(env).divide(a, b);
+				public Representation<GCSignal> secureCompute(Representation<GCSignal> a, Representation<GCSignal> b, CompEnv<GCSignal> env) throws Exception {
+					return new FloatLib<GCSignal>(env).divide(a, b);
 				}
 				
 				@Override

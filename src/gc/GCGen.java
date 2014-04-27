@@ -4,14 +4,13 @@ import java.security.*;
 import java.io.*;
 
 import circuits.FloatFormat;
-import flexsc.CompEnv;
-import objects.Float.Represention;
+import objects.Float.Representation;
 import ot.*;
 import test.Utils;
 
-public class GCGen implements CompEnv<Signal> {
+public class GCGen extends GCCompEnv {
 
-	public final Signal R;
+	public final GCSignal R;
 	SecureRandom rnd = new SecureRandom();
 
 	InputStream is;
@@ -25,7 +24,7 @@ public class GCGen implements CompEnv<Signal> {
 		this.is = is;
 		this.os = os;
 
-		R = Signal.freshLabel(rnd);
+		R = GCSignal.freshLabel(rnd);
 		R.setLSB();
 
 		snd = new OTExtSender(80, is, os);
@@ -34,82 +33,82 @@ public class GCGen implements CompEnv<Signal> {
 		gb = new Garbler();
 	}
 
-	private Signal[] genPair() {
-		Signal[] label = new Signal[2];
-		label[0] = Signal.freshLabel(rnd);
+	private GCSignal[] genPair() {
+		GCSignal[] label = new GCSignal[2];
+		label[0] = GCSignal.freshLabel(rnd);
 		label[1] = R.xor(label[0]);
 		return label;
 	}
 
-	public Signal inputOfGen(boolean in) throws Exception {
-		Signal[] label = genPair();
+	public GCSignal inputOfGen(boolean in) throws Exception {
+		GCSignal[] label = genPair();
 		label[in ? 1 : 0].send(os);
 		return label[0];
 	}
 
-	public Signal inputOfEva(boolean in) throws Exception {
-		Signal[] label = genPair();
+	public GCSignal inputOfEva(boolean in) throws Exception {
+		GCSignal[] label = genPair();
 		snd.send(label);
 		return in ? label[1] : label[0];
 	}
 	
-	public Signal[] inputOfGen(boolean[] x) throws Exception {
-		Signal[] result = new Signal[x.length];
+	public GCSignal[] inputOfGen(boolean[] x) throws Exception {
+		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
 			result[i] = inputOfGen(x[i]);
 		return result;
 	}
 
-	public Signal[] inputOfEva(boolean[] x) throws Exception {
-		Signal[] result = new Signal[x.length];
+	public GCSignal[] inputOfEva(boolean[] x) throws Exception {
+		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
 			result[i] = inputOfEva(false);
 		return result;
 	}
 	
-	public Represention inputOfGen(double d, int widthV, int widthP) throws Exception {
+	public Representation<GCSignal> inputOfGen(double d, int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(d, widthV, widthP);
-		Signal signalS = inputOfGen(f.s);
-		Signal signalZ = inputOfGen(f.z);
-		Signal[] v = inputOfGen(f.v);
-		Signal[] p = inputOfGen(f.p);
+		GCSignal signalS = inputOfGen(f.s);
+		GCSignal signalZ = inputOfGen(f.z);
+		GCSignal[] v = inputOfGen(f.v);
+		GCSignal[] p = inputOfGen(f.p);
 		
-		return new Represention(signalS, p, v, signalZ);
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 	
-	public Represention inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
-		Signal signalS = inputOfGen(f.s);
-		Signal signalZ = inputOfGen(f.z);
-		Signal[] v = inputOfGen(f.v);
-		Signal[] p = inputOfGen(f.p);
+	public Representation<GCSignal> inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
+		GCSignal signalS = inputOfGen(f.s);
+		GCSignal signalZ = inputOfGen(f.z);
+		GCSignal[] v = inputOfGen(f.v);
+		GCSignal[] p = inputOfGen(f.p);
 		
-		return new Represention(signalS, p, v, signalZ);
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}	
 	
-	public Represention inputOfEva(int widthV, int widthP) throws Exception {
+	public Representation<GCSignal> inputOfEva(int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(0, widthV, widthP);
-		Signal signalS = inputOfEva(false);
-		Signal signalZ = inputOfEva(false);
-		Signal[] v = inputOfEva(f.v);
-		Signal[] p = inputOfEva(f.p);
+		GCSignal signalS = inputOfEva(false);
+		GCSignal signalZ = inputOfEva(false);
+		GCSignal[] v = inputOfEva(f.v);
+		GCSignal[] p = inputOfEva(f.p);
 		
-		return new Represention(signalS, p, v, signalZ);
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 
-	public Signal[] inputOfGenFixPoint(double a, int width, int offset) throws Exception {
-		Signal[] result = inputOfGen(Utils.fromFixPoint(a,width,offset));
+	public GCSignal[] inputOfGenFixPoint(double a, int width, int offset) throws Exception {
+		GCSignal[] result = inputOfGen(Utils.fromFixPoint(a,width,offset));
 		return result;
 	}
 	
-	public Signal[] inputOfEvaFixPoint(int width, int offset) throws Exception {
+	public GCSignal[] inputOfEvaFixPoint(int width, int offset) throws Exception {
 		return inputOfEva(new boolean[width]);
 	}
 	
-	public boolean outputToGen(Signal out) throws Exception {
+	public boolean outputToGen(GCSignal out) throws Exception {
 		if (out.isPublic())
 			return out.v;
 		
-		Signal lb = Signal.receive(is);
+		GCSignal lb = GCSignal.receive(is);
 		if (lb.equals(out))
 			return false;
 		else if (lb.equals(R.xor(out)))
@@ -118,7 +117,7 @@ public class GCGen implements CompEnv<Signal> {
 		throw new Exception("bad label at final output.");
 	}
 	
-	public boolean[] outputToGen(Signal[] out) throws Exception {
+	public boolean[] outputToGen(GCSignal[] out) throws Exception {
 		boolean [] result = new boolean[out.length];
 		for(int i = 0; i < result.length; ++i) {
 			result[i] = outputToGen(out[i]);
@@ -126,7 +125,7 @@ public class GCGen implements CompEnv<Signal> {
 		return result;
 	}
 
-	public double outputToGen(Represention gcf) throws Exception {
+	public double outputToGen(Representation<GCSignal> gcf) throws Exception {
 		boolean s = outputToGen(gcf.s);
 		boolean z = outputToGen(gcf.z);
 		boolean[] v = outputToGen(gcf.v);
@@ -137,11 +136,11 @@ public class GCGen implements CompEnv<Signal> {
 	//
 	// }
 
-	private Signal[][] gtt = new Signal[2][2];
-	private Signal labelL[] = new Signal[2];
-	private Signal labelR[] = new Signal[2];
+	private GCSignal[][] gtt = new GCSignal[2][2];
+	private GCSignal labelL[] = new GCSignal[2];
+	private GCSignal labelR[] = new GCSignal[2];
 
-	private Signal garble(Signal a, Signal b) {
+	private GCSignal garble(GCSignal a, GCSignal b) {
 		labelL[0] = a;
 		labelL[1] = R.xor(labelL[0]);
 		labelR[0] = b;
@@ -150,8 +149,8 @@ public class GCGen implements CompEnv<Signal> {
 		int cL = a.getLSB() ? 1 : 0;
 		int cR = b.getLSB() ? 1 : 0;
 
-		Signal[] lb = new Signal[2];
-		lb[cL & cR] = gb.enc(labelL[cL], labelR[cR], gid, Signal.ZERO);
+		GCSignal[] lb = new GCSignal[2];
+		lb[cL & cR] = gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO);
 		lb[1 - (cL & cR)] = R.xor(lb[cL & cR]);
 
 		gtt[0 ^ cL][0 ^ cR] = lb[0];
@@ -188,15 +187,15 @@ public class GCGen implements CompEnv<Signal> {
 		}
 	}
 
-	public Signal and(Signal a, Signal b) {
+	public GCSignal and(GCSignal a, GCSignal b) {
 		if (a.isPublic() && b.isPublic())
-			return new Signal(a.v && b.v);
+			return new GCSignal(a.v && b.v);
 		else if (a.isPublic())
-			return a.v ? b : new Signal(false);
+			return a.v ? b : new GCSignal(false);
 		else if (b.isPublic())
-			return b.v ? a : new Signal(false);
+			return b.v ? a : new GCSignal(false);
 		else {
-			Signal ret = garble(a, b);
+			GCSignal ret = garble(a, b);
 			sendGTT();
 			gid++;
 			return ret;
@@ -211,21 +210,21 @@ public class GCGen implements CompEnv<Signal> {
 	// return zero;
 	// }
 	//
-	public Signal xor(Signal a, Signal b) {
+	public GCSignal xor(GCSignal a, GCSignal b) {
 		if (a.isPublic() && b.isPublic())
-			return new Signal(a.v ^ b.v);
+			return new GCSignal(a.v ^ b.v);
 		else if (a.isPublic())
-			return a.v ? not(b) : new Signal(b);
+			return a.v ? not(b) : new GCSignal(b);
 		else if (b.isPublic())
-			return b.v ? not(a) : new Signal(a);
+			return b.v ? not(a) : new GCSignal(a);
 		else {
 			return a.xor(b);
 		}
 	}
 
-	public Signal not(Signal a) {
+	public GCSignal not(GCSignal a) {
 		if (a.isPublic())
-			return new Signal(!a.v);
+			return new GCSignal(!a.v);
 		else 
 			return R.xor(a);
 	}

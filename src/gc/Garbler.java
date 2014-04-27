@@ -16,19 +16,19 @@ final class Garbler {
         }
     }
 	
-	public Signal enc(Signal lb0, Signal lb1, long k, Signal m) {
+	public GCSignal enc(GCSignal lb0, GCSignal lb1, long k, GCSignal m) {
 		return getPadding(lb0, lb1, k).xor(m);
 	}
 
-	public Signal dec(Signal lb0, Signal lb1, long k, Signal c) {
+	public GCSignal dec(GCSignal lb0, GCSignal lb1, long k, GCSignal c) {
 		return getPadding(lb0, lb1, k).xor(c);
 	}
 	
-	private Signal getPadding(Signal lb0, Signal lb1, long k) {
+	private GCSignal getPadding(GCSignal lb0, GCSignal lb1, long k) {
         sha1.update(lb0.bytes);
         sha1.update(lb1.bytes);
         sha1.update(ByteBuffer.allocate(8).putLong(k).array());
-        Signal ret = Signal.newInstance(sha1.digest());
+        GCSignal ret = GCSignal.newInstance(sha1.digest());
         return ret;
     }
 }

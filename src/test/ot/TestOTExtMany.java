@@ -14,9 +14,9 @@ import ot.OTExtSender;
 
 public class TestOTExtMany {
 	static int n = 1000;
-	Signal[][] m;
+	GCSignal[][] m;
 	boolean[] c;
-	Signal[] rcvd;
+	GCSignal[] rcvd;
 	
 	class SenderRunnable extends network.Server implements Runnable {
 		OTExtSender snd;
@@ -27,10 +27,10 @@ public class TestOTExtMany {
 			try {
 				listen(54321);
 
-				m = new Signal[n][2];
+				m = new GCSignal[n][2];
 				for (int i = 0; i < n; i++) {
-					m[i][0] = Signal.freshLabel(rnd);
-					m[i][1] = Signal.freshLabel(rnd);
+					m[i][0] = GCSignal.freshLabel(rnd);
+					m[i][1] = GCSignal.freshLabel(rnd);
 				}
 				snd = new OTExtSender(80, is, os);
 				snd.send(m);

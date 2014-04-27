@@ -1,11 +1,9 @@
 package test.harness;
 
-import java.util.Arrays;
-
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Assert;
 
@@ -24,7 +22,7 @@ public class Test_2Input1Output {
 			a = Utils.fromInt(aa, 32);
 			b = Utils.fromInt(bb, 32);
 		}
-		public abstract Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception;
+		public abstract GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception;
 		public abstract int plainCompute(int x, int y);
 	}
 
@@ -40,10 +38,10 @@ public class Test_2Input1Output {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				Signal[] a = gen.inputOfGen(h.a);
-				Signal [] b = gen.inputOfEva(new boolean[32]);
+				GCSignal[] a = gen.inputOfGen(h.a);
+				GCSignal [] b = gen.inputOfEva(new boolean[32]);
 				
-				Signal[] d = h.secureCompute(a, b, gen);
+				GCSignal[] d = h.secureCompute(a, b, gen);
 				os.flush();
 
 				z = gen.outputToGen(d);
@@ -68,10 +66,10 @@ public class Test_2Input1Output {
 
 				GCEva eva = new GCEva(is, os);
 				
-				Signal [] a = eva.inputOfGen(new boolean[32]);
-				Signal [] b = eva.inputOfEva(h.b);
+				GCSignal [] a = eva.inputOfGen(new boolean[32]);
+				GCSignal [] b = eva.inputOfEva(h.b);
 				
-				Signal[] d = h.secureCompute(a, b, eva);
+				GCSignal[] d = h.secureCompute(a, b, eva);
 				
 				eva.outputToGen(d);
 				os.flush();

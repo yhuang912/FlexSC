@@ -4,7 +4,7 @@ package test.harness;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 import org.junit.Assert;
 
 import test.Utils;
@@ -19,7 +19,7 @@ public class TestFixedPoint {
 			this.b = b;
 			this.a = a;
 		}
-		public abstract Signal[] secureCompute(Signal[] a, Signal[] b, int offset, CompEnv<Signal> env) throws Exception;
+		public abstract GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b, int offset, CompEnv<GCSignal> env) throws Exception;
 		public abstract double plainCompute(double a, double b);
 	}
 	
@@ -36,9 +36,9 @@ public class TestFixedPoint {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				Signal[] fgc1 = gen.inputOfGenFixPoint(h.a, len, offset);
-				Signal[] fgc2 = gen.inputOfEvaFixPoint(len, offset);
-				Signal[] re = h.secureCompute(fgc1, fgc2, offset, gen);
+				GCSignal[] fgc1 = gen.inputOfGenFixPoint(h.a, len, offset);
+				GCSignal[] fgc2 = gen.inputOfEvaFixPoint(len, offset);
+				GCSignal[] re = h.secureCompute(fgc1, fgc2, offset, gen);
 									
 				boolean[] res = gen.outputToGen(re);
 				z = Utils.toFixPoint(res, len, offset);
@@ -63,9 +63,9 @@ public class TestFixedPoint {
 				connect("localhost", 54321);	
 
 				GCEva eva = new GCEva(is, os);
-				Signal[] fgc1 = eva.inputOfGenFixPoint(len, offset);
-				Signal[] fgc2 = eva.inputOfEvaFixPoint(h.b, len, offset);
-				Signal[] re = h.secureCompute(fgc1, fgc2, offset, eva);
+				GCSignal[] fgc1 = eva.inputOfGenFixPoint(len, offset);
+				GCSignal[] fgc2 = eva.inputOfEvaFixPoint(h.b, len, offset);
+				GCSignal[] re = h.secureCompute(fgc1, fgc2, offset, eva);
 									
 				eva.outputToGen(re);
 				

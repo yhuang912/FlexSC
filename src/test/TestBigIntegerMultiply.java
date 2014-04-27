@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class TestBigIntegerMultiply extends TestBigInteger{
 				BigInteger b = new BigInteger(LENGTH, rnd);
 				
 				runThreads(new Helper(a, b ) {
-					public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
+					public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
 						return new IntegerLib(e).unSignedMultiply(Signala ,Signalb);}
 
 					@Override

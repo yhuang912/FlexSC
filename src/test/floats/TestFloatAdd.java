@@ -2,9 +2,9 @@ package test.floats;
 
 import java.util.Random;
 
-import objects.Float.Represention;
+import objects.Float.Representation;
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -23,8 +23,8 @@ public class TestFloatAdd extends TestFloat {
 			runThreads(new Helper(rng.nextDouble(), rng.nextDouble()) {
 				
 				@Override
-				public Represention secureCompute(Represention a, Represention b, CompEnv<Signal> env) throws Exception {
-					return new FloatLib(env).add(a, b);
+				public Representation<GCSignal> secureCompute(Representation<GCSignal> a, Representation<GCSignal> b, CompEnv<GCSignal> env) throws Exception {
+					return new FloatLib<GCSignal>(env).add(a, b);
 				}
 				
 				@Override

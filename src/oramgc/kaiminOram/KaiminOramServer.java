@@ -1,6 +1,6 @@
 package oramgc.kaiminOram;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,9 +24,9 @@ public class KaiminOramServer extends KaiminOramParty {
 		BlockInBinary[] randomQueue = randomBucket(queueCapacity);
 		Block[][] scPath = prepareBlocks(blocks, blocks, randomPath);
 		Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
-		Signal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
-		Signal[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
-		Signal[] scData = null;
+		GCSignal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		GCSignal[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		GCSignal[] scData = null;
 		if(data != null)
 			scData = eva.inputOfGen(new boolean[lengthOfData]);
 		
@@ -68,7 +68,7 @@ public class KaiminOramServer extends KaiminOramParty {
 
 	@Override
 	public void flushOneTime(boolean[] pos) throws Exception {
-		Signal[] pathSignal = new Signal[pos.length];
+		GCSignal[] pathSignal = new GCSignal[pos.length];
 		for(int i = 0; i < pos.length; ++i)
 			pathSignal[i] = pos[i] ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 		
@@ -104,7 +104,7 @@ public class KaiminOramServer extends KaiminOramParty {
 		Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
 		
 		if(DEBUG) {//veridy queue is not full
-			Signal full = lib.SIGNAL_ONE;
+			GCSignal full = lib.SIGNAL_ONE;
 			for(int i = 0; i <scQueue[0].length; ++i){
 				full = lib.and(full, lib.not(lib.eq(scQueue[0][i].iden, lib.zeros(lengthOfIden)) ));
 			}
@@ -117,7 +117,7 @@ public class KaiminOramServer extends KaiminOramParty {
 	}
 	
 	Block[][] scQueue;
-	Signal[] scIden;
+	GCSignal[] scIden;
 	BlockInBinary[] randomQueue;
 	public void readAndRemove(boolean[] pos) throws Exception {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
@@ -138,8 +138,8 @@ public class KaiminOramServer extends KaiminOramParty {
 	}
 	
 	public void putBack() throws Exception {		
-		Signal[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
-		Signal[] scData = eva.inputOfGen(new boolean[lengthOfData]);
+		GCSignal[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		GCSignal[] scData = eva.inputOfGen(new boolean[lengthOfData]);
 				
 		Block b = new Block(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 

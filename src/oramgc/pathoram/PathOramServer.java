@@ -1,6 +1,6 @@
 package oramgc.pathoram;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,12 +45,12 @@ public class PathOramServer extends PathOramParty {
 		Block[][] scStash = prepareBlocks(stash, stash, randomBucketStash);
 		
 		//prepare newblock
-		Signal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
-		Signal[] scPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		GCSignal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		GCSignal[] scPos = eva.inputOfGen(new boolean[lengthOfPos]);
 		
 		Block res = lib.readAndRemove(scPath[0], scIden);
 		outputBlock(res);
-		Signal[] scData = res.data;
+		GCSignal[] scData = res.data;
 		if(data != null)
 			scData = eva.inputOfGen(new boolean[lengthOfData]);
 		
@@ -74,8 +74,8 @@ public class PathOramServer extends PathOramParty {
 	Block[][] scStash;
 	Block[][] scPath;
 	BlockInBinary[] randomBucket;
-	Signal[] scIden;
-	Signal[] scPos;
+	GCSignal[] scIden;
+	GCSignal[] scPos;
 	boolean[] WorkingPos;
 	public void readAndRemove(boolean[] pos) throws Exception {
 		WorkingPos = pos;
@@ -98,7 +98,7 @@ public class PathOramServer extends PathOramParty {
 	public void putBack() throws Exception {
 		boolean[] pos = WorkingPos;
 		scPos = eva.inputOfGen(new boolean[lengthOfPos]);
-		Signal[] scData = eva.inputOfGen(new boolean[lengthOfData]);
+		GCSignal[] scData = eva.inputOfGen(new boolean[lengthOfData]);
 		
 		Block scNewBlock = new Block(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		

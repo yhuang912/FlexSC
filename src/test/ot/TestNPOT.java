@@ -11,9 +11,9 @@ import ot.NPOTReceiver;
 import ot.NPOTSender;
 
 public class TestNPOT {
-	Signal[] m;
+	GCSignal[] m;
 	boolean c;
-	Signal rcvd;
+	GCSignal rcvd;
 	
 	class SenderRunnable extends network.Server implements Runnable {
 		NPOTSender snd;
@@ -24,9 +24,9 @@ public class TestNPOT {
 			try {
 				listen(54321);
 
-				m = new Signal[2];
-				m[0] = Signal.freshLabel(rnd);
-				m[1] = Signal.freshLabel(rnd);
+				m = new GCSignal[2];
+				m[0] = GCSignal.freshLabel(rnd);
+				m[1] = GCSignal.freshLabel(rnd);
 				snd = new NPOTSender(80, is, os);
 				snd.send(m);
 				

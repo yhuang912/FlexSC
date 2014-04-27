@@ -4,20 +4,20 @@ import flexsc.CompEnv;
 
 public class DbgUtils {
 
-	static void debugMsg(CompEnv<Signal> env, String msg) {
+	static void debugMsg(CompEnv<GCSignal> env, String msg) {
 		if (env instanceof GCEva)
 			System.err.println(msg);
 	}
 	
-	static void debugVal(CompEnv<Signal> env, Signal bs, String msg)
+	static void debugVal(CompEnv<GCSignal> env, GCSignal bs, String msg)
 			throws Exception {
 		if (env instanceof GCGen) {
 			bs.send(((GCGen) env).os);
 			((GCGen) env).R.send(((GCGen) env).os);
 		} else {
 			int x;
-			Signal glb = Signal.receive(((GCEva) env).is);
-			Signal R = Signal.receive(((GCEva) env).is);
+			GCSignal glb = GCSignal.receive(((GCEva) env).is);
+			GCSignal R = GCSignal.receive(((GCEva) env).is);
 			if (bs.equals(glb))
 				x = 0;
 			else if (bs.equals(R.xor(glb)))
@@ -30,7 +30,7 @@ public class DbgUtils {
 		}
 	}
 
-	static void debugLabel(CompEnv<Signal> env, Signal bs, String msg) {
+	static void debugLabel(CompEnv<GCSignal> env, GCSignal bs, String msg) {
 		if (env instanceof GCGen) {
 			System.err.println(String.format("[%s] %s, %s",  msg, bs.toHexStr(), ((GCGen) env).R.xor(bs).toHexStr()));
 		} else

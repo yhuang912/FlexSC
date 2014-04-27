@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class TestBigIntegerKaratsubaMultiply extends TestBigInteger {
 				//System.out.println(a);
 				//System.out.println(b);
 				runThreads(new Helper(a, b ) {
-					public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
+					public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
 						return new IntegerLib(e).karatsubaMultiply(Signala ,Signalb);}
 
 					@Override

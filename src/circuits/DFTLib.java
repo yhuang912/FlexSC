@@ -4,18 +4,18 @@ package circuits;
 
 
 import flexsc.CompEnv;
-import gc.Signal;
-import objects.Float.Represention;
+import gc.GCSignal;
+import objects.Float.Representation;
 
 public class DFTLib extends FloatLib {
 
-	public DFTLib(CompEnv<Signal> e) {
+	public DFTLib(CompEnv<GCSignal> e) {
 		super(e);
 	}
 	
-	public void InverseFDFT(Represention[]x, Represention[] y) throws Exception {
+	public void InverseFDFT(Representation[]x, Representation[] y) throws Exception {
 		FFT(x,y);
-		Represention invN = divide(publicFloat(1, x[0].v.length, x[0].p.length),
+		Representation invN = divide(publicFloat(1, x[0].v.length, x[0].p.length),
 				publicFloat(x.length, x[0].v.length, x[0].p.length)
 				);
 		for(int i = 0; i < x.length; ++i)
@@ -25,7 +25,7 @@ public class DFTLib extends FloatLib {
 			y[i] = multiply(invN, y[i]);
 	}
 	
-	public void FFT(Represention[] x, Represention[] y) throws Exception {
+	public void FFT(Representation[] x, Representation[] y) throws Exception {
 		int lengthV = x[0].v.length, lengthP = x[0].p.length;;
 		int n = x.length;
 		int m = (int)(Math.log(n) / Math.log(2));
@@ -43,7 +43,7 @@ public class DFTLib extends FloatLib {
 			j = j + n1;
 
 			if (i < j) {
-				Represention t1 = x[i];
+				Representation t1 = x[i];
 				x[i] = x[j];
 				x[j] = t1;
 				t1 = y[i];
@@ -62,13 +62,13 @@ public class DFTLib extends FloatLib {
 			int a = 0;
 
 			for (j=0; j < n1; j++) {
-				Represention c = publicFloat(Math.cos(-2*Math.PI*a/n), lengthV, lengthP);
-				Represention s = publicFloat(Math.sin(-2*Math.PI*a/n), lengthV, lengthP);
+				Representation c = publicFloat(Math.cos(-2*Math.PI*a/n), lengthV, lengthP);
+				Representation s = publicFloat(Math.sin(-2*Math.PI*a/n), lengthV, lengthP);
 				a +=  1 << (m-i-1);
 
 				for (int k = j; k < n; k = k + n2) {
-					Represention t1 = sub(multiply(c,x[k+n1]), multiply(s, y[k+n1]));
-					Represention t2 = add(multiply(s,x[k+n1]), multiply(c, y[k+n1]));
+					Representation t1 = sub(multiply(c,x[k+n1]), multiply(s, y[k+n1]));
+					Representation t2 = add(multiply(s,x[k+n1]), multiply(c, y[k+n1]));
 					
 					x[k+n1] = sub(x[k], t1);
 					y[k+n1] = sub(y[k], t2);

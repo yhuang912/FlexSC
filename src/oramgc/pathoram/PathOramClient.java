@@ -1,6 +1,6 @@
 package oramgc.pathoram;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,15 +22,15 @@ public class PathOramClient extends PathOramParty {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		Block[][] scStash = prepareBlocks(stash, stash, stash);
-		Signal[] scIden = gen.inputOfGen(iden);
-		Signal[] scPos = gen.inputOfGen(newPos);
+		GCSignal[] scIden = gen.inputOfGen(iden);
+		GCSignal[] scPos = gen.inputOfGen(newPos);
 		
 		
 		Block res = lib.readAndRemove(scPath[0], scIden);
 
 		BlockInBinary r =  outputBlock(res);
 		
-		Signal[] scData = res.data;
+		GCSignal[] scData = res.data;
 		if(data != null)
 			scData = gen.inputOfGen(data);
 		
@@ -47,7 +47,7 @@ public class PathOramClient extends PathOramParty {
 		
 		return r;
 	}
-	Signal[] scIden;
+	GCSignal[] scIden;
 	Block[][] scStash;
 	Block[][] scPath;
 	boolean[] workingPos;
@@ -65,8 +65,8 @@ public class PathOramClient extends PathOramParty {
 	}
 	
 	public void putBack(boolean[] iden, boolean[] newPos, boolean[] data) throws Exception {
-		Signal[] scPos = gen.inputOfGen(newPos);
-		Signal[] scData = gen.inputOfGen(data);
+		GCSignal[] scPos = gen.inputOfGen(newPos);
+		GCSignal[] scData = gen.inputOfGen(data);
 		boolean[] pos = workingPos;
 		Block scNewBlock = new Block(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		

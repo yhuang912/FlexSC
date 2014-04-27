@@ -2,7 +2,7 @@ package oramgc.pathoram;
 
 import java.util.Random;
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 import org.junit.Test;
 import test.harness.Test_2Input1Output;
 
@@ -16,7 +16,7 @@ public class TestDeepestLevel extends Test_2Input1Output{
 
 		for (int i = 0; i < testCases; i++) {
 			runThreads(new Helper(rnd.nextInt()%(1<<30), rnd.nextInt()%(1<<30)) {
-				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
+				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
 					return new PathOramLib(0, 0, 0, 0, e).deepestLevel(Signala ,Signalb);
 					}
 

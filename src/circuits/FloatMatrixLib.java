@@ -1,30 +1,30 @@
 package circuits;
 
 import flexsc.CompEnv;
-import gc.Signal;
-import objects.Float.Represention;
+import gc.GCSignal;
+import objects.Float.Representation;
 
 public class FloatMatrixLib extends FloatLib {
 
-	public FloatMatrixLib(CompEnv<Signal> e) {
+	public FloatMatrixLib(CompEnv<GCSignal> e) {
 		super(e);
 	}
 	
-	public Represention[][] add(Represention[][] a, Represention[][] b) throws Exception {
+	public Representation[][] add(Representation[][] a, Representation[][] b) throws Exception {
 		int n = a.length;
 		int m = a[0].length;
-		Represention result[][] = new Represention[n][m];
+		Representation result[][] = new Representation[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j)
 				result[i][j] = add(a[i][j], b[i][j]);
 		return result;
 	}
 	
-	public Represention[][] multiply(Represention[][] a, Represention[][] b) throws Exception {
+	public Representation[][] multiply(Representation[][] a, Representation[][] b) throws Exception {
 		int n = a.length;
 		int m = a[0].length;
 		int l = b[0].length;
-		Represention result[][] = new Represention[n][m];
+		Representation result[][] = new Representation[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < l; ++l) {
 				result[i][j] = multiply(a[i][0], b[0][l]);
@@ -34,38 +34,38 @@ public class FloatMatrixLib extends FloatLib {
 		return result;		
 	}
 	
-	public Represention[][] transpose(Represention[][] a){
+	public Representation[][] transpose(Representation[][] a){
 		int n = a.length;
 		int m = a[0].length;
-		Represention result[][] = new Represention[n][m];
+		Representation result[][] = new Representation[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j)
 				result[i][j] = a[j][i];
 		return result;
 	}
 	
-	public Represention[][] xor(Represention[][] a, Represention[][] b){
+	public Representation[][] xor(Representation[][] a, Representation[][] b){
 		int n = a.length;
 		int m = a[0].length;
-		Represention result[][] = new Represention[n][m];
+		Representation result[][] = new Representation[n][m];
 		for(int i = 0; i < a.length; ++i)
 			for(int j = 0; j < a[i].length; ++j)
 				result[i][j] = xor(a[i][j], b[i][j]);
 		return result;
 	}
 	
-	public Represention determinant(Represention[][] a) throws Exception{
+	public Representation determinant(Representation[][] a) throws Exception{
 		if(a.length == 1)
 			return a[0][0];
 		if(a.length == 2){
 			return sub(multiply(a[0][0], a[1][1]), multiply(a[0][1], a[1][0]));
 		}
 		else {
-			Represention result = sub(a[0][0], a[0][0]);
+			Representation result = sub(a[0][0], a[0][0]);
 			for (int i = 0; i < a[0].length; ++i) {
-				Represention tmp = determinant(createSubMatrix(a, 0, i));
+				Representation tmp = determinant(createSubMatrix(a, 0, i));
 				tmp = multiply(a[0][i], tmp);
-				Signal t = (i % 2 == 1) ? SIGNAL_ONE : SIGNAL_ZERO;
+				GCSignal t = (i % 2 == 1) ? SIGNAL_ONE : SIGNAL_ZERO;
 				tmp.s = xor(t, tmp.s);
 		        result = add(result, tmp);
 		    }
@@ -73,11 +73,11 @@ public class FloatMatrixLib extends FloatLib {
 		}
 	}
 	
-	public Represention[][] createSubMatrix(Represention[][] a, int row, int col) throws Exception {
+	public Representation[][] createSubMatrix(Representation[][] a, int row, int col) throws Exception {
 		int n = a.length;
 		int m = a[0].length;
 		int r = -1;
-		Represention result[][] = new Represention[n-1][m-1];
+		Representation result[][] = new Representation[n-1][m-1];
 		for(int i = 0; i < n; ++i){
 			if(i == row)continue;
 			
@@ -92,36 +92,36 @@ public class FloatMatrixLib extends FloatLib {
 		return result;
 	}
 			
-	public Represention[][] inverse(Represention[][] a) throws Exception {
-		Represention[][] result = transpose(cofactor(a));
+	public Representation[][] inverse(Representation[][] a) throws Exception {
+		Representation[][] result = transpose(cofactor(a));
 		
-		Represention c = determinant(a);
-		Represention cInv = divide(publicFloat(1.0, c.v.length, c.p.length), c);
+		Representation c = determinant(a);
+		Representation cInv = divide(publicFloat(1.0, c.v.length, c.p.length), c);
 		for(int i = 0; i < a.length; ++i)
 			for(int j = 0; j < a[i].length; ++j)
 				result[i][j] = multiply(result[i][j], cInv);
 		return result;
 	}
 	
-	public Represention[][] cofactor(Represention[][] a) throws Exception  {
+	public Representation[][] cofactor(Representation[][] a) throws Exception  {
 		int n = a.length;
 		int m = a[0].length;
-		Represention[][] result = new Represention[n][m];
+		Representation[][] result = new Representation[n][m];
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j){
-				Represention tmp = determinant(createSubMatrix(a, i, j));
-				Signal t = ((j+i) % 2 == 1) ?  SIGNAL_ONE : SIGNAL_ZERO;
+				Representation tmp = determinant(createSubMatrix(a, i, j));
+				GCSignal t = ((j+i) % 2 == 1) ?  SIGNAL_ONE : SIGNAL_ZERO;
 				tmp.s = xor(tmp.s, t);
 				result[i][j] = tmp; 
 			}
 		return result;
 	}
 	
-	public Represention[][] fastInverse(Represention[][] m) throws Exception {
+	public Representation[][] fastInverse(Representation[][] m) throws Exception {
 		int dimension = m.length;
-		Represention[][] extended = new Represention[dimension][2*dimension];
-		Represention zeroFloat = publicFloat(0, m[0][0].v.length, m[0][0].p.length);
-		Represention oneFloat = publicFloat(1, m[0][0].v.length, m[0][0].p.length);
+		Representation[][] extended = new Representation[dimension][2*dimension];
+		Representation zeroFloat = publicFloat(0, m[0][0].v.length, m[0][0].p.length);
+		Representation oneFloat = publicFloat(1, m[0][0].v.length, m[0][0].p.length);
 		for(int i = 0 ; i < dimension; ++i){
 			for(int j = 0; j < dimension; ++j)
 				extended[i][j] = m[i][j];
@@ -130,7 +130,7 @@ public class FloatMatrixLib extends FloatLib {
 			extended[i][dimension+i] = oneFloat;
 		}
 		extended = rref(extended);
-		Represention[][] result = new Represention[dimension][dimension];
+		Representation[][] result = new Representation[dimension][dimension];
 		for(int i = 0 ; i < dimension; ++i) {
 			for(int j = 0; j < dimension; ++j)
 				result[i][j] = extended[i][dimension+j];
@@ -138,8 +138,8 @@ public class FloatMatrixLib extends FloatLib {
 		return result;
 	}
 	
-	public Represention[][] rref(Represention[][] m) throws Exception {
-		Represention[][] result = new Represention[m.length][m[0].length];
+	public Representation[][] rref(Representation[][] m) throws Exception {
+		Representation[][] result = new Representation[m.length][m[0].length];
 		for (int r = 0; r < m.length; ++r)
 	        for (int c = 0; c < m[r].length; ++c)
 	            result[r][c] = m[r][c];
@@ -147,8 +147,8 @@ public class FloatMatrixLib extends FloatLib {
 	    for (int p = 0; p <  result.length; ++p)
 	    {
 	        /* Make this pivot 1 */
-	        Represention pv = result[p][p];
-	        Represention pvInv = divide(publicFloat(1.0, pv.v.length, pv.p.length), pv);
+	        Representation pv = result[p][p];
+	        Representation pvInv = divide(publicFloat(1.0, pv.v.length, pv.p.length), pv);
 	        for (int i = 0; i < result[p].length; ++i)
 	        	result[p][i] = mux(multiply(result[p][i], pvInv),result[p][i],pv.z);
 
@@ -157,7 +157,7 @@ public class FloatMatrixLib extends FloatLib {
 	        {
 	            if (r != p)
 	            {
-	                Represention f = result[r][p];
+	                Representation f = result[r][p];
 	                for (int i = 0; i < result[r].length; ++i)
 	                {
 	                	result[r][i] = sub(result[r][i], multiply(f, result[p][i]));

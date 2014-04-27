@@ -1,6 +1,6 @@
 package oramgc.treeoram;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +29,7 @@ public class TreeOramClient extends TreeOramParty {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		
-		Signal[] scIden = gen.inputOfGen(iden);
+		GCSignal[] scIden = gen.inputOfGen(iden);
 				
 		Block res = lib.readAndRemove(scPath[0], scIden);
 		

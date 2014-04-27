@@ -6,7 +6,7 @@ import java.util.Random;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class TestSort {
 			for(int i = 0; i < intA.length; ++i)
 				a[i] = Utils.fromInt(aa[i], 32);
 		}
-		abstract Signal[][] secureCompute(Signal[][] Signala, CompEnv<Signal> e) throws Exception;
+		abstract GCSignal[][] secureCompute(GCSignal[][] Signala, CompEnv<GCSignal> e) throws Exception;
 		abstract int[] plainCompute(int[] intA2);
 	}
 
@@ -39,13 +39,13 @@ public class TestSort {
 			try {
 				listen(54321);
 				
-				Signal[][] a = new Signal[h.a.length][h.a[0].length];
+				GCSignal[][] a = new GCSignal[h.a.length][h.a[0].length];
 
 				GCGen gen = new GCGen(is, os);
 				for(int i = 0; i < a.length; ++i)
 					a[i] = gen.inputOfEva(new boolean[32]);
 
-				Signal[][] d = h.secureCompute(a, gen);
+				GCSignal[][] d = h.secureCompute(a, gen);
 				os.flush();
 				
 				z = new boolean[d.length][d[0].length];
@@ -70,13 +70,13 @@ public class TestSort {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				Signal[][] a = new Signal[h.a.length][h.a[0].length];
+				GCSignal[][] a = new GCSignal[h.a.length][h.a[0].length];
 
 				GCEva eva = new GCEva(is, os);
 				for(int i = 0; i < a.length; ++i)
 					a[i] = eva.inputOfEva(h.a[i]);
 
-				Signal[][] d = h.secureCompute(a, eva);
+				GCSignal[][] d = h.secureCompute(a, eva);
 				
 				for (int i = 0; i < d.length; i++)
 					eva.outputToGen(d[i]);
@@ -115,7 +115,7 @@ public class TestSort {
 				a[j] = rnd.nextInt()%(1<<30);
 			
 			runThreads(new Helper(a) {
-				Signal[][] secureCompute(Signal[][] Signala, CompEnv<Signal> e) throws Exception {
+				GCSignal[][] secureCompute(GCSignal[][] Signala, CompEnv<GCSignal> e) throws Exception {
 					BitonicSortLib lib =  new BitonicSortLib(e);
 					lib.sort(Signala, BitonicSortLib.SIGNAL_ONE);
 					return Signala;

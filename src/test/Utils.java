@@ -3,6 +3,20 @@ package test;
 import java.math.BigInteger;
 
 public class Utils {
+	public static Boolean[] toBooleanArray(boolean[] a) {
+		Boolean[] res = new Boolean[a.length];
+		for (int i = 0; i < a.length; i++)
+			res[i] = a[i];
+		return res;
+	}
+	
+	public static boolean[] tobooleanArray(Boolean[] a) {
+		boolean[] res = new boolean[a.length];
+		for (int i = 0; i < a.length; i++)
+			res[i] = a[i];
+		return res;
+	}
+	
 	public static boolean[] fromInt(int value, int width) {
 		boolean[] res = new boolean[width];
 		for (int i = 0; i < width; i++)

@@ -3,7 +3,7 @@ package test;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class TestConditionalIncreament extends Test_1Input1Output{
 		for (int i = 0; i < testCases; i++) {
 			runThreads(
 					new Helper(rnd.nextInt(1<<30)) {
-						public Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
+						public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
 							IntegerLib lib = new IntegerLib(e);
 							return lib.conditionalDecrement(Signala, CircuitLib.SIGNAL_ONE);
 						}
@@ -34,7 +34,7 @@ public class TestConditionalIncreament extends Test_1Input1Output{
 
 			runThreads(
 					new Helper(rnd.nextInt(1<<30)) {
-						public Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
+						public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
 							IntegerLib lib = new IntegerLib(e);
 							return lib.conditionalDecrement(Signala, CircuitLib.SIGNAL_ZERO);
 						}

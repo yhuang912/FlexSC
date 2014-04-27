@@ -1,6 +1,6 @@
 package ot;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.io.*;
 import java.util.*;
@@ -11,20 +11,20 @@ public class FakeOTReceiver extends OTReceiver {
 	}
 	
 	@Override
-	public Signal receive(boolean c) throws Exception {
-		Signal[] m = new Signal[2];
-		m[0] = Signal.receive(is);
-		m[1] = Signal.receive(is);
+	public GCSignal receive(boolean c) throws Exception {
+		GCSignal[] m = new GCSignal[2];
+		m[0] = GCSignal.receive(is);
+		m[1] = GCSignal.receive(is);
 		return m[c?1:0];
 	}
 
 	@Override
-	public Signal[] receive(boolean[] c) throws Exception {
-		Signal[] res = new Signal[c.length];
+	public GCSignal[] receive(boolean[] c) throws Exception {
+		GCSignal[] res = new GCSignal[c.length];
 		for (int i = 0; i < c.length; i++) {
-			Signal[] m = new Signal[2];
-			m[0] = Signal.receive(is);
-			m[1] = Signal.receive(is);
+			GCSignal[] m = new GCSignal[2];
+			m[0] = GCSignal.receive(is);
+			m[1] = GCSignal.receive(is);
 			res[i] = m[c[i]?1:0];
 		}
 		return res;

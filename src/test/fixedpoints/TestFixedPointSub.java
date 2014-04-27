@@ -3,7 +3,7 @@ package test.fixedpoints;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 import org.junit.Test;
 import test.harness.TestFixedPoint;
 import test.harness.TestFloat;
@@ -23,7 +23,7 @@ public class TestFixedPointSub extends TestFixedPoint {
 			runThreads(new Helper(d1, d2) {
 				
 				@Override
-				public Signal[] secureCompute(Signal[] a, Signal[] b, int offset, CompEnv<Signal> env) throws Exception {
+				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b, int offset, CompEnv<GCSignal> env) throws Exception {
 					return new FixedPointLib(env).sub(a, b, offset);
 				}
 				

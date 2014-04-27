@@ -2,7 +2,7 @@
 
 package ot;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.math.*;
 import java.io.*;
@@ -19,7 +19,7 @@ public class OTExtSender extends OTSender {
     private static SecureRandom rnd = new SecureRandom();
     private OTReceiver rcver;
     private boolean[] s;
-    private Signal[] keys;
+    private GCSignal[] keys;
     
     ObjectInputStream ois;
 	ObjectOutputStream oos;
@@ -37,10 +37,10 @@ public class OTExtSender extends OTSender {
     	initialize();
     }
 
-    Signal[][] pool = new Signal[OTPerBatch][2];
+    GCSignal[][] pool = new GCSignal[OTPerBatch][2];
     int poolIndex = 0;
 	@Override
-	public void send(Signal[] m) throws Exception {
+	public void send(GCSignal[] m) throws Exception {
 		boolean x = ois.readBoolean();
 		int i = x?1:0;
 		pool[poolIndex][i].xor(m[0]).send(os);
@@ -53,11 +53,11 @@ public class OTExtSender extends OTSender {
 			refillPool();
 	}
 	
-    public void send(Signal[][] msgPairs) throws Exception {    	
-    	Signal[][] pairs = new Signal[SecurityParameter.k1 + msgPairs.length][2];
+    public void send(GCSignal[][] msgPairs) throws Exception {    	
+    	GCSignal[][] pairs = new GCSignal[SecurityParameter.k1 + msgPairs.length][2];
     	for (int i = 0; i < SecurityParameter.k1; i++) {
-    		pairs[i][0] = Signal.freshLabel(rnd);
-    		pairs[i][1] = Signal.freshLabel(rnd);
+    		pairs[i][0] = GCSignal.freshLabel(rnd);
+    		pairs[i][1] = GCSignal.freshLabel(rnd);
     	}
     	
     	for (int i = SecurityParameter.k1; i < pairs.length; i++) {
@@ -67,7 +67,7 @@ public class OTExtSender extends OTSender {
     	
     	reverseAndExtend(s, keys, msgBitLength, pairs, ois, oos, cipher);
     	
-    	Signal[][] keyPairs = new Signal[SecurityParameter.k1][2];
+    	GCSignal[][] keyPairs = new GCSignal[SecurityParameter.k1][2];
     	for (int i = 0; i < SecurityParameter.k1; i++) {
     		keyPairs[i][0] = pairs[i][0];
     		keyPairs[i][1] = pairs[i][1];
@@ -79,8 +79,8 @@ public class OTExtSender extends OTSender {
 
 	// Given s and keys, obliviously sends msgPairs which contains 'numOfPairs'
 	// pair of strings, each of length 'msgBitLength' bits.  
-    static void reverseAndExtend(boolean[] s, Signal[] keys, 
-    		int msgBitLength, Signal[][] msgPairs,
+    static void reverseAndExtend(boolean[] s, GCSignal[] keys, 
+    		int msgBitLength, GCSignal[][] msgPairs,
     		ObjectInputStream ois, ObjectOutputStream oos, Cipher cipher) throws Exception {
     	BigInteger[][] cphPairs = (BigInteger[][]) ois.readObject();
     	int numOfPairs = msgPairs.length;
@@ -127,8 +127,8 @@ public class OTExtSender extends OTSender {
     
     private void refillPool() throws Exception {
     	for (int i = 0; i < pool.length; i++) {
-			pool[i][0] = Signal.freshLabel(rnd);
-			pool[i][1] = Signal.freshLabel(rnd);
+			pool[i][0] = GCSignal.freshLabel(rnd);
+			pool[i][1] = GCSignal.freshLabel(rnd);
 		}
 		send(pool);
 		poolIndex = 0;

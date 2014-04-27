@@ -1,140 +1,139 @@
 package circuits;
 
 import flexsc.CompEnv;
-import gc.Signal;
 
 import java.util.Arrays;
 
-import objects.Float.Represention;
+import objects.Float.Representation;
 
-public class FloatLib extends IntegerLib {
+public class FloatLib<T> extends IntegerLib<T> {
 
-	public FloatLib(CompEnv<Signal> e) {
+	public FloatLib(CompEnv<T> e) {
 		super(e);
 	}
 	
-	public Represention one(Represention a) throws Exception {
-		Signal[] v = zeros(a.v.length);
+	public Representation<T> one(Representation<T> a) throws Exception {
+		T[] v = zeros(a.v.length);
 		v[v.length-1] = SIGNAL_ONE;
 		
-		Signal[] p = zeros(a.p.length);
+		T[] p = zeros(a.p.length);
 		p = sub(p, toSignals(v.length-1, p.length));
 		
-		Represention result = new Represention(SIGNAL_ZERO, p, v, SIGNAL_ZERO);
+		Representation<T> result = new Representation<T>(SIGNAL_ZERO, p, v, SIGNAL_ZERO);
 		return result;
 	}
 	
-	public Represention zero(Represention a) throws Exception {
-		Signal[] v = zeros(a.v.length);
-		Signal[] p = zeros(a.p.length);
+	public Representation<T> zero(Representation<T> a) throws Exception {
+		T[] v = zeros(a.v.length);
+		T[] p = zeros(a.p.length);
 		
-		Represention result = new Represention(SIGNAL_ZERO, p, v, SIGNAL_ONE);
+		Representation<T> result = new Representation<T>(SIGNAL_ZERO, p, v, SIGNAL_ONE);
 		return result;
 	}
 	
-	public Represention zero(int lengthV, int lengthP) throws Exception {
-		Signal[] v = zeros(lengthV);
-		Signal[] p = zeros(lengthP);
-		Represention result = new Represention(SIGNAL_ZERO, p, v, SIGNAL_ONE);
+	public Representation<T> zero(int lengthV, int lengthP) throws Exception {
+		T[] v = zeros(lengthV);
+		T[] p = zeros(lengthP);
+		Representation<T> result = new Representation<T>(SIGNAL_ZERO, p, v, SIGNAL_ONE);
 		return result;
 	}	
 	
-	public Represention multiply(Represention a, Represention b) throws Exception {
+	public Representation<T> multiply(Representation<T> a, Representation<T> b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
-		Signal new_z = or(a.z, b.z);
-		Signal new_s = mux(xor(a.s, b.s),SIGNAL_ONE,new_z);
-		Signal[] a_multi_b = unSignedMultiply(a.v, b.v);//length 2*v.length
-		Signal[] a_add_b = add(a.p, b.p);
+		T new_z = or(a.z, b.z);
+		T new_s = mux(xor(a.s, b.s),SIGNAL_ONE,new_z);
+		T[] a_multi_b = unSignedMultiply(a.v, b.v);//length 2*v.length
+		T[] a_add_b = add(a.p, b.p);
 				
-		Signal toShift = not(a_multi_b[a_multi_b.length-1]);
-		Signal[] Shifted = conditionalLeftPublicShift(a_multi_b, 1, toShift);
+		T toShift = not(a_multi_b[a_multi_b.length-1]);
+		T[] Shifted = conditionalLeftPublicShift(a_multi_b, 1, toShift);
 		
-		Signal[] new_v = Arrays.copyOfRange(Shifted, a.v.length, a.v.length*2);
-		Signal[] new_p = add(a_add_b, toSignals(a.v.length, a_add_b.length));
+		T[] new_v = Arrays.copyOfRange(Shifted, a.v.length, a.v.length*2);
+		T[] new_p = add(a_add_b, toSignals(a.v.length, a_add_b.length));
 		
-		Signal[] decrement = zeros(new_p.length);
+		T[] decrement = zeros(new_p.length);
 		decrement[0] = toShift;
 		new_p = sub(new_p, decrement);
-		return new Represention(new_s, new_p, new_v, new_z);
+		return new Representation<T>(new_s, new_p, new_v, new_z);
 	}
 	
-	public Represention divide(Represention a, Represention b) throws Exception {
+	public Representation<T> divide(Representation<T> a, Representation<T> b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
-		Signal new_z = a.z;
-		Signal new_s = mux(xor(a.s, b.s), SIGNAL_ONE, a.z);
+		T new_z = a.z;
+		T new_s = mux(xor(a.s, b.s), SIGNAL_ONE, a.z);
 		int length = a.v.length;
 		int newLength = 3*a.v.length;
-		Signal[] padded_av = padSignal(a.v, newLength);
-		Signal[] padded_bv = padSignal(b.v, newLength);
-		Signal[] shifted_av = leftPublicShift(padded_av, newLength-length-1);
-		Signal[] new_a_p = sub(a.p, toSignals(newLength-length-1, a.p.length));
-		Signal[] a_div_b = divide(shifted_av, padded_bv);//length 2*NewLength
-		Signal[] a_sub_b = sub(new_a_p, b.p);
+		T[] padded_av = padSignal(a.v, newLength);
+		T[] padded_bv = padSignal(b.v, newLength);
+		T[] shifted_av = leftPublicShift(padded_av, newLength-length-1);
+		T[] new_a_p = sub(a.p, toSignals(newLength-length-1, a.p.length));
+		T[] a_div_b = divide(shifted_av, padded_bv);//length 2*NewLength
+		T[] a_sub_b = sub(new_a_p, b.p);
 		
-		Signal[] leadingzero = leadingZeros(a_div_b);
-		Signal[] ShiftAmount = sub( toSignals(2*newLength-length), padSignal(leadingzero,32));
-		Signal[] normalized_av = mux( rightPrivateShift(a_div_b, ShiftAmount), 
+		T[] leadingzero = leadingZeros(a_div_b);
+		T[] ShiftAmount = sub( toSignals(2*newLength-length), padSignal(leadingzero,32));
+		T[] normalized_av = mux( rightPrivateShift(a_div_b, ShiftAmount), 
 		leftPrivateShift(a_div_b, twosComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
 
-		Signal[] new_v = Arrays.copyOfRange(normalized_av, 0, length);
-		Signal[] new_p = add(a_sub_b, ShiftAmount);
+		T[] new_v = Arrays.copyOfRange(normalized_av, 0, length);
+		T[] new_p = add(a_sub_b, ShiftAmount);
 
-		return new Represention(new_s, new_p, new_v, new_z);
+		return new Representation<T>(new_s, new_p, new_v, new_z);
 	}
 	
 	
-	public Represention publicFloat(double d, int lengthV, int lengthP) {
+	public Representation<T> publicFloat(double d, int lengthV, int lengthP) {
 		FloatFormat f = new FloatFormat(d, lengthV, lengthP);
-		Signal s = f.s? SIGNAL_ONE : SIGNAL_ZERO;
-		Signal z = f.z? SIGNAL_ONE : SIGNAL_ZERO;
-		Signal[] v = new Signal[lengthV];
-		Signal[] p = new Signal[lengthP];
+		T s = f.s? SIGNAL_ONE : SIGNAL_ZERO;
+		T z = f.z? SIGNAL_ONE : SIGNAL_ZERO;
+		T[] v = env.newTArray(lengthV);
+		T[] p = env.newTArray(lengthP);
 		for(int i = 0; i < lengthV; ++i)
 			v[i] = f.v[i] ? SIGNAL_ONE : SIGNAL_ZERO;
 		for(int i = 0; i < lengthP; ++i)
 			p[i] = f.p[i] ? SIGNAL_ONE : SIGNAL_ZERO;
-		return new Represention(s, p, v, z);
+		return new Representation<T>(s, p, v, z);
 	}
 	
 	/* does not handle the case like 100000001 + 10000000001. fix later.
 	 * -> fix is newlengthV : 2->3.
 	 * */
-	public Represention add(Represention a, Represention b) throws Exception {
+	public Representation<T> add(Representation<T> a, Representation<T> b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
 		int lengthV = a.v.length;
 		int newLengthV = 3*a.v.length;
-		Signal[] diffab = sub(a.p, b.p);
-		Signal[] diffba = twosComplement(diffab);//sub(b.p, a.p);
-		Signal aPGreater = diffba[diffba.length-1];
+		T[] diffab = sub(a.p, b.p);
+		T[] diffba = twosComplement(diffab);//sub(b.p, a.p);
+		T aPGreater = diffba[diffba.length-1];
 		
 		
 		//make v signed
-		Signal[] signed_av = padSignal(a.v, newLengthV);
+		T[] signed_av = padSignal(a.v, newLengthV);
 		signed_av = mux(signed_av, twosComplement(signed_av), a.s);
-		Signal[] signed_bv = padSignal(b.v, newLengthV);
+		T[] signed_bv = padSignal(b.v, newLengthV);
 		signed_bv = mux(signed_bv, twosComplement(signed_bv), b.s);
 				
 		//shift them to have same p
-		Signal[] shifted_v =  leftPrivateShift(mux(signed_bv, signed_av, aPGreater), mux(diffba, diffab, aPGreater));
+		T[] shifted_v =  leftPrivateShift(mux(signed_bv, signed_av, aPGreater), mux(diffba, diffab, aPGreater));
 		
 		// add v's
-		Signal[] new_v = add(shifted_v, mux(signed_av, signed_bv, aPGreater));
+		T[] new_v = add(shifted_v, mux(signed_av, signed_bv, aPGreater));
 		
 		//change back to unsigned ver
-		Signal resultNeg = new_v[new_v.length-1];
+		T resultNeg = new_v[new_v.length-1];
 		new_v = mux(new_v, twosComplement(new_v), resultNeg);
 		
 		//get new p, which is the smaller of the two
-		Signal[] new_p = Arrays.copyOf(mux(a.p, b.p, aPGreater), b.p.length);
+		T[] new_p = Arrays.copyOf(mux(a.p, b.p, aPGreater), b.p.length);
 		
 		
 		//now do normalize
-		Signal[] leadingzero = leadingZeros(new_v);
-		Signal[] ShiftAmount = sub( toSignals(newLengthV-lengthV), padSignal(leadingzero,32));
-		Signal[] normalized_av = mux( rightPrivateShift(new_v, ShiftAmount), 
+		T[] leadingzero = leadingZeros(new_v);
+		T[] ShiftAmount = sub( toSignals(newLengthV-lengthV), padSignal(leadingzero,32));
+		T[] normalized_av = mux( rightPrivateShift(new_v, ShiftAmount), 
 				leftPrivateShift(new_v, twosComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
 
 		new_v = Arrays.copyOfRange(normalized_av, 0, lengthV);
@@ -144,7 +143,7 @@ public class FloatLib extends IntegerLib {
 		//Signal[] absDiff = mux(diffba, diffab, aPGreater);
 		//Signal outBound = geq(absDiff, getPublicSignal(lengthV, absDiff.length));
 		//Signal[] result_v = mux(mux(a.v, b.v, aPGreater),outBound);
-		Represention result = new Represention(resultNeg, new_p, new_v, eq(new_v, zeros(lengthV)));
+		Representation<T> result = new Representation<T>(resultNeg, new_p, new_v, eq(new_v, zeros(lengthV)));
 		return mux(mux(result,a,b.z),b,a.z);
 	}
 	
@@ -172,25 +171,25 @@ public class FloatLib extends IntegerLib {
 //		return null;
 //	}
 	
-	public Represention sub(Represention a, Represention b) throws Exception {
+	public Representation<T> sub(Representation<T> a, Representation<T> b) throws Exception {
 		assert(a.compatiable(b)) :"floats not compatible";
-		Represention negB = b.clone();
+		Representation<T> negB = b.clone();
 		negB.s = not(negB.s);
 		return add(a, negB);
 	}
 	
-	public Represention mux(Represention a, Represention b, Signal s) throws Exception{
-		return new Represention(mux(a.s, b.s, s), 
+	public Representation<T> mux(Representation<T> a, Representation<T> b, T s) throws Exception{
+		return new Representation<T>(mux(a.s, b.s, s), 
 						mux(a.p, b.p, s), 
 						mux(a.v, b.v, s), 
 						mux(a.z, b.z, s));
 	}
 	
-	public Represention xor(Represention a, Represention b){
-		Signal[] v = xor(a.v, b.v);
-		Signal[] p = xor(a.p, b.p);
-		Signal z= xor(a.z, b.z);
-		Signal s= xor(a.s, b.s);
-		return new Represention(s, p, v, z);
+	public Representation<T> xor(Representation<T> a, Representation<T> b){
+		T[] v = xor(a.v, b.v);
+		T[] p = xor(a.p, b.p);
+		T z= xor(a.z, b.z);
+		T s= xor(a.s, b.s);
+		return new Representation<T>(s, p, v, z);
 	}
 }

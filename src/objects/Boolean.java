@@ -2,21 +2,21 @@ package objects;
 
 import circuits.CircuitLib;
 import flexsc.CompEnv;
-import gc.*;
+import flexsc.Signal;
 
-public class Boolean {
-	CompEnv<Signal> env;
-	private Signal content;
-	private CircuitLib lib;
+public class Boolean<T extends Signal> {
+	CompEnv<T> env;
+	private T content;
+	private CircuitLib<T> lib;
 	
-	public Boolean(CompEnv<Signal> env, Signal s) throws Exception {
+	public Boolean(CompEnv<T> env, T s) throws Exception {
 		this.env = env;
-		lib = new CircuitLib(env);
+		lib = new CircuitLib<T>(env);
 		content = s;
 	}
 	
-	Boolean and(Boolean b) throws Exception {
-		Signal result = lib.and(this.content, b.content);
-		return new Boolean(env, result);
+	Boolean<T> and(Boolean<T> b) throws Exception {
+		T result = lib.and(this.content, b.content);
+		return new Boolean<T>(env, result);
 	}
 }

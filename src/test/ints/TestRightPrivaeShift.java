@@ -3,7 +3,7 @@ package test.ints;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class TestRightPrivaeShift extends Test_2Input1Output{
 		for (int i = 0; i < testCases; i++) {
 			int shift = rnd.nextInt(1<<5);
 			runThreads(new Helper(rnd.nextInt(1<<30), shift) {
-				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
+				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
 					return new IntegerLib(e).rightPrivateShift(Signala ,Signalb);}
 
 				public int plainCompute(int x, int y) {

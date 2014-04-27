@@ -1,6 +1,6 @@
 package ot;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.io.*;
 import java.util.*;
@@ -15,6 +15,6 @@ public abstract class OTReceiver {
 		os = out;
 	}
 	
-	public abstract Signal receive(boolean c) throws Exception;
-	public abstract Signal[] receive(boolean[] c) throws Exception;
+	public abstract GCSignal receive(boolean c) throws Exception;
+	public abstract GCSignal[] receive(boolean[] c) throws Exception;
 }

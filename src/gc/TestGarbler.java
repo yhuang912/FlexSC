@@ -8,9 +8,9 @@ public class TestGarbler {
 	SecureRandom rnd = new SecureRandom();
 	
 	public void test() {
-		Signal a = Signal.freshLabel(rnd);
-		Signal b = Signal.freshLabel(rnd);
-		Signal m = Signal.freshLabel(rnd);
+		GCSignal a = GCSignal.freshLabel(rnd);
+		GCSignal b = GCSignal.freshLabel(rnd);
+		GCSignal m = GCSignal.freshLabel(rnd);
 		Garbler gb = new Garbler();
 		
 		Assert.assertTrue(m.equals(gb.dec(a, b, 0L, gb.enc(a, b, 0L, m))));

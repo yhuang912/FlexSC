@@ -2,7 +2,7 @@
 
 package ot;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.math.*;
 //import java.util.*;
@@ -37,7 +37,7 @@ public class NPOTSender extends OTSender {
         initialize();
     }
 
-    public void send(Signal[][] msgPairs) throws Exception {
+    public void send(GCSignal[][] msgPairs) throws Exception {
 //        super.execProtocol(msgPairs);
 
         step1(msgPairs);
@@ -114,14 +114,14 @@ public class NPOTSender extends OTSender {
     }
 
     @Override
-    public void send(Signal[] msgPair) throws Exception {
-    	Signal[][] m = new Signal[1][2];
+    public void send(GCSignal[] msgPair) throws Exception {
+    	GCSignal[][] m = new GCSignal[1][2];
     	m[0][0] = msgPair[0];
     	m[0][1] = msgPair[1];
     	send(m);
     }
     
-    private void step1(Signal[][] msgPairs) throws Exception {
+    private void step1(GCSignal[][] msgPairs) throws Exception {
         BigInteger[] pk0 = (BigInteger[]) ois.readObject();
         BigInteger[] pk1 = new BigInteger[msgPairs.length];
         BigInteger[][] msg = new BigInteger[msgPairs.length][2];

@@ -11,9 +11,9 @@ import ot.NPOTReceiver;
 import ot.NPOTSender;
 
 public class TestNPOT_Special {
-	Signal[] m;
+	GCSignal[] m;
 	boolean c;
-	Signal rcvd;
+	GCSignal rcvd;
 	
 	class SenderRunnable extends network.Server implements Runnable {
 		NPOTSender snd;
@@ -71,9 +71,9 @@ public class TestNPOT_Special {
 	@Test
 	public void testAllCases() throws Exception {
 		System.out.println("Testing NPOT for a special case...");
-		m = new Signal[2];
-		m[0] = Signal.newInstance(new byte[]{0, 51, -81, -8, -31, -11, -63, -33, 119, 88});
-		m[1] = Signal.newInstance(new byte[]{90, 51, -81, -8, -31, -11, -63, -33, 119, 88});
+		m = new GCSignal[2];
+		m[0] = GCSignal.newInstance(new byte[]{0, 51, -81, -8, -31, -11, -63, -33, 119, 88});
+		m[1] = GCSignal.newInstance(new byte[]{90, 51, -81, -8, -31, -11, -63, -33, 119, 88});
 		c = false;
 		runThreads();
 	}

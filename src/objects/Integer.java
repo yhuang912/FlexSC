@@ -2,36 +2,36 @@ package objects;
 
 import circuits.IntegerLib;
 import flexsc.CompEnv;
-import gc.*;
+import flexsc.Signal;
 
-public class Integer {
-	CompEnv<Signal> env;
-	private Signal[] content;
-	IntegerLib lib;
+public class Integer<T extends Signal> {
+	CompEnv<T> env;
+	private T[] content;
+	IntegerLib<T> lib;
 	
-	public Integer(CompEnv<Signal> env, Signal[] s) throws Exception {
+	public Integer(CompEnv<T> env, T[] s) throws Exception {
 		this.env = env;
-		lib = new IntegerLib(env);
+		lib = new IntegerLib<T>(env);
 		content = s;
 	}
 	
-	Integer add(Integer b) throws Exception {
-		Signal[] result = lib.add(this.content, b.content);
-		return new Integer(env, result);
+	Integer<T> add(Integer<T> b) throws Exception {
+		T[] result = lib.add(this.content, b.content);
+		return new Integer<T>(env, result);
 	}
 
-	Integer sub(Integer b) throws Exception {
-		Signal[] result = lib.sub(this.content, b.content);
-		return new Integer(env, result);
+	Integer<T> sub(Integer<T> b) throws Exception {
+		T[] result = lib.sub(this.content, b.content);
+		return new Integer<T>(env, result);
 	}
 
-	Integer multiply(Integer b) throws Exception {
-		Signal[] result = lib.multiply(this.content, b.content);
-		return new Integer(env, result);
+	Integer<T> multiply(Integer<T> b) throws Exception {
+		T[] result = lib.multiply(this.content, b.content);
+		return new Integer<T>(env, result);
 	}
 	
-	Integer divide(Integer b) throws Exception {
-		Signal[] result = lib.divide(this.content, b.content);
-		return new Integer(env, result);
+	Integer<T> divide(Integer<T> b) throws Exception {
+		T[] result = lib.divide(this.content, b.content);
+		return new Integer<T>(env, result);
 	}
 }

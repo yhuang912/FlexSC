@@ -2,7 +2,7 @@ package test.binarygates;
 
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 import org.junit.Assert;
@@ -22,7 +22,7 @@ public class TestBinaryGates {
 		public void run() {
 			try {
 				listen(54321);
-				Signal a, b, c=null;
+				GCSignal a, b, c=null;
 				GCGen gen = new GCGen(is, os);
 				a = gen.inputOfGen(x);
 				b = gen.inputOfEva(false);
@@ -54,7 +54,7 @@ public class TestBinaryGates {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				Signal a, b, c=null;
+				GCSignal a, b, c=null;
 				GCEva eva = new GCEva(is, os);
 				a = eva.inputOfGen(false);
 				b = eva.inputOfEva(y);

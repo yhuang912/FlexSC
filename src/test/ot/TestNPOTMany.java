@@ -13,9 +13,9 @@ import ot.NPOTSender;
 
 public class TestNPOTMany {
 	static int n = 100;
-	Signal[][] m;
+	GCSignal[][] m;
 	boolean[] c;
-	Signal[] rcvd;
+	GCSignal[] rcvd;
 	
 	static SecureRandom rnd;
 	static {
@@ -38,10 +38,10 @@ public class TestNPOTMany {
 
 				listen(54321);
 
-				m = new Signal[n][2];
+				m = new GCSignal[n][2];
 				for (int i = 0; i < n; i++) {
-					m[i][0] = Signal.freshLabel(rnd);
-					m[i][1] = Signal.freshLabel(rnd);
+					m[i][0] = GCSignal.freshLabel(rnd);
+					m[i][1] = GCSignal.freshLabel(rnd);
 				}
 				snd = new NPOTSender(80, is, os);
 				snd.send(m);

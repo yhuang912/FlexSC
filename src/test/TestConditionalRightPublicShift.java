@@ -3,7 +3,7 @@ package test;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class TestConditionalRightPublicShift extends Test_1Input1Output{
 			final int shift = Math.abs(rnd.nextInt()%32);
 			runThreads(
 				new Helper(rnd.nextInt(1<<30)) {
-					public Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
+					public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
 						IntegerLib lib = new IntegerLib(e);
 						return lib.conditionalRightPublicShift(Signala, shift, CircuitLib.SIGNAL_ONE);
 					}
@@ -35,7 +35,7 @@ public class TestConditionalRightPublicShift extends Test_1Input1Output{
 			
 			runThreads(
 					new Helper(rnd.nextInt(1<<30)) {
-						public Signal[] secureCompute(Signal[] Signala, CompEnv<Signal> e) throws Exception {
+						public GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
 							IntegerLib lib = new IntegerLib(e);
 							return lib.conditionalRightPublicShift(Signala, shift, CircuitLib.SIGNAL_ZERO);
 						}

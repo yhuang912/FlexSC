@@ -3,7 +3,7 @@ package test.ints;
 import java.util.Random;
 
 import flexsc.CompEnv;
-import gc.Signal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class TestRemainder extends Test_2Input1Output{
 			int b = rnd.nextInt()%(1<<15);
 			b = (b == 0) ? 1 : b;
 			runThreads(new Helper(rnd.nextInt()%(1<<15), b){
-				public Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception {
+				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
 					return new IntegerLib(e).reminder(Signala ,Signalb);}
 
 				public int plainCompute(int x, int y) {

@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
-import gc.Signal;
+import gc.GCSignal;
 import org.junit.Assert;
 import test.Utils;
 
@@ -24,7 +24,7 @@ public class TestBigInteger {
 			a = Utils.fromBigInteger(aa, RANGE);
 			b = Utils.fromBigInteger(bb, RANGE);
 		}
-		public abstract Signal[] secureCompute(Signal[] Signala, Signal[] Signalb, CompEnv<Signal> e) throws Exception;
+		public abstract GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception;
 		public abstract BigInteger plainCompute(BigInteger x, BigInteger y);
 	}
 
@@ -40,11 +40,11 @@ public class TestBigInteger {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				Signal[] a = gen.inputOfGen(h.a);
-				Signal [] b = gen.inputOfEva(new boolean[h.b.length]);
+				GCSignal[] a = gen.inputOfGen(h.a);
+				GCSignal [] b = gen.inputOfEva(new boolean[h.b.length]);
 				
 				//new java.util.Scanner(System.in).nextLine();
-				Signal[] d = h.secureCompute(a, b, gen);
+				GCSignal[] d = h.secureCompute(a, b, gen);
 				os.flush();
 				
 		          
@@ -70,10 +70,10 @@ public class TestBigInteger {
 
 				GCEva eva = new GCEva(is, os);
 				
-				Signal [] a = eva.inputOfGen(new boolean[h.a.length]);
-				Signal [] b = eva.inputOfEva(h.b);
+				GCSignal [] a = eva.inputOfGen(new boolean[h.a.length]);
+				GCSignal [] b = eva.inputOfEva(h.b);
 				
-				Signal[] d = h.secureCompute(a, b, eva);
+				GCSignal[] d = h.secureCompute(a, b, eva);
 				
 				eva.outputToGen(d);
 				os.flush();

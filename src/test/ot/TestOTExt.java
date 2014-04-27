@@ -13,9 +13,9 @@ import ot.OTExtSender;
 
 public class TestOTExt {
 	static int n = 100000;
-	Signal[][] m;
+	GCSignal[][] m;
 	boolean[] c;
-	Signal[] rcvd;
+	GCSignal[] rcvd;
 	
 	static SecureRandom rnd = new SecureRandom("abc".getBytes());
 	
@@ -29,10 +29,10 @@ public class TestOTExt {
 				listen(54321);
 
 				snd = new OTExtSender(80, is, os);
-				m = new Signal[n][2];
+				m = new GCSignal[n][2];
 				for (int i = 0; i < n; i++) {
-					m[i][0] = Signal.freshLabel(rnd);
-					m[i][1] = Signal.freshLabel(rnd);
+					m[i][0] = GCSignal.freshLabel(rnd);
+					m[i][1] = GCSignal.freshLabel(rnd);
 					snd.send(m[i]);
 				}
 				
@@ -54,7 +54,7 @@ public class TestOTExt {
 				
 				rcv = new OTExtReceiver(is, os);
 				c = new boolean[n];
-				rcvd = new Signal[n];
+				rcvd = new GCSignal[n];
 				for (int i = 0; i < n; i++) {
 					c[i] = rnd.nextBoolean();
 					rcvd[i] = rcv.receive(c[i]);

@@ -1,6 +1,6 @@
 package oramgc.kaiminOram;
 
-import gc.Signal;
+import gc.GCSignal;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,9 +20,9 @@ public class KaiminOramClient extends KaiminOramParty {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		Block[][] scQueue = prepareBlocks(queue, queue, queue);
-		Signal[] scIden = gen.inputOfGen(iden);
-		Signal[] scNewPos = gen.inputOfGen(newPos);
-		Signal[] scData = null;
+		GCSignal[] scIden = gen.inputOfGen(iden);
+		GCSignal[] scNewPos = gen.inputOfGen(newPos);
+		GCSignal[] scData = null;
 		if(data != null)
 			scData = gen.inputOfGen(data);
 		
@@ -60,7 +60,7 @@ public class KaiminOramClient extends KaiminOramParty {
 
 	@Override
 	public void flushOneTime(boolean[] pos) throws Exception {
-		Signal[] pathSignal = new Signal[pos.length];
+		GCSignal[] pathSignal = new GCSignal[pos.length];
 		for(int i = 0; i < pos.length; ++i)
 			pathSignal[i] = pos[i] ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 		
@@ -90,7 +90,7 @@ public class KaiminOramClient extends KaiminOramParty {
 		Block[][] scQueue = prepareBlocks(queue, queue, queue);
 		
 		if(DEBUG) {//veridy queue is not full
-			Signal full = lib.SIGNAL_ONE;
+			GCSignal full = lib.SIGNAL_ONE;
 			for(int i = 0; i <scQueue[0].length; ++i){
 				full = lib.and(full, lib.not(lib.eq(scQueue[0][i].iden, lib.zeros(lengthOfIden)) ));
 			}
@@ -105,7 +105,7 @@ public class KaiminOramClient extends KaiminOramParty {
 	}
 	
 	Block[][] scQueue;
-	Signal[] scIden;
+	GCSignal[] scIden;
 	public boolean[] readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block[][] scPath = prepareBlocks(blocks, blocks, blocks);
@@ -125,8 +125,8 @@ public class KaiminOramClient extends KaiminOramParty {
 	}
 	
 	public void putBack(boolean[] iden, boolean[] newPos, boolean[] data) throws Exception {
-		Signal[] scNewPos = gen.inputOfGen(newPos);
-		Signal[] scData = gen.inputOfGen(data);
+		GCSignal[] scNewPos = gen.inputOfGen(newPos);
+		GCSignal[] scData = gen.inputOfGen(data);
 		Block b = new Block(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 
 		lib.add(scQueue[0], b);
