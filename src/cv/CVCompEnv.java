@@ -80,4 +80,13 @@ public class CVCompEnv implements CompEnv<Boolean> {
 		return d.toDouble();
 	}
 
+	@Override
+	public Boolean[][] newTArray(int d1, int d2) {
+		return new Boolean[d1][d2];
+	}
+	
+	@Override
+	public Boolean[][][] newTArray(int d1, int d2, int d3) {
+		return new Boolean[d1][d2][d3];
+	}
 }

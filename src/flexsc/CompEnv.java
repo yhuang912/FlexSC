@@ -18,5 +18,7 @@ public interface CompEnv<T> {
 	T ZERO();
 	
 	T[] newTArray(int len);
+	T[][] newTArray(int d1, int d2);
+	T[][][] newTArray(int d1, int d2, int d3);
 	T newT(boolean v);
 }
