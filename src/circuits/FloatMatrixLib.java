@@ -14,6 +14,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		return new Representation[len];
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Representation<T>[][] representationMatrix(int len1, int len2) {
 		return new Representation[len1][len2];
 	}
