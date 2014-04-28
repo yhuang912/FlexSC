@@ -6,7 +6,7 @@ import java.util.Arrays;
 import oramgc.Block;
 import oramgc.TreeBasedOramParty;
 
-public abstract class KaiminOramParty extends TreeBasedOramParty {
+public abstract class KaiminOramParty<T> extends TreeBasedOramParty<T> {
 	final boolean DEBUG = true;
 	BlockInBinary[] queue;
 	final int queueCapacity = 29;
@@ -14,8 +14,8 @@ public abstract class KaiminOramParty extends TreeBasedOramParty {
 	int leafCapacity;
 	int nodeCapacity;
 	public KaiminOramParty(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int nodeCapacity, int leafCapacity) throws Exception {
-		super(is, os, N, dataSize, p, nodeCapacity);
+			Party p, int nodeCapacity, int leafCapacity, Mode m) throws Exception {
+		super(is, os, N, dataSize, p, nodeCapacity, m);
 		this.leafCapacity = leafCapacity;
 		this.nodeCapacity = nodeCapacity;
 		
@@ -25,7 +25,7 @@ public abstract class KaiminOramParty extends TreeBasedOramParty {
 				for(int j = 0; j < leafCapacity; ++j)
 					tree[i][j] = getDummyBlock();
 				
-				Block[][] result = prepareBlocks(tree[i], tree[i], tree[i]);
+				Block<T>[][] result = prepareBlocks(tree[i], tree[i], tree[i]);
 				tree[i] = prepareBlockInBinaries(result[0], result[1]);
 			}
 		}
@@ -36,7 +36,7 @@ public abstract class KaiminOramParty extends TreeBasedOramParty {
 					tree[i][j] = getDummyBlock2();
 				
 				BlockInBinary[] randomBucket = randomBucket(leafCapacity);
-				Block[][] result = prepareBlocks(tree[i], tree[i], randomBucket);
+				Block<T>[][] result = prepareBlocks(tree[i], tree[i], randomBucket);
 				tree[i] = randomBucket;
 				prepareBlockInBinaries(result[0], result[1]);			
 			}
@@ -47,14 +47,14 @@ public abstract class KaiminOramParty extends TreeBasedOramParty {
 		if(gen != null) {
 			for(int i = 0; i < queue.length; ++i) 
 				queue[i] = getDummyBlock();
-				Block[][] result = prepareBlocks(queue, queue, queue);
+				Block<T>[][] result = prepareBlocks(queue, queue, queue);
 				queue = prepareBlockInBinaries(result[0], result[1]);
 		}
 		else {
 			for(int i = 0; i < queue.length; ++i) 
 				queue[i] = getDummyBlock2();	
 				BlockInBinary[] randomBucket = randomBucket(queueCapacity);
-				Block[][] result = prepareBlocks(queue, queue, randomBucket);
+				Block<T>[][] result = prepareBlocks(queue, queue, randomBucket);
 				queue = randomBucket;
 				prepareBlockInBinaries(result[0], result[1]);
 		}
@@ -104,8 +104,8 @@ public abstract class KaiminOramParty extends TreeBasedOramParty {
 		}
 	}
 	
-	public Block[] flatten(Block[][] path) {
-		Block[] result = new Block[(path.length -1) * nodeCapacity + leafCapacity];
+	public Block<T>[] flatten(Block<T>[][] path) {
+		Block<T>[] result = new Block[(path.length -1) * nodeCapacity + leafCapacity];
 		int counter = 0;
 		for(int i = 0; i < path.length; ++i )
 			for(int j = 0; j < path[i].length; ++j)

@@ -1,24 +1,21 @@
 package oramgc.treeoram;
 
-import gc.GCSignal;
-
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import oramgc.Block;
 import test.Utils;
 
-public class TreeOramClient extends TreeOramParty {
-	TreeOramLib lib;
+public class TreeOramClient<T> extends TreeOramParty<T> {
+	TreeOramLib<T> lib;
 	public TreeOramClient(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int capacity) throws Exception {
-		super(is, os, N, dataSize, p, capacity);
-		lib = new TreeOramLib(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, gen);
+			Party p, int capacity, Mode m) throws Exception {
+		super(is, os, N, dataSize, p, capacity, m);
+		lib = new TreeOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, gen);
 	}
 	
 	public void add(BlockInBinary b) throws Exception {
-		Block scNewBlock = inputBlockOfClient(b);
-		Block[][] tree1 = prepareBlocks(tree[1], tree[1], tree[1]);
+		Block<T> scNewBlock = inputBlockOfClient(b);
+		Block<T>[][] tree1 = prepareBlocks(tree[1], tree[1], tree[1]);
 		 
 		lib.add(tree1[0], scNewBlock);
 
@@ -27,11 +24,11 @@ public class TreeOramClient extends TreeOramParty {
 	
 	public BlockInBinary readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
-		Block[][] scPath = prepareBlocks(blocks, blocks, blocks);
+		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		
-		GCSignal[] scIden = gen.inputOfGen(iden);
+		T[] scIden = gen.inputOfGen(iden);
 				
-		Block res = lib.readAndRemove(scPath[0], scIden);
+		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		
 		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
 		putAPath(blocks, pos);
@@ -40,9 +37,9 @@ public class TreeOramClient extends TreeOramParty {
 	}
 	
 	public void evictUnit(int index, int level) throws Exception {
-		Block[][] top = prepareBlocks(tree[index], tree[index], tree[index]);
-		Block[][] left = prepareBlocks(tree[index*2], tree[index*2], tree[index*2]);
-		Block[][] right = prepareBlocks(tree[index*2+1], tree[index*2+1], tree[index*2+1]);
+		Block<T>[][] top = prepareBlocks(tree[index], tree[index], tree[index]);
+		Block<T>[][] left = prepareBlocks(tree[index*2], tree[index*2], tree[index*2]);
+		Block<T>[][] right = prepareBlocks(tree[index*2+1], tree[index*2+1], tree[index*2+1]);
 				
 		lib.evitUnit(top[0], 
 					 left[0],

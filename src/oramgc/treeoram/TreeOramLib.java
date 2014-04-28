@@ -1,35 +1,35 @@
 package oramgc.treeoram;
 
 import java.security.SecureRandom;
+
 import oramgc.Block;
 import oramgc.BucketLib;
 import flexsc.CompEnv;
-import gc.GCSignal;
 
-public class TreeOramLib extends BucketLib {
+public class TreeOramLib<T> extends BucketLib<T> {
 
 	int capacity, logN;
 	SecureRandom rng = new SecureRandom();
 	public TreeOramLib(int lengthOfIden, int lengthOfPos, int lengthOfData, int logN, int capacity,
-			CompEnv<GCSignal> e) {
+			CompEnv<T> e) {
 		super(lengthOfIden, lengthOfPos, lengthOfData, e);
 		this.logN = logN;
 		this.capacity = capacity;
 	}
 	
-	public GCSignal[] deepestLevel(GCSignal[] pos, int path) throws Exception {
-		GCSignal[] pathSignal = toSignals(path, pos.length);
-		GCSignal[] xored = xor(pos, pathSignal);
+	public T[] deepestLevel(T[] pos, int path) throws Exception {
+		T[] pathSignal = toSignals(path, pos.length);
+		T[] xored = xor(pos, pathSignal);
 		return leadingZeros(xored);
 	}
 	
-	public Block readAndRemove(Block[] path, GCSignal[] iden) throws Exception {
+	public Block<T> readAndRemove(Block<T>[] path, T[] iden) throws Exception {
 		return super.readAndRemove(path, iden);
 	}
 	
-	public void evitUnit(Block[] top, Block[] left, Block[] right, int level) throws Exception {
-		Block block = pop(top);
-		GCSignal toLeft = eq(block.pos[lengthOfPos-level], SIGNAL_ZERO);
+	public void evitUnit(Block<T>[] top, Block<T>[] left, Block<T>[] right, int level) throws Exception {
+		Block<T> block = pop(top);
+		T toLeft = eq(block.pos[lengthOfPos-level], SIGNAL_ZERO);
 		conditionalAdd(left, block, toLeft);
 		conditionalAdd(right, block, not(toLeft));
 	}	

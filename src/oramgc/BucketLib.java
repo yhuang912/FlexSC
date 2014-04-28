@@ -1,5 +1,6 @@
 package oramgc;
 
+import oramgc.OramParty.Mode;
 import circuits.BitonicSortLib;
 import flexsc.CompEnv;
 
@@ -89,9 +90,14 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 	
 	public Block<T>[] xor(Block<T>[] a, Block<T>[] b) {
 		assert(a.length == b.length) : "xor Block<T>s error";
-		Block<T>[] result = new Block<T>[a.length];
+		Block<T>[] result = newBlockArray(b.length);
 		for(int i = 0; i < a.length; ++i)
 			result[i] = xor(a[i], b[i]);
 		return result;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Block<T>[] newBlockArray(int len) {
+		return new Block[len];
 	}
 }

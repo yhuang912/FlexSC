@@ -1,43 +1,40 @@
 package oramgc.kaiminOram;
 
-import gc.GCSignal;
-
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import oramgc.Block;
 import oramgc.OramParty.BlockInBinary;
 import test.Utils;
 
 
-public class KaiminOramServer extends KaiminOramParty {
-	KaiminOramLib lib;
+public class KaiminOramServer<T> extends KaiminOramParty<T> {
+	KaiminOramLib<T> lib;
 	public KaiminOramServer(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int nodeCapacity, int leafCapacity) throws Exception {
-		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity);
-		lib = new KaiminOramLib(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, eva);
+			Party p, int nodeCapacity, int leafCapacity, Mode m) throws Exception {
+		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity, m);
+		lib = new KaiminOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, eva);
 	}
 	
 	public void fetch(boolean[] pos, boolean[] data) throws Exception{
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		BlockInBinary[] randomPath = randomBucket(blocks.length);
 		BlockInBinary[] randomQueue = randomBucket(queueCapacity);
-		Block[][] scPath = prepareBlocks(blocks, blocks, randomPath);
-		Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
-		GCSignal[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
-		GCSignal[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
-		GCSignal[] scData = null;
+		Block<T>[][] scPath = prepareBlocks(blocks, blocks, randomPath);
+		Block<T>[][] scQueue = prepareBlocks(queue, queue, randomQueue);
+		T[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		T[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		T[] scData = null;
 		if(data != null)
 			scData = eva.inputOfGen(new boolean[lengthOfData]);
 		
-		Block res = lib.readAndRemove(scPath[0], scIden);
-		Block res2 = lib.readAndRemove(scQueue[0], scIden);
-		Block finalRes = lib.mux(res, res2, res.isDummy);
+		Block<T> res = lib.readAndRemove(scPath[0], scIden);
+		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
+		Block<T> finalRes = lib.mux(res, res2, res.isDummy);
 		
 		if(data == null)
 			scData = finalRes.data;
 		
-		Block b = new Block(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
+		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 
 		lib.add(scQueue[0], b);
 		blocks = randomPath;
@@ -53,9 +50,9 @@ public class KaiminOramServer extends KaiminOramParty {
 		//BlockInBinary[] randomQueue = randomBucket(queueCapacity);
 		BlockInBinary[] randomBucket = randomBucket(nodeCapacity);
 		//Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
-		Block[][] scTree1 = prepareBlocks(tree[1], tree[1], randomBucket);
+		Block<T>[][] scTree1 = prepareBlocks(tree[1], tree[1], randomBucket);
 		
-		Block b = lib.pop(scQueue[0]);
+		Block<T> b = lib.pop(scQueue[0]);
 		lib.add(scTree1[0], b);
 		
 		//queue = randomQueue;
@@ -68,20 +65,20 @@ public class KaiminOramServer extends KaiminOramParty {
 
 	@Override
 	public void flushOneTime(boolean[] pos) throws Exception {
-		GCSignal[] pathSignal = new GCSignal[pos.length];
+		T[] pathSignal = eva.newTArray(pos.length);//new T[pos.length];
 		for(int i = 0; i < pos.length; ++i)
 			pathSignal[i] = pos[i] ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 		
 		int index = 1;
-		Block transit = lib.dummyBlock;
-		Block[] overflowedBlocks = new Block[tempStashSize];
+		Block<T> transit = lib.dummyBlock;
+		Block<T>[] overflowedBlocks = new Block[tempStashSize];
 		for(int i = 0; i < tempStashSize; ++i)
 			overflowedBlocks[i] = lib.dummyBlock;
 		for(int i = 1; i < logN; ++i){
 			BlockInBinary[] top = tree[index];
 			BlockInBinary[] randomTop = randomBucket(nodeCapacity);
 			//System.out.println(top.length);
-			Block[][] scTop = prepareBlocks(top, top, randomTop);
+			Block<T>[][] scTop = prepareBlocks(top, top, randomTop);
 
 			transit = lib.flushUnit(scTop[0], transit, i, pathSignal, overflowedBlocks);
 			tree[index] = randomTop;
@@ -95,16 +92,16 @@ public class KaiminOramServer extends KaiminOramParty {
 		BlockInBinary[] top = tree[index];
 		BlockInBinary[] randomTop = randomBucket(leafCapacity);
 		
-		Block[][] scTop = prepareBlocks(top, top, randomTop);
+		Block<T>[][] scTop = prepareBlocks(top, top, randomTop);
 		lib.add(scTop[0], transit);
 		tree[index] = randomTop;
 		prepareBlockInBinaries(scTop[0], scTop[1]);
 		
 		BlockInBinary[] randomQueue = randomBucket(queueCapacity);
-		Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
+		Block<T>[][] scQueue = prepareBlocks(queue, queue, randomQueue);
 		
 		if(DEBUG) {//veridy queue is not full
-			GCSignal full = lib.SIGNAL_ONE;
+			T full = lib.SIGNAL_ONE;
 			for(int i = 0; i <scQueue[0].length; ++i){
 				full = lib.and(full, lib.not(lib.eq(scQueue[0][i].iden, lib.zeros(lengthOfIden)) ));
 			}
@@ -116,20 +113,20 @@ public class KaiminOramServer extends KaiminOramParty {
 		prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
 	
-	Block[][] scQueue;
-	GCSignal[] scIden;
+	Block<T>[][] scQueue;
+	T[] scIden;
 	BlockInBinary[] randomQueue;
 	public void readAndRemove(boolean[] pos) throws Exception {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		BlockInBinary[] randomPath = randomBucket(blocks.length);
 		randomQueue = randomBucket(queueCapacity);
-		Block[][] scPath = prepareBlocks(blocks, blocks, randomPath);
+		Block<T>[][] scPath = prepareBlocks(blocks, blocks, randomPath);
 		scQueue = prepareBlocks(queue, queue, randomQueue);
 		scIden = eva.inputOfGen(new boolean[lengthOfIden]);
 		
-		Block res = lib.readAndRemove(scPath[0], scIden);
-		Block res2 = lib.readAndRemove(scQueue[0], scIden);
-		Block finalRes = lib.mux(res, res2, res.isDummy);
+		Block<T> res = lib.readAndRemove(scPath[0], scIden);
+		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
+		Block<T> finalRes = lib.mux(res, res2, res.isDummy);
 		
 		blocks = randomPath;
 		prepareBlockInBinaries(scPath[0], scPath[1]);
@@ -138,10 +135,10 @@ public class KaiminOramServer extends KaiminOramParty {
 	}
 	
 	public void putBack() throws Exception {		
-		GCSignal[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
-		GCSignal[] scData = eva.inputOfGen(new boolean[lengthOfData]);
+		T[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		T[] scData = eva.inputOfGen(new boolean[lengthOfData]);
 				
-		Block b = new Block(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
+		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 
 		lib.add(scQueue[0], b);
 		

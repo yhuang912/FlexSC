@@ -8,13 +8,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import oramgc.OramParty;
+import oramgc.OramParty.Mode;
 import oramgc.OramParty.Party;
 import oramgc.trivialoram.TrivialOramClient;
 import test.Utils;
 
-public class RecursiveTreeOramClient {
-	TrivialOramClient baseOram;
-	ArrayList<TreeOramClient> clients = new ArrayList<>();
+public class RecursiveTreeOramClient<T> {
+	TrivialOramClient<T> baseOram;
+	ArrayList<TreeOramClient<T>> clients = new ArrayList<>();
 	int initialLengthOfIden;
 	int recurFactor;
 	int cutoff;
@@ -23,28 +24,28 @@ public class RecursiveTreeOramClient {
 	SecureRandom rng = new SecureRandom();
 	protected InputStream is;
 	protected OutputStream os;
-	public RecursiveTreeOramClient(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity) throws Exception {
+	public RecursiveTreeOramClient(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity, Mode m) throws Exception {
 		this.is = is;
 		this.os = os;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		TreeOramClient  oram = new TreeOramClient(is, os, N, dataSize, Party.CLIENT, capacity);
+		TreeOramClient<T>  oram = new TreeOramClient<T>(is, os, N, dataSize, Party.CLIENT, capacity, m);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
-			oram = new TreeOramClient(is, os, newN, newDataSize, Party.CLIENT, capacity);
+			oram = new TreeOramClient<T>(is, os, newN, newDataSize, Party.CLIENT, capacity, m);
 			clients.add(oram);
 		}
-		TreeOramClient last = clients.get(clients.size()-1);
-		baseOram = new TrivialOramClient(is, os, (1<<last.lengthOfIden), last.lengthOfPos);
+		TreeOramClient<T> last = clients.get(clients.size()-1);
+		baseOram = new TrivialOramClient<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, m);
 	}
 	
 	public boolean[] read(int iden) throws Exception {
 		boolean[][] poses = travelToDeep(iden, 1);
-		TreeOramClient currentOram = clients.get(0);
+		TreeOramClient<T> currentOram = clients.get(0);
 		
 		sendBooleans(poses[0]);
 		System.out.println("read " + iden + " " + Utils.toInt(poses[0]) + " "+Utils.toInt(poses[1]));
@@ -54,7 +55,7 @@ public class RecursiveTreeOramClient {
 	
 	public void write(int iden, boolean[] data) throws Exception {
 		boolean[][] poses = travelToDeep(iden, 1);
-		TreeOramClient currentOram = clients.get(0);
+		TreeOramClient<T> currentOram = clients.get(0);
 		
 		sendBooleans(poses[0]);
 		System.out.println("write " + iden + " " + Utils.toInt(poses[0]) + " "+Utils.toInt(poses[1]));
@@ -75,7 +76,7 @@ public class RecursiveTreeOramClient {
 			return new boolean[][]{pos, newPos};
 		}
 		else {
-			TreeOramClient currentOram = clients.get(level);
+			TreeOramClient<T> currentOram = clients.get(level);
 			
 			boolean[][] poses = travelToDeep(subIdentifier(iden, currentOram), level+1);
 			//System.out.println(" tr "+level+" "+iden+" "+Utils.toInt(poses[0]) + " "+Utils.toInt(poses[1]));
@@ -95,7 +96,7 @@ public class RecursiveTreeOramClient {
 		}
 	}
 	
-	public int subIdentifier(int iden, OramParty o) {
+	public int subIdentifier(int iden, OramParty<T> o) {
 		int a = (iden % (1<<o.lengthOfIden)) ;
 		return a;
 	}

@@ -1,7 +1,11 @@
 package oramgc.trivialoram;
 
+import gc.GCSignal;
+import oramgc.OramParty.Mode;
+
 import org.junit.Assert;
 import org.junit.Test;
+
 import test.Utils;
 
 
@@ -19,7 +23,7 @@ public class TestTrivialOram {
 			try {
 				listen(54321);
 
-				TrivialOramClient client = new TrivialOramClient(is, os, N, dataSize);
+				TrivialOramClient<Boolean> client = new TrivialOramClient<Boolean>(is, os, N, dataSize, Mode.TEST);
 				
 
 				for(int i = 0; i < writeCount; ++i) {
@@ -57,7 +61,7 @@ public class TestTrivialOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				TrivialOramServer server = new TrivialOramServer(is, os, N, dataSize);
+				TrivialOramServer<Boolean> server = new TrivialOramServer<Boolean>(is, os, N, dataSize, Mode.TEST);
 				System.out.flush();
 				
 				for(int i = 0; i < writeCount; ++i) {

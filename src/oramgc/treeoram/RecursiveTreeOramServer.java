@@ -5,40 +5,41 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
+import oramgc.OramParty.Mode;
 import oramgc.OramParty.Party;
 import oramgc.trivialoram.TrivialOramServer;
 
-public class RecursiveTreeOramServer {
-	TrivialOramServer baseOram;
-	ArrayList<TreeOramServer> servers = new ArrayList<>();
+public class RecursiveTreeOramServer<T> {
+	TrivialOramServer<T> baseOram;
+	ArrayList<TreeOramServer<T>> servers = new ArrayList<>();
 	int recurFactor;
 	int cutoff;
 	int capacity;
 	int initialLengthOfIden;
 	protected InputStream is;
 	protected OutputStream os;
-	public RecursiveTreeOramServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity) throws Exception {
+	public RecursiveTreeOramServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity, Mode m) throws Exception {
 		this.is = is;
 		this.os = os;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		TreeOramServer  oram = new TreeOramServer(is, os, N, dataSize, Party.SERVER, capacity);
+		TreeOramServer<T>  oram = new TreeOramServer<T>(is, os, N, dataSize, Party.SERVER, capacity, m);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden ) / recurFactor;
-			oram = new TreeOramServer(is, os, newN, newDataSize, Party.SERVER, capacity);
+			oram = new TreeOramServer<T>(is, os, newN, newDataSize, Party.SERVER, capacity, m);
 			servers.add(oram);
 		}
-		TreeOramServer last = servers.get(servers.size()-1);
-		baseOram = new TrivialOramServer(is, os, (1<<last.lengthOfIden), last.lengthOfPos);
+		TreeOramServer<T> last = servers.get(servers.size()-1);
+		baseOram = new TrivialOramServer<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, m);
 	}
 	
 	public void access() throws Exception {
 		travelToDeep(1);
-		TreeOramServer currentOram = servers.get(0);
+		TreeOramServer<T> currentOram = servers.get(0);
 		boolean[] pos = getBooleans();
 		//System.out.println("server"+Utils.toInt(pos));
 		currentOram.access(pos);
@@ -52,7 +53,7 @@ public class RecursiveTreeOramServer {
 		else {
 			travelToDeep(level+1);
 			
-			TreeOramServer currentOram = servers.get(level);
+			TreeOramServer<T> currentOram = servers.get(level);
 			boolean[] pos = getBooleans();
 			currentOram.readAndRemove(pos);
 			

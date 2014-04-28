@@ -1,6 +1,9 @@
 package oramgc.kaiminOram;
 
 import java.security.SecureRandom;
+
+import oramgc.OramParty.Mode;
+
 import org.junit.Test;
 
 import test.Utils;
@@ -26,7 +29,7 @@ public class TestRecursiveKaiminOram {
 			try {
 				listen(54321);
 				
-				RecursiveKaiminOramClient client = new RecursiveKaiminOramClient(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity);
+				RecursiveKaiminOramClient<Boolean> client = new RecursiveKaiminOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.TEST);
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					client.write(element, Utils.fromInt(element, dataSize));
@@ -70,7 +73,7 @@ public class TestRecursiveKaiminOram {
 			try {
 				connect("localhost", 54321);		
 				
-				RecursiveKaiminOramServer server = new RecursiveKaiminOramServer(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity);
+				RecursiveKaiminOramServer<Boolean> server = new RecursiveKaiminOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.TEST);
 				for(int i = 0; i < writeCount; ++i) {
 					server.access();
 				}

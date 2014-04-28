@@ -7,7 +7,7 @@ import java.util.Arrays;
 import oramgc.Block;
 import oramgc.OramParty;
 
-public abstract class TreeBasedOramParty extends OramParty {
+public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	public BlockInBinary[][] tree;
 	protected int capacity;
 	static byte[] seed = new byte[512];
@@ -19,8 +19,8 @@ public abstract class TreeBasedOramParty extends OramParty {
 	protected final SecureRandom commonRandom = SecureRandom.getInstance("SHA1PRNG");
 
 	public TreeBasedOramParty(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int capacity) throws Exception {
-		super(is, os, N, dataSize, p);
+			Party p, int capacity, Mode m) throws Exception {
+		super(is, os, N, dataSize, p, m);
 		this.capacity = capacity;
 
 		tree  = new BlockInBinary[this.N][capacity];
@@ -31,7 +31,7 @@ public abstract class TreeBasedOramParty extends OramParty {
 				for(int j = 0; j < capacity; ++j)
 					tree[i][j] = getDummyBlock();
 
-				Block[][] result = prepareBlocks(tree[i], tree[i], tree[i]);
+				Block<T>[][] result = prepareBlocks(tree[i], tree[i], tree[i]);
 				tree[i] = prepareBlockInBinaries(result[0], result[1]);
 			}
 		}
@@ -41,7 +41,7 @@ public abstract class TreeBasedOramParty extends OramParty {
 					tree[i][j] = getDummyBlock2();
 				
 				BlockInBinary[] randomBucket = randomBucket(capacity);
-				Block[][] result = prepareBlocks(tree[i], tree[i], randomBucket);
+				Block<T>[][] result = prepareBlocks(tree[i], tree[i], randomBucket);
 				tree[i] = randomBucket;
 				prepareBlockInBinaries(result[0], result[1]);
 			}
@@ -75,8 +75,8 @@ public abstract class TreeBasedOramParty extends OramParty {
 		}
 	}
 
-	public Block[] flatten(Block[][] path) {
-		Block[] result = new Block[path.length * path[0].length];
+	public Block<T>[] flatten(Block<T>[][] path) {
+		Block<T>[] result = new Block[path.length * path[0].length];
 		int counter = 0;
 		for(int i = 0; i < path.length; ++i )
 			for(int j = 0; j < path[0].length; ++j)

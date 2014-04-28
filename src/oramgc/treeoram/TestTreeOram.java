@@ -2,9 +2,9 @@ package oramgc.treeoram;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Test;
+import oramgc.OramParty.Mode;
 import oramgc.OramParty.Party;
 import test.Utils;
 
@@ -31,7 +31,8 @@ public class TestTreeOram {
 				listen(54321);
 
 				int data[] = new int[N+1];
-				TreeOramClient client = new TreeOramClient(is, os, N, dataSize, Party.CLIENT, capacity);
+				//TreeOramClient<GCSignal> client = new TreeOramClient<GCSignal>(is, os, N, dataSize, Party.CLIENT, capacity, Mode.REAL);
+				TreeOramClient<Boolean> client = new TreeOramClient<Boolean>(is, os, N, dataSize, Party.CLIENT, capacity, Mode.TEST);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 
 				idens = new int[client.tree.length][capacity];
@@ -89,7 +90,8 @@ public class TestTreeOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				TreeOramServer server = new TreeOramServer(is, os, N, dataSize, Party.SERVER, capacity);
+				//TreeOramServer<GCSignal> server = new TreeOramServer<GCSignal>(is, os, N, dataSize, Party.SERVER, capacity, Mode.REAL);
+				TreeOramServer<Boolean> server = new TreeOramServer<Boolean>(is, os, N, dataSize, Party.SERVER, capacity, Mode.TEST);
 
 				idens = new int[server.tree.length][capacity];
 				du = new boolean[server.tree.length][capacity];
@@ -128,7 +130,7 @@ public class TestTreeOram {
 	public void printTree(GenRunnable gen, EvaRunnable eva) {
 		int k = 1;
 		int i = 1;
-		for(int j = 1; j < gen.idens.length; ++j){
+		for(int j = 1; j < gen.idens.length; ++j) {
 			System.out.print("[");
 			int[] a = xor(gen.idens[j], eva.idens[j]);
 			boolean[] bb = xor(gen.du[j], eva.du[j]);

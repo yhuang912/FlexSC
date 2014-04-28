@@ -2,13 +2,12 @@ package oramgc.treeoram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import oramgc.TreeBasedOramParty;
 
-public abstract class TreeOramParty extends TreeBasedOramParty {
+public abstract class TreeOramParty<T> extends TreeBasedOramParty<T> {
 	public TreeOramParty(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int capacity) throws Exception {
-		super(is, os, N, dataSize, p, capacity);
+			Party p, int capacity, Mode m) throws Exception {
+		super(is, os, N, dataSize, p, capacity, m);
 	}
 	
 	public int randomIndexOnLevel(int level) {

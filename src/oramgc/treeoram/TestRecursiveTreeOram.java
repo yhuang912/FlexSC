@@ -2,8 +2,11 @@ package oramgc.treeoram;
 
 import java.security.SecureRandom;
 
+import oramgc.OramParty.Mode;
+
 import org.junit.Assert;
 import org.junit.Test;
+
 import test.Utils;
 
 public class TestRecursiveTreeOram {
@@ -26,7 +29,7 @@ public class TestRecursiveTreeOram {
 			try {
 				listen(54321);
 				
-				RecursiveTreeOramClient client = new RecursiveTreeOramClient(is, os, N, dataSize, cutoff, recurFactor, capacity);
+				RecursiveTreeOramClient<Boolean> client = new RecursiveTreeOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.TEST);
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					client.write(element, Utils.fromInt(element, dataSize));
@@ -72,7 +75,7 @@ public class TestRecursiveTreeOram {
 			try {
 				connect("localhost", 54321);		
 				
-				RecursiveTreeOramServer server = new RecursiveTreeOramServer(is, os, N, dataSize, cutoff, recurFactor, capacity);
+				RecursiveTreeOramServer<Boolean> server = new RecursiveTreeOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.TEST);
 				for(int i = 0; i < writeCount; ++i) {
 					server.access();
 				}

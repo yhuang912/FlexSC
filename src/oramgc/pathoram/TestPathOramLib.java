@@ -169,7 +169,7 @@ public class TestPathOramLib {
 					@Override
 					public GCSignal[][] secureCompute(GCSignal[][] Signala, GCSignal[][] Signalb,
 							CompEnv<GCSignal> e) throws Exception {
-						PathOramLib lib = new PathOramLib(3, 3, 3, 4, e);
+						PathOramLib<GCSignal> lib = new PathOramLib<GCSignal>(3, 3, 3, 4, e);
 						return lib.pushDownHelp(Signala, Signalb);
 					}
 

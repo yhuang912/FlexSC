@@ -9,17 +9,17 @@ public class CVCompEnv implements CompEnv<Boolean> {
 
 	@Override
 	public Boolean inputOfGen(boolean in) throws Exception {
-		throw new Exception("No need to prepare inputs.");
+		return new Boolean(in);
 	}
 
 	@Override
 	public Boolean inputOfEva(boolean in) throws Exception {
-		throw new Exception("No need to prepare inputs.");
+		return new Boolean(in);
 	}
 
 	@Override
 	public boolean outputToGen(Boolean out) throws Exception {
-		throw new Exception("No need to prepare outputs.");
+		return out;
 	}
 
 	@Override
@@ -78,5 +78,20 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	@Override
 	public Boolean[][][] newTArray(int d1, int d2, int d3) {
 		return new Boolean[d1][d2][d3];
+	}
+
+	@Override
+	public boolean[] outputToGen(Boolean[] out) throws Exception {
+		return Utils.tobooleanArray(out);
+	}
+
+	@Override
+	public Boolean[] inputOfGen(boolean[] in) throws Exception {
+		return Utils.toBooleanArray(in);
+	}
+
+	@Override
+	public Boolean[] inputOfEva(boolean[] in) throws Exception {
+		return Utils.toBooleanArray(in);
 	}
 }

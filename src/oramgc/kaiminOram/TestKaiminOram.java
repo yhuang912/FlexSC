@@ -3,6 +3,8 @@ package oramgc.kaiminOram;
 import java.security.SecureRandom;
 import org.junit.Assert;
 import org.junit.Test;
+
+import oramgc.OramParty.Mode;
 import oramgc.OramParty.Party;
 import test.Utils;
 
@@ -34,7 +36,7 @@ public class TestKaiminOram {
 				listen(54321);
 
 				int data[] = new int[N+1];
-				KaiminOramClient client = new KaiminOramClient(is, os, N, dataSize, Party.CLIENT, nodeCapacity, leafCapacity);
+				KaiminOramClient<Boolean> client = new KaiminOramClient<Boolean>(is, os, N, dataSize, Party.CLIENT, nodeCapacity, leafCapacity, Mode.TEST);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				idens = new int[client.tree.length][nodeCapacity];
@@ -103,7 +105,7 @@ public class TestKaiminOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				KaiminOramServer server= new KaiminOramServer(is, os, N, dataSize, Party.SERVER, nodeCapacity, leafCapacity);
+				KaiminOramServer<Boolean> server= new KaiminOramServer<Boolean>(is, os, N, dataSize, Party.SERVER, nodeCapacity, leafCapacity, Mode.TEST);
 				
 				idens = new int[server.tree.length][nodeCapacity];
 				du = new boolean[server.tree.length][nodeCapacity];
