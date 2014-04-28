@@ -13,7 +13,8 @@ public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
 		int n = a.length;
 		int m = a[0].length;
 		int l = a[0][0].length;
-		T[][][] result = new T[n][m][l];
+//		T[][][] result = new T[n][m][l];
+		T[][][] result = env.newTArray(n, m, l);
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j)
 				result[i][j] = add(a[i][j], b[i][j], offset);
@@ -24,7 +25,8 @@ public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
 		int n = a.length;
 		int m = a[0].length;
 		int l = b[0].length;
-		T[][][]result = new T[n][m][l];
+//		T[][][]result = new T[n][m][l];
+		T[][][] result = env.newTArray(n, m, l);
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < l; ++l) {
 				result[i][j] = multiply(a[i][0], b[0][l], offset);
@@ -37,7 +39,8 @@ public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
 	public T[][][] transpose(T[][][] a){
 		int n = a.length;
 		int m = a[0].length;
-		T[][][] result = new T[n][m][a[0][0].length];
+//		T[][][] result = new T[n][m][a[0][0].length];
+		T[][][] result = env.newTArray(n, m, a[0][0].length);
 		for(int i = 0; i < n; ++i)
 			for(int j = 0; j < m; ++j)
 				result[i][j] = a[j][i];
@@ -47,7 +50,8 @@ public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
 	public T[][][] xor(T[][][] a, T[][][] b){
 		int n = a.length;
 		int m = a[0].length;
-		T[][][]result = new T[n][m][a[0][0].length];
+//		T[][][]result = new T[n][m][a[0][0].length];
+		T[][][] result = env.newTArray(n, m, a[0][0].length);
 		for(int i = 0; i < a.length; ++i)
 			for(int j = 0; j < a[i].length; ++j)
 				result[i][j] = xor(a[i][j], b[i][j]);
@@ -58,7 +62,8 @@ public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
 	public T[][][] fastInverse(T[][][] m, int offset) throws Exception {
 		int dimension = m.length;
 		int width = m[0][0].length;
-		T[][][] extended = new T[dimension][2*dimension][width];
+//		T[][][] extended = new T[dimension][2*dimension][width];
+		T[][][] extended = env.newTArray(dimension, 2*dimension, width);
 		T[] zeroFloat = publicFixPoint(0, width, offset);
 		T[] oneFloat = publicFixPoint(1, width, offset);
 		for(int i = 0 ; i < dimension; ++i){
@@ -69,7 +74,8 @@ public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
 			extended[i][dimension+i] = oneFloat;
 		}
 		extended = rref(extended, offset);
-		T[][][] result = new T[dimension][dimension][width];
+//		T[][][] result = new T[dimension][dimension][width];
+		T[][][] result = env.newTArray(dimension, dimension, width);
 		for(int i = 0 ; i < dimension; ++i) {
 			for(int j = 0; j < dimension; ++j)
 				result[i][j] = extended[i][dimension+j];
@@ -80,14 +86,16 @@ public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
 	public T[][] Solve(T[][][] A, T[][]b, int offset) throws Exception {
 		int dimension = A.length;
 		int width = A[0][0].length;
-		T[][][] extended = new T[dimension][1+dimension][width];
+//		T[][][] extended = new T[dimension][1+dimension][width];
+		T[][][] extended = env.newTArray(dimension, 1+dimension, width);
 		for(int i = 0 ; i < dimension; ++i){
 			for(int j = 0; j < dimension; ++j)
 				extended[i][j] = A[i][j];
 			extended[i][dimension] = b[i];
 		}
 		extended = rref(extended, offset);
-		T[][] result = new T[dimension][width];
+//		T[][] result = new T[dimension][width];
+		T[][] result = env.newTArray(dimension, width);
 		for(int i = 0 ; i < dimension; ++i) {
 				result[i] = extended[i][dimension];
 		}
@@ -95,7 +103,8 @@ public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
 	}
 	
 	public T[][][] rref(T[][][] m, int offset) throws Exception {
-		T[][][] result = new T[m.length][m[0].length][m[0][0].length];
+//		T[][][] result = new T[m.length][m[0].length][m[0][0].length];
+		T[][][] result = env.newTArray(m.length, m[0].length, m[0][0].length);
 		for (int r = 0; r < m.length; ++r)
 	        for (int c = 0; c < m[r].length; ++c)
 	            result[r][c] = m[r][c];
