@@ -2,6 +2,7 @@ package cv;
 
 import circuits.FloatFormat;
 import objects.Float.Representation;
+import test.Utils;
 import flexsc.CompEnv;
 
 public class CVCompEnv implements CompEnv<Boolean> {
@@ -59,24 +60,13 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	
 	public Representation<Boolean> fromDouble(double d, int widthV, int widthP) {
 		FloatFormat f = new FloatFormat(d, 23, 9);
-		Boolean[] v = new Boolean[f.v.length];
-		Boolean[] p = new Boolean[f.p.length];
-		for(int i = 0; i < v.length; ++i)
-			v[i] = f.v[i];
-		for(int i = 0; i < p.length; ++i)
-			p[i] = f.p[i];
-		Representation<Boolean> result = new Representation<Boolean>(f.s, p, v, f.z);
+		Representation<Boolean> result = 
+				new Representation<Boolean>(f.s, Utils.toBooleanArray(f.p), Utils.toBooleanArray(f.v), f.z);
 		return result;
 	}
 	
 	public double toDouble(Representation<Boolean> f) {
-		boolean[] v = new boolean[f.v.length];
-		boolean[] p = new boolean[f.p.length];
-		for(int i = 0; i < v.length; ++i)
-			v[i] = f.v[i];
-		for(int i = 0; i < p.length; ++i)
-			p[i] = f.p[i];
-		FloatFormat d = new FloatFormat(v, p, f.s, f.z);
+		FloatFormat d = new FloatFormat(Utils.tobooleanArray(f.v), Utils.tobooleanArray(f.p), f.s, f.z);
 		return d.toDouble();
 	}
 
