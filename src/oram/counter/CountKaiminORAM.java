@@ -59,8 +59,9 @@ public class CountKaiminORAM extends ORAMCounterHarness{
 	}
 
 	public static void main(String [ ] args) throws Exception{
-		CountKaiminORAM c = new CountKaiminORAM(10, 6, 10, 80);
+		CountKaiminORAM c = new CountKaiminORAM(10, 6, 16, 80);
 		c.count();
-		System.out.print(c.statistic.andGate);
+		System.out.println(c.statistic.andGate);
+		System.out.println(c.statistic.OTs);
 	}
 }

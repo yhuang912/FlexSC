@@ -14,37 +14,7 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		super(is, os, N, dataSize, p, m);
 		lib = new PathOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, gen);
 	}
-	
-	public BlockInBinary access(boolean[] iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception {
-		BlockInBinary[] blocks = flatten(getAPath(pos));
-		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
-		Block<T>[][] scStash = prepareBlocks(stash, stash, stash);
-		T[] scIden = gen.inputOfAlice(iden);
-		T[] scPos = gen.inputOfAlice(newPos);
-		
-		
-		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 
-		BlockInBinary r =  outputBlock(res);
-		
-		T[] scData = res.data;
-		if(data != null)
-			scData = gen.inputOfAlice(data);
-		
-		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
-		
-		lib.add(scStash[0], scNewBlock);
-		
-		//Signal[][] debug = 
-		lib.pushDown(scPath[0], scStash[0], pos);
-		lib.pushDown(scPath[0], scStash[0], pos);
-		
-		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
-		stash = prepareBlockInBinaries(scStash[0], scStash[1]);
-		putAPath(blocks, pos);
-		
-		return r;
-	}
 	T[] scIden;
 	Block<T>[][] scStash;
 	Block<T>[][] scPath;
@@ -72,12 +42,11 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		T[] scData = gen.inputOfAlice(data);
 		boolean[] pos = workingPos;
 		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
-		
-		lib.add(scStash[0], scNewBlock);
-		
-		//Signal[][] debug = 
+
+		lib.add(scStash[0], scNewBlock); 
 		lib.pushDown(scPath[0], scStash[0], pos);
 		lib.pushDown(scPath[0], scStash[0], pos);
+		
 		
 		BlockInBinary[] blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
 		stash = prepareBlockInBinaries(scStash[0], scStash[1]);

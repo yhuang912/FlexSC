@@ -2,24 +2,21 @@ package test.oram;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
-
 import oram.pathoram.PathOramClient;
 import oram.pathoram.PathOramServer;
-
 import org.junit.Assert;
 import org.junit.Test;
-
 import flexsc.*;
 import test.Utils;
 
 
 public class TestPathOram {
 	
-	final int N = 1<<10;
+	final int N = 1<<15;
 	final int capacity = 4;
 	int[] posMap = new int[N+1];
-	int writeCount = N;
-	int readCount = N;
+	int writeCount = N*2;
+	int readCount = N*2;
 	int dataSize = 13;
 	int[] writeIndex = new int[writeCount];
 	int[] readIndex = new int[readCount];

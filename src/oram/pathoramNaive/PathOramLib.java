@@ -20,19 +20,17 @@ public class PathOramLib<T> extends BucketLib<T> {
 	
 	public T[] deepestLevel(T[] pos, T[] path) throws Exception {
 		T[] xored = xor(pos, path);
-		
-		return padSignal(
-				leadingZeros(
-						padSignal(xored, xored.length)
-					)
-				, xored.length+1);
-		
+		T[] result = xored;
+		for(int i = result.length-2; i>=0; --i) {
+			result[i] = or(result[i], result[i+1]);
+		}	
+		return padSignal(result, result.length+1);
 	}
 		
 	public T[] deepestLevel(T[] pos, T[] path, T isDummy) throws Exception {
 		T[] depth = deepestLevel(pos, path);
-		return mux(depth, zeros(depth.length), isDummy);
-	}	
+		return mux(depth, ones(depth.length), isDummy);
+	}
 	
 	public Block<T> readAndRemove(Block<T>[] path, T[] iden) throws Exception {
 		return super.readAndRemove(path, iden);
@@ -86,32 +84,40 @@ public class PathOramLib<T> extends BucketLib<T> {
 		for(int i = 0; i < pos.length; ++i)
 			posInSignal[i] = pos[i] ? SIGNAL_ONE : SIGNAL_ZERO;
 		
-		T[][] depth = env.newTArray(blockInSignal.length, 0);
+		T[][] canPushm = env.newTArray(blockInSignal.length, 0);
 		for(int k = 0; k < blockInSignal.length; ++k) {
-			depth[k] = deepestLevel(
+			canPushm[k] = deepestLevel(
 					Arrays.copyOfRange(blockInSignal[k], lengthOfIden, lengthOfIden + lengthOfPos),
-					posInSignal,
-					blockInSignal[k][blockInSignal[k].length-1]);			
+					posInSignal);//,blockInSignal[k][blockInSignal[k].length-1]);			
 		}
-		
+
+		for(int k = 0; k < blockInSignal.length; ++k) {
+			T pushed = SIGNAL_ZERO;
+			for(int i = logN; i >=1; --i) {
+				T canPush = not(canPushm[k][canPushm[k].length-i]);//geq(depth[k], toSignals(i-1,depth.length));
+				canPush = and(canPush, not(blockInSignal[k][blockInSignal[k].length-1] ));
+				T toPush = and(canPush, not(pushed));
+				for(int j = 0; j < capacity; ++j){
+					
+				}
+			}
+		}
 		int cnt = newPath.length-1;
 		for(int i = logN; i >=1; --i)
 			for(int j = 0; j < capacity; ++j){
 				T pushed = SIGNAL_ZERO;
-				
 				for(int k = 0; k < blockInSignal.length; ++k) {
-					
-					T canPush = geq(depth[k], toSignals(i-1,depth.length));
+					T canPush = not(canPushm[k][canPushm[k].length-i]);//geq(depth[k], toSignals(i-1,depth.length));
+					canPush = and(canPush, not(blockInSignal[k][blockInSignal[k].length-1] ));
 					T toPush = and(canPush, not(pushed));
-					depth[k] = mux(depth[k], zeros(depth[k].length), toPush);
+					//canPushm[k] = mux(canPushm[k], ones(canPushm[k].length), toPush);
 					newPath[cnt] = mux(newPath[cnt], blockInSignal[k], toPush);
 					blockInSignal[k][blockInSignal[k].length-1] = mux(blockInSignal[k][blockInSignal[k].length-1], SIGNAL_ONE, toPush);
-					pushed  = or(pushed, canPush);
-					
+					pushed  = or(pushed, canPush);	
 				}
 				cnt--;
 			}
-		
+			
 		T[][] newStash = env.newTArray(stash.length, 0);//new Signal[blockInSignal.length][];
 		for(int i = 0; i < newStash.length; ++i){
 			newStash[i] = zeros(blockInSignal[0].length);

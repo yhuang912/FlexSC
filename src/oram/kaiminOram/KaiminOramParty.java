@@ -9,7 +9,6 @@ import oram.TreeBasedOramParty;
 
 
 public abstract class KaiminOramParty<T> extends TreeBasedOramParty<T> {
-	final boolean DEBUG = false;
 	public BlockInBinary[] queue;
 	public final int queueCapacity = 29;
 	final int tempStashSize = 10;
@@ -63,6 +62,13 @@ public abstract class KaiminOramParty<T> extends TreeBasedOramParty<T> {
 	}
 	
 	public void flush() throws Exception{
+		for(int k = 0; k < 2; ++k) {
+			boolean[] pos = new boolean[lengthOfPos];
+			for(int i = 0; i < lengthOfPos; ++i)
+				pos[i] = commonRandom.nextBoolean();
+			flushOneTime(pos);
+		}
+		/*
 		while(true){
 			int a = commonRandom.nextInt(3);
 			if(a == 0)
@@ -73,7 +79,7 @@ public abstract class KaiminOramParty<T> extends TreeBasedOramParty<T> {
 					pos[i] = commonRandom.nextBoolean();
 				flushOneTime(pos);
 			}
-		}	
+		}*/	
 	}
 	abstract public void flushOneTime(boolean[] pos) throws Exception;
 	

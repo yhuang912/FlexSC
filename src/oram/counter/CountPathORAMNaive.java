@@ -37,7 +37,7 @@ public class CountPathORAMNaive extends ORAMCounterHarness{
 				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize, Party.Bob, Mode.COUNT);
 				MeasureCompEnv mce = (MeasureCompEnv)server.eva;
 				mce.statistic.flush();
-				server.write(1);
+				server.access(1);
 				statistic = mce.statistic;
 				os.flush();
 				disconnect();
@@ -59,8 +59,9 @@ public class CountPathORAMNaive extends ORAMCounterHarness{
 	}
 
 	public static void main(String [ ] args) throws Exception{
-		CountPathORAMNaive c = new CountPathORAMNaive(10, 5, 10, 80);
+		CountPathORAMNaive c = new CountPathORAMNaive(10, 4, 16, 80);
 		c.count();
-		System.out.print(c.statistic.andGate);
+		System.out.println(c.statistic.andGate);
+		System.out.println(c.statistic.OTs);
 	}
 }

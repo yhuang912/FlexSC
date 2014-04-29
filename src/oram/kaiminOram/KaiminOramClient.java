@@ -2,7 +2,6 @@ package oram.kaiminOram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import oram.Block;
 import test.Utils;
 import flexsc.*;
@@ -15,34 +14,6 @@ public class KaiminOramClient<T> extends KaiminOramParty<T> {
 		lib = new KaiminOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, gen);
 	}
 	
-	public BlockInBinary fetch(boolean[] iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception{
-		BlockInBinary[] blocks = flatten(getAPath(pos));
-		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
-		Block<T>[][] scQueue = prepareBlocks(queue, queue, queue);
-		T[] scIden = gen.inputOfAlice(iden);
-		T[] scNewPos = gen.inputOfAlice(newPos);
-		T[] scData = null;
-		if(data != null)
-			scData = gen.inputOfAlice(data);
-		
-		Block<T> res = lib.readAndRemove(scPath[0], scIden);
-		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
-		Block<T> finalRes = lib.mux(res, res2, res.isDummy);
-
-		if(data == null)
-			scData = finalRes.data;
-		
-		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
-
-		lib.add(scQueue[0], b);
-
-		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
-		queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
-		BlockInBinary r = outputBlock(b);
-		putAPath(blocks, pos);
-		
-		return r;
-	} 
 
 	public void dequeue() throws Exception{
 		//Block[][] scQueue = prepareBlocks(queue, queue, queue);
@@ -88,16 +59,6 @@ public class KaiminOramClient<T> extends KaiminOramParty<T> {
 		
 		Block<T>[][] scQueue = prepareBlocks(queue, queue, queue);
 		
-		if(DEBUG) {//veridy queue is not full
-			T full = lib.SIGNAL_ONE;
-			for(int i = 0; i <scQueue[0].length; ++i){
-				full = lib.and(full, lib.not(lib.eq(scQueue[0][i].iden, lib.zeros(lengthOfIden)) ));
-			}
-			boolean fullb = gen.outputToAlice(full);
-			if(fullb)
-				System.out.println("queue Full!!");
-		}
-		
 		for(int i = 0; i < tempStashSize; ++i)
 			lib.add(scQueue[0], overflowedBlocks[i]);
 		queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
@@ -113,7 +74,10 @@ public class KaiminOramClient<T> extends KaiminOramParty<T> {
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
-		Block<T> finalRes = lib.mux(res, res2, res.isDummy);
+		res = lib.mux(res, res2, res.isDummy);
+		BlockInBinary b = randomBlock();
+		Block<T> scb = inputBlockOfClient(b);
+		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
 
 		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
 		

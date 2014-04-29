@@ -61,6 +61,7 @@ public class CountPathORAM extends ORAMCounterHarness{
 	public static void main(String [ ] args) throws Exception{
 		CountPathORAM c = new CountPathORAM(10, 4, 10, 80);
 		c.count();
-		System.out.print(c.statistic.andGate);
+		System.out.println(c.statistic.andGate);
+		System.out.println(c.statistic.OTs);
 	}
 }
