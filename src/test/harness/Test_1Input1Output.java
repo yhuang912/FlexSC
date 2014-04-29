@@ -35,11 +35,11 @@ public class Test_1Input1Output {
 
 				GCGen gen = new GCGen(is, os);
 
-				GCSignal[] a = gen.inputOfEva(new  boolean[32]);
+				GCSignal[] a = gen.inputOfBob(new  boolean[32]);
 				GCSignal[] d = h.secureCompute(a, gen);
 				os.flush();
 
-				z = gen.outputToGen(d);
+				z = gen.outputToAlice(d);
 
 				disconnect();
 			} catch (Exception e) {
@@ -60,10 +60,10 @@ public class Test_1Input1Output {
 				connect("localhost", 54321);
 
 				GCEva eva = new GCEva(is, os);
-				GCSignal[] a = eva.inputOfEva(h.a);
+				GCSignal[] a = eva.inputOfBob(h.a);
 				GCSignal[] d = h.secureCompute(a, eva);
 				
-				eva.outputToGen(d);
+				eva.outputToAlice(d);
 				os.flush();
 
 				disconnect();

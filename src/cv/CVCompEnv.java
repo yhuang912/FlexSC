@@ -8,17 +8,17 @@ import flexsc.CompEnv;
 public class CVCompEnv implements CompEnv<Boolean> {
 
 	@Override
-	public Boolean inputOfGen(boolean in) throws Exception {
+	public Boolean inputOfAlice(boolean in) throws Exception {
 		return new Boolean(in);
 	}
 
 	@Override
-	public Boolean inputOfEva(boolean in) throws Exception {
+	public Boolean inputOfBob(boolean in) throws Exception {
 		return new Boolean(in);
 	}
 
 	@Override
-	public boolean outputToGen(Boolean out) throws Exception {
+	public boolean outputToAlice(Boolean out) throws Exception {
 		return out;
 	}
 
@@ -81,17 +81,17 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	}
 
 	@Override
-	public boolean[] outputToGen(Boolean[] out) throws Exception {
+	public boolean[] outputToAlice(Boolean[] out) throws Exception {
 		return Utils.tobooleanArray(out);
 	}
 
 	@Override
-	public Boolean[] inputOfGen(boolean[] in) throws Exception {
+	public Boolean[] inputOfAlice(boolean[] in) throws Exception {
 		return Utils.toBooleanArray(in);
 	}
 
 	@Override
-	public Boolean[] inputOfEva(boolean[] in) throws Exception {
+	public Boolean[] inputOfBob(boolean[] in) throws Exception {
 		return Utils.toBooleanArray(in);
 	}
 }

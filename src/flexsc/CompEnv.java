@@ -1,12 +1,12 @@
 package flexsc;
 
 public interface CompEnv<T> {
-	T inputOfGen(boolean in) throws Exception;
-	T inputOfEva(boolean in) throws Exception;
-	T[] inputOfGen(boolean[] in) throws Exception;
-	T[] inputOfEva(boolean[] in) throws Exception;
-	boolean outputToGen(T out) throws Exception;
-	boolean[] outputToGen(T[] out) throws Exception;
+	T inputOfAlice(boolean in) throws Exception;
+	T inputOfBob(boolean in) throws Exception;
+	T[] inputOfAlice(boolean[] in) throws Exception;
+	T[] inputOfBob(boolean[] in) throws Exception;
+	boolean outputToAlice(T out) throws Exception;
+	boolean[] outputToAlice(T[] out) throws Exception;
 //	boolean transOutputToEva(T out) throws Exception;
 	
 //	T or(T a, T b) throws Exception;

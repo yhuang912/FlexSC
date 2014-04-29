@@ -40,15 +40,15 @@ public class TestBigInteger {
 				listen(54321);
 
 				GCGen gen = new GCGen(is, os);
-				GCSignal[] a = gen.inputOfGen(h.a);
-				GCSignal [] b = gen.inputOfEva(new boolean[h.b.length]);
+				GCSignal[] a = gen.inputOfAlice(h.a);
+				GCSignal [] b = gen.inputOfBob(new boolean[h.b.length]);
 				
 				//new java.util.Scanner(System.in).nextLine();
 				GCSignal[] d = h.secureCompute(a, b, gen);
 				os.flush();
 				
 		          
-				z = gen.outputToGen(d);
+				z = gen.outputToAlice(d);
 
 				disconnect();
 			} catch (Exception e) {
@@ -70,12 +70,12 @@ public class TestBigInteger {
 
 				GCEva eva = new GCEva(is, os);
 				
-				GCSignal [] a = eva.inputOfGen(new boolean[h.a.length]);
-				GCSignal [] b = eva.inputOfEva(h.b);
+				GCSignal [] a = eva.inputOfAlice(new boolean[h.a.length]);
+				GCSignal [] b = eva.inputOfBob(h.b);
 				
 				GCSignal[] d = h.secureCompute(a, b, eva);
 				
-				eva.outputToGen(d);
+				eva.outputToAlice(d);
 				os.flush();
 				System.out.println("numberofAnd:"+eva.nonFreeGate);
 				disconnect();

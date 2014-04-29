@@ -41,7 +41,7 @@ public class TestLeadingZeros {
 
 				GCGen gen = new GCGen(is, os);
 				for (int i = 0; i < a.length; i++) 	
-					a[i] = gen.inputOfEva(false);
+					a[i] = gen.inputOfBob(false);
 
 				d = h.secureCompute(a, gen);
 				os.flush();
@@ -49,7 +49,7 @@ public class TestLeadingZeros {
 				z = new boolean[d.length];
 
 				for (int i = 0; i < d.length; i++)
-					z[i] = gen.outputToGen(d[i]);
+					z[i] = gen.outputToAlice(d[i]);
 
 				disconnect();
 			} catch (Exception e) {
@@ -73,12 +73,12 @@ public class TestLeadingZeros {
 
 				GCEva eva = new GCEva(is, os);
 				for(int i = 0; i < a.length; ++i)
-					a[i] = eva.inputOfEva(h.a[i]);
+					a[i] = eva.inputOfBob(h.a[i]);
 
 
 				d = h.secureCompute(a, eva);
 				for (int i = 0; i < d.length; i++) 
-					eva.outputToGen(d[i]);
+					eva.outputToAlice(d[i]);
 				os.flush();
 
 				disconnect();

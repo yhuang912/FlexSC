@@ -40,7 +40,7 @@ public class TestFixedPoint {
 				GCSignal[] fgc2 = gen.inputOfEvaFixPoint(len, offset);
 				GCSignal[] re = h.secureCompute(fgc1, fgc2, offset, gen);
 									
-				boolean[] res = gen.outputToGen(re);
+				boolean[] res = gen.outputToAlice(re);
 				z = Utils.toFixPoint(res, len, offset);
 
 				disconnect();
@@ -67,7 +67,7 @@ public class TestFixedPoint {
 				GCSignal[] fgc2 = eva.inputOfEvaFixPoint(h.b, len, offset);
 				GCSignal[] re = h.secureCompute(fgc1, fgc2, offset, eva);
 									
-				eva.outputToGen(re);
+				eva.outputToAlice(re);
 				
 				disconnect();
 			} catch (Exception e) {

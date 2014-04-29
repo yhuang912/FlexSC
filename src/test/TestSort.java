@@ -43,14 +43,14 @@ public class TestSort {
 
 				GCGen gen = new GCGen(is, os);
 				for(int i = 0; i < a.length; ++i)
-					a[i] = gen.inputOfEva(new boolean[32]);
+					a[i] = gen.inputOfBob(new boolean[32]);
 
 				GCSignal[][] d = h.secureCompute(a, gen);
 				os.flush();
 				
 				z = new boolean[d.length][d[0].length];
 				for (int i = 0; i < d.length; i++)
-					z[i] = gen.outputToGen(d[i]);
+					z[i] = gen.outputToAlice(d[i]);
 				os.flush();
 				
 				disconnect();
@@ -74,12 +74,12 @@ public class TestSort {
 
 				GCEva eva = new GCEva(is, os);
 				for(int i = 0; i < a.length; ++i)
-					a[i] = eva.inputOfEva(h.a[i]);
+					a[i] = eva.inputOfBob(h.a[i]);
 
 				GCSignal[][] d = h.secureCompute(a, eva);
 				
 				for (int i = 0; i < d.length; i++)
-					eva.outputToGen(d[i]);
+					eva.outputToAlice(d[i]);
 				os.flush();
 
 				disconnect();

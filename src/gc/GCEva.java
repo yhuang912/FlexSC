@@ -26,83 +26,83 @@ public class GCEva extends GCCompEnv {
 		gb = new Garbler();
 	}
 
-	public GCSignal inputOfGen(boolean in) throws Exception {
+	public GCSignal inputOfAlice(boolean in) throws Exception {
 		return GCSignal.receive(is);
 	}
 
-	public GCSignal inputOfEva(boolean in) throws Exception {
+	public GCSignal inputOfBob(boolean in) throws Exception {
 		return rcv.receive(in);
 	}
 
-	public GCSignal[] inputOfEva(boolean[] x) throws Exception {
+	public GCSignal[] inputOfBob(boolean[] x) throws Exception {
 		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
-			result[i] = inputOfEva(x[i]);
+			result[i] = inputOfBob(x[i]);
 		return result;
 	}
 
-	public GCSignal[] inputOfGen(boolean[] x) throws Exception {
+	public GCSignal[] inputOfAlice(boolean[] x) throws Exception {
 		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
-			result[i] = inputOfGen(false);
+			result[i] = inputOfAlice(false);
 		return result;
 	}
 	
 	public Representation<GCSignal> inputOfEva(double d, int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(d, widthV, widthP);
-		GCSignal signalS = inputOfEva(f.s);
-		GCSignal signalZ = inputOfEva(f.z);
-		GCSignal[] v = inputOfEva(f.v);
-		GCSignal[] p = inputOfEva(f.p);
+		GCSignal signalS = inputOfBob(f.s);
+		GCSignal signalZ = inputOfBob(f.z);
+		GCSignal[] v = inputOfBob(f.v);
+		GCSignal[] p = inputOfBob(f.p);
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 	
 	public Representation<GCSignal> inputOfGen(int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(0, widthV, widthP);
-		GCSignal signalS = inputOfGen(f.s);
-		GCSignal signalZ = inputOfGen(f.z);
-		GCSignal[] v = inputOfGen(f.v);
-		GCSignal[] p = inputOfGen(f.p);
+		GCSignal signalS = inputOfAlice(f.s);
+		GCSignal signalZ = inputOfAlice(f.z);
+		GCSignal[] v = inputOfAlice(f.v);
+		GCSignal[] p = inputOfAlice(f.p);
 		
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 	
 	public Representation<GCSignal> inputOfEva(FloatFormat f, int widthV, int widthP) throws Exception {
-		GCSignal signalS = inputOfEva(f.s);
-		GCSignal signalZ = inputOfEva(f.z);
-		GCSignal[] v = inputOfEva(f.v);
-		GCSignal[] p = inputOfEva(f.p);
+		GCSignal signalS = inputOfBob(f.s);
+		GCSignal signalZ = inputOfBob(f.z);
+		GCSignal[] v = inputOfBob(f.v);
+		GCSignal[] p = inputOfBob(f.p);
 		
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}	
 	public GCSignal[] inputOfEvaFixPoint(double a, int width, int offset) throws Exception {
-		GCSignal[] result = inputOfEva(Utils.fromFixPoint(a,width,offset));
+		GCSignal[] result = inputOfBob(Utils.fromFixPoint(a,width,offset));
 		return result;
 	}
 	
 	public GCSignal[] inputOfGenFixPoint(int width, int offset) throws Exception {
-		return inputOfGen(new boolean[width]);
+		return inputOfAlice(new boolean[width]);
 	}
 	
-	public boolean outputToGen(GCSignal out) throws Exception {
+	public boolean outputToAlice(GCSignal out) throws Exception {
 		if (!out.isPublic())
 			out.send(os);
 		return false;
 	}
 
-	public boolean[] outputToGen(GCSignal[] out) throws Exception {
+	public boolean[] outputToAlice(GCSignal[] out) throws Exception {
 		boolean [] result = new boolean[out.length];
 		for(int i = 0; i < result.length; ++i) {
-			result[i] = outputToGen(out[i]);
+			result[i] = outputToAlice(out[i]);
 		}
 		return result;
 	}
 
 	public double outputToGen(Representation<GCSignal> gcf) throws Exception {
-		boolean s = outputToGen(gcf.s);
-		boolean z = outputToGen(gcf.z);
-		boolean[] v = outputToGen(gcf.v);
-		boolean[] p = outputToGen(gcf.p);
+		boolean s = outputToAlice(gcf.s);
+		boolean z = outputToAlice(gcf.z);
+		boolean[] v = outputToAlice(gcf.v);
+		boolean[] p = outputToAlice(gcf.p);
 		return new FloatFormat(v, p, s, z).toDouble();
 	}
 
