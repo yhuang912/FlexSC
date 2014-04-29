@@ -10,9 +10,7 @@ import org.junit.Test;
 import test.harness.TestSortHarness;
 import circuits.BitonicSortLib;
 
-
 public class TestSort  extends TestSortHarness<GCSignal>{
-
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();

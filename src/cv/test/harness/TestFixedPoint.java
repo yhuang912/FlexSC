@@ -1,26 +1,25 @@
-package test.harness;
+package cv.test.harness;
 
-import flexsc.*;
-import flexsc.Party;
+
+import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
+import gc.GCSignal;
 import org.junit.Assert;
-import cv.CVCompEnv;
-import cv.MeasureCompEnv;
+
+import test.Utils;
 
 
-public class TestFixedPoint<T> {
+public class TestFixedPoint {
 	final int len = 32;
 	final int offset = 20;
 	public abstract class Helper {
-		Mode m;
 		double a,b;
-		public Helper(double a, double b, Mode m) {
-			this.m = m;
+		public Helper(double a, double b) {
 			this.b = b;
 			this.a = a;
 		}
-		public abstract T[] secureCompute(T[] a, T[] b, int offset, CompEnv<T> env) throws Exception;
+		public abstract GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b, int offset, CompEnv<GCSignal> env) throws Exception;
 		public abstract double plainCompute(double a, double b);
 	}
 	
@@ -36,19 +35,13 @@ public class TestFixedPoint<T> {
 			try {
 				listen(54321);
 
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);
-
-				T[] fgc1 = gen.inputOfGenFixPoint(h.a, len, offset);
-				T[] fgc2 = gen.inputOfEvaFixPoint(0, len, offset);
-				T[] re = h.secureCompute(fgc1, fgc2, offset, gen);
+				GCGen gen = new GCGen(is, os);
+				GCSignal[] fgc1 = gen.inputOfGenFixPoint(h.a, len, offset);
+				GCSignal[] fgc2 = gen.inputOfEvaFixPoint(len, offset);
+				GCSignal[] re = h.secureCompute(fgc1, fgc2, offset, gen);
 									
-				z = gen.outputToGen(re, offset);
+				boolean[] res = gen.outputToAlice(re);
+				z = Utils.toFixPoint(res, len, offset);
 
 				disconnect();
 			} catch (Exception e) {
@@ -69,21 +62,12 @@ public class TestFixedPoint<T> {
 			try {
 				connect("localhost", 54321);	
 
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
-
-				
-				T[] fgc1 = eva.inputOfGenFixPoint(0, len, offset);
-				T[] fgc2 = eva.inputOfEvaFixPoint(h.b, len, offset);
-				T[] re = h.secureCompute(fgc1, fgc2, offset, eva);
+				GCEva eva = new GCEva(is, os);
+				GCSignal[] fgc1 = eva.inputOfGenFixPoint(len, offset);
+				GCSignal[] fgc2 = eva.inputOfEvaFixPoint(h.b, len, offset);
+				GCSignal[] re = h.secureCompute(fgc1, fgc2, offset, eva);
 									
-				eva.outputToGen(re, offset);
-
+				eva.outputToAlice(re);
 				
 				disconnect();
 			} catch (Exception e) {

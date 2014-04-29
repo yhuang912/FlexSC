@@ -5,9 +5,10 @@ import objects.Float.Representation;
 public interface CompEnv<T> {
 	T inputOfGen(boolean in) throws Exception;
 	T inputOfEva(boolean in) throws Exception;
+	boolean outputToGen(T out) throws Exception;
+	
 	T[] inputOfGen(boolean[] in) throws Exception;
 	T[] inputOfEva(boolean[] in) throws Exception;
-	boolean outputToGen(T out) throws Exception;
 	boolean[] outputToGen(T[] out) throws Exception;
 	
 	public Representation<T> inputOfEva(double d, int widthV, int widthP) throws Exception;
@@ -18,7 +19,7 @@ public interface CompEnv<T> {
 	public T[] inputOfGenFixPoint(double d, int width, int offset) throws Exception;
 	public double outputToGen(T[] f, int offset) throws Exception;
 
-	
+
 //	boolean transOutputToEva(T out) throws Exception;
 	
 //	T or(T a, T b) throws Exception;

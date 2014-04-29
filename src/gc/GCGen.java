@@ -77,6 +77,7 @@ public class GCGen extends GCCompEnv {
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 	
+
 //	public Representation<GCSignal> inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
 //		GCSignal signalS = inputOfGen(f.s);
 //		GCSignal signalZ = inputOfGen(f.z);
@@ -85,6 +86,16 @@ public class GCGen extends GCCompEnv {
 //		
 //		return new Representation<GCSignal>(signalS, p, v, signalZ);
 //	}	
+
+	public Representation<GCSignal> inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
+		GCSignal signalS = inputOfGen(f.s);
+		GCSignal signalZ = inputOfGen(f.z);
+		GCSignal[] v = inputOfGen(f.v);
+		GCSignal[] p = inputOfGen(f.p);
+		
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
+	}	
+
 	
 	public Representation<GCSignal> inputOfEva(double d, int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(0, widthV, widthP);
@@ -101,7 +112,7 @@ public class GCGen extends GCCompEnv {
 		return result;
 	}
 	
-	public GCSignal[] inputOfEvaFixPoint(double d, int width, int offset) throws Exception {
+	public GCSignal[] inputOfEvaFixPoint(double a, int width, int offset) throws Exception {
 		return inputOfEva(new boolean[width]);
 	}
 	

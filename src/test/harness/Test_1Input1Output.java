@@ -43,9 +43,9 @@ public class Test_1Input1Output<T>{
 
 				if(h.m == Mode.REAL)
 					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.M == Mode.VERIFY)
+				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);				
-				else if(h.M == Mode.COUNT)
+				else if(h.m == Mode.COUNT)
 					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);			
 				
 				T[] a = gen.inputOfEva(new boolean[32]);
@@ -76,9 +76,9 @@ public class Test_1Input1Output<T>{
 				CompEnv<T> eva = null;
 				if(h.m == Mode.REAL) 
 					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.M == Mode.VERIFY)
+				else if(h.m == Mode.VERIFY)
 					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.M == Mode.COUNT) 
+				else if(h.m == Mode.COUNT) 
 					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
 
 				T[] a = eva.inputOfEva(h.a);

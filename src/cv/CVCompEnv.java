@@ -94,12 +94,6 @@ public class CVCompEnv implements CompEnv<Boolean> {
 		return new Boolean[d1][d2][d3];
 	}
 
-	@Override
-	public boolean[] outputToGen(Boolean[] out) throws Exception {
-		return Utils.tobooleanArray(out);
-	}
-
-	@Override
 	public Boolean[] inputOfGen(boolean[] in) throws Exception {
 		Boolean[] res = new Boolean[in.length];
 		for(int i = 0; i < res.length; ++i)
@@ -155,5 +149,10 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	public double outputToGen(Boolean[] f, int offset) throws Exception {
 		boolean[] res = outputToGen(f);
 		return  Utils.toFixPoint(res, res.length, offset);
+	}
+
+	@Override
+	public boolean[] outputToGen(Boolean[] out) throws Exception {
+		return Utils.tobooleanArray(out);
 	}
 }
