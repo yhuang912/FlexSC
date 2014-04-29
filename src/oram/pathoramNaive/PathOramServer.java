@@ -57,6 +57,7 @@ public class PathOramServer<T> extends PathOramParty<T> {
 		lib.add(scStash[0], scNewBlock);
 		//Signal[][] debug = 
 				lib.pushDown(scPath[0], scStash[0], pos);
+				lib.pushDown(scPath[0], scStash[0], pos);
 		
 		blocks = randomBucket;
 		stash = randomBucketStash;

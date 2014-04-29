@@ -6,7 +6,7 @@ import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Signal;
 
-public class FixedPointLib<T extends Signal> extends IntegerLib<T> {
+public class FixedPointLib<T> extends IntegerLib<T> {
 
 	public FixedPointLib(CompEnv<T> e) {
 		super(e);

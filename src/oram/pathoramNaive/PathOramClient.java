@@ -37,6 +37,7 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		
 		//Signal[][] debug = 
 		lib.pushDown(scPath[0], scStash[0], pos);
+		lib.pushDown(scPath[0], scStash[0], pos);
 		
 		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
 		stash = prepareBlockInBinaries(scStash[0], scStash[1]);
@@ -75,6 +76,7 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		lib.add(scStash[0], scNewBlock);
 		
 		//Signal[][] debug = 
+		lib.pushDown(scPath[0], scStash[0], pos);
 		lib.pushDown(scPath[0], scStash[0], pos);
 		
 		BlockInBinary[] blocks = prepareBlockInBinaries(scPath[0], scPath[1]);

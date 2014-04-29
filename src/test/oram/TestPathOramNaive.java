@@ -15,12 +15,12 @@ import test.Utils;
 
 public class TestPathOramNaive {
 	
-	final int N = 1<<10;
+	final int N = 1<<7;
 	final int capacity = 4;
 	int[] posMap = new int[N+1];
 	int writeCount = N;
 	int readCount = N;
-	int dataSize = 13;
+	int dataSize = 11;
 	int[] writeIndex = new int[writeCount];
 	int[] readIndex = new int[readCount];
 	public TestPathOramNaive() {

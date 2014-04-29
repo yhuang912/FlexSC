@@ -9,10 +9,10 @@ import oram.TreeBasedOramParty;
 
 
 public abstract class KaiminOramParty<T> extends TreeBasedOramParty<T> {
-	final boolean DEBUG = true;
+	final boolean DEBUG = false;
 	public BlockInBinary[] queue;
 	public final int queueCapacity = 29;
-	final int tempStashSize = 7;
+	final int tempStashSize = 10;
 	int leafCapacity;
 	int nodeCapacity;
 	public KaiminOramParty(InputStream is, OutputStream os, int N, int dataSize,

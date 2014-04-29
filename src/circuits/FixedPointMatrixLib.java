@@ -3,7 +3,7 @@ package circuits;
 import flexsc.CompEnv;
 import flexsc.Signal;
 
-public class FixedPointMatrixLib<T extends Signal> extends FixedPointLib<T> {
+public class FixedPointMatrixLib<T> extends FixedPointLib<T> {
 
 	public FixedPointMatrixLib(CompEnv<T> e) {
 		super(e);

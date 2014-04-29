@@ -8,25 +8,43 @@ import objects.Float.Representation;
 import test.Utils;
 
 public class MeasureCompEnv implements CompEnv<Boolean> {
+	public static class Statistic {
+		public int andGate = 0;
+		public int xorGate = 0;
+		public int notGate = 0;
+		public int OTs = 0;
+		public void flush(){
+			andGate = 0;
+			xorGate = 0;
+			notGate = 0;
+			OTs = 0;			
+		}
+		public void add(Statistic s2) {
+			andGate += s2.andGate;
+			xorGate += s2.xorGate;
+			notGate += s2.notGate;
+			OTs += s2.OTs;
+		}
+	}
 	InputStream is;
 	OutputStream os;
 	Party p;
-	
-	int andGate = 0;
-	int xorGate = 0;
-	int notGate = 0;
-	int OTs = 0;
+	public Statistic statistic;
+	Boolean t = true;
+	Boolean f = false;
+
 	public MeasureCompEnv(InputStream is, OutputStream os, Party p) {
 		this.p = p;
+		t = true;
+		f = false;
+		statistic = new Statistic();
 		this.is = is;
 		this.os = os;
 	}
 	
-	Boolean t = true;
-	Boolean f = false;
 	@Override
 	public Boolean inputOfAlice(boolean in) throws Exception {
-		OTs = 0;
+		++statistic.OTs;
 		return f;
 	}
 
@@ -42,19 +60,19 @@ public class MeasureCompEnv implements CompEnv<Boolean> {
 
 	@Override
 	public Boolean and(Boolean a, Boolean b) throws Exception {
-		++andGate;
+		++statistic.andGate;
 		return f;
 	}
 
 	@Override
 	public Boolean xor(Boolean a, Boolean b) {
-		++xorGate;
+		++statistic.xorGate;
 		return f;
 	}
 
 	@Override
 	public Boolean not(Boolean a) {
-		++notGate;
+		++statistic.notGate;
 		return f;
 	}
 

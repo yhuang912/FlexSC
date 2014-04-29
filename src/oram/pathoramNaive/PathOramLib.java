@@ -22,8 +22,10 @@ public class PathOramLib<T> extends BucketLib<T> {
 		T[] xored = xor(pos, path);
 		
 		return padSignal(
-				leadingZeros(padSignal(xored, xored.length+1))
-				, lengthOfPos+1);
+				leadingZeros(
+						padSignal(xored, xored.length)
+					)
+				, xored.length+1);
 		
 	}
 		
@@ -84,22 +86,28 @@ public class PathOramLib<T> extends BucketLib<T> {
 		for(int i = 0; i < pos.length; ++i)
 			posInSignal[i] = pos[i] ? SIGNAL_ONE : SIGNAL_ZERO;
 		
+		T[][] depth = env.newTArray(blockInSignal.length, 0);
+		for(int k = 0; k < blockInSignal.length; ++k) {
+			depth[k] = deepestLevel(
+					Arrays.copyOfRange(blockInSignal[k], lengthOfIden, lengthOfIden + lengthOfPos),
+					posInSignal,
+					blockInSignal[k][blockInSignal[k].length-1]);			
+		}
+		
 		int cnt = newPath.length-1;
 		for(int i = logN; i >=1; --i)
 			for(int j = 0; j < capacity; ++j){
 				T pushed = SIGNAL_ZERO;
 				
 				for(int k = 0; k < blockInSignal.length; ++k) {
-					T[] depth = deepestLevel(
-							Arrays.copyOfRange(blockInSignal[k], lengthOfIden, lengthOfIden + lengthOfPos),
-							posInSignal,
-							blockInSignal[k][blockInSignal[k].length-1]);
-							//Arrays.copyOfRange(blockInSignal[i], 0, lengthOfIden) );
 					
-					T canPush = geq(depth, toSignals(i,depth.length));
-					newPath[cnt] = mux(newPath[cnt], blockInSignal[k], and(canPush, not(pushed)));
-					blockInSignal[k][blockInSignal[k].length-1] = mux(blockInSignal[k][blockInSignal[k].length-1], SIGNAL_ONE, and(canPush, not(pushed)));
+					T canPush = geq(depth[k], toSignals(i-1,depth.length));
+					T toPush = and(canPush, not(pushed));
+					depth[k] = mux(depth[k], zeros(depth[k].length), toPush);
+					newPath[cnt] = mux(newPath[cnt], blockInSignal[k], toPush);
+					blockInSignal[k][blockInSignal[k].length-1] = mux(blockInSignal[k][blockInSignal[k].length-1], SIGNAL_ONE, toPush);
 					pushed  = or(pushed, canPush);
+					
 				}
 				cnt--;
 			}
