@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import oramgc.Block;
 import oramgc.OramParty.BlockInBinary;
 import test.Utils;
+import flexsc.*;
 
 
 public class KaiminOramServer<T> extends KaiminOramParty<T> {

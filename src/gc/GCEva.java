@@ -57,7 +57,7 @@ public class GCEva extends GCCompEnv {
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 	
-	public Representation<GCSignal> inputOfGen(int widthV, int widthP) throws Exception {
+	public Representation<GCSignal> inputOfGen(double d, int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(0, widthV, widthP);
 		GCSignal signalS = inputOfGen(f.s);
 		GCSignal signalZ = inputOfGen(f.z);
@@ -66,22 +66,19 @@ public class GCEva extends GCCompEnv {
 		
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
-	
-	public Representation<GCSignal> inputOfEva(FloatFormat f, int widthV, int widthP) throws Exception {
-		GCSignal signalS = inputOfEva(f.s);
-		GCSignal signalZ = inputOfEva(f.z);
-		GCSignal[] v = inputOfEva(f.v);
-		GCSignal[] p = inputOfEva(f.p);
 		
-		return new Representation<GCSignal>(signalS, p, v, signalZ);
-	}	
 	public GCSignal[] inputOfEvaFixPoint(double a, int width, int offset) throws Exception {
 		GCSignal[] result = inputOfEva(Utils.fromFixPoint(a,width,offset));
 		return result;
 	}
 	
-	public GCSignal[] inputOfGenFixPoint(int width, int offset) throws Exception {
+	public GCSignal[] inputOfGenFixPoint(double d, int width, int offset) throws Exception {
 		return inputOfGen(new boolean[width]);
+	}
+	
+	public double outputToGen(GCSignal[] f, int offset) throws Exception{
+		boolean[] res = outputToGen(f);
+		return  Utils.toFixPoint(res, res.length, offset);
 	}
 	
 	public boolean outputToGen(GCSignal out) throws Exception {

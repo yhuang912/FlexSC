@@ -4,18 +4,17 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import test.Utils;
 
 
 public class TestTreeOram {
-	final int N =7;
-	final int capacity = 10;
+	final int N =(1<<10);
+	final int capacity = 13;
 	int[] posMap = new int[N+1];
-	int writeCount = N*2;
-	int readCount = N*2;
-	int dataSize = 6;
+	int writeCount = 100;
+	int readCount = 100;
+	int dataSize = 13;
 	public TestTreeOram(){
 		for(int i = 0; i < posMap.length; ++i)
 			posMap[i] = 1;
@@ -32,7 +31,7 @@ public class TestTreeOram {
 
 				int data[] = new int[N+1];
 				//TreeOramClient<GCSignal> client = new TreeOramClient<GCSignal>(is, os, N, dataSize, Party.CLIENT, capacity, Mode.REAL);
-				TreeOramClient<Boolean> client = new TreeOramClient<Boolean>(is, os, N, dataSize, Party.CLIENT, capacity, Mode.TEST);
+				TreeOramClient<Boolean> client = new TreeOramClient<Boolean>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 
 				idens = new int[client.tree.length][capacity];
@@ -91,7 +90,7 @@ public class TestTreeOram {
 			try {
 				connect("localhost", 54321);				
 				//TreeOramServer<GCSignal> server = new TreeOramServer<GCSignal>(is, os, N, dataSize, Party.SERVER, capacity, Mode.REAL);
-				TreeOramServer<Boolean> server = new TreeOramServer<Boolean>(is, os, N, dataSize, Party.SERVER, capacity, Mode.TEST);
+				TreeOramServer<Boolean> server = new TreeOramServer<Boolean>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY);
 
 				idens = new int[server.tree.length][capacity];
 				du = new boolean[server.tree.length][capacity];

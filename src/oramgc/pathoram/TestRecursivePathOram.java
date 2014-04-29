@@ -1,24 +1,22 @@
 package oramgc.pathoram;
 
 import java.security.SecureRandom;
-
-import oramgc.OramParty.Mode;
-
+import flexsc.*;
 import org.junit.Test;
-
 import test.Utils;
 
 
 public class TestRecursivePathOram {
-	final int N = 1<<4;
-	int recurFactor = 2;
-	int cutoff = 1<<2;
+	final int N = 1<<10;
+	int recurFactor = 1<<5;
+	int cutoff = 1<<10;
 	int capacity = 4;
 	int dataSize = 10;
-	int writeCount = N*2;
-	int readCount = N*2;
+	int writeCount = N;
+	int readCount = N;
 	public TestRecursivePathOram(){
 	}
+	
 	SecureRandom rng = new SecureRandom();
 	class GenRunnable extends network.Server implements Runnable {
 		GenRunnable () {
@@ -29,7 +27,7 @@ public class TestRecursivePathOram {
 			try {
 				listen(54321);
 				
-				RecursivePathOramClient<Boolean> client = new RecursivePathOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.TEST);
+				RecursivePathOramClient<Boolean> client = new RecursivePathOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY);
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					client.write(element, Utils.fromInt(element, dataSize));
@@ -48,7 +46,7 @@ public class TestRecursivePathOram {
 
 				for(int j = 1; j < client.clients.get(0).tree.length; ++j)
 					for(int i = 0; i < capacity; ++i){
-						idens[j][i]=Utils.toInt(client.clients.get(0).tree[j][i].iden);
+						idens[j][i]=Utils.toInt(client.clients.get(0).tree[j][i].data);
 						du[j][i]=client.clients.get(0).tree[j][i].isDummy;	
 					}
 
@@ -73,7 +71,7 @@ public class TestRecursivePathOram {
 			try {
 				connect("localhost", 54321);		
 				
-				RecursivePathOramServer<Boolean> server = new RecursivePathOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.TEST);
+				RecursivePathOramServer<Boolean> server = new RecursivePathOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY);
 				for(int i = 0; i < writeCount; ++i) {
 					server.access();
 				}
@@ -87,7 +85,7 @@ public class TestRecursivePathOram {
 
 				for(int j = 1; j < server.servers.get(0).tree.length; ++j)
 					for(int i = 0; i < capacity; ++i){
-						idens[j][i]=Utils.toInt(server.servers.get(0).tree[j][i].iden);
+						idens[j][i]=Utils.toInt(server.servers.get(0).tree[j][i].data);
 						du[j][i]=server.servers.get(0).tree[j][i].isDummy;
 					}						
 

@@ -4,8 +4,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import test.Utils;
 
 
@@ -14,14 +13,21 @@ public class TestPathOram {
 	final int N = 1<<10;
 	final int capacity = 4;
 	int[] posMap = new int[N+1];
-	int writeCount = N*2;
-	int readCount = N*2;
-	int dataSize = 10;
-	public TestPathOram(){
+	int writeCount = N;
+	int readCount = N;
+	int dataSize = 13;
+	int[] writeIndex = new int[writeCount];
+	int[] readIndex = new int[readCount];
+	public TestPathOram() {
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
 			posMap[i] = rng.nextInt(N);
+		for(int i = 0; i < writeCount; ++i)
+			writeIndex[i] = i%N;//rng.nextInt(N);
+		for(int i = 0; i < readCount; ++i)
+			readIndex[i] = i%N;//rng.nextInt(N);
 	}
+	
 	SecureRandom rng = new SecureRandom();
 	
 	final int PATHORAMCAPACITY = 4;
@@ -36,12 +42,11 @@ public class TestPathOram {
 				listen(54321);
 				int data[] = new int[N+1];
 
-				PathOramClient<Boolean> client = new PathOramClient<Boolean>(is, os, N, dataSize, Party.CLIENT, Mode.TEST);
+				PathOramClient<Boolean> client = new PathOramClient<Boolean>(is, os, N, dataSize, Party.Alice, Mode.VERIFY);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
-				
 				for(int i = 0; i < writeCount; ++i) {
-					int element = i%N;
+					int element = writeIndex[i];
 
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
@@ -51,8 +56,8 @@ public class TestPathOram {
 					posMap[element] = newValue;
 				}
 				
-				for(int i = 1; i < readCount; ++i) {
-					int element = i%N;
+				for(int i = 0; i < readCount; ++i) {
+					int element = readIndex[i];
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					
@@ -60,7 +65,7 @@ public class TestPathOram {
 					
 					//Assert.assertTrue(Utils.toInt(b) == data[element]);
 					if(Utils.toInt(b) != data[element])
-					System.out.println("inconsistent: "+element+" "+Utils.toInt(b) + " "+data[element]+" "+Utils.toInt(b));
+					System.out.println("inconsistent: "+element+" "+Utils.toInt(b) + " "+data[element]);
 
 					posMap[element] = newValue;
 				}
@@ -101,17 +106,17 @@ public class TestPathOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize, Party.SERVER, Mode.TEST);
+				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize, Party.Bob, Mode.VERIFY);
 				
 				for(int i = 0; i < writeCount; ++i) {
-					int element = i%N;
+					int element = writeIndex[i];
 					int oldValue = posMap[element];
 					server.access(oldValue);
 				}
 				
 				
-				for(int i = 1; i < readCount; ++i){
-					int element = i%N;
+				for(int i = 0; i < readCount; ++i){
+					int element = readIndex[i];
 					int oldValue = posMap[element];
 					server.access(oldValue);
 				}
@@ -176,8 +181,8 @@ public class TestPathOram {
 		
 		printTree(gen,eva);
 		System.out.println(Arrays.toString(xor(gen.stash, eva.stash)));
-		System.out.print("\n");
-		System.out.println(Arrays.toString(posMap));
+		//System.out.print("\n");
+		//System.out.println(Arrays.toString(posMap));
 		
 	}
 	

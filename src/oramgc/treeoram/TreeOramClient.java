@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import oramgc.Block;
 import test.Utils;
+import flexsc.*;
 
 public class TreeOramClient<T> extends TreeOramParty<T> {
 	TreeOramLib<T> lib;

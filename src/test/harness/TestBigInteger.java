@@ -1,30 +1,39 @@
 package test.harness;
 
 import java.math.BigInteger;
+import java.util.Arrays;
+
 import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
-import gc.GCSignal;
+
 import org.junit.Assert;
+
+import cv.CVCompEnv;
+import cv.MeasureCompEnv;
 import test.Utils;
 
 
 
-public class TestBigInteger {
-	public final int LENGTH = 1000;
-	final int RANGE = 1000;
+public class TestBigInteger<T> {
+	public final int LENGTH = 100;
+	final int RANGE = 100;
 	public abstract class Helper {
 		BigInteger intA, intB;
 		boolean[] a;
 		boolean[] b;
-		public Helper(BigInteger aa, BigInteger bb) {
+		Mode m;
+		public Helper(BigInteger aa, BigInteger bb, Mode m) {
 			intA = aa;
 			intB = bb;
+			this.M = m;
 
 			a = Utils.fromBigInteger(aa, RANGE);
 			b = Utils.fromBigInteger(bb, RANGE);
 		}
-		public abstract GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception;
+		public abstract T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception;
 		public abstract BigInteger plainCompute(BigInteger x, BigInteger y);
 	}
 
@@ -39,12 +48,19 @@ public class TestBigInteger {
 			try {
 				listen(54321);
 
-				GCGen gen = new GCGen(is, os);
-				GCSignal[] a = gen.inputOfGen(h.a);
-				GCSignal [] b = gen.inputOfEva(new boolean[h.b.length]);
+				CompEnv<T> gen = null;
+				if(h.m == Mode.REAL)
+					gen = (CompEnv<T>) new GCGen(is, os);
+				else if(h.m == Mode.VERIFY)
+					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
+				else if(h.m == Mode.COUNT) 
+					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);						
+
+				T[] a = gen.inputOfGen(h.a);
+				T [] b = gen.inputOfEva(new boolean[h.b.length]);
 				
 				//new java.util.Scanner(System.in).nextLine();
-				GCSignal[] d = h.secureCompute(a, b, gen);
+				T[] d = h.secureCompute(a, b, gen);
 				os.flush();
 				
 		          
@@ -68,16 +84,22 @@ public class TestBigInteger {
 			try {
 				connect("localhost", 54321);				
 
-				GCEva eva = new GCEva(is, os);
+				CompEnv<T> eva = null;
+				if(h.m == Mode.REAL)
+					eva = (CompEnv<T>) new GCEva(is, os);
+				else if(h.m == Mode.VERIFY)
+					eva = (CompEnv<T>) new CVCompEnv(is ,os, Party.Bob);
+				else if (h.M == Mode.COUNT) 
+					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
+
 				
-				GCSignal [] a = eva.inputOfGen(new boolean[h.a.length]);
-				GCSignal [] b = eva.inputOfEva(h.b);
+				T [] a = eva.inputOfGen(new boolean[h.a.length]);
+				T [] b = eva.inputOfEva(h.b);
 				
-				GCSignal[] d = h.secureCompute(a, b, eva);
+				T[] d = h.secureCompute(a, b, eva);
 				
 				eva.outputToGen(d);
 				os.flush();
-				System.out.println("numberofAnd:"+eva.nonFreeGate);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

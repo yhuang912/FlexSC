@@ -6,10 +6,8 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import oramgc.OramParty;
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import oramgc.trivialoram.TrivialOramClient;
 import test.Utils;
 
@@ -33,13 +31,13 @@ public class RecursiveKaiminOramClient<T> {
 		this.recurFactor = recurFactor;
 		this.nodeCapacity = nodeCapacity;
 		this.leafCapacity = leafCapacity;
-		KaiminOramClient<T>  oram = new KaiminOramClient<T>(is, os, N, dataSize, Party.CLIENT, nodeCapacity, leafCapacity, m);
+		KaiminOramClient<T>  oram = new KaiminOramClient<T>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, m);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
-			oram = new KaiminOramClient<T>(is, os, newN, newDataSize, Party.CLIENT, nodeCapacity, leafCapacity, m);
+			oram = new KaiminOramClient<T>(is, os, newN, newDataSize, Party.Alice, nodeCapacity, leafCapacity, m);
 			clients.add(oram);
 		}
 		KaiminOramClient<T> last = clients.get(clients.size()-1);

@@ -2,14 +2,14 @@ package test.fixedpoints;
 
 import java.util.Random;
 
-import flexsc.CompEnv;
+import flexsc.*;
 import gc.GCSignal;
 import org.junit.Test;
 import test.harness.TestFixedPoint;
 import circuits.FixedPointLib;
 
 
-public class TestFixedPointMultiply extends TestFixedPoint {
+public class TestFixedPointMultiply extends TestFixedPoint<GCSignal> {
 
 	@Test
 	public void testAllCases() throws Exception {
@@ -19,7 +19,7 @@ public class TestFixedPointMultiply extends TestFixedPoint {
 		for (int i = 0; i < testCases; i++) {
 			double d1 = rng.nextInt(1<<30)%1000000.0/1000000.0;
 			double d2 = rng.nextInt(1<<30)%1000000.0/1000000.0;
-			runThreads(new Helper(d1, d2) {
+			runThreads(new Helper(d1, d2, Mode.REAL) {
 				
 				@Override
 				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b, int offset, CompEnv<GCSignal> env) throws Exception {

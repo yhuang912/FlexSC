@@ -1,28 +1,32 @@
 package test.harness;
 
-import flexsc.CompEnv;
+import flexsc.*;
 import gc.GCEva;
 import gc.GCGen;
-import gc.GCSignal;
 
 import org.junit.Assert;
 
+import cv.CVCompEnv;
+import cv.MeasureCompEnv;
 import test.Utils;
 
 
-public class Test_2Input1Output {
+public class Test_2Input1Output<T> {
+	
 	public abstract class Helper {
 		int intA, intB;
 		boolean[] a;
 		boolean[] b;
-		public Helper(int aa, int bb) {
+		Mode m;
+		public Helper(int aa, int bb, Mode m) {
+			this.m = m;
 			intA = aa;
 			intB = bb;
 
 			a = Utils.fromInt(aa, 32);
 			b = Utils.fromInt(bb, 32);
 		}
-		public abstract GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception;
+		public abstract T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception;
 		public abstract int plainCompute(int x, int y);
 	}
 
@@ -37,11 +41,19 @@ public class Test_2Input1Output {
 			try {
 				listen(54321);
 
-				GCGen gen = new GCGen(is, os);
-				GCSignal[] a = gen.inputOfGen(h.a);
-				GCSignal [] b = gen.inputOfEva(new boolean[32]);
+				CompEnv<T> gen = null;
+				if(h.m == Mode.REAL)
+					gen = (CompEnv<T>) new GCGen(is, os);
+				else if(h.m == Mode.VERIFY)
+					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
+				else if(h.m == Mode.COUNT) 
+					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);						
 				
-				GCSignal[] d = h.secureCompute(a, b, gen);
+				T[] a = gen.inputOfGen(h.a);
+				T[] b = gen.inputOfEva(new boolean[32]);
+
+				
+				T[] d = h.secureCompute(a, b, gen);
 				os.flush();
 
 				z = gen.outputToGen(d);
@@ -64,12 +76,19 @@ public class Test_2Input1Output {
 			try {
 				connect("localhost", 54321);				
 
-				GCEva eva = new GCEva(is, os);
+				CompEnv<T> eva = null;
+
+				if(h.m == Mode.REAL)
+					eva = (CompEnv<T>) new GCEva(is, os);
+				else if(h.m == Mode.VERIFY)
+					eva = (CompEnv<T>) new CVCompEnv(is ,os, Party.Bob);
+				else if (h.M == Mode.COUNT) 
+					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
 				
-				GCSignal [] a = eva.inputOfGen(new boolean[32]);
-				GCSignal [] b = eva.inputOfEva(h.b);
-				
-				GCSignal[] d = h.secureCompute(a, b, eva);
+				T[] a = eva.inputOfGen(new boolean[32]);
+				T[] b = eva.inputOfEva(h.b);
+
+				T[] d = h.secureCompute(a, b, eva);
 				
 				eva.outputToGen(d);
 				os.flush();

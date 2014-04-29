@@ -2,13 +2,13 @@ package oramgc.pathoram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import flexsc.*;
 import oramgc.Block;
 import oramgc.TreeBasedOramParty;
 
 
 public abstract class PathOramParty<T> extends TreeBasedOramParty<T> {
-	final int lengthOfStash = 80;//should be 89 with lambda is 80
+	final int lengthOfStash = 20;//should be 89 with lambda is 80
 	public BlockInBinary[] stash = new BlockInBinary[lengthOfStash];
 	final static int capacity = 4;
 	static byte[] seed = new byte[512];
@@ -25,7 +25,7 @@ public abstract class PathOramParty<T> extends TreeBasedOramParty<T> {
 		}
 		else {
 			for(int i = 0; i < stash.length; ++i) 
-				stash[i] = getDummyBlock2();	
+				stash[i] = getDummyBlock2();
 				BlockInBinary[] randomBucket = randomBucket(lengthOfStash);
 				Block<T>[][] result = prepareBlocks(stash, stash, randomBucket);
 				stash = randomBucket;

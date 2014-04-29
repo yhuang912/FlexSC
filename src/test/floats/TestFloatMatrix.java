@@ -36,7 +36,7 @@ public class TestFloatMatrix {
 						if(f[i][j] != 9999999)
 							m[i][j] = gen.inputOfGen(f[i][j], lengthv, lengthp);
 						else
-							m[i][j] = gen.inputOfEva(lengthv, lengthp);
+							m[i][j] = gen.inputOfEva(0, lengthv, lengthp);
 							
 				}
 				
@@ -84,7 +84,7 @@ public class TestFloatMatrix {
 						//if(f[i][j] != null)
 						//	m[i][j] = new FloatGC(eva, f[i][j], lengthv, lengthp);
 						//else
-							m[i][j] = eva.inputOfGen(lengthv, lengthp);
+							m[i][j] = eva.inputOfGen(0, lengthv, lengthp);
 							
 				}
 

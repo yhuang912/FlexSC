@@ -3,16 +3,14 @@ package test.floats;
 import java.util.Random;
 
 import objects.Float.Representation;
-import flexsc.CompEnv;
+import flexsc.*;
 import gc.GCSignal;
-
 import org.junit.Test;
-
 import test.harness.TestFloat;
 import circuits.FloatLib;
 
 
-public class TestFloatDivide extends TestFloat {
+public class TestFloatDivide extends TestFloat<GCSignal> {
 
 	@Test
 	public void testAllCases() throws Exception {
@@ -22,7 +20,7 @@ public class TestFloatDivide extends TestFloat {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble();
 			a = (a == 0) ? 1:a;
-			runThreads(new Helper(rng.nextDouble(), a) {
+			runThreads(new Helper(rng.nextDouble(), a, Mode.REAL) {
 				
 				@Override
 				public Representation<GCSignal> secureCompute(Representation<GCSignal> a, Representation<GCSignal> b, CompEnv<GCSignal> env) throws Exception {

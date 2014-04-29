@@ -3,20 +3,18 @@ package oramgc.kaiminOram;
 import java.security.SecureRandom;
 import org.junit.Assert;
 import org.junit.Test;
-
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import test.Utils;
 
 
 public class TestKaiminOram {
-	final int N = 1<<4;
+	final int N = 1<<10;
 	final int nodeCapacity = 6;
 	final int leafCapacity = 6;
 	int[] posMap = new int[N];
-	int writecount = N*2;
-	int readcount = N*2;
-	int dataSize = 7;
+	int writecount = N;
+	int readcount = N;
+	int dataSize = 12;
 	public TestKaiminOram(){
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
@@ -36,7 +34,7 @@ public class TestKaiminOram {
 				listen(54321);
 
 				int data[] = new int[N+1];
-				KaiminOramClient<Boolean> client = new KaiminOramClient<Boolean>(is, os, N, dataSize, Party.CLIENT, nodeCapacity, leafCapacity, Mode.TEST);
+				KaiminOramClient<Boolean> client = new KaiminOramClient<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				idens = new int[client.tree.length][nodeCapacity];
@@ -63,7 +61,7 @@ public class TestKaiminOram {
 					
 					boolean[] b = client.read(element, oldValue, newValue);
 					//Assert.assertTrue(Utils.toInt(b.data) == data[element]);
-					if(Utils.toInt(b) != data[element]){
+					if(Utils.toInt(b) != data[element]) {
 						System.out.println("inconsistent: "+element+" "+Utils.toInt(b) + " "+data[element]+" "+posMap[element]);
 					}
 					posMap[element] = newValue;
@@ -105,7 +103,7 @@ public class TestKaiminOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				KaiminOramServer<Boolean> server= new KaiminOramServer<Boolean>(is, os, N, dataSize, Party.SERVER, nodeCapacity, leafCapacity, Mode.TEST);
+				KaiminOramServer<Boolean> server= new KaiminOramServer<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY);
 				
 				idens = new int[server.tree.length][nodeCapacity];
 				du = new boolean[server.tree.length][nodeCapacity];

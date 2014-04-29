@@ -1,19 +1,17 @@
 package oramgc.trivialoram;
 
-import gc.GCSignal;
-import oramgc.OramParty.Mode;
-
 import org.junit.Assert;
 import org.junit.Test;
 
+import flexsc.Mode;
 import test.Utils;
 
 
 public class TestTrivialOram {
-	int N = 31;
-	int dataSize = 8;
-	int writeCount = N*2;
-	int readCount = N*2;
+	int N = 1<<10;
+	int dataSize = 13;
+	int writeCount = N;
+	int readCount = N;
 	class GenRunnable extends network.Server implements Runnable {
 		public int[] idens;
 		GenRunnable () {
@@ -23,8 +21,7 @@ public class TestTrivialOram {
 			try {
 				listen(54321);
 
-				TrivialOramClient<Boolean> client = new TrivialOramClient<Boolean>(is, os, N, dataSize, Mode.TEST);
-				
+				TrivialOramClient<Boolean> client = new TrivialOramClient<Boolean>(is, os, N, dataSize, Mode.VERIFY);
 
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
@@ -34,9 +31,10 @@ public class TestTrivialOram {
 				for(int i = 1; i < readCount; ++i){
 					int element = i%N;
 					boolean[] b = client.read(element);
-					Assert.assertTrue(Utils.toInt(b) == 2*element);
+
 					if(Utils.toInt(b) != 2*element)
 						System.out.println("inconsistent: "+element+" "+Utils.toInt(b));
+					Assert.assertTrue(Utils.toInt(b) == 2*element);
 				}
 
 				idens = new int[N];
@@ -61,7 +59,7 @@ public class TestTrivialOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				TrivialOramServer<Boolean> server = new TrivialOramServer<Boolean>(is, os, N, dataSize, Mode.TEST);
+				TrivialOramServer<Boolean> server = new TrivialOramServer<Boolean>(is, os, N, dataSize, Mode.VERIFY);
 				System.out.flush();
 				
 				for(int i = 0; i < writeCount; ++i) {

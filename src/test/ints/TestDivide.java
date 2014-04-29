@@ -1,14 +1,14 @@
 package test.ints;
 
 import java.util.Random;
-import flexsc.CompEnv;
+import flexsc.*;
 import gc.GCSignal;
 import org.junit.Test;
 import test.harness.Test_2Input1Output;
 import circuits.IntegerLib;
 
 
-public class TestDivide extends Test_2Input1Output{
+public class TestDivide extends Test_2Input1Output<GCSignal>{
 
 	@Test
 	public void testAllCases() throws Exception {
@@ -19,7 +19,7 @@ public class TestDivide extends Test_2Input1Output{
 			int b = rnd.nextInt()%(1<<15);
 			int a = rnd.nextInt()%(1<<15);
 			b = (b == 0) ? 1 : b;
-			runThreads(new Helper(a, b){
+			runThreads(new Helper(a, b, Mode.REAL){
 				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
 					return new IntegerLib<GCSignal>(e).divide(Signala ,Signalb);}
 

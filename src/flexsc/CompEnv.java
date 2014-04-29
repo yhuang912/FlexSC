@@ -1,5 +1,7 @@
 package flexsc;
 
+import objects.Float.Representation;
+
 public interface CompEnv<T> {
 	T inputOfGen(boolean in) throws Exception;
 	T inputOfEva(boolean in) throws Exception;
@@ -7,6 +9,16 @@ public interface CompEnv<T> {
 	T[] inputOfEva(boolean[] in) throws Exception;
 	boolean outputToGen(T out) throws Exception;
 	boolean[] outputToGen(T[] out) throws Exception;
+	
+	public Representation<T> inputOfEva(double d, int widthV, int widthP) throws Exception;
+	public Representation<T> inputOfGen(double d, int widthV, int widthP) throws Exception;
+	public double outputToGen(Representation<T> gcf) throws Exception;
+	
+	public T[] inputOfEvaFixPoint(double a, int width, int offset) throws Exception;
+	public T[] inputOfGenFixPoint(double d, int width, int offset) throws Exception;
+	public double outputToGen(T[] f, int offset) throws Exception;
+
+	
 //	boolean transOutputToEva(T out) throws Exception;
 	
 //	T or(T a, T b) throws Exception;

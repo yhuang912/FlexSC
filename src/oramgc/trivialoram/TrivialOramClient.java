@@ -2,7 +2,7 @@ package oramgc.trivialoram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import flexsc.*;
 import oramgc.Block;
 import oramgc.OramParty;
 import test.Utils;
@@ -12,7 +12,7 @@ public class TrivialOramClient<T> extends OramParty<T> {
 	int capacity;
 	public TrivialOramClient(InputStream is, OutputStream os, int N,
 			int dataSize, Mode m) throws Exception {
-		super(is, os, N, dataSize, OramParty.Party.CLIENT, 1, m);
+		super(is, os, N, dataSize, Party.Alice, 1, m);
 		this.capacity = N;
 		bucket = new BlockInBinary[capacity];
 		
@@ -51,9 +51,12 @@ public class TrivialOramClient<T> extends OramParty<T> {
 		T[] scIden = gen.inputOfGen(iden);
 		
 		Block<T> res = lib.readAndRemove(scBlocks, scIden);
+		BlockInBinary b = randomBlock();
+		Block<T> scb = inputBlockOfClient(b);
+		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
 
 		bucket = prepareBlockInBinaries(scBlocks, scBlocksMask);
-		BlockInBinary r = outputBlock(res);
+		BlockInBinary r = outputBlock(finalRes);
 		//System.out.print(Utils.toInt(r.iden)+" "+r.isDummy);
 		return r;
 	}

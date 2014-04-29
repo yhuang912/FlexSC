@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import oramgc.Block;
 import oramgc.OramParty;
+import flexsc.*;
 
 public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	public BlockInBinary[][] tree;

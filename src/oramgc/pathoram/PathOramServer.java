@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import oramgc.Block;
 import oramgc.OramParty.BlockInBinary;
 import test.Utils;
-
+import flexsc.*;
 
 public class PathOramServer<T> extends PathOramParty<T> {
 	PathOramLib<T> lib;
@@ -89,7 +89,14 @@ public class PathOramServer<T> extends PathOramParty<T> {
 		scIden = eva.inputOfGen(new boolean[lengthOfIden]);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
-		outputBlock(res);
+		Block<T> res2 = lib.readAndRemove(scStash[0], scIden);
+		res = lib.mux(res, res2, res.isDummy);
+		BlockInBinary b = randomBlock();
+		Block<T> scb = inputBlockOfClient(b);
+		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
+
+		
+		outputBlock(finalRes);
 	}
 	
 	public void putBack() throws Exception {

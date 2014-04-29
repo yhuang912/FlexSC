@@ -1,6 +1,5 @@
 package oramgc;
 
-import oramgc.OramParty.Mode;
 import circuits.BitonicSortLib;
 import flexsc.CompEnv;
 

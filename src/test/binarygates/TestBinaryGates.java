@@ -90,7 +90,6 @@ public class TestBinaryGates {
 			case NOT:	Assert.assertEquals(!x, gen.z);		break;
 			default:	break;
 		}
-		
 	}
 
 	@Test

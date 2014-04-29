@@ -3,6 +3,7 @@ package oramgc.treeoram;
 import java.io.InputStream;
 import java.io.OutputStream;
 import oramgc.TreeBasedOramParty;
+import flexsc.*;
 
 public abstract class TreeOramParty<T> extends TreeBasedOramParty<T> {
 	public TreeOramParty(InputStream is, OutputStream os, int N, int dataSize,

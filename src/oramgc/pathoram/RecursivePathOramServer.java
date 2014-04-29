@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import oramgc.trivialoram.TrivialOramServer;
 
 public class RecursivePathOramServer<T> {
@@ -24,13 +22,13 @@ public class RecursivePathOramServer<T> {
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		PathOramServer<T>  oram = new PathOramServer<T>(is, os, N, dataSize, Party.SERVER, m);
+		PathOramServer<T>  oram = new PathOramServer<T>(is, os, N, dataSize, Party.Bob, m);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden ) / recurFactor;
-			oram = new PathOramServer<T>(is, os, newN, newDataSize, Party.SERVER, m);
+			oram = new PathOramServer<T>(is, os, newN, newDataSize, Party.Bob, m);
 			servers.add(oram);
 		}
 		PathOramServer<T> last = servers.get(servers.size()-1);

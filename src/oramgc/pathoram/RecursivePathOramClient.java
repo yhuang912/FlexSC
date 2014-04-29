@@ -6,10 +6,8 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import oramgc.OramParty;
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import oramgc.trivialoram.TrivialOramClient;
 import test.Utils;
 
@@ -30,13 +28,13 @@ public class RecursivePathOramClient<T> {
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		PathOramClient<T>  oram = new PathOramClient<T>(is, os, N, dataSize, Party.CLIENT, m);
+		PathOramClient<T>  oram = new PathOramClient<T>(is, os, N, dataSize, Party.Alice, m);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
-			oram = new PathOramClient<T>(is, os, newN, newDataSize, Party.CLIENT, m);
+			oram = new PathOramClient<T>(is, os, newN, newDataSize, Party.Alice, m);
 			clients.add(oram);
 		}
 		PathOramClient<T> last = clients.get(clients.size()-1);

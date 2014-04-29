@@ -1,30 +1,27 @@
-package test.DFT;
-
+package test.harness;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import objects.Float.Representation;
-import flexsc.CompEnv;
+import flexsc.*;
+import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
-import gc.GCSignal;
-
 import org.junit.Assert;
-import org.junit.Test;
+import cv.CVCompEnv;
+import cv.MeasureCompEnv;
 
-import circuits.DFTLib;
-
-
-public class TestDFT {
+public class TestDFTHarness<T> {
 	public abstract class Helper {
 		double[] a,b;
-		Helper(double[] a, double[] b) {
+		Mode m;
+		public Helper(double[] a, double[] b, Mode m) {
+			this.m = m;
 			this.b = b;
 			this.a = a;
 		}
-		abstract void secureCompute(Representation<GCSignal>[] a, Representation<GCSignal>[] b, CompEnv<GCSignal> env) throws Exception;
-		abstract void plainCompute(double a[], double b[]);
+		public abstract void secureCompute(Representation<T>[] a, Representation<T>[] b, CompEnv<T> env) throws Exception;
+		public abstract void plainCompute(double a[], double b[]);
 	}
 	
 	class GenRunnable extends network.Server implements Runnable {
@@ -39,14 +36,22 @@ public class TestDFT {
 			try {
 				listen(54321);
 
-				GCGen gen = new GCGen(is, os);
-				Representation<GCSignal>[] fgc1 = new Representation[h.a.length];
-				Representation<GCSignal>[] fgc2 = new Representation[h.b.length];
+				CompEnv<T> gen = null;
+				if(h.m == Mode.REAL)
+					gen = (CompEnv<T>) new GCGen(is, os);
+				else if(h.m == Mode.VERIFY)
+					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
+				else if(h.m == Mode.COUNT)
+					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);
+				
+
+				Representation<T>[] fgc1 = new Representation[h.a.length];
+				Representation<T>[] fgc2 = new Representation[h.b.length];
 				
 				for(int i = 0; i < fgc1.length; ++i)
 					fgc1[i] = gen.inputOfGen(h.a[i], 23, 9);
 				for(int i = 0; i < fgc2.length; ++i)
-					fgc2[i] = gen.inputOfEva(23, 9);
+					fgc2[i] = gen.inputOfEva(0, 23, 9);
 				
 				h.secureCompute(fgc1, fgc2, gen);
 				os.flush();
@@ -78,12 +83,19 @@ public class TestDFT {
 			try {
 				connect("localhost", 54321);	
 
-				GCEva eva = new GCEva(is, os);
+				CompEnv<T> eva = null;
+				if(h.m == Mode.REAL)
+					eva = (CompEnv<T>) new GCEva(is, os);
+				else if(h.m == Mode.VERIFY)
+					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
+				else if(h.m == Mode.COUNT)
+					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
 
-				Representation<GCSignal>[] fgc1 = new Representation[h.a.length];
-				Representation<GCSignal>[] fgc2 = new Representation[h.b.length];
+
+				Representation<T>[] fgc1 = new Representation[h.a.length];
+				Representation<T>[] fgc2 = new Representation[h.b.length];
 				for(int i = 0; i < fgc1.length; ++i)
-					fgc1[i] = eva.inputOfGen(23, 9);
+					fgc1[i] = eva.inputOfGen(0, 23, 9);
 				for(int i = 0; i < fgc2.length; ++i)
 					fgc2[i] = eva.inputOfEva(h.b[i], 23, 9);
 				
@@ -125,33 +137,6 @@ public class TestDFT {
 		for(int i = 0; i < LENGTH; ++i)
 			Assert.assertTrue(Math.abs(gen.z2[i] - h.b[i]) < 1);
 	}
-	final int LENGTH = 8;
-	@Test
-	public void testAllCases() throws Exception {
-		Random rng = new Random();
-		
-		double[] real = new double[LENGTH];
-		double[] img = new double[LENGTH];
-		for(int i = 0; i < LENGTH; ++i) {
-			real[i] = rng.nextInt()%10000;
-			img[i] = 0;
-		}
-		int testCases = 1;
+	protected final int LENGTH = 8;
 
-		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(real, img) {
-
-				@Override
-				void secureCompute(Representation<GCSignal>[] a, Representation<GCSignal>[] b,
-						CompEnv<GCSignal> env) throws Exception {
-					new DFTLib<GCSignal>(env).FFT(a, b);
-				}
-
-				@Override
-				void plainCompute(double[] a, double[] b) {
-					new DFT(LENGTH).fft(a, b);
-				}
-			});
-		}
-	}
 }

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import oramgc.trivialoram.TrivialOramServer;
 
 public class RecursiveTreeOramServer<T> {
@@ -24,13 +22,13 @@ public class RecursiveTreeOramServer<T> {
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		TreeOramServer<T>  oram = new TreeOramServer<T>(is, os, N, dataSize, Party.SERVER, capacity, m);
+		TreeOramServer<T>  oram = new TreeOramServer<T>(is, os, N, dataSize, Party.Bob, capacity, m);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden ) / recurFactor;
-			oram = new TreeOramServer<T>(is, os, newN, newDataSize, Party.SERVER, capacity, m);
+			oram = new TreeOramServer<T>(is, os, newN, newDataSize, Party.Bob, capacity, m);
 			servers.add(oram);
 		}
 		TreeOramServer<T> last = servers.get(servers.size()-1);

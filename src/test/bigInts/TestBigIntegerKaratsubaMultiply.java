@@ -1,18 +1,16 @@
-package test;
+package test.bigInts;
 
 import java.math.BigInteger;
 import java.util.Random;
-
 import flexsc.CompEnv;
+import flexsc.Mode;
 import gc.GCSignal;
-
 import org.junit.Test;
-
 import test.harness.TestBigInteger;
 import circuits.IntegerLib;
 
 
-public class TestBigIntegerMultiply extends TestBigInteger{
+public class TestBigIntegerKaratsubaMultiply extends TestBigInteger<GCSignal> {
 		@Test
 		public void testAllCases() throws Exception {
 			Random rnd = new Random();
@@ -20,10 +18,10 @@ public class TestBigIntegerMultiply extends TestBigInteger{
 			for (int i = 0; i < testCases; i++) {
 				BigInteger a = new BigInteger(LENGTH, rnd);
 				BigInteger b = new BigInteger(LENGTH, rnd);
-				
-				runThreads(new Helper(a, b ) {
+
+				runThreads(new Helper(a, b, Mode.REAL ) {
 					public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
-						return new IntegerLib<GCSignal>(e).unSignedMultiply(Signala ,Signalb);}
+						return new IntegerLib<GCSignal>(e).karatsubaMultiply(Signala ,Signalb);}
 
 					@Override
 					public BigInteger plainCompute(BigInteger x, BigInteger y) {

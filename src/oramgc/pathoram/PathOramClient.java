@@ -2,7 +2,9 @@ package oramgc.pathoram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import flexsc.*;
 import oramgc.Block;
+import oramgc.OramParty.BlockInBinary;
 import test.Utils;
 
 
@@ -55,8 +57,13 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		scIden = gen.inputOfGen(iden);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
+		Block<T> res2 = lib.readAndRemove(scStash[0], scIden);
+		res = lib.mux(res, res2, res.isDummy);
+		BlockInBinary b = randomBlock();
+		Block<T> scb = inputBlockOfClient(b);
+		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
 
-		BlockInBinary r =  outputBlock(res);
+		BlockInBinary r =  outputBlock(finalRes);
 		return r;
 	}
 	

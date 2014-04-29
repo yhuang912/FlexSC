@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import oramgc.trivialoram.TrivialOramServer;
 
 public class RecursiveKaiminOramServer<T> {
@@ -26,13 +24,13 @@ public class RecursiveKaiminOramServer<T> {
 		this.recurFactor = recurFactor;
 		this.nodeCapacity = nodeCapacity;
 		this.leafCapacity = leafCapacity;
-		KaiminOramServer<T>  oram = new KaiminOramServer<T>(is, os, N, dataSize, Party.SERVER, nodeCapacity, leafCapacity, m);
+		KaiminOramServer<T>  oram = new KaiminOramServer<T>(is, os, N, dataSize, Party.Bob, nodeCapacity, leafCapacity, m);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden ) / recurFactor;
-			oram = new KaiminOramServer<T>(is, os, newN, newDataSize, Party.SERVER, nodeCapacity, leafCapacity, m);
+			oram = new KaiminOramServer<T>(is, os, newN, newDataSize, Party.Bob, nodeCapacity, leafCapacity, m);
 			servers.add(oram);
 		}
 		KaiminOramServer<T> last = servers.get(servers.size()-1);

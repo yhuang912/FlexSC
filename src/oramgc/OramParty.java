@@ -7,6 +7,8 @@ import java.util.Arrays;
 import cv.CVCompEnv;
 import test.Utils;
 import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
 
@@ -36,9 +38,8 @@ public abstract class OramParty<T> {
 	public CompEnv<T> eva;
 	public Party role;
 	protected SecureRandom rng = new SecureRandom();
-	public enum Party { SERVER, CLIENT };
-	public enum Mode { REAL, TEST };
 	public BucketLib<T> lib;
+	public Mode mode;
 	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p, Mode m) throws Exception {
 		this.is = is;
 		this.os = os;
@@ -56,11 +57,12 @@ public abstract class OramParty<T> {
 		lengthOfPos = logN-1;
 		role = p;
 		System.out.println(this.N+" "+this.logN+" "+lengthOfIden+" "+lengthOfPos);
-		if(p == Party.SERVER){
+		mode = m;
+		if(p == Party.Bob){
 			if(m == Mode.REAL)
 				eva = (CompEnv<T>) new GCEva(is, os);
 			else
-				eva = (CompEnv<T>) new CVCompEnv();
+				eva = (CompEnv<T>) new CVCompEnv(is,os, p);
 			
 			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, eva);
 		}
@@ -68,7 +70,7 @@ public abstract class OramParty<T> {
 			if(m == Mode.REAL)
 				gen = (CompEnv<T>) new GCGen(is, os);
 			else
-				gen = (CompEnv<T>) new CVCompEnv();
+				gen = (CompEnv<T>) new CVCompEnv(is, os, p);
 			
 			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, gen);	
 		}
@@ -91,11 +93,11 @@ public abstract class OramParty<T> {
 		this.lengthOfPos = lengthOfPos;
 		role = p;
 		System.out.println(this.N+" "+this.logN+" "+lengthOfIden+" "+lengthOfPos);
-		if(p == Party.SERVER){
+		if(p == Party.Bob){
 			if(m == Mode.REAL)
 				eva = (CompEnv<T>) new GCEva(is, os);
 			else
-				eva = (CompEnv<T>) new CVCompEnv();
+				eva = (CompEnv<T>) new CVCompEnv(is, os, p);
 			
 			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, eva);
 		}
@@ -103,7 +105,7 @@ public abstract class OramParty<T> {
 			if(m == Mode.REAL)
 				gen = (CompEnv<T>) new GCGen(is, os);
 			else
-				gen = (CompEnv<T>) new CVCompEnv();
+				gen = (CompEnv<T>) new CVCompEnv(is, os, p);
 			
 			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, gen);	
 		}
@@ -132,7 +134,7 @@ public abstract class OramParty<T> {
 		Block<T> res = lib.xor(blocks, randomBlock);
 		BlockInBinary clientBlockInBinary = outputBlock(res);
 		
-		if(role == Party.SERVER) {
+		if(role == Party.Bob) {
 			return null;
 		}
 		else{
@@ -144,7 +146,7 @@ public abstract class OramParty<T> {
 		Block<T>[] res = lib.xor(blocks, randomBlock);
 		BlockInBinary[] clientBlockInBinary = outputBucket(res);
 		
-		if(role == Party.SERVER) {
+		if(role == Party.Bob) {
 			return null;
 		}
 		else{
@@ -153,7 +155,7 @@ public abstract class OramParty<T> {
 	}
 	
 	public Block<T> inputBlockOfServer(BlockInBinary b) throws Exception {
-		if(role == Party.SERVER) {
+		if(role == Party.Bob) {
 			T[] iden = (T[]) eva.inputOfEva(b.iden);
 			T[] pos = (T[]) eva.inputOfEva(b.pos);
 			T[] data = (T[]) eva.inputOfEva(b.data);
@@ -230,11 +232,11 @@ public abstract class OramParty<T> {
 		boolean[] pos = new boolean[lengthOfPos];
 		boolean[] data = new boolean[lengthOfData];
 		for(int i = 0; i < lengthOfIden; ++i)
-			iden[i] = false;
+			iden[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfPos; ++i)
-			pos[i] = false;
+			pos[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfData; ++i)
-			data[i] = false;
+			data[i] = rng.nextBoolean();
 		return new BlockInBinary(iden, pos, data, true);
 	}
 	
@@ -243,11 +245,11 @@ public abstract class OramParty<T> {
 		boolean[] pos = new boolean[lengthOfPos];
 		boolean[] data = new boolean[lengthOfData];
 		for(int i = 0; i < lengthOfIden; ++i)
-			iden[i] = false;
+			iden[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfPos; ++i)
-			pos[i] = false;
+			pos[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfData; ++i)
-			data[i] = false;
+			data[i] = rng.nextBoolean();
 		return new BlockInBinary(iden, pos, data, false);
 	}
 

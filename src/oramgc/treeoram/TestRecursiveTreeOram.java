@@ -2,21 +2,19 @@ package oramgc.treeoram;
 
 import java.security.SecureRandom;
 
-import oramgc.OramParty.Mode;
-
+import flexsc.*;
 import org.junit.Assert;
 import org.junit.Test;
-
 import test.Utils;
 
 public class TestRecursiveTreeOram {
-	final int N = 1<<4;
-	int recurFactor = 2;
-	int cutoff = 1<<2;
+	final int N = 1<<10;
+	int recurFactor = 5;
+	int cutoff = 1<<10;
 	int capacity = 10;
-	int dataSize = 10;
-	int writeCount = N*2;
-	int readCount = N*2;
+	int dataSize = 13;
+	int writeCount = 100;
+	int readCount = 100;
 	public TestRecursiveTreeOram(){
 	}
 	SecureRandom rng = new SecureRandom();
@@ -29,7 +27,7 @@ public class TestRecursiveTreeOram {
 			try {
 				listen(54321);
 				
-				RecursiveTreeOramClient<Boolean> client = new RecursiveTreeOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.TEST);
+				RecursiveTreeOramClient<Boolean> client = new RecursiveTreeOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY);
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					client.write(element, Utils.fromInt(element, dataSize));
@@ -75,7 +73,7 @@ public class TestRecursiveTreeOram {
 			try {
 				connect("localhost", 54321);		
 				
-				RecursiveTreeOramServer<Boolean> server = new RecursiveTreeOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.TEST);
+				RecursiveTreeOramServer<Boolean> server = new RecursiveTreeOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY);
 				for(int i = 0; i < writeCount; ++i) {
 					server.access();
 				}

@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import oramgc.Block;
 import test.Utils;
+import flexsc.*;
 
 public class KaiminOramClient<T> extends KaiminOramParty<T> {
 	KaiminOramLib<T> lib;

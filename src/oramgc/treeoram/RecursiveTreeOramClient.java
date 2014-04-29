@@ -6,10 +6,8 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import oramgc.OramParty;
-import oramgc.OramParty.Mode;
-import oramgc.OramParty.Party;
+import flexsc.*;
 import oramgc.trivialoram.TrivialOramClient;
 import test.Utils;
 
@@ -30,13 +28,13 @@ public class RecursiveTreeOramClient<T> {
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		TreeOramClient<T>  oram = new TreeOramClient<T>(is, os, N, dataSize, Party.CLIENT, capacity, m);
+		TreeOramClient<T>  oram = new TreeOramClient<T>(is, os, N, dataSize, Party.Alice, capacity, m);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
-			oram = new TreeOramClient<T>(is, os, newN, newDataSize, Party.CLIENT, capacity, m);
+			oram = new TreeOramClient<T>(is, os, newN, newDataSize, Party.Alice, capacity, m);
 			clients.add(oram);
 		}
 		TreeOramClient<T> last = clients.get(clients.size()-1);
