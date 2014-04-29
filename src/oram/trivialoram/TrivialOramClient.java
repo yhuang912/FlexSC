@@ -8,7 +8,7 @@ import oram.OramParty;
 import test.Utils;
 
 public class TrivialOramClient<T> extends OramParty<T> {
-	BlockInBinary[] bucket;
+	public BlockInBinary[] bucket;
 	int capacity;
 	public TrivialOramClient(InputStream is, OutputStream os, int N,
 			int dataSize, Mode m) throws Exception {
@@ -48,7 +48,7 @@ public class TrivialOramClient<T> extends OramParty<T> {
 		Block<T>[][] result = prepareBlocks(bucket, bucket, bucket);
 		Block<T>[] scBlocks = result[0];
 		Block<T>[] scBlocksMask = result[1];
-		T[] scIden = gen.inputOfGen(iden);
+		T[] scIden = gen.inputOfAlice(iden);
 		
 		Block<T> res = lib.readAndRemove(scBlocks, scIden);
 		BlockInBinary b = randomBlock();

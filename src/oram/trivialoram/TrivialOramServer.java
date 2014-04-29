@@ -9,7 +9,7 @@ import oram.OramParty;
 
 
 public class TrivialOramServer<T> extends OramParty<T> {
-	BlockInBinary[] bucket;
+	public BlockInBinary[] bucket;
 	int capacity;
 	public TrivialOramServer(InputStream is, OutputStream os, int N,
 			int dataSize, Mode m) throws Exception {
@@ -58,7 +58,7 @@ public class TrivialOramServer<T> extends OramParty<T> {
 		Block<T>[][] result = prepareBlocks(bucket, bucket, randomBucket);
 		Block<T>[] scBlocks = result[0];
 		Block<T>[] scBlocksMask = result[1];
-		T[] scIden = eva.inputOfGen(new boolean[lengthOfIden]); 
+		T[] scIden = eva.inputOfAlice(new boolean[lengthOfIden]); 
 		Block<T> res = lib.readAndRemove(scBlocks, scIden);
 		BlockInBinary b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);

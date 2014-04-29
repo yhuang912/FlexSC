@@ -34,9 +34,9 @@ public class TestFloatMatrix {
 				for(int i = 0; i < f.length; ++i){
 					for(int j = 0; j < f[0].length; ++j)
 						if(f[i][j] != 9999999)
-							m[i][j] = gen.inputOfGen(f[i][j], lengthv, lengthp);
+							m[i][j] = gen.inputOfAliceFloatPoint(f[i][j], lengthv, lengthp);
 						else
-							m[i][j] = gen.inputOfEva(0, lengthv, lengthp);
+							m[i][j] = gen.inputOfBobFloatPoint(0, lengthv, lengthp);
 							
 				}
 				
@@ -44,7 +44,7 @@ public class TestFloatMatrix {
 				double[][] r = new double[res.length][res[0].length];
 				for(int i = 0 ; i < r.length; ++i)
 					for(int j = 0; j < r[0].length; ++j)
-						r[i][j] = gen.outputToGen(res[i][j]);
+						r[i][j] = gen.outputToAliceFloatPoint(res[i][j]);
 				
 				for(int i = 0; i < res.length; ++i){
 					for(int j = 0; j < res[0].length; ++j){
@@ -84,7 +84,7 @@ public class TestFloatMatrix {
 						//if(f[i][j] != null)
 						//	m[i][j] = new FloatGC(eva, f[i][j], lengthv, lengthp);
 						//else
-							m[i][j] = eva.inputOfGen(0, lengthv, lengthp);
+							m[i][j] = eva.inputOfAliceFloatPoint(0, lengthv, lengthp);
 							
 				}
 
@@ -92,7 +92,7 @@ public class TestFloatMatrix {
 				
 				for(int i = 0 ; i < res.length; ++i)
 					for(int j = 0; j < res[0].length; ++j)
-						eva.outputToGen(res[i][j]);
+						eva.outputToAliceFloatPoint(res[i][j]);
 				
 				disconnect();
 			} catch (Exception e) {

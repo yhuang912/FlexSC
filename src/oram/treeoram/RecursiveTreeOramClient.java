@@ -13,7 +13,7 @@ import test.Utils;
 
 public class RecursiveTreeOramClient<T> {
 	TrivialOramClient<T> baseOram;
-	ArrayList<TreeOramClient<T>> clients = new ArrayList<>();
+	public ArrayList<TreeOramClient<T>> clients = new ArrayList<>();
 	int initialLengthOfIden;
 	int recurFactor;
 	int cutoff;

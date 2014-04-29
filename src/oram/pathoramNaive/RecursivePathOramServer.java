@@ -9,7 +9,7 @@ import oram.trivialoram.TrivialOramServer;
 
 public class RecursivePathOramServer<T> {
 	TrivialOramServer<T> baseOram;
-	ArrayList<PathOramServer<T>> servers = new ArrayList<>();
+	public ArrayList<PathOramServer<T>> servers = new ArrayList<>();
 	int recurFactor;
 	int cutoff;
 	int capacity;

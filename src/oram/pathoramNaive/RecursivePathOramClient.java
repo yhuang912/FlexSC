@@ -13,7 +13,7 @@ import test.Utils;
 
 public class RecursivePathOramClient<T> {
 	TrivialOramClient<T> baseOram;
-	ArrayList<PathOramClient<T>> clients = new ArrayList<>();
+	public ArrayList<PathOramClient<T>> clients = new ArrayList<>();
 	int initialLengthOfIden;
 	int recurFactor;
 	int cutoff;

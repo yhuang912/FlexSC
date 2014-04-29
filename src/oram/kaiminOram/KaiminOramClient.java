@@ -19,11 +19,11 @@ public class KaiminOramClient<T> extends KaiminOramParty<T> {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		Block<T>[][] scQueue = prepareBlocks(queue, queue, queue);
-		T[] scIden = gen.inputOfGen(iden);
-		T[] scNewPos = gen.inputOfGen(newPos);
+		T[] scIden = gen.inputOfAlice(iden);
+		T[] scNewPos = gen.inputOfAlice(newPos);
 		T[] scData = null;
 		if(data != null)
-			scData = gen.inputOfGen(data);
+			scData = gen.inputOfAlice(data);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
@@ -93,7 +93,7 @@ public class KaiminOramClient<T> extends KaiminOramParty<T> {
 			for(int i = 0; i <scQueue[0].length; ++i){
 				full = lib.and(full, lib.not(lib.eq(scQueue[0][i].iden, lib.zeros(lengthOfIden)) ));
 			}
-			boolean fullb = gen.outputToGen(full);
+			boolean fullb = gen.outputToAlice(full);
 			if(fullb)
 				System.out.println("queue Full!!");
 		}
@@ -109,7 +109,7 @@ public class KaiminOramClient<T> extends KaiminOramParty<T> {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		scQueue = prepareBlocks(queue, queue, queue);
-		scIden = gen.inputOfGen(iden);
+		scIden = gen.inputOfAlice(iden);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
@@ -124,8 +124,8 @@ public class KaiminOramClient<T> extends KaiminOramParty<T> {
 	}
 	
 	public void putBack(boolean[] iden, boolean[] newPos, boolean[] data) throws Exception {
-		T[] scNewPos = gen.inputOfGen(newPos);
-		T[] scData = gen.inputOfGen(data);
+		T[] scNewPos = gen.inputOfAlice(newPos);
+		T[] scData = gen.inputOfAlice(data);
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 
 		lib.add(scQueue[0], b);

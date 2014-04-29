@@ -49,9 +49,9 @@ public class TestDFTHarness<T> {
 				Representation<T>[] fgc2 = new Representation[h.b.length];
 				
 				for(int i = 0; i < fgc1.length; ++i)
-					fgc1[i] = gen.inputOfGen(h.a[i], 23, 9);
+					fgc1[i] = gen.inputOfAliceFloatPoint(h.a[i], 23, 9);
 				for(int i = 0; i < fgc2.length; ++i)
-					fgc2[i] = gen.inputOfEva(0, 23, 9);
+					fgc2[i] = gen.inputOfBobFloatPoint(0, 23, 9);
 				
 				h.secureCompute(fgc1, fgc2, gen);
 				os.flush();
@@ -59,10 +59,10 @@ public class TestDFTHarness<T> {
 				z1 = new double[fgc1.length];
 				z2 = new double[fgc2.length];
 				for(int i = 0; i < fgc1.length; ++i)
-					z1[i] = gen.outputToGen(fgc1[i]);
+					z1[i] = gen.outputToAliceFloatPoint(fgc1[i]);
 
 				for(int i = 0; i < fgc2.length; ++i)
-					z2[i] = gen.outputToGen(fgc2[i]);
+					z2[i] = gen.outputToAliceFloatPoint(fgc2[i]);
 
 				disconnect();
 			} catch (Exception e) {
@@ -95,16 +95,16 @@ public class TestDFTHarness<T> {
 				Representation<T>[] fgc1 = new Representation[h.a.length];
 				Representation<T>[] fgc2 = new Representation[h.b.length];
 				for(int i = 0; i < fgc1.length; ++i)
-					fgc1[i] = eva.inputOfGen(0, 23, 9);
+					fgc1[i] = eva.inputOfAliceFloatPoint(0, 23, 9);
 				for(int i = 0; i < fgc2.length; ++i)
-					fgc2[i] = eva.inputOfEva(h.b[i], 23, 9);
+					fgc2[i] = eva.inputOfBobFloatPoint(h.b[i], 23, 9);
 				
 				h.secureCompute(fgc1, fgc2, eva);
 				
 				for(int i = 0; i < fgc1.length; ++i)
-					eva.outputToGen(fgc1[i]);
+					eva.outputToAliceFloatPoint(fgc1[i]);
 				for(int i = 0; i < fgc2.length; ++i)
-					eva.outputToGen(fgc2[i]);
+					eva.outputToAliceFloatPoint(fgc2[i]);
 				os.flush();
 				disconnect();
 			} catch (Exception e) {

@@ -31,7 +31,7 @@ public class TreeOramServer<T> extends TreeOramParty<T> {
 		BlockInBinary[] randomBucket = randomBucket(blocks.length);
 		Block<T>[][] scPath = prepareBlocks(blocks, blocks, randomBucket);
 		
-		T[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		T[] scIden = eva.inputOfAlice(new boolean[lengthOfIden]);
 				
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		

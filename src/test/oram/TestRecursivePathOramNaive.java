@@ -1,12 +1,17 @@
-package oram.pathoramNaive;
+package test.oram;
 
 import java.security.SecureRandom;
+
 import flexsc.*;
+import oram.pathoramNaive.RecursivePathOramClient;
+import oram.pathoramNaive.RecursivePathOramServer;
+
 import org.junit.Test;
+
 import test.Utils;
 
 
-public class TestRecursivePathOram {
+public class TestRecursivePathOramNaive {
 	final int N = 1<<10;
 	int recurFactor = 1<<4;
 	int cutoff = 1<<10;
@@ -14,7 +19,7 @@ public class TestRecursivePathOram {
 	int dataSize = 10;
 	int writeCount = N;
 	int readCount = N;
-	public TestRecursivePathOram(){
+	public TestRecursivePathOramNaive(){
 	}
 	
 	SecureRandom rng = new SecureRandom();

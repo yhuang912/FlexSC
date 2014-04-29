@@ -1,7 +1,11 @@
-package oram.trivialoram;
+package test.oram;
+
+import oram.trivialoram.TrivialOramClient;
+import oram.trivialoram.TrivialOramServer;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import flexsc.Mode;
 import test.Utils;
 

@@ -45,9 +45,9 @@ public class TestFixedMatrix<T> {
 				for(int i = 0; i < f.length; ++i){
 					for(int j = 0; j < f[0].length; ++j)
 						if(f[i][j] != 9999999)
-							m[i][j] = gen.inputOfGenFixPoint(f[i][j], len, offset);
+							m[i][j] = gen.inputOfAliceFixedPoint(f[i][j], len, offset);
 						else
-							m[i][j] = gen.inputOfEvaFixPoint(0, len, offset);
+							m[i][j] = gen.inputOfBobFixedPoint(0, len, offset);
 							
 				}
 				
@@ -55,7 +55,7 @@ public class TestFixedMatrix<T> {
 				double[][] r = new double[res.length][res[0].length];
 				for(int i = 0 ; i < r.length; ++i)
 					for(int j = 0; j < r[0].length; ++j)
-						r[i][j] = gen.outputToGen(res[i][j]);
+						r[i][j] = gen.outputToAliceFloatPoint(res[i][j]);
 				
 				for(int i = 0; i < res.length; ++i){
 					for(int j = 0; j < res[0].length; ++j){
@@ -103,7 +103,7 @@ public class TestFixedMatrix<T> {
 				
 				for(int i = 0 ; i < res.length; ++i)
 					for(int j = 0; j < res[0].length; ++j)
-						eva.outputToGen(res[i][j]);
+						eva.outputToAliceFloatPoint(res[i][j]);
 				
 				disconnect();
 			} catch (Exception e) {

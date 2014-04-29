@@ -43,14 +43,14 @@ public class PathOramServer<T> extends PathOramParty<T> {
 		Block<T>[][] scStash = prepareBlocks(stash, stash, randomBucketStash);
 		
 		//prepare newblock
-		T[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
-		T[] scPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		T[] scIden = eva.inputOfAlice(new boolean[lengthOfIden]);
+		T[] scPos = eva.inputOfAlice(new boolean[lengthOfPos]);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		outputBlock(res);
 		T[] scData = res.data;
 		if(data != null)
-			scData = eva.inputOfGen(new boolean[lengthOfData]);
+			scData = eva.inputOfAlice(new boolean[lengthOfData]);
 		
 		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		
@@ -87,7 +87,7 @@ public class PathOramServer<T> extends PathOramParty<T> {
 		scStash = prepareBlocks(stash, stash, randomBucketStash);
 		
 		//prepare newblock
-		scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		scIden = eva.inputOfAlice(new boolean[lengthOfIden]);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scStash[0], scIden);
@@ -102,8 +102,8 @@ public class PathOramServer<T> extends PathOramParty<T> {
 	
 	public void putBack() throws Exception {
 		boolean[] pos = WorkingPos;
-		scPos = eva.inputOfGen(new boolean[lengthOfPos]);
-		T[] scData = eva.inputOfGen(new boolean[lengthOfData]);
+		scPos = eva.inputOfAlice(new boolean[lengthOfPos]);
+		T[] scData = eva.inputOfAlice(new boolean[lengthOfData]);
 		
 		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		

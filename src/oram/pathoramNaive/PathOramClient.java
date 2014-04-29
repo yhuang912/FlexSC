@@ -19,8 +19,8 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		Block<T>[][] scStash = prepareBlocks(stash, stash, stash);
-		T[] scIden = gen.inputOfGen(iden);
-		T[] scPos = gen.inputOfGen(newPos);
+		T[] scIden = gen.inputOfAlice(iden);
+		T[] scPos = gen.inputOfAlice(newPos);
 		
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
@@ -29,7 +29,7 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		
 		T[] scData = res.data;
 		if(data != null)
-			scData = gen.inputOfGen(data);
+			scData = gen.inputOfAlice(data);
 		
 		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		
@@ -53,7 +53,7 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		scPath = prepareBlocks(blocks, blocks, blocks);
 		scStash = prepareBlocks(stash, stash, stash);
-		scIden = gen.inputOfGen(iden);
+		scIden = gen.inputOfAlice(iden);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scStash[0], scIden);
@@ -67,8 +67,8 @@ public class PathOramClient<T> extends PathOramParty<T> {
 	}
 	
 	public void putBack(boolean[] iden, boolean[] newPos, boolean[] data) throws Exception {
-		T[] scPos = gen.inputOfGen(newPos);
-		T[] scData = gen.inputOfGen(data);
+		T[] scPos = gen.inputOfAlice(newPos);
+		T[] scData = gen.inputOfAlice(data);
 		boolean[] pos = workingPos;
 		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		

@@ -13,7 +13,7 @@ import test.Utils;
 
 public class RecursiveKaiminOramClient<T> {
 	TrivialOramClient<T> baseOram;
-	ArrayList<KaiminOramClient<T>> clients = new ArrayList<>();
+	public ArrayList<KaiminOramClient<T>> clients = new ArrayList<>();
 	int initialLengthOfIden;
 	int recurFactor;
 	int cutoff;

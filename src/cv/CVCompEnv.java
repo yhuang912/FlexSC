@@ -20,7 +20,7 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	}
 	
 	@Override
-	public Boolean inputOfGen(boolean in) throws Exception {
+	public Boolean inputOfAlice(boolean in) throws Exception {
 		Boolean res = in;
 		if(p == Party.Alice)
 			os.write(in ? 1:0);
@@ -32,7 +32,7 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	}
 
 	@Override
-	public Boolean inputOfEva(boolean in) throws Exception {
+	public Boolean inputOfBob(boolean in) throws Exception {
 		Boolean res = in;
 		if(p == Party.Bob)
 			os.write(in ? 1:0);
@@ -44,7 +44,7 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	}
 
 	@Override
-	public boolean outputToGen(Boolean out) throws Exception {
+	public boolean outputToAlice(Boolean out) throws Exception {
 		return out;
 	}
 
@@ -94,23 +94,23 @@ public class CVCompEnv implements CompEnv<Boolean> {
 		return new Boolean[d1][d2][d3];
 	}
 
-	public Boolean[] inputOfGen(boolean[] in) throws Exception {
+	public Boolean[] inputOfAlice(boolean[] in) throws Exception {
 		Boolean[] res = new Boolean[in.length];
 		for(int i = 0; i < res.length; ++i)
-			res[i] = inputOfGen(in[i]);
+			res[i] = inputOfAlice(in[i]);
 		return res;
 	}
 
 	@Override
-	public Boolean[] inputOfEva(boolean[] in) throws Exception {
+	public Boolean[] inputOfBob(boolean[] in) throws Exception {
 		Boolean[] res = new Boolean[in.length];
 		for(int i = 0; i < res.length; ++i)
-			res[i] = inputOfEva(in[i]);
+			res[i] = inputOfBob(in[i]);
 		return res;
 	}
 
 	@Override
-	public Representation<Boolean> inputOfEva(double d, int widthV, int widthP)
+	public Representation<Boolean> inputOfBobFloatPoint(double d, int widthV, int widthP)
 			throws Exception {
 		FloatFormat f = new FloatFormat(d, 23, 9);
 		Representation<Boolean> result = 
@@ -119,7 +119,7 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	}
 
 	@Override
-	public Representation<Boolean> inputOfGen(double d, int widthV, int widthP)
+	public Representation<Boolean> inputOfAliceFloatPoint(double d, int widthV, int widthP)
 			throws Exception {
 		FloatFormat f = new FloatFormat(d, 23, 9);
 		Representation<Boolean> result = 
@@ -128,31 +128,31 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	}
 
 	@Override
-	public double outputToGen(Representation<Boolean> f) throws Exception {
+	public double outputToAliceFloatPoint(Representation<Boolean> f) throws Exception {
 		FloatFormat d = new FloatFormat(Utils.tobooleanArray(f.v), Utils.tobooleanArray(f.p), f.s, f.z);
 		return d.toDouble();
 	}
 
 	@Override
-	public Boolean[] inputOfEvaFixPoint(double d, int width, int offset)
+	public Boolean[] inputOfBobFixedPoint(double d, int width, int offset)
 			throws Exception {
-		return inputOfEva(Utils.fromFixPoint(d,width,offset));
+		return inputOfBob(Utils.fromFixPoint(d,width,offset));
 	}
 
 	@Override
-	public Boolean[] inputOfGenFixPoint(double d, int width, int offset)
+	public Boolean[] inputOfAliceFixedPoint(double d, int width, int offset)
 			throws Exception {
-		return inputOfEva(Utils.fromFixPoint(d,width,offset));
+		return inputOfBob(Utils.fromFixPoint(d,width,offset));
 	}
 
 	@Override
-	public double outputToGen(Boolean[] f, int offset) throws Exception {
-		boolean[] res = outputToGen(f);
+	public double outputToAliceFixedPoint(Boolean[] f, int offset) throws Exception {
+		boolean[] res = outputToAlice(f);
 		return  Utils.toFixPoint(res, res.length, offset);
 	}
 
 	@Override
-	public boolean[] outputToGen(Boolean[] out) throws Exception {
+	public boolean[] outputToAlice(Boolean[] out) throws Exception {
 		return Utils.tobooleanArray(out);
 	}
 }

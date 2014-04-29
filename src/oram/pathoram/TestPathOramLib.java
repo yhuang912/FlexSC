@@ -48,18 +48,18 @@ public class TestPathOramLib {
 				GCGen gen = new GCGen(is, os);
 				GCSignal [][] a = new GCSignal[16][];
 				for(int i = 0; i < N; ++i)
-					a[i] = gen.inputOfGen(h.a[i]);
+					a[i] = gen.inputOfAlice(h.a[i]);
 				
 				GCSignal [][] b = new GCSignal[16][];
 				for(int i = 0; i < N; ++i)
-					b[i] = gen.inputOfGen(h.b[i]);
+					b[i] = gen.inputOfAlice(h.b[i]);
 				
 				GCSignal[][] d = h.secureCompute(a, b, gen);
 				os.flush();
 
 				z = new int[d.length];
 				for(int i = 0; i < d.length; ++i)
-					z[i] = Utils.toInt(gen.outputToGen(d[i]));
+					z[i] = Utils.toInt(gen.outputToAlice(d[i]));
 
 				disconnect();
 			} catch (Exception e) {
@@ -83,17 +83,17 @@ public class TestPathOramLib {
 				GCEva eva = new GCEva(is, os);
 				GCSignal [][] a = new GCSignal[16][];
 				for(int i = 0; i < N; ++i)
-					a[i] = eva.inputOfGen(h.a[i]);
+					a[i] = eva.inputOfAlice(h.a[i]);
 				
 				GCSignal [][] b = new GCSignal[16][];
 				for(int i = 0; i < N; ++i)
-					b[i] = eva.inputOfGen(h.b[i]);
+					b[i] = eva.inputOfAlice(h.b[i]);
 
 				GCSignal[][] d = h.secureCompute(a, b, eva);
 				os.flush();
 
 				for(int i = 0; i < d.length; ++i)
-					eva.outputToGen(d[i]);
+					eva.outputToAlice(d[i]);
 				
 				disconnect();
 			} catch (Exception e) {

@@ -48,12 +48,12 @@ public class Test_1Input1Output<T>{
 				else if(h.m == Mode.COUNT)
 					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);			
 				
-				T[] a = gen.inputOfEva(new boolean[32]);
+				T[] a = gen.inputOfBob(new boolean[32]);
 				 
 				T[] d = h.secureCompute(a, gen);
 				os.flush();
 
-				z = gen.outputToGen(d);
+				z = gen.outputToAlice(d);
 
 				disconnect();
 			} catch (Exception e) {
@@ -81,10 +81,10 @@ public class Test_1Input1Output<T>{
 				else if(h.m == Mode.COUNT) 
 					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
 
-				T[] a = eva.inputOfEva(h.a);
+				T[] a = eva.inputOfBob(h.a);
 				T[] d = h.secureCompute(a, eva);
 				
-				eva.outputToGen(d);
+				eva.outputToAlice(d);
 				os.flush();
 
 				disconnect();

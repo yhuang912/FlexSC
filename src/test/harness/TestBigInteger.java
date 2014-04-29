@@ -56,15 +56,15 @@ public class TestBigInteger<T> {
 				else if(h.m == Mode.COUNT) 
 					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);						
 
-				T[] a = gen.inputOfGen(h.a);
-				T [] b = gen.inputOfEva(new boolean[h.b.length]);
+				T[] a = gen.inputOfAlice(h.a);
+				T [] b = gen.inputOfBob(new boolean[h.b.length]);
 
 				
 				//new java.util.Scanner(System.in).nextLine();
 				T[] d = h.secureCompute(a, b, gen);
 				os.flush();
 		          
-				z = gen.outputToGen(d);
+				z = gen.outputToAlice(d);
 
 				disconnect();
 			} catch (Exception e) {
@@ -92,12 +92,12 @@ public class TestBigInteger<T> {
 				else if (h.m == Mode.COUNT) 
 					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
 
-				T [] a = eva.inputOfGen(new boolean[h.a.length]);
-				T [] b = eva.inputOfEva(h.b);
+				T [] a = eva.inputOfAlice(new boolean[h.a.length]);
+				T [] b = eva.inputOfBob(h.b);
 				
 				T[] d = h.secureCompute(a, b, eva);
 				
-				eva.outputToGen(d);
+				eva.outputToAlice(d);
 				os.flush();
 				disconnect();
 			} catch (Exception e) {

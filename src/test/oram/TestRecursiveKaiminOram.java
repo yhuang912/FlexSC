@@ -1,8 +1,13 @@
-package oram.kaiminOram;
+package test.oram;
 
 import java.security.SecureRandom;
+
 import flexsc.*;
+import oram.kaiminOram.RecursiveKaiminOramClient;
+import oram.kaiminOram.RecursiveKaiminOramServer;
+
 import org.junit.Test;
+
 import test.Utils;
 
 

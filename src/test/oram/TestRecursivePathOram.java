@@ -1,8 +1,13 @@
-package oram.pathoram;
+package test.oram;
 
 import java.security.SecureRandom;
+
 import flexsc.*;
+import oram.pathoram.RecursivePathOramClient;
+import oram.pathoram.RecursivePathOramServer;
+
 import org.junit.Test;
+
 import test.Utils;
 
 

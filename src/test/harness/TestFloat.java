@@ -42,11 +42,11 @@ public class TestFloat<T> {
 				else if(h.m == Mode.COUNT)
 					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);
 				
-				Representation<T> fgc1 = (Representation<T>) gen.inputOfGen(h.a, 23, 9);
-				Representation<T> fgc2 = (Representation<T>) gen.inputOfEva(0, 23, 9);
+				Representation<T> fgc1 = (Representation<T>) gen.inputOfAliceFloatPoint(h.a, 23, 9);
+				Representation<T> fgc2 = (Representation<T>) gen.inputOfBobFloatPoint(0, 23, 9);
 				Representation<T> re = h.secureCompute(fgc1, fgc2, gen);
 									
-				z = gen.outputToGen(re);
+				z = gen.outputToAliceFloatPoint(re);
 
 				disconnect();
 			} catch (Exception e) {
@@ -75,11 +75,11 @@ public class TestFloat<T> {
 				else if(h.m == Mode.COUNT)
 					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
 
-				Representation<T> fgc1 = eva.inputOfGen(0, 23, 9);
-				Representation<T> fgc2 = eva.inputOfEva(h.b, 23, 9);
+				Representation<T> fgc1 = eva.inputOfAliceFloatPoint(0, 23, 9);
+				Representation<T> fgc2 = eva.inputOfBobFloatPoint(h.b, 23, 9);
 				Representation<T> re = h.secureCompute(fgc1, fgc2, eva);
 									
-				eva.outputToGen(re);
+				eva.outputToAliceFloatPoint(re);
 				
 				disconnect();
 			} catch (Exception e) {

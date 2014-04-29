@@ -1,9 +1,14 @@
-package oram.treeoram;
+package test.oram;
 
 import java.security.SecureRandom;
+
 import flexsc.*;
+import oram.treeoram.RecursiveTreeOramClient;
+import oram.treeoram.RecursiveTreeOramServer;
+
 import org.junit.Assert;
 import org.junit.Test;
+
 import test.Utils;
 
 public class TestRecursiveTreeOram {

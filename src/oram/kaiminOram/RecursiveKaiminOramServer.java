@@ -9,7 +9,7 @@ import flexsc.*;
 
 public class RecursiveKaiminOramServer<T> {
 	TrivialOramServer<T> baseOram;
-	ArrayList<KaiminOramServer<T>> servers = new ArrayList<>();
+	public ArrayList<KaiminOramServer<T>> servers = new ArrayList<>();
 	int recurFactor;
 	int cutoff;
 	int nodeCapacity, leafCapacity;

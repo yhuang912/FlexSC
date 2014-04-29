@@ -24,8 +24,8 @@ public class TestBinaryGates {
 				listen(54321);
 				GCSignal a, b, c=null;
 				GCGen gen = new GCGen(is, os);
-				a = gen.inputOfGen(x);
-				b = gen.inputOfEva(false);
+				a = gen.inputOfAlice(x);
+				b = gen.inputOfBob(false);
 				switch (gtype) {
 					case AND:	c = gen.and(a, b);	break;
 					case XOR:	c = gen.xor(a, b);	break;
@@ -33,7 +33,7 @@ public class TestBinaryGates {
 					default:	break;
 				}
 				os.flush();
-				z = gen.outputToGen(c);
+				z = gen.outputToAlice(c);
 				
 				disconnect();
 			} catch (Exception e) {
@@ -56,15 +56,15 @@ public class TestBinaryGates {
 				connect("localhost", 54321);				
 				GCSignal a, b, c=null;
 				GCEva eva = new GCEva(is, os);
-				a = eva.inputOfGen(false);
-				b = eva.inputOfEva(y);
+				a = eva.inputOfAlice(false);
+				b = eva.inputOfBob(y);
 				switch (gtype) {
 					case AND:	c = eva.and(a, b);	break;
 					case XOR:	c = eva.xor(a, b);	break;
 					case NOT:	c = eva.not(a);		break;
 					default:	break;
 				}
-				eva.outputToGen(c);
+				eva.outputToAlice(c);
 				os.flush();
 				
 				disconnect();

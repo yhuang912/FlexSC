@@ -44,11 +44,11 @@ public class TestFixedPoint<T> {
 				else if(h.m == Mode.COUNT)
 					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);
 
-				T[] fgc1 = gen.inputOfGenFixPoint(h.a, len, offset);
-				T[] fgc2 = gen.inputOfEvaFixPoint(0, len, offset);
+				T[] fgc1 = gen.inputOfAliceFixedPoint(h.a, len, offset);
+				T[] fgc2 = gen.inputOfBobFixedPoint(0, len, offset);
 				T[] re = h.secureCompute(fgc1, fgc2, offset, gen);
 									
-				z = gen.outputToGen(re, offset);
+				z = gen.outputToAliceFixedPoint(re, offset);
 
 				disconnect();
 			} catch (Exception e) {
@@ -78,11 +78,11 @@ public class TestFixedPoint<T> {
 					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
 
 				
-				T[] fgc1 = eva.inputOfGenFixPoint(0, len, offset);
-				T[] fgc2 = eva.inputOfEvaFixPoint(h.b, len, offset);
+				T[] fgc1 = eva.inputOfAliceFixedPoint(0, len, offset);
+				T[] fgc2 = eva.inputOfBobFixedPoint(h.b, len, offset);
 				T[] re = h.secureCompute(fgc1, fgc2, offset, eva);
 									
-				eva.outputToGen(re, offset);
+				eva.outputToAliceFixedPoint(re, offset);
 
 				
 				disconnect();

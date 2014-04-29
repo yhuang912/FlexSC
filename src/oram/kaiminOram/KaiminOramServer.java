@@ -23,11 +23,11 @@ public class KaiminOramServer<T> extends KaiminOramParty<T> {
 		BlockInBinary[] randomQueue = randomBucket(queueCapacity);
 		Block<T>[][] scPath = prepareBlocks(blocks, blocks, randomPath);
 		Block<T>[][] scQueue = prepareBlocks(queue, queue, randomQueue);
-		T[] scIden = eva.inputOfGen(new boolean[lengthOfIden]);
-		T[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
+		T[] scIden = eva.inputOfAlice(new boolean[lengthOfIden]);
+		T[] scNewPos = eva.inputOfAlice(new boolean[lengthOfPos]);
 		T[] scData = null;
 		if(data != null)
-			scData = eva.inputOfGen(new boolean[lengthOfData]);
+			scData = eva.inputOfAlice(new boolean[lengthOfData]);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
@@ -107,7 +107,7 @@ public class KaiminOramServer<T> extends KaiminOramParty<T> {
 			for(int i = 0; i <scQueue[0].length; ++i){
 				full = lib.and(full, lib.not(lib.eq(scQueue[0][i].iden, lib.zeros(lengthOfIden)) ));
 			}
-			eva.outputToGen(full);
+			eva.outputToAlice(full);
 		}
 		for(int i = 0; i < tempStashSize; ++i)
 			lib.add(scQueue[0], overflowedBlocks[i]);
@@ -124,7 +124,7 @@ public class KaiminOramServer<T> extends KaiminOramParty<T> {
 		randomQueue = randomBucket(queueCapacity);
 		Block<T>[][] scPath = prepareBlocks(blocks, blocks, randomPath);
 		scQueue = prepareBlocks(queue, queue, randomQueue);
-		scIden = eva.inputOfGen(new boolean[lengthOfIden]);
+		scIden = eva.inputOfAlice(new boolean[lengthOfIden]);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
@@ -137,8 +137,8 @@ public class KaiminOramServer<T> extends KaiminOramParty<T> {
 	}
 	
 	public void putBack() throws Exception {		
-		T[] scNewPos = eva.inputOfGen(new boolean[lengthOfPos]);
-		T[] scData = eva.inputOfGen(new boolean[lengthOfData]);
+		T[] scNewPos = eva.inputOfAlice(new boolean[lengthOfPos]);
+		T[] scData = eva.inputOfAlice(new boolean[lengthOfData]);
 				
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 

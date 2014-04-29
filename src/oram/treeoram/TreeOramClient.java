@@ -28,7 +28,7 @@ public class TreeOramClient<T> extends TreeOramParty<T> {
 		BlockInBinary[] blocks = flatten(getAPath(pos));
 		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
 		
-		T[] scIden = gen.inputOfGen(iden);
+		T[] scIden = gen.inputOfAlice(iden);
 				
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		

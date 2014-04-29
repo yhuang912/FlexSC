@@ -156,34 +156,34 @@ public abstract class OramParty<T> {
 	
 	public Block<T> inputBlockOfServer(BlockInBinary b) throws Exception {
 		if(eva != null) {
-			T[] iden = (T[]) eva.inputOfEva(b.iden);
-			T[] pos = (T[]) eva.inputOfEva(b.pos);
-			T[] data = (T[]) eva.inputOfEva(b.data);
-			T isDummy = (T) eva.inputOfEva(b.isDummy);
+			T[] iden = (T[]) eva.inputOfBob(b.iden);
+			T[] pos = (T[]) eva.inputOfBob(b.pos);
+			T[] data = (T[]) eva.inputOfBob(b.data);
+			T isDummy = (T) eva.inputOfBob(b.isDummy);
 			return new Block<T>(iden, pos, data, isDummy);
 		}
 		else {
-			T[] iden = (T[]) gen.inputOfEva(new boolean[lengthOfIden]);
-			T[] pos = (T[]) gen.inputOfEva(new boolean[lengthOfPos]);
-			T[] data = (T[]) gen.inputOfEva(new boolean[lengthOfData]);
-			T isDummy = (T) gen.inputOfEva(false);
+			T[] iden = (T[]) gen.inputOfBob(new boolean[lengthOfIden]);
+			T[] pos = (T[]) gen.inputOfBob(new boolean[lengthOfPos]);
+			T[] data = (T[]) gen.inputOfBob(new boolean[lengthOfData]);
+			T isDummy = (T) gen.inputOfBob(false);
 			return new Block<T>(iden, pos, data, isDummy);
 		}
 	}
 
 	public Block<T> inputBlockOfClient(BlockInBinary b) throws Exception {
 		if(eva != null) {
-			T[] iden = (T[]) eva.inputOfGen(new boolean[lengthOfIden]);
-			T[] pos = (T[]) eva.inputOfGen(new boolean[lengthOfPos]);
-			T[] data = (T[]) eva.inputOfGen(new boolean[lengthOfData]);
-			T isDummy = (T) eva.inputOfGen(false);
+			T[] iden = (T[]) eva.inputOfAlice(new boolean[lengthOfIden]);
+			T[] pos = (T[]) eva.inputOfAlice(new boolean[lengthOfPos]);
+			T[] data = (T[]) eva.inputOfAlice(new boolean[lengthOfData]);
+			T isDummy = (T) eva.inputOfAlice(false);
 			return new Block<T>(iden, pos, data, isDummy);
 		}
 		else {
-			T[] iden = (T[]) gen.inputOfGen(b.iden);
-			T[] pos = (T[]) gen.inputOfGen(b.pos);
-			T[] data = (T[]) gen.inputOfGen(b.data);
-			T isDummy = (T) gen.inputOfGen(b.isDummy);
+			T[] iden = (T[]) gen.inputOfAlice(b.iden);
+			T[] pos = (T[]) gen.inputOfAlice(b.pos);
+			T[] data = (T[]) gen.inputOfAlice(b.data);
+			T isDummy = (T) gen.inputOfAlice(b.isDummy);
 			return new Block<T>(iden, pos, data, isDummy);
 		}
 	}
@@ -205,17 +205,17 @@ public abstract class OramParty<T> {
 
 	public BlockInBinary outputBlock(Block<T> b) throws Exception {
 		if(eva != null){
-			boolean[] iden = eva.outputToGen(b.iden);
-			boolean[] pos = eva.outputToGen(b.pos);
-			boolean[] data = eva.outputToGen(b.data);
-			boolean isDummy = eva.outputToGen(b.isDummy);
+			boolean[] iden = eva.outputToAlice(b.iden);
+			boolean[] pos = eva.outputToAlice(b.pos);
+			boolean[] data = eva.outputToAlice(b.data);
+			boolean isDummy = eva.outputToAlice(b.isDummy);
 			return new BlockInBinary(iden, pos, data, isDummy);
 		}
 		else {
-			boolean[] iden = gen.outputToGen(b.iden);
-			boolean[] pos = gen.outputToGen(b.pos);
-			boolean[] data = gen.outputToGen(b.data);
-			boolean isDummy = gen.outputToGen(b.isDummy);
+			boolean[] iden = gen.outputToAlice(b.iden);
+			boolean[] pos = gen.outputToAlice(b.pos);
+			boolean[] data = gen.outputToAlice(b.data);
+			boolean isDummy = gen.outputToAlice(b.isDummy);
 			return new BlockInBinary(iden, pos, data, isDummy);				
 		}
 	}
