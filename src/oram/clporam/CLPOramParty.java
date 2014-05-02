@@ -1,4 +1,4 @@
-package oram.kaiminOram;
+package oram.clporam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,13 +8,13 @@ import oram.Block;
 import oram.TreeBasedOramParty;
 
 
-public abstract class KaiminOramParty<T> extends TreeBasedOramParty<T> {
+public abstract class CLPOramParty<T> extends TreeBasedOramParty<T> {
 	public BlockInBinary[] queue;
 	public final int queueCapacity = 29;
 	final int tempStashSize = 10;
 	int leafCapacity;
 	int nodeCapacity;
-	public KaiminOramParty(InputStream is, OutputStream os, int N, int dataSize,
+	public CLPOramParty(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int nodeCapacity, int leafCapacity, Mode m) throws Exception {
 		super(is, os, N, dataSize, p, nodeCapacity, m);
 		this.leafCapacity = leafCapacity;

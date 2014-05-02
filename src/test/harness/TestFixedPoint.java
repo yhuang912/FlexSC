@@ -1,12 +1,13 @@
 package test.harness;
 
 import flexsc.*;
-import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
+
 import org.junit.Assert;
+
+import pm.PMCompEnv;
 import cv.CVCompEnv;
-import cv.MeasureCompEnv;
 
 
 public class TestFixedPoint<T> {
@@ -42,7 +43,7 @@ public class TestFixedPoint<T> {
 				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
 				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);
+					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
 
 				T[] fgc1 = gen.inputOfAliceFixedPoint(h.a, len, offset);
 				T[] fgc2 = gen.inputOfBobFixedPoint(0, len, offset);
@@ -75,7 +76,7 @@ public class TestFixedPoint<T> {
 				else if(h.m == Mode.VERIFY)
 					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
 				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
+					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
 
 				
 				T[] fgc1 = eva.inputOfAliceFixedPoint(0, len, offset);

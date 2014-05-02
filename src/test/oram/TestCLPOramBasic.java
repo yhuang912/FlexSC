@@ -2,8 +2,8 @@ package test.oram;
 
 import java.security.SecureRandom;
 
-import oram.kaiminOram.KaiminOramClient;
-import oram.kaiminOram.KaiminOramServer;
+import oram.clporam.CLPOramBasicClient;
+import oram.clporam.CLPOramBasicServer;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import flexsc.*;
 import test.Utils;
 
 
-public class TestKaiminOram {
+public class TestCLPOramBasic {
 	final int N = 1<<10;
 	final int nodeCapacity = 6;
 	final int leafCapacity = 6;
@@ -20,7 +20,7 @@ public class TestKaiminOram {
 	int writecount = N;
 	int readcount = N;
 	int dataSize = 12;
-	public TestKaiminOram(){
+	public TestCLPOramBasic(){
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
 			posMap[i] = rng.nextInt(N);
@@ -39,7 +39,7 @@ public class TestKaiminOram {
 				listen(54321);
 
 				int data[] = new int[N+1];
-				KaiminOramClient<Boolean> client = new KaiminOramClient<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY);
+				CLPOramBasicClient<Boolean> client = new CLPOramBasicClient<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				idens = new int[client.tree.length][nodeCapacity];
@@ -108,7 +108,7 @@ public class TestKaiminOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				KaiminOramServer<Boolean> server= new KaiminOramServer<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY);
+				CLPOramBasicServer<Boolean> server= new CLPOramBasicServer<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY);
 				
 				idens = new int[server.tree.length][nodeCapacity];
 				du = new boolean[server.tree.length][nodeCapacity];

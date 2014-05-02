@@ -2,25 +2,27 @@ package test.oram;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
-import oram.pathoram.PathOramClient;
-import oram.pathoram.PathOramServer;
-import org.junit.Assert;
+
+import oram.pathoramNaive.PathOramClient;
+import oram.pathoramNaive.PathOramServer;
+
 import org.junit.Test;
+
 import flexsc.*;
 import test.Utils;
 
 
-public class TestPathOram {
+public class TestPathOramBasicNaive {
 	
-	final int N = 1<<15;
+	final int N = 1<<7;
 	final int capacity = 4;
 	int[] posMap = new int[N+1];
-	int writeCount = N*2;
-	int readCount = N*2;
-	int dataSize = 13;
+	int writeCount = N;
+	int readCount = N;
+	int dataSize = 11;
 	int[] writeIndex = new int[writeCount];
 	int[] readIndex = new int[readCount];
-	public TestPathOram() {
+	public TestPathOramBasicNaive() {
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
 			posMap[i] = rng.nextInt(N);
@@ -41,7 +43,7 @@ public class TestPathOram {
 		public int[] stash;
 		public void run() {
 			try {
-				listen(54321);
+				listen(54322);
 				int data[] = new int[N+1];
 
 				PathOramClient<Boolean> client = new PathOramClient<Boolean>(is, os, N, dataSize, Party.Alice, Mode.VERIFY);
@@ -107,7 +109,7 @@ public class TestPathOram {
 
 		public void run() {
 			try {
-				connect("localhost", 54321);				
+				connect("localhost", 54322);				
 				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize, Party.Bob, Mode.VERIFY);
 				
 				for(int i = 0; i < writeCount; ++i) {

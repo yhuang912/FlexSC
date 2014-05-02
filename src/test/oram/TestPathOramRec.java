@@ -3,24 +3,25 @@ package test.oram;
 import java.security.SecureRandom;
 
 import flexsc.*;
-import oram.kaiminOram.RecursiveKaiminOramClient;
-import oram.kaiminOram.RecursiveKaiminOramServer;
+import oram.pathoram.RecursivePathOramClient;
+import oram.pathoram.RecursivePathOramServer;
 
 import org.junit.Test;
 
 import test.Utils;
 
 
-public class TestRecursiveKaiminOram {
-	final int N = 1<<3;
-	int recurFactor = 2;
-	int cutoff = 1<<2;
-	int capacity = 6;
+public class TestPathOramRec {
+	final int N = 1<<10;
+	int recurFactor = 1<<5;
+	int cutoff = 1<<10;
+	int capacity = 4;
 	int dataSize = 10;
-	int writeCount = N*2;
-	int readCount = N*2;
-	public TestRecursiveKaiminOram(){
+	int writeCount = N;
+	int readCount = N;
+	public TestPathOramRec(){
 	}
+	
 	SecureRandom rng = new SecureRandom();
 	class GenRunnable extends network.Server implements Runnable {
 		GenRunnable () {
@@ -31,7 +32,7 @@ public class TestRecursiveKaiminOram {
 			try {
 				listen(54321);
 				
-				RecursiveKaiminOramClient<Boolean> client = new RecursiveKaiminOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.VERIFY);
+				RecursivePathOramClient<Boolean> client = new RecursivePathOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY);
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					client.write(element, Utils.fromInt(element, dataSize));
@@ -50,7 +51,7 @@ public class TestRecursiveKaiminOram {
 
 				for(int j = 1; j < client.clients.get(0).tree.length; ++j)
 					for(int i = 0; i < capacity; ++i){
-						idens[j][i]=Utils.toInt(client.clients.get(0).tree[j][i].iden);
+						idens[j][i]=Utils.toInt(client.clients.get(0).tree[j][i].data);
 						du[j][i]=client.clients.get(0).tree[j][i].isDummy;	
 					}
 
@@ -75,7 +76,7 @@ public class TestRecursiveKaiminOram {
 			try {
 				connect("localhost", 54321);		
 				
-				RecursiveKaiminOramServer<Boolean> server = new RecursiveKaiminOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.VERIFY);
+				RecursivePathOramServer<Boolean> server = new RecursivePathOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY);
 				for(int i = 0; i < writeCount; ++i) {
 					server.access();
 				}
@@ -89,7 +90,7 @@ public class TestRecursiveKaiminOram {
 
 				for(int j = 1; j < server.servers.get(0).tree.length; ++j)
 					for(int i = 0; i < capacity; ++i){
-						idens[j][i]=Utils.toInt(server.servers.get(0).tree[j][i].iden);
+						idens[j][i]=Utils.toInt(server.servers.get(0).tree[j][i].data);
 						du[j][i]=server.servers.get(0).tree[j][i].isDummy;
 					}						
 

@@ -2,7 +2,7 @@ package oram.counter;
 
 import oram.pathoramNaive.PathOramClient;
 import oram.pathoramNaive.PathOramServer;
-import cv.MeasureCompEnv;
+import pm.PMCompEnv;
 import flexsc.*;
 import test.Utils;
 
@@ -35,7 +35,7 @@ public class CountPathORAMNaive extends ORAMCounterHarness{
 			try {
 				connect("localhost", 54321);				
 				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize, Party.Bob, Mode.COUNT);
-				MeasureCompEnv mce = (MeasureCompEnv)server.eva;
+				PMCompEnv mce = (PMCompEnv)server.eva;
 				mce.statistic.flush();
 				server.access(1);
 				statistic = mce.statistic;

@@ -8,8 +8,8 @@ import gc.GCGen;
 
 import org.junit.Assert;
 
+import pm.PMCompEnv;
 import cv.CVCompEnv;
-import cv.MeasureCompEnv;
 import test.Utils;
 
 
@@ -46,7 +46,7 @@ public class Test_1Input1Output<T>{
 				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);				
 				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);			
+					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);			
 				
 				T[] a = gen.inputOfBob(new boolean[32]);
 				 
@@ -79,7 +79,7 @@ public class Test_1Input1Output<T>{
 				else if(h.m == Mode.VERIFY)
 					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
 				else if(h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
+					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
 
 				T[] a = eva.inputOfBob(h.a);
 				T[] d = h.secureCompute(a, eva);

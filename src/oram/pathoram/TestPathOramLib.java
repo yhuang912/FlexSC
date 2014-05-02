@@ -1,11 +1,9 @@
 package oram.pathoram;
 
 import java.util.Arrays;
-import java.util.Random;
 
 import org.junit.Test;
 
-import circuits.IntegerLib;
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
@@ -117,10 +115,9 @@ public class TestPathOramLib {
 
 	@Test
 	public void test() throws Exception{
-		Random rnd = new Random();
 		int testCases = 1;
 
-		int[] ina = new int[]{3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0};
+		int[] ina = new int[]{3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 		int[] inb = Arrays.copyOf(ina, ina.length);
 		int c = 0; int[]b = new int[ina.length];
 		b[0] = ina[0];

@@ -1,4 +1,4 @@
-package cv;
+package pm;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,8 +7,11 @@ import circuits.FloatFormat;
 import objects.Float.Representation;
 import test.Utils;
 
-public class MeasureCompEnv implements CompEnv<Boolean> {
-	public static class Statistic {
+/*
+ * The computational environment for performance measurement. 
+ */
+public class PMCompEnv implements CompEnv<Boolean> {
+	public static class Statistics {
 		public int andGate = 0;
 		public int xorGate = 0;
 		public int notGate = 0;
@@ -19,7 +22,7 @@ public class MeasureCompEnv implements CompEnv<Boolean> {
 			notGate = 0;
 			OTs = 0;			
 		}
-		public void add(Statistic s2) {
+		public void add(Statistics s2) {
 			andGate += s2.andGate;
 			xorGate += s2.xorGate;
 			notGate += s2.notGate;
@@ -29,15 +32,15 @@ public class MeasureCompEnv implements CompEnv<Boolean> {
 	InputStream is;
 	OutputStream os;
 	Party p;
-	public Statistic statistic;
+	public Statistics statistic;
 	Boolean t = true;
 	Boolean f = false;
 
-	public MeasureCompEnv(InputStream is, OutputStream os, Party p) {
+	public PMCompEnv(InputStream is, OutputStream os, Party p) {
 		this.p = p;
 		t = true;
 		f = false;
-		statistic = new Statistic();
+		statistic = new Statistics();
 		this.is = is;
 		this.os = os;
 	}

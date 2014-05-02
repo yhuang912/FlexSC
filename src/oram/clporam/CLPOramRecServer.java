@@ -1,4 +1,4 @@
-package oram.kaiminOram;
+package oram.clporam;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,16 +7,16 @@ import java.util.ArrayList;
 import oram.trivialoram.TrivialOramServer;
 import flexsc.*;
 
-public class RecursiveKaiminOramServer<T> {
+public class CLPOramRecServer<T> {
 	TrivialOramServer<T> baseOram;
-	public ArrayList<KaiminOramServer<T>> servers = new ArrayList<>();
+	public ArrayList<CLPOramBasicServer<T>> servers = new ArrayList<>();
 	int recurFactor;
 	int cutoff;
 	int nodeCapacity, leafCapacity;
 	int initialLengthOfIden;
 	protected InputStream is;
 	protected OutputStream os;
-	public RecursiveKaiminOramServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int nodeCapacity,
+	public CLPOramRecServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int nodeCapacity,
 			int leafCapacity, Mode m) throws Exception {
 		this.is = is;
 		this.os = os;
@@ -24,22 +24,22 @@ public class RecursiveKaiminOramServer<T> {
 		this.recurFactor = recurFactor;
 		this.nodeCapacity = nodeCapacity;
 		this.leafCapacity = leafCapacity;
-		KaiminOramServer<T>  oram = new KaiminOramServer<T>(is, os, N, dataSize, Party.Bob, nodeCapacity, leafCapacity, m);
+		CLPOramBasicServer<T>  oram = new CLPOramBasicServer<T>(is, os, N, dataSize, Party.Bob, nodeCapacity, leafCapacity, m);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden ) / recurFactor;
-			oram = new KaiminOramServer<T>(is, os, newN, newDataSize, Party.Bob, nodeCapacity, leafCapacity, m);
+			oram = new CLPOramBasicServer<T>(is, os, newN, newDataSize, Party.Bob, nodeCapacity, leafCapacity, m);
 			servers.add(oram);
 		}
-		KaiminOramServer<T> last = servers.get(servers.size()-1);
+		CLPOramBasicServer<T> last = servers.get(servers.size()-1);
 		baseOram = new TrivialOramServer<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, m);
 	}
 	
 	public void access() throws Exception {
 		travelToDeep(1);
-		KaiminOramServer<T> currentOram = servers.get(0);
+		CLPOramBasicServer<T> currentOram = servers.get(0);
 		boolean[] pos = getBooleans();
 		//System.out.println("server"+Utils.toInt(pos));
 		currentOram.access(pos);
@@ -53,7 +53,7 @@ public class RecursiveKaiminOramServer<T> {
 		else {
 			travelToDeep(level+1);
 			
-			KaiminOramServer<T> currentOram = servers.get(level);
+			CLPOramBasicServer<T> currentOram = servers.get(level);
 			boolean[] pos = getBooleans();
 			currentOram.readAndRemove(pos);
 			

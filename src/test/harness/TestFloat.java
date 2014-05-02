@@ -4,9 +4,11 @@ import objects.Float.Representation;
 import gc.GCEva;
 import gc.GCGen;
 import flexsc.*;
+
 import org.junit.Assert;
+
+import pm.PMCompEnv;
 import cv.CVCompEnv;
-import cv.MeasureCompEnv;
 
 
 public class TestFloat<T> {
@@ -40,7 +42,7 @@ public class TestFloat<T> {
 				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
 				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);
+					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
 				
 				Representation<T> fgc1 = (Representation<T>) gen.inputOfAliceFloatPoint(h.a, 23, 9);
 				Representation<T> fgc2 = (Representation<T>) gen.inputOfBobFloatPoint(0, 23, 9);
@@ -73,7 +75,7 @@ public class TestFloat<T> {
 				else if(h.m == Mode.VERIFY)
 					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
 				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
+					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
 
 				Representation<T> fgc1 = eva.inputOfAliceFloatPoint(0, 23, 9);
 				Representation<T> fgc2 = eva.inputOfBobFloatPoint(h.b, 23, 9);

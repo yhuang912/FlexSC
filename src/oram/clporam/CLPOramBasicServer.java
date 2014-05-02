@@ -1,4 +1,4 @@
-package oram.kaiminOram;
+package oram.clporam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,12 +9,12 @@ import test.Utils;
 import flexsc.*;
 
 
-public class KaiminOramServer<T> extends KaiminOramParty<T> {
-	KaiminOramLib<T> lib;
-	public KaiminOramServer(InputStream is, OutputStream os, int N, int dataSize,
+public class CLPOramBasicServer<T> extends CLPOramParty<T> {
+	CLPOramLib<T> lib;
+	public CLPOramBasicServer(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int nodeCapacity, int leafCapacity, Mode m) throws Exception {
 		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity, m);
-		lib = new KaiminOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, eva);
+		lib = new CLPOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, eva);
 	}
 
 	public void dequeue() throws Exception{

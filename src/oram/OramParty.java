@@ -5,8 +5,8 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import pm.PMCompEnv;
 import cv.CVCompEnv;
-import cv.MeasureCompEnv;
 import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Mode;
@@ -66,7 +66,7 @@ public abstract class OramParty<T> {
 			else if(m == Mode.VERIFY)
 				eva = (CompEnv<T>) new CVCompEnv(is,os, p);
 			else if(m == mode.COUNT)
-				eva = (CompEnv<T>) new MeasureCompEnv(is,os, p);
+				eva = (CompEnv<T>) new PMCompEnv(is,os, p);
 			
 			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, eva);
 		}
@@ -76,7 +76,7 @@ public abstract class OramParty<T> {
 			else if(m == Mode.VERIFY)
 				gen = (CompEnv<T>) new CVCompEnv(is, os, p);
 			else if(m == mode.COUNT)
-				gen = (CompEnv<T>) new MeasureCompEnv(is,os, p);
+				gen = (CompEnv<T>) new PMCompEnv(is,os, p);
 			
 			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, gen);	
 		}

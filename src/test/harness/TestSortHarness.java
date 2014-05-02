@@ -5,10 +5,12 @@ import flexsc.Mode;
 import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
+
 import org.junit.Assert;
 import org.junit.Test;
+
+import pm.PMCompEnv;
 import cv.CVCompEnv;
-import cv.MeasureCompEnv;
 import test.Utils;
 
 
@@ -45,7 +47,7 @@ public class TestSortHarness<T> {
 				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);				
 				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);			
+					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);			
 
 				T[][] a = gen.newTArray(h.a.length, h.a[0].length);//new T[h.a.length][h.a[0].length];
 				for(int i = 0; i < a.length; ++i)
@@ -83,7 +85,7 @@ public class TestSortHarness<T> {
 				else if(h.m == Mode.VERIFY)
 					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
 				else if(h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
+					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
 
 				T[][] a = eva.newTArray(h.a.length, h.a[0].length);
 				for(int i = 0; i < a.length; ++i)

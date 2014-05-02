@@ -13,14 +13,14 @@ import flexsc.*;
 import test.Utils;
 
 
-public class TestTreeOram {
+public class TestTreeOramBasic {
 	final int N =(1<<10);
 	final int capacity = 13;
 	int[] posMap = new int[N+1];
 	int writeCount = 100;
 	int readCount = 100;
 	int dataSize = 13;
-	public TestTreeOram(){
+	public TestTreeOramBasic(){
 		for(int i = 0; i < posMap.length; ++i)
 			posMap[i] = 1;
 	}

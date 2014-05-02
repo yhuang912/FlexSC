@@ -1,4 +1,4 @@
-package oram.kaiminOram;
+package oram.clporam;
 
 import java.security.SecureRandom;
 
@@ -6,12 +6,12 @@ import oram.Block;
 import oram.BucketLib;
 import flexsc.CompEnv;
 
-public class KaiminOramLib<T> extends BucketLib<T> {
+public class CLPOramLib<T> extends BucketLib<T> {
 
 	int logN;
 	SecureRandom rng = new SecureRandom();
 	int nodeCapacity, leafCapacity;
-	public KaiminOramLib(int lengthOfIden, int lengthOfPos, int lengthOfData, int logN, int nodeCapacity,
+	public CLPOramLib(int lengthOfIden, int lengthOfPos, int lengthOfData, int logN, int nodeCapacity,
 			int leafCapacity, CompEnv<T> e) {
 		super(lengthOfIden, lengthOfPos, lengthOfData, e);
 		this.logN = logN;

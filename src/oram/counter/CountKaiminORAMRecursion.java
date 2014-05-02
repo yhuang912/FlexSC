@@ -1,8 +1,8 @@
 package oram.counter;
 
-import oram.kaiminOram.RecursiveKaiminOramClient;
-import oram.kaiminOram.RecursiveKaiminOramServer;
-import cv.MeasureCompEnv;
+import oram.clporam.CLPOramRecClient;
+import oram.clporam.CLPOramRecServer;
+import pm.PMCompEnv;
 import flexsc.*;
 import test.Utils;
 
@@ -20,7 +20,7 @@ public class CountKaiminORAMRecursion extends ORAMCounterHarness{
 		public void run() {
 			try {
 				listen(54321);
-				RecursiveKaiminOramClient<Boolean> client = new RecursiveKaiminOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.COUNT);
+				CLPOramRecClient<Boolean> client = new CLPOramRecClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.COUNT);
 				client.write(1, Utils.fromInt(1, client.clients.get(0).lengthOfData));
 				os.flush();
 				disconnect();
@@ -37,15 +37,15 @@ public class CountKaiminORAMRecursion extends ORAMCounterHarness{
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				RecursiveKaiminOramServer<Boolean> server = new RecursiveKaiminOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.COUNT);
+				CLPOramRecServer<Boolean> server = new CLPOramRecServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.COUNT);
 				for(int i = 0; i < server.servers.size(); ++i) {
-					MeasureCompEnv mce = (MeasureCompEnv)server.servers.get(i).eva;
+					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					mce.statistic.flush();
 				}
 				server.access();
 				
 				for(int i = 0; i < server.servers.size(); ++i) {
-					MeasureCompEnv mce = (MeasureCompEnv)server.servers.get(i).eva;
+					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					statistic.add(mce.statistic);
 				}
 				

@@ -11,8 +11,8 @@ import gc.GCGen;
 
 import org.junit.Assert;
 
+import pm.PMCompEnv;
 import cv.CVCompEnv;
-import cv.MeasureCompEnv;
 import test.Utils;
 
 
@@ -54,7 +54,7 @@ public class TestBigInteger<T> {
 				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
 				else if(h.m == Mode.COUNT) 
-					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);						
+					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);						
 
 				T[] a = gen.inputOfAlice(h.a);
 				T [] b = gen.inputOfBob(new boolean[h.b.length]);
@@ -90,7 +90,7 @@ public class TestBigInteger<T> {
 				else if(h.m == Mode.VERIFY)
 					eva = (CompEnv<T>) new CVCompEnv(is ,os, Party.Bob);
 				else if (h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
+					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
 
 				T [] a = eva.inputOfAlice(new boolean[h.a.length]);
 				T [] b = eva.inputOfBob(h.b);

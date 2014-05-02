@@ -8,9 +8,9 @@ import oram.TreeBasedOramParty;
 
 
 public abstract class PathOramParty<T> extends TreeBasedOramParty<T> {
-	final int lengthOfStash = 65;//should be 89 with lambda is 80
+	final int lengthOfStash = 65;//should be 89 when lambda is 80
 	public BlockInBinary[] stash = new BlockInBinary[lengthOfStash];
-	final static int capacity = 4;
+	final static int capacity = 5;
 	static byte[] seed = new byte[512];
 	public PathOramParty(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, Mode m) throws Exception {

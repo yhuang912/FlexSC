@@ -2,7 +2,7 @@ package oram.counter;
 
 import oram.pathoramNaive.RecursivePathOramServer;
 import oram.pathoramNaive.RecursivePathOramClient;
-import cv.MeasureCompEnv;
+import pm.PMCompEnv;
 import flexsc.*;
 import test.Utils;
 
@@ -39,13 +39,13 @@ public class CountPathORAMNaiveRecursion extends ORAMCounterHarness{
 				connect("localhost", 54321);
 				RecursivePathOramServer<Boolean> server = new RecursivePathOramServer<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor, Mode.COUNT);
 				for(int i = 0; i < server.servers.size(); ++i) {
-					MeasureCompEnv mce = (MeasureCompEnv)server.servers.get(i).eva;
+					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					mce.statistic.flush();
 				}
 				server.access();
 				
 				for(int i = 0; i < server.servers.size(); ++i) {
-					MeasureCompEnv mce = (MeasureCompEnv)server.servers.get(i).eva;
+					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					statistic.add(mce.statistic);
 				}
 				

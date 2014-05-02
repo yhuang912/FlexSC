@@ -1,8 +1,8 @@
 package oram.counter;
 
-import oram.kaiminOram.KaiminOramClient;
-import oram.kaiminOram.KaiminOramServer;
-import cv.MeasureCompEnv;
+import oram.clporam.CLPOramBasicClient;
+import oram.clporam.CLPOramBasicServer;
+import pm.PMCompEnv;
 import flexsc.*;
 import test.Utils;
 
@@ -17,7 +17,7 @@ public class CountKaiminORAM extends ORAMCounterHarness{
 		public void run() {
 			try {
 				listen(54321);
-				KaiminOramClient<Boolean> client = new KaiminOramClient<Boolean>(is, os, N, dataSize, Party.Alice, capacity, capacity, Mode.COUNT);
+				CLPOramBasicClient<Boolean> client = new CLPOramBasicClient<Boolean>(is, os, N, dataSize, Party.Alice, capacity, capacity, Mode.COUNT);
 				client.write(1, 1, 1, Utils.fromInt(1, client.lengthOfData));
 				os.flush();
 				disconnect();
@@ -34,8 +34,8 @@ public class CountKaiminORAM extends ORAMCounterHarness{
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				KaiminOramServer<Boolean> server = new KaiminOramServer<Boolean>(is, os, N, dataSize, Party.Bob, capacity, capacity, Mode.COUNT);
-				MeasureCompEnv mce = (MeasureCompEnv)server.eva;
+				CLPOramBasicServer<Boolean> server = new CLPOramBasicServer<Boolean>(is, os, N, dataSize, Party.Bob, capacity, capacity, Mode.COUNT);
+				PMCompEnv mce = (PMCompEnv)server.eva;
 				mce.statistic.flush();
 				server.access(1);
 				statistic = mce.statistic;

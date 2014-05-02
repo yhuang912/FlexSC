@@ -4,12 +4,13 @@ import java.util.Arrays;
 
 import objects.Float.Representation;
 import flexsc.*;
-import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
+
 import org.junit.Assert;
+
+import pm.PMCompEnv;
 import cv.CVCompEnv;
-import cv.MeasureCompEnv;
 
 public class TestDFTHarness<T> {
 	public abstract class Helper {
@@ -42,7 +43,7 @@ public class TestDFTHarness<T> {
 				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
 				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Alice);
+					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
 				
 
 				Representation<T>[] fgc1 = new Representation[h.a.length];
@@ -89,7 +90,7 @@ public class TestDFTHarness<T> {
 				else if(h.m == Mode.VERIFY)
 					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
 				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new MeasureCompEnv(is, os, Party.Bob);
+					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
 
 
 				Representation<T>[] fgc1 = new Representation[h.a.length];

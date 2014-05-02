@@ -2,7 +2,7 @@ package oram.counter;
 
 import oram.treeoram.TreeOramClient;
 import oram.treeoram.TreeOramServer;
-import cv.MeasureCompEnv;
+import pm.PMCompEnv;
 import flexsc.*;
 import test.Utils;
 
@@ -35,7 +35,7 @@ public class CountTreeORAM extends ORAMCounterHarness{
 			try {
 				connect("localhost", 54321);				
 				TreeOramServer<Boolean> server = new TreeOramServer<Boolean>(is, os, N, dataSize, Party.Bob, capacity, Mode.COUNT);
-				MeasureCompEnv mce = (MeasureCompEnv)server.eva;
+				PMCompEnv mce = (PMCompEnv)server.eva;
 				mce.statistic.flush();
 				server.access(1);
 				statistic = mce.statistic;
