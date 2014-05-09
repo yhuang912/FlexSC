@@ -89,9 +89,9 @@ public class OTExtSender extends OTSender {
 
 		for (int i = 0; i < SecurityParameter.k1; i++) {
 		    if (s[i])
-				Q.data[i] = cipher.decrypt(new BigInteger(keys[i].bytes), cphPairs[i][1], numOfPairs);
+				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][1], numOfPairs);
 			else
-				Q.data[i] = cipher.decrypt(new BigInteger(keys[i].bytes), cphPairs[i][0], numOfPairs);
+				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][0], numOfPairs);
 		}
 
 		BitMatrix tQ = Q.transpose();
@@ -99,10 +99,10 @@ public class OTExtSender extends OTSender {
 		BigInteger biS = fromBoolArray(s);
 		BigInteger[][] y = new BigInteger[numOfPairs][2];
 		for (int i = 0; i < numOfPairs; i++) {
-		    y[i][0] = cipher.encrypt(i, tQ.data[i],          new BigInteger(msgPairs[i][0].bytes), msgBitLength);
-		    y[i][1] = cipher.encrypt(i, tQ.data[i].xor(biS), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
+		    y[i][0] = cipher.encrypt(i, tQ.data[i].toByteArray(),          new BigInteger(msgPairs[i][0].bytes), msgBitLength);
+		    y[i][1] = cipher.encrypt(i, tQ.data[i].xor(biS).toByteArray(), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
 		}
-	
+
 		for (int i = 0; i < numOfPairs; i++) {
 			oos.writeObject(y[i][0]);
 			oos.writeObject(y[i][1]);

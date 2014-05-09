@@ -74,9 +74,9 @@ public class OTExtReceiver extends OTReceiver {
 			msgPairs[i][0] = T.data[i];
 			msgPairs[i][1] = T.data[i].xor(biChoices);
 
-			cphPairs[i][0] = cipher.encrypt(new BigInteger(keyPairs[i][0].bytes), msgPairs[i][0],
+			cphPairs[i][0] = cipher.encrypt(keyPairs[i][0].bytes, msgPairs[i][0],
 					choices.length);
-			cphPairs[i][1] = cipher.encrypt(new BigInteger(keyPairs[i][1].bytes), msgPairs[i][1],
+			cphPairs[i][1] = cipher.encrypt(keyPairs[i][1].bytes, msgPairs[i][1],
 					choices.length);
 		}
 
@@ -95,7 +95,7 @@ public class OTExtReceiver extends OTReceiver {
 
 		for (int i = 0; i < choices.length; i++) {
 			int sigma = choices[i] ? 1 : 0;
-			res[i] = GCSignal.newInstance(cipher.decrypt(i, tT.data[i],
+			res[i] = GCSignal.newInstance(cipher.decrypt(i, tT.data[i].toByteArray(),
 					y[i][sigma], msgBitLength).toByteArray());
 		}
 		return res;

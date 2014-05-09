@@ -130,8 +130,8 @@ public class NPOTSender extends OTSender {
             pk0[i] = pk0[i].modPow(r, p);
             pk1[i] = Cr.multiply(pk0[i].modInverse(p)).mod(p);
 
-            msg[i][0] = cipher.encrypt(pk0[i], new BigInteger(msgPairs[i][0].bytes), msgBitLength);
-            msg[i][1] = cipher.encrypt(pk1[i], new BigInteger(msgPairs[i][1].bytes), msgBitLength);
+            msg[i][0] = cipher.encrypt(pk0[i].toByteArray(), new BigInteger(msgPairs[i][0].bytes), msgBitLength);
+            msg[i][1] = cipher.encrypt(pk1[i].toByteArray(), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
         }
 
         oos.writeObject(msg);

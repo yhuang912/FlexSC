@@ -1,12 +1,14 @@
-//Copyright (C) 2010 by Yan Huang <yhuang@virginia.edu>
+//Copyright (C) 2014 by Yan Huang <yhuang@virginia.edu>
 
 package ot;
 
 import java.security.*;
 import java.math.*;
+import java.nio.ByteBuffer;
 
 public final class Cipher {
 	private static final int unitLength = 160; // SHA-1 has 160-bit output.
+	private static final int bytesPerUnit = (unitLength-1)/8+1; // SHA-1 has 20 bytes.
 
 	private MessageDigest sha1;
 
@@ -19,45 +21,57 @@ public final class Cipher {
 		}
 	}
 
-	public BigInteger encrypt(BigInteger key, BigInteger msg, int msgLength) {
+	public BigInteger encrypt(byte[] key, BigInteger msg, int msgLength) {
 		assert (msgLength <= unitLength) : "Message longer than hash block width.";
 		return msg.xor(getPaddingOfLength(key, msgLength));
 	}
 
-	public BigInteger decrypt(BigInteger key, BigInteger cph, int cphLength) {
+	public BigInteger decrypt(byte[] key, BigInteger cph, int cphLength) {
 		assert (cphLength > unitLength) : "Ciphertext longer than hash block width.";
 		return cph.xor(getPaddingOfLength(key, cphLength));
 	}
 
-	private BigInteger getPaddingOfLength(BigInteger key, int padLength) {
-		sha1.update(key.toByteArray());
-		return new BigInteger(1, sha1.digest());
+	private BigInteger getPaddingOfLength(byte[] key, int padLength) {
+		sha1.update(key);
+		byte[] pad = new byte[(padLength-1)/8+1];
+		byte[] tmp;
+		tmp = sha1.digest();
+		int i;
+		for (i = 0; i < (pad.length-1)/bytesPerUnit; i++) {
+			System.arraycopy(tmp, 0, pad, i*bytesPerUnit, bytesPerUnit);
+			sha1.update(tmp);
+			tmp = sha1.digest();
+		}
+		System.arraycopy(tmp, 0, pad, i*bytesPerUnit, pad.length-i*bytesPerUnit);
+		
+		return new BigInteger(1, pad);
 	}
 
-	public BigInteger encrypt(int j, BigInteger key, BigInteger msg,
+	public BigInteger encrypt(int j, byte[] key, BigInteger msg,
 			int msgLength) {
 		return msg.xor(getPaddingOfLength(j, key, msgLength));
 	}
 
-	public BigInteger decrypt(int j, BigInteger key, BigInteger cph,
+	public BigInteger decrypt(int j, byte[] key, BigInteger cph,
 			int cphLength) {
 		return cph.xor(getPaddingOfLength(j, key, cphLength));
 	}
 
-	private BigInteger getPaddingOfLength(int j, BigInteger key, int padLength) {
-		sha1.update(BigInteger.valueOf(j).toByteArray());
-		sha1.update(key.toByteArray());
-		BigInteger pad = BigInteger.ZERO;
-		byte[] tmp = new byte[unitLength / 8];
-		for (int i = 0; i < padLength / unitLength; i++) {
-			System.arraycopy(sha1.digest(), 0, tmp, 0, unitLength / 8);
-			pad = pad.shiftLeft(unitLength).xor(new BigInteger(1, tmp));
+	private BigInteger getPaddingOfLength(int j, byte[] key, int padLength) {
+		sha1.update(ByteBuffer.allocate(4).putInt(j).array());
+		sha1.update(key);
+
+		byte[] pad = new byte[(padLength-1)/8+1];
+		byte[] tmp;
+		tmp = sha1.digest();
+		int i;
+		for (i = 0; i < (pad.length-1)/bytesPerUnit; i++) {
+			System.arraycopy(tmp, 0, pad, i*bytesPerUnit, bytesPerUnit);
 			sha1.update(tmp);
+			tmp = sha1.digest();
 		}
-		System.arraycopy(sha1.digest(), 0, tmp, 0, unitLength / 8);
-		pad = pad.shiftLeft(padLength % unitLength).xor(
-				(new BigInteger(1, tmp)).shiftRight(unitLength
-						- (padLength % unitLength)));
-		return pad;
+		System.arraycopy(tmp, 0, pad, i*bytesPerUnit, pad.length-i*bytesPerUnit);
+		
+		return new BigInteger(1, pad);
 	}
 }
