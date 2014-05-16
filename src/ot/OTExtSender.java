@@ -53,6 +53,10 @@ public class OTExtSender extends OTSender {
 			refillPool();
 	}
 	
+	/*
+	 * Everything in msgPairs are effective Sender's messages. 
+	 * 
+	 */
     public void send(GCSignal[][] msgPairs) throws Exception {    	
     	GCSignal[][] pairs = new GCSignal[SecurityParameter.k1 + msgPairs.length][2];
     	for (int i = 0; i < SecurityParameter.k1; i++) {
@@ -99,8 +103,12 @@ public class OTExtSender extends OTSender {
 		BigInteger biS = fromBoolArray(s);
 		BigInteger[][] y = new BigInteger[numOfPairs][2];
 		for (int i = 0; i < numOfPairs; i++) {
-		    y[i][0] = cipher.encrypt(i, tQ.data[i].toByteArray(),          new BigInteger(msgPairs[i][0].bytes), msgBitLength);
-		    y[i][1] = cipher.encrypt(i, tQ.data[i].xor(biS).toByteArray(), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
+//		    y[i][0] = cipher.encrypt(i, tQ.data[i].toByteArray(),          new BigInteger(msgPairs[i][0].bytes), msgBitLength);
+//		    y[i][1] = cipher.encrypt(i, tQ.data[i].xor(biS).toByteArray(), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
+//		    y[i][0] = cipher.encryptNoBI(i, tQ.data[i].toByteArray(),          new BigInteger(msgPairs[i][0].bytes), msgBitLength);
+//		    y[i][1] = cipher.encryptNoBI(i, tQ.data[i].xor(biS).toByteArray(), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
+			y[i][0] = cipher.encrypt(tQ.data[i].toByteArray(),          new BigInteger(msgPairs[i][0].bytes), i);
+		    y[i][1] = cipher.encrypt(tQ.data[i].xor(biS).toByteArray(), new BigInteger(msgPairs[i][1].bytes), i);
 		}
 
 		for (int i = 0; i < numOfPairs; i++) {

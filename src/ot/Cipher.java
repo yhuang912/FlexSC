@@ -2,7 +2,10 @@
 
 package ot;
 
+import gc.GCSignal;
+
 import java.security.*;
+import java.util.Arrays;
 import java.math.*;
 import java.nio.ByteBuffer;
 
@@ -74,4 +77,19 @@ public final class Cipher {
 		
 		return new BigInteger(1, pad);
 	}
+	
+	public GCSignal enc(GCSignal key, GCSignal m, long k) {
+		return getPadding(key, k).xor(m);
+	}
+
+	public GCSignal dec(GCSignal key, GCSignal c, long k) {
+		return getPadding(key, k).xor(c);
+	}
+	
+	private GCSignal getPadding(GCSignal key, long k) {
+        sha1.update(key.bytes);
+        sha1.update(ByteBuffer.allocate(8).putLong(k).array());
+        GCSignal ret = GCSignal.newInstance(sha1.digest());
+        return ret;
+    }
 }

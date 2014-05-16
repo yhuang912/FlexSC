@@ -13,7 +13,7 @@ import ot.OTExtReceiver;
 import ot.OTExtSender;
 
 public class TestOTExtMany {
-	static int n = 10000;
+	static final int n = 10000;
 	GCSignal[][] m;
 	boolean[] c;
 	GCSignal[] rcvd;
@@ -90,6 +90,7 @@ public class TestOTExtMany {
 				throw e;
 			}
 		}
+		
 	}
 
 	@Test

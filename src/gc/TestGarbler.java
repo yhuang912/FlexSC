@@ -6,14 +6,15 @@ import org.junit.Assert;
 
 public class TestGarbler {
 	SecureRandom rnd = new SecureRandom();
+	GCSignal a = GCSignal.freshLabel(rnd);
+	GCSignal b = GCSignal.freshLabel(rnd);
+	GCSignal m = GCSignal.freshLabel(rnd);
+	Garbler gb = new Garbler();
 	
 	public void test() {
-		GCSignal a = GCSignal.freshLabel(rnd);
-		GCSignal b = GCSignal.freshLabel(rnd);
-		GCSignal m = GCSignal.freshLabel(rnd);
-		Garbler gb = new Garbler();
+		gb.enc(a, b, 0, m);
 		
-		Assert.assertTrue(m.equals(gb.dec(a, b, 0L, gb.enc(a, b, 0L, m))));
+//		Assert.assertTrue(m.equals(gb.dec(a, b, 0L, gb.enc(a, b, 0L, m))));
 	}
 
 	@Test
