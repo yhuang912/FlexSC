@@ -8,6 +8,8 @@ import java.math.*;
 import java.io.*;
 import java.security.SecureRandom;
 
+import network.RWBigInteger;
+
 
 public class NPOTReceiver extends OTReceiver {
     private static SecureRandom rnd = new SecureRandom();
@@ -18,15 +20,11 @@ public class NPOTReceiver extends OTReceiver {
     private BigInteger[][] pk;
 
     private BigInteger[] keys;
-	ObjectInputStream ois;
-	ObjectOutputStream oos;
 
 	Cipher cipher;
 	
     public NPOTReceiver(InputStream in, OutputStream out) throws Exception {
     	super(in, out);
-    	oos = new ObjectOutputStream(out);
-    	ois = new ObjectInputStream(in);
     	
     	cipher = new Cipher();
 
@@ -44,12 +42,12 @@ public class NPOTReceiver extends OTReceiver {
     }
     
     private void initialize() throws Exception {
-        C  = (BigInteger) ois.readObject();
-        p  = (BigInteger) ois.readObject();
-        q  = (BigInteger) ois.readObject();
-        g  = (BigInteger) ois.readObject();
-        gr = (BigInteger) ois.readObject();
-        msgBitLength = ois.readInt();
+    	C = RWBigInteger.readBI(is);
+        p  = RWBigInteger.readBI(is);
+        q  = RWBigInteger.readBI(is);
+        g  = RWBigInteger.readBI(is);
+        gr = RWBigInteger.readBI(is);
+        msgBitLength = is.read();
     }
 
     private void step1(boolean[] choices) throws Exception {
@@ -69,12 +67,17 @@ public class NPOTReceiver extends OTReceiver {
             pk0[i] = pk[i][0];
         }
 
-        oos.writeObject(pk0);
-        oos.flush();
+        for (int i = 0; i < choices.length; i++)
+        	RWBigInteger.writeBI(os, pk0[i]);
+        os.flush();
     }
 
     private GCSignal[] step2(boolean[] choices) throws Exception {
-        BigInteger[][] msg = (BigInteger[][]) ois.readObject();
+    	BigInteger[][] msg = new BigInteger[choices.length][2];
+    	for (int i = 0; i < choices.length; i++) {
+    		msg[i][0] = RWBigInteger.readBI(is);
+    		msg[i][1] = RWBigInteger.readBI(is);
+    	}
 
         GCSignal[] data = new GCSignal[choices.length];
         for (int i = 0; i < choices.length; i++) {

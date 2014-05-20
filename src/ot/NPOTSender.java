@@ -5,10 +5,10 @@ package ot;
 import gc.GCSignal;
 
 import java.math.*;
-//import java.util.*;
 import java.io.*;
 import java.security.SecureRandom;
-import java.util.Arrays;
+
+import network.RWBigInteger;
 
 
 public class NPOTSender extends OTSender {
@@ -22,24 +22,17 @@ public class NPOTSender extends OTSender {
     private BigInteger p, q, g, C, r;
     private BigInteger Cr, gr;
     
-	ObjectInputStream ois;
-	ObjectOutputStream oos;
-
 	Cipher cipher;
 	
     public NPOTSender(int msgBitLength, InputStream is,
                       OutputStream os) throws Exception {
     	super(msgBitLength, is, os);
-    	ois = new ObjectInputStream(is);
-    	oos = new ObjectOutputStream(os);
     	cipher = new Cipher();
     	
         initialize();
     }
 
     public void send(GCSignal[][] msgPairs) throws Exception {
-//        super.execProtocol(msgPairs);
-
         step1(msgPairs);
     }
 
@@ -57,14 +50,14 @@ public class NPOTSender extends OTSender {
             r = (BigInteger) fois.readObject();
             fois.close();
 
-            oos.writeObject(C);
-            oos.writeObject(p);
-            oos.writeObject(q);
-            oos.writeObject(g);
-            oos.writeObject(gr);
-            oos.writeInt(msgBitLength);
-            oos.flush();
-
+            RWBigInteger.writeBI(os, C);
+            RWBigInteger.writeBI(os, p);
+            RWBigInteger.writeBI(os, q);
+            RWBigInteger.writeBI(os, g);
+            RWBigInteger.writeBI(os, gr);
+            os.write(msgBitLength);
+            os.flush();
+            
             Cr = C.modPow(r, p);
         } else {
         	System.out.println("to generate params");
@@ -88,14 +81,14 @@ public class NPOTSender extends OTSender {
 
             System.out.println("runs to here");
             
-            oos.writeObject(C);
-            oos.writeObject(p);
-            oos.writeObject(q);
-            oos.writeObject(g);
-            oos.writeObject(gr);
-            oos.writeInt(msgBitLength);
-            oos.flush();
-
+            RWBigInteger.writeBI(os, C);
+            RWBigInteger.writeBI(os, p);
+            RWBigInteger.writeBI(os, q);
+            RWBigInteger.writeBI(os, g);
+            RWBigInteger.writeBI(os, gr);
+            os.write(msgBitLength);
+            os.flush();
+            
             Cr = C.modPow(r, p);
 
             FileOutputStream fout = new FileOutputStream(keyfile);
@@ -122,7 +115,10 @@ public class NPOTSender extends OTSender {
     }
     
     private void step1(GCSignal[][] msgPairs) throws Exception {
-        BigInteger[] pk0 = (BigInteger[]) ois.readObject();
+    	BigInteger[] pk0 = new BigInteger[msgPairs.length];
+    	for (int i = 0; i < pk0.length; i++)
+    		pk0[i] = RWBigInteger.readBI(is);
+    	
         BigInteger[] pk1 = new BigInteger[msgPairs.length];
         BigInteger[][] msg = new BigInteger[msgPairs.length][2];
 
@@ -134,7 +130,9 @@ public class NPOTSender extends OTSender {
             msg[i][1] = cipher.encrypt(pk1[i].toByteArray(), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
         }
 
-        oos.writeObject(msg);
-        oos.flush();
+        for (int i = 0; i < msg.length; i++) {
+        	RWBigInteger.writeBI(os, msg[i][0]);
+        	RWBigInteger.writeBI(os, msg[i][1]);
+        }
     }
 }

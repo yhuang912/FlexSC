@@ -78,17 +78,17 @@ public final class Cipher {
 		return new BigInteger(1, pad);
 	}
 	
-	public GCSignal enc(GCSignal key, GCSignal m, long k) {
+	public GCSignal enc(GCSignal key, GCSignal m, int k) {
 		return getPadding(key, k).xor(m);
 	}
 
-	public GCSignal dec(GCSignal key, GCSignal c, long k) {
+	public GCSignal dec(GCSignal key, GCSignal c, int k) {
 		return getPadding(key, k).xor(c);
 	}
 	
-	private GCSignal getPadding(GCSignal key, long k) {
+	private GCSignal getPadding(GCSignal key, int k) {
         sha1.update(key.bytes);
-        sha1.update(ByteBuffer.allocate(8).putLong(k).array());
+        sha1.update(ByteBuffer.allocate(4).putInt(k).array());
         GCSignal ret = GCSignal.newInstance(sha1.digest());
         return ret;
     }

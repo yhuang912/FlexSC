@@ -13,7 +13,7 @@ import ot.OTExtReceiver;
 import ot.OTExtSender;
 
 public class TestOTExtMany {
-	static final int n = 10000;
+	static final int n = 50000;
 	GCSignal[][] m;
 	boolean[] c;
 	GCSignal[] rcvd;
@@ -74,6 +74,7 @@ public class TestOTExtMany {
 		tSnd.start(); 
 		tRcv.start(); 
 		tSnd.join();
+		tRcv.join();
 
 		for (int i = 0; i < n; i++) {
 //		System.out.println(m[c?1:0].toHexStr());
