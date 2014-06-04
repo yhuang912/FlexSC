@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import oram.Block;
-import oram.OramParty.BlockInBinary;
+import oram.PlainBlock;
 import test.Utils;
 import flexsc.*;
 
@@ -12,25 +12,22 @@ import flexsc.*;
 public class CLPOramBasicServer<T> extends CLPOramParty<T> {
 	CLPOramLib<T> lib;
 	public CLPOramBasicServer(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int nodeCapacity, int leafCapacity, Mode m) throws Exception {
-		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity, m);
+			Party p, int nodeCapacity, int leafCapacity, Mode m, int sp) throws Exception {
+		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity, m, sp);
 		lib = new CLPOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, eva);
+		randomQueue = randomBucket(queueCapacity);
+		scQueue = prepareBlocks(queue, queue, randomQueue);
 	}
 
 	public void dequeue() throws Exception{
-		//BlockInBinary[] randomQueue = randomBucket(queueCapacity);
-		BlockInBinary[] randomBucket = randomBucket(nodeCapacity);
-		//Block[][] scQueue = prepareBlocks(queue, queue, randomQueue);
+		PlainBlock[] randomBucket = randomBucket(nodeCapacity);
 		Block<T>[][] scTree1 = prepareBlocks(tree[1], tree[1], randomBucket);
 		
 		Block<T> b = lib.pop(scQueue[0]);
 		lib.add(scTree1[0], b);
 		
-		//queue = randomQueue;
 		tree[1] = randomBucket;
-		//prepareBlockInBinaries(scQueue[0], scQueue[1]);
-		prepareBlockInBinaries(scTree1[0], scTree1[1]);
-		
+		preparePlainBlocks(scTree1[0], scTree1[1]);
 		flush();
 	}
 
@@ -45,60 +42,54 @@ public class CLPOramBasicServer<T> extends CLPOramParty<T> {
 		Block<T>[] overflowedBlocks = new Block[tempStashSize];
 		for(int i = 0; i < tempStashSize; ++i)
 			overflowedBlocks[i] = lib.dummyBlock;
-		for(int i = 1; i < logN; ++i){
-			BlockInBinary[] top = tree[index];
-			BlockInBinary[] randomTop = randomBucket(nodeCapacity);
-			//System.out.println(top.length);
+		
+		for(int i = 1; i < logN; ++i) {
+			PlainBlock[] top = tree[index];
+			PlainBlock[] randomTop = randomBucket(nodeCapacity);
 			Block<T>[][] scTop = prepareBlocks(top, top, randomTop);
 
 			transit = lib.flushUnit(scTop[0], transit, i, pathSignal, overflowedBlocks);
 			tree[index] = randomTop;
-			prepareBlockInBinaries(scTop[0], scTop[1]);
+			preparePlainBlocks(scTop[0], scTop[1]);
 			
 			index*=2;
 			if(pos[lengthOfPos-i])
 				++index;
 		}
-		//debug(overflowedBlocks);
-		BlockInBinary[] top = tree[index];
-		BlockInBinary[] randomTop = randomBucket(leafCapacity);
+		PlainBlock[] top = tree[index];
+		PlainBlock[] randomTop = randomBucket(leafCapacity);
 		
 		Block<T>[][] scTop = prepareBlocks(top, top, randomTop);
 		lib.add(scTop[0], transit);
 		tree[index] = randomTop;
-		prepareBlockInBinaries(scTop[0], scTop[1]);
+		preparePlainBlocks(scTop[0], scTop[1]);
 		
-		BlockInBinary[] randomQueue = randomBucket(queueCapacity);
-		Block<T>[][] scQueue = prepareBlocks(queue, queue, randomQueue);
+		PlainBlock[] randomQueue = randomBucket(queueCapacity);
 		
 		for(int i = 0; i < tempStashSize; ++i)
 			lib.add(scQueue[0], overflowedBlocks[i]);
-		queue = randomQueue;
-		prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
 	
 	Block<T>[][] scQueue;
 	T[] scIden;
-	BlockInBinary[] randomQueue;
+	PlainBlock[] randomQueue;
 	public void readAndRemove(boolean[] pos) throws Exception {
-		BlockInBinary[] blocks = flatten(getAPath(pos));
-		BlockInBinary[] randomPath = randomBucket(blocks.length);
-		randomQueue = randomBucket(queueCapacity);
-		Block<T>[][] scPath = prepareBlocks(blocks, blocks, randomPath);
-		scQueue = prepareBlocks(queue, queue, randomQueue);
+		PlainBlock[][] blocks = getPath(pos);
+		PlainBlock[][] ranPath = randomPath(blocks);
+		Block<T>[][][] scPath = preparePath(blocks, blocks, ranPath);
+
 		scIden = eva.inputOfAlice(new boolean[lengthOfIden]);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
 		res = lib.mux(res, res2, res.isDummy);
-		BlockInBinary b = randomBlock();
+		PlainBlock b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);
 		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
-
 		
-		blocks = randomPath;
-		prepareBlockInBinaries(scPath[0], scPath[1]);
-		putAPath(blocks, pos);
+		preparePlainPath(scPath[0], scPath[1]);
+		putPath(ranPath, pos);
+
 		outputBlock(finalRes);
 	}
 	
@@ -112,9 +103,6 @@ public class CLPOramBasicServer<T> extends CLPOramParty<T> {
 		
 		dequeue();
 		dequeue();
-		queue = randomQueue;
-		prepareBlockInBinaries(scQueue[0], scQueue[1]);
-		//queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}	
 	
 	public void access(int pos) throws Exception {
@@ -125,6 +113,5 @@ public class CLPOramBasicServer<T> extends CLPOramParty<T> {
 	public void access(boolean[] pos) throws Exception {
 		access(Utils.toInt(pos));
 	}
-
 
 }

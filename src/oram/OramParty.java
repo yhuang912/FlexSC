@@ -7,7 +7,6 @@ import java.util.Arrays;
 
 import pm.PMCompEnv;
 import cv.CVCompEnv;
-import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
@@ -15,77 +14,49 @@ import gc.GCEva;
 import gc.GCGen;
 
 public abstract class OramParty<T> {
-
-	public static class BlockInBinary {
-		public boolean[] iden;
-		public boolean[] pos;
-		public boolean[] data;
-		public boolean isDummy;
-		public BlockInBinary(boolean[] iden, boolean[] pos, boolean[] data, boolean isDummy) {
-			this.iden = iden;
-			this.pos = pos;
-			this.data = data;
-			this.isDummy = isDummy;
-		}
-	}
 	public int N;
 	int dataSize;
+
 	public int logN;
 	public int lengthOfIden;
 	public int lengthOfPos;
 	public int lengthOfData;
+
 	protected InputStream is;
 	protected OutputStream os;
 	public CompEnv<T> gen;
 	public CompEnv<T> eva;
 	public Party role;
+	public Mode mode;
+
 	protected SecureRandom rng = new SecureRandom();
 	public BucketLib<T> lib;
-	public Mode mode;
+	boolean[] dummyArray;
+
 	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p, Mode m) throws Exception {
 		this.is = is;
 		this.os = os;
-		
+
 		this.dataSize = dataSize;
-		int a = 1;logN=1;
-		while(a < N){
+		long a = 1;logN=1;
+		while(a < N) {
 			a*=2;
 			++logN;
 		}
-		//--logN;
+
 		this.N = 1<<logN;
 		lengthOfData = dataSize;
 		lengthOfIden = logN-1;
 		lengthOfPos = logN-1;
 		role = p;
-		System.out.println(this.N+" "+this.logN+" "+lengthOfIden+" "+lengthOfPos);
 		mode = m;
-		if(p == Party.Bob){
-			if(m == Mode.REAL)
-				eva = (CompEnv<T>) new GCEva(is, os);
-			else if(m == Mode.VERIFY)
-				eva = (CompEnv<T>) new CVCompEnv(is,os, p);
-			else if(m == mode.COUNT)
-				eva = (CompEnv<T>) new PMCompEnv(is,os, p);
-			
-			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, eva);
-		}
-		else{
-			if(m == Mode.REAL)
-				gen = (CompEnv<T>) new GCGen(is, os);
-			else if(m == Mode.VERIFY)
-				gen = (CompEnv<T>) new CVCompEnv(is, os, p);
-			else if(m == mode.COUNT)
-				gen = (CompEnv<T>) new PMCompEnv(is,os, p);
-			
-			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, gen);	
-		}
+		init();
 	}
-	
+
 	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p, int lengthOfPos, Mode m) throws Exception {
 		this.is = is;
 		this.os = os;
-		
+
 		this.dataSize = dataSize;
 		int a = 1;logN=1;
 		while(a < N){
@@ -98,170 +69,180 @@ public abstract class OramParty<T> {
 		lengthOfIden = logN;
 		this.lengthOfPos = lengthOfPos;
 		role = p;
-		System.out.println(this.N+" "+this.logN+" "+lengthOfIden+" "+lengthOfPos);
-		if(p == Party.Bob){
-			if(m == Mode.REAL)
+		mode = m;
+		init();
+
+	}
+
+	public void init() throws Exception {
+		dummyArray = new boolean[lengthOfIden+lengthOfPos+lengthOfData+1];
+		for(int i = 0; i < dummyArray.length; ++i)
+			dummyArray[i] = false;
+
+		if(role == Party.Bob){
+			if(mode == Mode.REAL)
 				eva = (CompEnv<T>) new GCEva(is, os);
-			else
-				eva = (CompEnv<T>) new CVCompEnv(is, os, p);
-			
+			else if(mode == Mode.VERIFY)
+				eva = (CompEnv<T>) new CVCompEnv(is,os, role);
+			else if(mode == mode.COUNT)
+				eva = (CompEnv<T>) new PMCompEnv(is,os, role);
+
 			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, eva);
 		}
 		else{
-			if(m == Mode.REAL)
+			if(mode == Mode.REAL)
 				gen = (CompEnv<T>) new GCGen(is, os);
-			else
-				gen = (CompEnv<T>) new CVCompEnv(is, os, p);
-			
+			else if(mode == Mode.VERIFY)
+				gen = (CompEnv<T>) new CVCompEnv(is, os, role);
+			else if(mode == mode.COUNT)
+				gen = (CompEnv<T>) new PMCompEnv(is,os, role);
+
 			lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, gen);	
 		}
 	}
-	
 
-	public Block<T>[][] prepareBlocks(BlockInBinary[] clientBlock, BlockInBinary[] serverBlock, BlockInBinary[] randomBlock) throws Exception {
+	public Block<T>[][] prepareBlocks(PlainBlock[] clientBlock, PlainBlock[] serverBlock, PlainBlock[] randomBlock) throws Exception {
 		Block<T>[] s = inputBucketOfServer(serverBlock);
 		Block<T>[] c = inputBucketOfClient(clientBlock);
 		Block<T>[] r = inputBucketOfServer(randomBlock);
-		
+
 		Block<T>[] xor = lib.xor(s, c);
 		return new Block[][]{xor, r};
 	}
 
-	public Block<T>[] prepareBlock(BlockInBinary clientBlock, BlockInBinary serverBlock, BlockInBinary randomBlock) throws Exception {
+	public Block<T>[] prepareBlock(PlainBlock clientBlock, PlainBlock serverBlock, PlainBlock randomBlock) throws Exception {
 		Block<T> s = inputBlockOfServer(serverBlock);
 		Block<T> c = inputBlockOfClient(clientBlock);
 		Block<T> r = inputBlockOfServer(randomBlock);
-		
+
 		Block<T> xor = lib.xor(s, c);
 		return new Block[]{xor, r};
 	}
-	
-	public BlockInBinary prepareBlockInBinary(Block<T> blocks, Block<T> randomBlock) throws Exception {
-		Block<T> res = lib.xor(blocks, randomBlock);
-		BlockInBinary clientBlockInBinary = outputBlock(res);
-		
-		if(role == Party.Bob) {
+
+
+	public PlainBlock preparePlainBlock(Block<T> blocks, Block<T> randomBlock) throws Exception {
+		PlainBlock result = outputBlock(lib.xor(blocks, randomBlock));
+		if(role == Party.Bob)
 			return null;
-		}
-		else{
-			return clientBlockInBinary;	
-		}
-	}
-	
-	public BlockInBinary[] prepareBlockInBinaries(Block<T>[] blocks, Block<T>[] randomBlock) throws Exception {
-		Block<T>[] res = lib.xor(blocks, randomBlock);
-		BlockInBinary[] clientBlockInBinary = outputBucket(res);
-		
-		if(role == Party.Bob) {
-			return null;
-		}
-		else{
-			return clientBlockInBinary;	
-		}
-	}
-	
-	public Block<T> inputBlockOfServer(BlockInBinary b) throws Exception {
-		if(eva != null) {
-			T[] iden = (T[]) eva.inputOfBob(b.iden);
-			T[] pos = (T[]) eva.inputOfBob(b.pos);
-			T[] data = (T[]) eva.inputOfBob(b.data);
-			T isDummy = (T) eva.inputOfBob(b.isDummy);
-			return new Block<T>(iden, pos, data, isDummy);
-		}
-		else {
-			T[] iden = (T[]) gen.inputOfBob(new boolean[lengthOfIden]);
-			T[] pos = (T[]) gen.inputOfBob(new boolean[lengthOfPos]);
-			T[] data = (T[]) gen.inputOfBob(new boolean[lengthOfData]);
-			T isDummy = (T) gen.inputOfBob(false);
-			return new Block<T>(iden, pos, data, isDummy);
-		}
+		else
+			return result;	
 	}
 
-	public Block<T> inputBlockOfClient(BlockInBinary b) throws Exception {
-		if(eva != null) {
-			T[] iden = (T[]) eva.inputOfAlice(new boolean[lengthOfIden]);
-			T[] pos = (T[]) eva.inputOfAlice(new boolean[lengthOfPos]);
-			T[] data = (T[]) eva.inputOfAlice(new boolean[lengthOfData]);
-			T isDummy = (T) eva.inputOfAlice(false);
-			return new Block<T>(iden, pos, data, isDummy);
-		}
-		else {
-			T[] iden = (T[]) gen.inputOfAlice(b.iden);
-			T[] pos = (T[]) gen.inputOfAlice(b.pos);
-			T[] data = (T[]) gen.inputOfAlice(b.data);
-			T isDummy = (T) gen.inputOfAlice(b.isDummy);
-			return new Block<T>(iden, pos, data, isDummy);
-		}
+	public PlainBlock[] preparePlainBlocks(Block<T>[] blocks, Block<T>[] randomBlock) throws Exception {
+		PlainBlock[] result = outputBucket(lib.xor(blocks, randomBlock));
+		if(role == Party.Bob)
+			return null;
+		else
+			return result;
 	}
 
-	public Block<T>[] inputBucketOfServer(BlockInBinary[] b) throws Exception {
-		Block<T>[] result = lib.newBlockArray(b.length);
-		for(int i = 0; i < b.length; ++i)
-			result[i] = inputBlockOfServer(b[i]);
+
+	public Block<T> inputBlockOfServer(PlainBlock b) throws Exception {
+		T[] TArray;
+		if(eva != null)
+			TArray = eva.inputOfBob(b.toBooleanArray());
+		else 
+			TArray = gen.inputOfBob(dummyArray);
+		os.flush();
+		return new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
+
+	}
+
+	public Block<T> inputBlockOfClient(PlainBlock b) throws Exception {
+		T[] TArray;
+		if(eva != null) 
+			TArray = eva.inputOfAlice(dummyArray);		
+		else 
+			TArray = gen.inputOfAlice(b.toBooleanArray());
+		os.flush();
+		return new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
+	}
+
+
+	public Block<T>[] toBlocks(T[] Tarray, int lengthOfIden, int lengthOfPos, int lengthOfData, int capacity) {
+		int blockSize = lengthOfIden + lengthOfPos + lengthOfData+1;
+		Block<T>[] result = lib.newBlockArray(capacity);
+		for(int i = 0; i < capacity; ++i) {
+			result[i] = new Block<T>(Arrays.copyOfRange(Tarray, i*blockSize, (i+1)*blockSize),
+					lengthOfIden, lengthOfPos, lengthOfData);
+		}
 		return result;
 	}
+	
+	public Block<T>[] inputBucketOfServer(PlainBlock[] b) throws Exception {
+		T[] TArray;
+		if(eva != null)
+			TArray = eva.inputOfBob(PlainBlock.toBooleanArray(b));
+		else 
+			TArray = gen.inputOfBob(PlainBlock.toBooleanArray(b));
 
-	public Block<T>[] inputBucketOfClient(BlockInBinary[] b) throws Exception {
-		Block<T>[] result = lib.newBlockArray(b.length);
-		for(int i = 0; i < b.length; ++i)
-			result[i] = inputBlockOfClient(b[i]);
-		return result;
+		os.flush();
+		return toBlocks(TArray, lengthOfIden, lengthOfPos, lengthOfData, b.length);//new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
+	}
+
+	public Block<T>[] inputBucketOfClient(PlainBlock[] b) throws Exception {
+		T[] TArray;
+		if(eva != null) 
+			TArray = eva.inputOfAlice(PlainBlock.toBooleanArray(b));
+		else 
+			TArray = gen.inputOfAlice(PlainBlock.toBooleanArray(b));
+		os.flush();
+		return toBlocks(TArray, lengthOfIden, lengthOfPos, lengthOfData, b.length);
 	}
 
 
-	public BlockInBinary outputBlock(Block<T> b) throws Exception {
+	public PlainBlock outputBlock(Block<T> b) throws Exception {
 		if(eva != null){
 			boolean[] iden = eva.outputToAlice(b.iden);
 			boolean[] pos = eva.outputToAlice(b.pos);
 			boolean[] data = eva.outputToAlice(b.data);
 			boolean isDummy = eva.outputToAlice(b.isDummy);
-			return new BlockInBinary(iden, pos, data, isDummy);
+			os.flush();
+			return new PlainBlock(iden, pos, data, isDummy);
 		}
 		else {
 			boolean[] iden = gen.outputToAlice(b.iden);
 			boolean[] pos = gen.outputToAlice(b.pos);
 			boolean[] data = gen.outputToAlice(b.data);
 			boolean isDummy = gen.outputToAlice(b.isDummy);
-			return new BlockInBinary(iden, pos, data, isDummy);				
+			os.flush();
+			return new PlainBlock(iden, pos, data, isDummy);				
 		}
 	}
 
-	public BlockInBinary[] outputBucket(Block<T>[] b) throws Exception {
-		BlockInBinary[] result = new BlockInBinary[b.length];
+	public PlainBlock[] outputBucket(Block<T>[] b) throws Exception {
+		PlainBlock[] result = new PlainBlock[b.length];
 		for(int i = 0; i < b.length; ++i)
 			result[i] = outputBlock(b[i]);
 		return result;
 	}
-
-	public BlockInBinary getDummyBlock(){
-		boolean[] iden = new boolean[lengthOfIden];
-		boolean[] pos = new boolean[lengthOfPos];
-		boolean[] data = new boolean[lengthOfData];
-		for(int i = 0; i < lengthOfIden; ++i)
-			iden[i] = rng.nextBoolean();
-		for(int i = 0; i < lengthOfPos; ++i)
-			pos[i] = rng.nextBoolean();
-		for(int i = 0; i < lengthOfData; ++i)
-			data[i] = rng.nextBoolean();
-		return new BlockInBinary(iden, pos, data, true);
-	}
 	
-	public BlockInBinary getDummyBlock2(){
+	public PlainBlock[][] outputBuckets(Block<T>[][] b) throws Exception {
+		PlainBlock[][] result = new PlainBlock[b.length][];
+		for(int i = 0; i < b.length; ++i)
+			result[i] = outputBucket(b[i]);
+		return result;
+	}
+
+	public PlainBlock getDummyBlock(boolean b){
 		boolean[] iden = new boolean[lengthOfIden];
 		boolean[] pos = new boolean[lengthOfPos];
 		boolean[] data = new boolean[lengthOfData];
 		for(int i = 0; i < lengthOfIden; ++i)
-			iden[i] = rng.nextBoolean();
+			iden[i] = true;
 		for(int i = 0; i < lengthOfPos; ++i)
-			pos[i] = rng.nextBoolean();
+			pos[i] = true;
 		for(int i = 0; i < lengthOfData; ++i)
-			data[i] = rng.nextBoolean();
-		return new BlockInBinary(iden, pos, data, false);
+			data[i] = true;
+		return new PlainBlock(iden, pos, data, b);
 	}
 
+	PlainBlock r = getDummyBlock(true);
+	public PlainBlock randomBlock() {
+		PlainBlock result = getDummyBlock(true);
+		if(mode == mode.COUNT)
+			return result;
 
-	public BlockInBinary randomBlock() {
-		BlockInBinary result = getDummyBlock();
 		for(int i = 0; i < lengthOfIden; ++i)
 			result.iden[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfPos; ++i)
@@ -269,39 +250,14 @@ public abstract class OramParty<T> {
 		for(int i = 0; i < lengthOfData; ++i)
 			result.data[i] = rng.nextBoolean();
 		result.isDummy = rng.nextBoolean();
+
 		return result;
 	}
 
-	public BlockInBinary[] randomBucket(int length) {
-		BlockInBinary[] result = new BlockInBinary[length];
+	public PlainBlock[] randomBucket(int length) {
+		PlainBlock[] result = new PlainBlock[length];
 		for(int i = 0; i < length; ++i)
 			result[i] = randomBlock();
 		return result;
 	}
-	
-	public void debug(Block<T> b) throws Exception{
-		if(eva != null)
-			outputBlock(b);
-		else {
-			System.out.print("DEBUG: ");
-			System.out.print(Utils.toInt(outputBlock(b).data));
-			System.out.println(" ");
-		}
-	}
-	
-	public void debug(Block<T>[] b) throws Exception{
-		if(eva!= null)
-			outputBucket(b);
-		else{
-			System.out.print("DEBUG: ");
-			BlockInBinary[] bib = outputBucket(b);
-			int[] idens = new int[b.length];
-			for(int i = 0; i < idens.length; ++i)
-				idens[i] = Utils.toInt(bib[i].data);
-			System.out.print(Arrays.toString(idens));
-			System.out.println(" ");
-		}
-		
-	}
-
 }

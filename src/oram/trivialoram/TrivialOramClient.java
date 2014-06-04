@@ -2,61 +2,64 @@ package oram.trivialoram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import flexsc.*;
 import oram.Block;
 import oram.OramParty;
+import oram.PlainBlock;
 import test.Utils;
 
 public class TrivialOramClient<T> extends OramParty<T> {
-	public BlockInBinary[] bucket;
+	public PlainBlock[] bucket;
+	Block<T>[][] result;
 	int capacity;
 	public TrivialOramClient(InputStream is, OutputStream os, int N,
 			int dataSize, Mode m) throws Exception {
 		super(is, os, N, dataSize, Party.Alice, 1, m);
 		this.capacity = N;
-		bucket = new BlockInBinary[capacity];
+		bucket = new PlainBlock[capacity];
 		
 		for(int i = 0; i < bucket.length; ++i){
-			bucket[i] = getDummyBlock();
+			bucket[i] = getDummyBlock(true);
 		}
-		Block<T>[][] result = prepareBlocks(bucket, bucket, bucket);
-		bucket = prepareBlockInBinaries(result[0], result[1]);
+		result = prepareBlocks(bucket, bucket, bucket);
+		//bucket = preparePlainBlocks(result[0], result[1]);
 	}
 	
-	public void add(BlockInBinary b) throws Exception {
-		Block<T>[][] result = prepareBlocks(bucket, bucket, bucket);
+	public void add(PlainBlock b) throws Exception {
+		//Block<T>[][] result = prepareBlocks(bucket, bucket, bucket);
 		Block<T>[] scBlocks = result[0];
 		Block<T>[] scBlocksMask = result[1];		
 		Block<T> scNewBlock = inputBlockOfClient(b);
 		lib.add(scBlocks, scNewBlock);
-		bucket = prepareBlockInBinaries(scBlocks, scBlocksMask);
+		//bucket = preparePlainBlocks(scBlocks, scBlocksMask);
 	}
 	
-	public BlockInBinary pop() throws Exception{
-		Block<T>[][] result = prepareBlocks(bucket, bucket, bucket);
+	public PlainBlock pop() throws Exception{
+		//Block<T>[][] result = prepareBlocks(bucket, bucket, bucket);
 		Block<T>[] scBlocks = result[0];
 		Block<T>[] scBlocksMask = result[1]; 
 		
 		Block<T> res = lib.pop(scBlocks);
 		
-		bucket = prepareBlockInBinaries(scBlocks, scBlocksMask);
-		BlockInBinary r =  outputBlock(res);
+		//bucket = preparePlainBlocks(scBlocks, scBlocksMask);
+		PlainBlock r =  outputBlock(res);
 		return r;
 	}
 	
-	public BlockInBinary readAndRemove(boolean [] iden) throws Exception {
-		Block<T>[][] result = prepareBlocks(bucket, bucket, bucket);
+	public PlainBlock readAndRemove(boolean [] iden) throws Exception {
+		//Block<T>[][] result = prepareBlocks(bucket, bucket, bucket);
 		Block<T>[] scBlocks = result[0];
 		Block<T>[] scBlocksMask = result[1];
 		T[] scIden = gen.inputOfAlice(iden);
 		
 		Block<T> res = lib.readAndRemove(scBlocks, scIden);
-		BlockInBinary b = randomBlock();
+		PlainBlock b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);
 		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
 
-		bucket = prepareBlockInBinaries(scBlocks, scBlocksMask);
-		BlockInBinary r = outputBlock(finalRes);
+		//bucket = preparePlainBlocks(scBlocks, scBlocksMask);
+		PlainBlock r = outputBlock(finalRes);
 		//System.out.print(Utils.toInt(r.iden)+" "+r.isDummy);
 		return r;
 	}
@@ -77,7 +80,7 @@ public class TrivialOramClient<T> extends OramParty<T> {
 	}
 	
 	public void putBack(int iden, boolean[] data) throws Exception{
-		add(new BlockInBinary(Utils.fromInt(iden, lengthOfIden), new boolean[]{true}, data, false));
+		add(new PlainBlock(Utils.fromInt(iden, lengthOfIden), new boolean[]{true}, data, false));
 	}
 	
 	

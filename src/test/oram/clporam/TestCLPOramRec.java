@@ -1,4 +1,4 @@
-package test.oram;
+package test.oram.clporam;
 
 import java.security.SecureRandom;
 
@@ -31,7 +31,7 @@ public class TestCLPOramRec {
 			try {
 				listen(54321);
 				
-				CLPOramRecClient<Boolean> client = new CLPOramRecClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.VERIFY);
+				CLPOramRecClient<Boolean> client = new CLPOramRecClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.VERIFY,80);
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					client.write(element, Utils.fromInt(element, dataSize));
@@ -75,7 +75,7 @@ public class TestCLPOramRec {
 			try {
 				connect("localhost", 54321);		
 				
-				CLPOramRecServer<Boolean> server = new CLPOramRecServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.VERIFY);
+				CLPOramRecServer<Boolean> server = new CLPOramRecServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.VERIFY,80);
 				for(int i = 0; i < writeCount; ++i) {
 					server.access();
 				}

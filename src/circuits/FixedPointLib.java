@@ -1,10 +1,8 @@
 package circuits;
 
 import java.util.Arrays;
-
 import test.Utils;
 import flexsc.CompEnv;
-import flexsc.Signal;
 
 public class FixedPointLib<T> extends IntegerLib<T> {
 

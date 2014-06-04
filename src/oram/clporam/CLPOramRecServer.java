@@ -17,20 +17,20 @@ public class CLPOramRecServer<T> {
 	protected InputStream is;
 	protected OutputStream os;
 	public CLPOramRecServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int nodeCapacity,
-			int leafCapacity, Mode m) throws Exception {
+			int leafCapacity, Mode m, int sp) throws Exception {
 		this.is = is;
 		this.os = os;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.nodeCapacity = nodeCapacity;
 		this.leafCapacity = leafCapacity;
-		CLPOramBasicServer<T>  oram = new CLPOramBasicServer<T>(is, os, N, dataSize, Party.Bob, nodeCapacity, leafCapacity, m);
+		CLPOramBasicServer<T>  oram = new CLPOramBasicServer<T>(is, os, N, dataSize, Party.Bob, nodeCapacity, leafCapacity, m, sp);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden ) / recurFactor;
-			oram = new CLPOramBasicServer<T>(is, os, newN, newDataSize, Party.Bob, nodeCapacity, leafCapacity, m);
+			oram = new CLPOramBasicServer<T>(is, os, newN, newDataSize, Party.Bob, nodeCapacity, leafCapacity, m, sp);
 			servers.add(oram);
 		}
 		CLPOramBasicServer<T> last = servers.get(servers.size()-1);

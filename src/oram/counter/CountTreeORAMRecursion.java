@@ -20,7 +20,7 @@ public class CountTreeORAMRecursion extends ORAMCounterHarness{
 		public void run() {
 			try {
 				listen(54321);
-				RecursiveTreeOramClient<Boolean> client = new RecursiveTreeOramClient<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor, Mode.COUNT);
+				RecursiveTreeOramClient<Boolean> client = new RecursiveTreeOramClient<Boolean>(is, os, N, dataSize,  cutoff, recurFactor, Mode.COUNT, securityParameter);
 				client.write(1, Utils.fromInt(1, client.clients.get(0).lengthOfData));
 				os.flush();
 				disconnect();
@@ -37,7 +37,7 @@ public class CountTreeORAMRecursion extends ORAMCounterHarness{
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				RecursiveTreeOramServer<Boolean> server = new RecursiveTreeOramServer<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor, Mode.COUNT);
+				RecursiveTreeOramServer<Boolean> server = new RecursiveTreeOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, Mode.COUNT, securityParameter);
 				for(int i = 0; i < server.servers.size(); ++i) {
 					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					mce.statistic.flush();

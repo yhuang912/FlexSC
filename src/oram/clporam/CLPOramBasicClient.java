@@ -2,28 +2,30 @@ package oram.clporam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import oram.Block;
+import oram.PlainBlock;
 import test.Utils;
 import flexsc.*;
 
 public class CLPOramBasicClient<T> extends CLPOramParty<T> {
 	CLPOramLib<T> lib;
 	public CLPOramBasicClient(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int nodeCapacity, int leafCapacity, Mode m) throws Exception {
-		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity, m);
+			Party p, int nodeCapacity, int leafCapacity, Mode m, int sp) throws Exception {
+		super(is, os, N, dataSize, p, nodeCapacity, leafCapacity, m, sp);
 		lib = new CLPOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, nodeCapacity, leafCapacity, gen);
+		scQueue = prepareBlocks(queue, queue, queue);
 	}
 	
 
-	public void dequeue() throws Exception{
+	public void dequeue() throws Exception {
 		//Block[][] scQueue = prepareBlocks(queue, queue, queue);
 		Block<T>[][] scTree1 = prepareBlocks(tree[1], tree[1], tree[1]);
 		
 		Block<T> b = lib.pop(scQueue[0]);
 		lib.add(scTree1[0], b);
 		
-		//queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
-		tree[1] = prepareBlockInBinaries(scTree1[0], scTree1[1]);
+		tree[1] = preparePlainBlocks(scTree1[0], scTree1[1]);
 		
 		flush();
 	}
@@ -41,49 +43,46 @@ public class CLPOramBasicClient<T> extends CLPOramParty<T> {
 			overflowedBlocks[i] = lib.dummyBlock;
 		
 		for(int i = 1; i < logN; ++i) {
-			BlockInBinary[] top = tree[index];
+			PlainBlock[] top = tree[index];
 			Block<T>[][] scTop = prepareBlocks(top, top, top);
 			
 			transit = lib.flushUnit(scTop[0], transit, i, pathSignal, overflowedBlocks);
 			
-			tree[index] = prepareBlockInBinaries(scTop[0], scTop[1]);
+			tree[index] = preparePlainBlocks(scTop[0], scTop[1]);
 			index*=2;
 			if(pos[lengthOfPos-i])
 				++index;
 		}
-		//debug(overflowedBlocks);
-		BlockInBinary[] top = tree[index];
+		PlainBlock[] top = tree[index];
 		Block<T>[][] scTop = prepareBlocks(top, top, top);
+		//lib.flushUnit(scTop[0], transit, logN, pathSignal, overflowedBlocks);
 		lib.add(scTop[0], transit);
-		tree[index] = prepareBlockInBinaries(scTop[0], scTop[1]);
-		
-		Block<T>[][] scQueue = prepareBlocks(queue, queue, queue);
-		
+		tree[index] = preparePlainBlocks(scTop[0], scTop[1]);
+				
 		for(int i = 0; i < tempStashSize; ++i)
 			lib.add(scQueue[0], overflowedBlocks[i]);
-		queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
 	
 	Block<T>[][] scQueue;
 	T[] scIden;
 	public boolean[] readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
-		BlockInBinary[] blocks = flatten(getAPath(pos));
-		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
-		scQueue = prepareBlocks(queue, queue, queue);
+		PlainBlock[][] blocks = getPath(pos);
+		Block<T>[][][] scPath = preparePath(blocks, blocks, blocks);
+
 		scIden = gen.inputOfAlice(iden);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
 		res = lib.mux(res, res2, res.isDummy);
-		BlockInBinary b = randomBlock();
+		PlainBlock b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);
 		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
 
-		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
+		blocks = preparePlainPath(scPath[0], scPath[1]);
+		putPath(blocks, pos);
 		
-		putAPath(blocks, pos);
 		
-		BlockInBinary r = outputBlock(finalRes);
+		PlainBlock r = outputBlock(finalRes);
 		return r.data;
 	}
 	
@@ -96,7 +95,6 @@ public class CLPOramBasicClient<T> extends CLPOramParty<T> {
 		
 		dequeue();
 		dequeue();
-		queue = prepareBlockInBinaries(scQueue[0], scQueue[1]);
 	}
 	
 	public boolean[] readAndRemove(int iden, boolean[] pos) throws Exception {

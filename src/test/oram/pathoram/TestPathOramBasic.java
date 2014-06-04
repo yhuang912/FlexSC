@@ -1,10 +1,10 @@
-package test.oram;
+package test.oram.pathoram;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import oram.pathoramNaive.PathOramClient;
-import oram.pathoramNaive.PathOramServer;
+import oram.pathoram.PathOramClient;
+import oram.pathoram.PathOramServer;
 
 import org.junit.Test;
 
@@ -12,17 +12,19 @@ import flexsc.*;
 import test.Utils;
 
 
-public class TestPathOramBasicNaive {
+public class TestPathOramBasic {
 	
 	final int N = 1<<7;
 	final int capacity = 4;
 	int[] posMap = new int[N+1];
 	int writeCount = N;
 	int readCount = N;
-	int dataSize = 11;
+	int dataSize = 10;
 	int[] writeIndex = new int[writeCount];
 	int[] readIndex = new int[readCount];
-	public TestPathOramBasicNaive() {
+	int securityParameter = 10;
+	int caacity = 4;
+	public TestPathOramBasic() {
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
 			posMap[i] = rng.nextInt(N);
@@ -46,7 +48,7 @@ public class TestPathOramBasicNaive {
 				listen(54322);
 				int data[] = new int[N+1];
 
-				PathOramClient<Boolean> client = new PathOramClient<Boolean>(is, os, N, dataSize, Party.Alice, Mode.VERIFY);
+				PathOramClient<Boolean> client = new PathOramClient<Boolean>(is, os, N, dataSize, capacity, Party.Alice, Mode.VERIFY, securityParameter);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				for(int i = 0; i < writeCount; ++i) {
@@ -65,12 +67,12 @@ public class TestPathOramBasicNaive {
 					int oldValue = posMap[element];
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					
+					System.out.println("read "+i);
 					boolean[] b = client.read(element, oldValue, newValue);
 					
 					//Assert.assertTrue(Utils.toInt(b) == data[element]);
 					if(Utils.toInt(b) != data[element])
 					System.out.println("inconsistent: "+element+" "+Utils.toInt(b) + " "+data[element]);
-
 					posMap[element] = newValue;
 				}
 
@@ -110,7 +112,7 @@ public class TestPathOramBasicNaive {
 		public void run() {
 			try {
 				connect("localhost", 54322);				
-				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize, Party.Bob, Mode.VERIFY);
+				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize, capacity, Party.Bob, Mode.VERIFY, securityParameter);
 				
 				for(int i = 0; i < writeCount; ++i) {
 					int element = writeIndex[i];

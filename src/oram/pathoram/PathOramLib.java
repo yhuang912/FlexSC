@@ -45,7 +45,7 @@ public class PathOramLib<T> extends BucketLib<T> {
 	}
 	
 	public T[] toSignals(Block<T> b) {
-		T[] res = env.newTArray(lengthOfIden+lengthOfPos+b.data.length+1);
+		T[] res = env.newTArray(lengthOfIden+lengthOfPos+lengthOfData+1);
 		System.arraycopy(b.iden, 0, res, 0, lengthOfIden);
 		System.arraycopy(b.pos, 0, res, lengthOfIden, lengthOfPos);
 		System.arraycopy(b.data, 0, res, lengthOfIden+lengthOfPos,lengthOfData);
@@ -69,6 +69,15 @@ public class PathOramLib<T> extends BucketLib<T> {
 		
 		for(int i = 0; i < stash.length; ++i)
 			stash[i] = toBlock(data[i+path.length]);
+	}
+	
+	public T[][] pushDown(Block<T>[][] path, Block<T>[] stash, boolean[] pos) throws Exception {
+		Block<T>[] pathtemp = newBlockArray((path.length-1)*path[0].length);
+		int cnt = 0;
+		for(int i = 1; i < path.length; ++i)
+			for(int j = 0; j < path[i].length; ++j)
+				pathtemp[cnt++] = path[i][j];
+		return pushDown(pathtemp, stash, pos);
 	}
 	
 	public T[][] pushDown(Block<T>[] path, Block<T>[] stash, boolean[] pos) throws Exception {

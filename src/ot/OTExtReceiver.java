@@ -29,6 +29,8 @@ public class OTExtReceiver extends OTReceiver {
     	
 		initialize();
 	}
+	GCSignal[] keys = new GCSignal[SecurityParameter.k1];
+	boolean[] s = new boolean[SecurityParameter.k1];
 
 	public GCSignal[] receive(boolean[] choices) throws Exception {
 		boolean[] c = new boolean[SecurityParameter.k1 + choices.length];
@@ -39,8 +41,6 @@ public class OTExtReceiver extends OTReceiver {
 		
 		GCSignal[] received = reverseAndExtend(keyPairs, c, msgBitLength, is, os, cipher);
 		
-		GCSignal[] keys = new GCSignal[SecurityParameter.k1];
-		boolean[] s = new boolean[SecurityParameter.k1];
 		for (int i = 0; i < OTExtSender.SecurityParameter.k1; i++) { 
 			keys[i] = received[i];
 			s[i] = c[i];

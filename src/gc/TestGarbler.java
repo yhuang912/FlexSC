@@ -2,7 +2,6 @@ package gc;
 
 import java.security.SecureRandom;
 import org.junit.Test;
-import org.junit.Assert;
 
 public class TestGarbler {
 	SecureRandom rnd = new SecureRandom();

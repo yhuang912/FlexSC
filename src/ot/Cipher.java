@@ -24,6 +24,7 @@ public final class Cipher {
 		}
 	}
 
+	BigInteger a = BigInteger.ONE;
 	public BigInteger encrypt(byte[] key, BigInteger msg, int msgLength) {
 		assert (msgLength <= unitLength) : "Message longer than hash block width.";
 		return msg.xor(getPaddingOfLength(key, msgLength));

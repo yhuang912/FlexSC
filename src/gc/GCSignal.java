@@ -32,7 +32,8 @@ public class GCSignal extends Signal {
 		return new GCSignal(b);
 	}
 	
-	public GCSignal(GCSignal lb) { v = lb.v; bytes = (lb.bytes == null) ? null : Arrays.copyOf(lb.bytes, len); }
+	public GCSignal(GCSignal lb) 
+	{ v = lb.v; bytes = (lb.bytes == null) ? null : Arrays.copyOf(lb.bytes, len); }
 	
 	public boolean isPublic () { return bytes == null; }
 	
@@ -53,7 +54,7 @@ public class GCSignal extends Signal {
 	
 	// 'send' and 'receive' are supposed to be used only for secret signals
 	public void send(OutputStream os) {
-		try { os.write(bytes);	}
+		try { os.write(bytes);}
 		catch (Exception e) { e.printStackTrace(); }
 	}
 

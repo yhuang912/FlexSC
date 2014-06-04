@@ -1,5 +1,7 @@
 package oram;
 
+import java.util.Arrays;
+
 public class Block<T> {
 
 	public T[] iden;
@@ -12,6 +14,13 @@ public class Block<T> {
 		this.pos = pos;
 		this.data = data;
 		this.isDummy = isDummy;
+	}
+	
+	public Block(T[] Tarray, int lengthOfIden, int lengthOfPos, int lengthOfData) {
+		iden = Arrays.copyOfRange(Tarray, 0, lengthOfIden);
+		pos = Arrays.copyOfRange(Tarray, lengthOfIden, lengthOfIden+lengthOfPos);
+		data = Arrays.copyOfRange(Tarray, lengthOfIden+lengthOfPos, lengthOfIden+lengthOfPos+lengthOfData);
+		isDummy = Tarray[Tarray.length-1];
 	}
 
 }

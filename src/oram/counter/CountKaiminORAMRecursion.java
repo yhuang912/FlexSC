@@ -20,7 +20,7 @@ public class CountKaiminORAMRecursion extends ORAMCounterHarness{
 		public void run() {
 			try {
 				listen(54321);
-				CLPOramRecClient<Boolean> client = new CLPOramRecClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.COUNT);
+				CLPOramRecClient<Boolean> client = new CLPOramRecClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.COUNT, securityParameter);
 				client.write(1, Utils.fromInt(1, client.clients.get(0).lengthOfData));
 				os.flush();
 				disconnect();
@@ -37,7 +37,7 @@ public class CountKaiminORAMRecursion extends ORAMCounterHarness{
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				CLPOramRecServer<Boolean> server = new CLPOramRecServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.COUNT);
+				CLPOramRecServer<Boolean> server = new CLPOramRecServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, capacity, Mode.COUNT, securityParameter);
 				for(int i = 0; i < server.servers.size(); ++i) {
 					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					mce.statistic.flush();
@@ -48,6 +48,12 @@ public class CountKaiminORAMRecursion extends ORAMCounterHarness{
 					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					statistic.add(mce.statistic);
 				}
+				
+				statistic.andGate *= (1+1.0/(Math.log(N)/Math.log(2.0)));
+				statistic.xorGate *= (1+1.0/(Math.log(N)/Math.log(2.0)));
+				statistic.NumEncAlice *=(1+1.0/(Math.log(N)/Math.log(2.0)));
+				statistic.NumEncBob *= (1+1.0/(Math.log(N)/Math.log(2.0)));
+
 				
 				os.flush();
 				disconnect();

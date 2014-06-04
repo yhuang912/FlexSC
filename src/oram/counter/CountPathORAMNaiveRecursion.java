@@ -20,7 +20,7 @@ public class CountPathORAMNaiveRecursion extends ORAMCounterHarness{
 		public void run() {
 			try {
 				listen(54321);
-				RecursivePathOramClient<Boolean> client = new RecursivePathOramClient<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor, Mode.COUNT);
+				RecursivePathOramClient<Boolean> client = new RecursivePathOramClient<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor, Mode.COUNT, securityParameter);
 				client.write(1, Utils.fromInt(1, client.clients.get(0).lengthOfData));
 				os.flush();
 				disconnect();
@@ -37,7 +37,7 @@ public class CountPathORAMNaiveRecursion extends ORAMCounterHarness{
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				RecursivePathOramServer<Boolean> server = new RecursivePathOramServer<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor, Mode.COUNT);
+				RecursivePathOramServer<Boolean> server = new RecursivePathOramServer<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor, Mode.COUNT, securityParameter);
 				for(int i = 0; i < server.servers.size(); ++i) {
 					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					mce.statistic.flush();

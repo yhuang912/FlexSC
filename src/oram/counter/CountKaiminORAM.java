@@ -17,8 +17,10 @@ public class CountKaiminORAM extends ORAMCounterHarness{
 		public void run() {
 			try {
 				listen(54321);
-				CLPOramBasicClient<Boolean> client = new CLPOramBasicClient<Boolean>(is, os, N, dataSize, Party.Alice, capacity, capacity, Mode.COUNT);
+				CLPOramBasicClient<Boolean> client = new CLPOramBasicClient<Boolean>(is, os, N, dataSize, Party.Alice, capacity, capacity, Mode.COUNT, securityParameter);
+				System.gc();
 				client.write(1, 1, 1, Utils.fromInt(1, client.lengthOfData));
+				System.gc();
 				os.flush();
 				disconnect();
 			} catch (Exception e) {
@@ -34,11 +36,17 @@ public class CountKaiminORAM extends ORAMCounterHarness{
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				CLPOramBasicServer<Boolean> server = new CLPOramBasicServer<Boolean>(is, os, N, dataSize, Party.Bob, capacity, capacity, Mode.COUNT);
+				CLPOramBasicServer<Boolean> server = new CLPOramBasicServer<Boolean>(is, os, N, dataSize, Party.Bob, capacity, capacity, Mode.COUNT, securityParameter);
+				System.gc();
 				PMCompEnv mce = (PMCompEnv)server.eva;
 				mce.statistic.flush();
 				server.access(1);
+				System.gc();
 				statistic = mce.statistic;
+				statistic.andGate *= (1+1.0/Math.log(N)/Math.log(2.0));
+				statistic.xorGate *= (1+1.0/Math.log(N)/Math.log(2.0));
+				statistic.NumEncAlice *= (1+1.0/Math.log(N)/Math.log(2.0));
+				statistic.NumEncBob *= (1+1.0/Math.log(N)/Math.log(2.0));
 				os.flush();
 				disconnect();
 			} catch (Exception e) {
@@ -59,7 +67,7 @@ public class CountKaiminORAM extends ORAMCounterHarness{
 	}
 
 	public static void main(String [ ] args) throws Exception{
-		CountKaiminORAM c = new CountKaiminORAM(10, 6, 16, 80);
+		CountKaiminORAM c = new CountKaiminORAM(15, 6, 16, 80);
 		c.count();
 		System.out.println(c.statistic.andGate);
 		System.out.println(c.statistic.OTs);

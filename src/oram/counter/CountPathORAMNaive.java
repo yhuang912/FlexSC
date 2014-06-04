@@ -17,8 +17,9 @@ public class CountPathORAMNaive extends ORAMCounterHarness{
 		public void run() {
 			try {
 				listen(54321);
-				PathOramClient<Boolean> client = new PathOramClient<Boolean>(is, os, N, dataSize, Party.Alice, Mode.COUNT);
+				PathOramClient<Boolean> client = new PathOramClient<Boolean>(is, os, N, dataSize,capacity, Party.Alice, Mode.COUNT,securityParameter);
 				client.write(1, 1, 1, Utils.fromInt(1, client.lengthOfData));
+				System.gc();
 				os.flush();
 				disconnect();
 			} catch (Exception e) {
@@ -34,10 +35,11 @@ public class CountPathORAMNaive extends ORAMCounterHarness{
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize, Party.Bob, Mode.COUNT);
+				PathOramServer<Boolean> server = new PathOramServer<Boolean>(is, os, N, dataSize,capacity, Party.Bob, Mode.COUNT,securityParameter);
 				PMCompEnv mce = (PMCompEnv)server.eva;
 				mce.statistic.flush();
 				server.access(1);
+				System.gc();
 				statistic = mce.statistic;
 				os.flush();
 				disconnect();

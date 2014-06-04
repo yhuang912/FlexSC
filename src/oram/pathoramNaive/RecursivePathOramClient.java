@@ -22,23 +22,25 @@ public class RecursivePathOramClient<T> {
 	SecureRandom rng = new SecureRandom();
 	protected InputStream is;
 	protected OutputStream os;
-	public RecursivePathOramClient(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity, Mode m) throws Exception {
+	public RecursivePathOramClient(InputStream is, OutputStream os, int N, int dataSize, int cap,
+			int cutoff, int recurFactor, Mode m, int sp) throws Exception {
 		this.is = is;
 		this.os = os;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
-		this.capacity = capacity;
-		PathOramClient<T>  oram = new PathOramClient<T>(is, os, N, dataSize, Party.Alice, m);
+		this.capacity = cap;
+		PathOramClient<T>  oram = new PathOramClient<T>(is, os, N, dataSize,cap, Party.Alice, m,sp);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
-			oram = new PathOramClient<T>(is, os, newN, newDataSize, Party.Alice, m);
+			oram = new PathOramClient<T>(is, os, newN, newDataSize,cap, Party.Alice, m, sp);
 			clients.add(oram);
 		}
 		PathOramClient<T> last = clients.get(clients.size()-1);
 		baseOram = new TrivialOramClient<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, m);
+		System.out.println(N+" "+capacity+" "+cutoff+" "+recurFactor);
 	}
 	
 	public boolean[] read(int iden) throws Exception {
@@ -57,6 +59,7 @@ public class RecursivePathOramClient<T> {
 		
 		sendBooleans(poses[0]);
 		System.out.println("write " + iden + " " + Utils.toInt(poses[0]) + " "+Utils.toInt(poses[1]));
+		System.out.println(currentOram.tree[0].length);
 		currentOram.write(iden, poses[0], poses[1], data);
 	}
 	

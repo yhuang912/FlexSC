@@ -12,23 +12,22 @@ public class RecursiveTreeOramServer<T> {
 	public ArrayList<TreeOramServer<T>> servers = new ArrayList<>();
 	int recurFactor;
 	int cutoff;
-	int capacity;
 	int initialLengthOfIden;
 	protected InputStream is;
 	protected OutputStream os;
-	public RecursiveTreeOramServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity, Mode m) throws Exception {
+	public RecursiveTreeOramServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor,
+			Mode m, int securityParameter) throws Exception {
 		this.is = is;
 		this.os = os;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
-		this.capacity = capacity;
-		TreeOramServer<T>  oram = new TreeOramServer<T>(is, os, N, dataSize, Party.Bob, capacity, m);
+		TreeOramServer<T>  oram = new TreeOramServer<T>(is, os, N, dataSize, Party.Bob, m, securityParameter);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden ) / recurFactor;
-			oram = new TreeOramServer<T>(is, os, newN, newDataSize, Party.Bob, capacity, m);
+			oram = new TreeOramServer<T>(is, os, newN, newDataSize, Party.Bob, m, securityParameter);
 			servers.add(oram);
 		}
 		TreeOramServer<T> last = servers.get(servers.size()-1);

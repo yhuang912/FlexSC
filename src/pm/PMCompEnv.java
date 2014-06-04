@@ -16,17 +16,42 @@ public class PMCompEnv implements CompEnv<Boolean> {
 		public int xorGate = 0;
 		public int notGate = 0;
 		public int OTs = 0;
-		public void flush(){
+		public int NumEncAlice = 0;
+		public int NumEncBob = 0;
+		public long bandwidth = 0;
+		public void flush() {
+			bandwidth = 0;
 			andGate = 0;
 			xorGate = 0;
 			notGate = 0;
-			OTs = 0;			
+			OTs = 0;
+			NumEncAlice = 0;
+			NumEncBob = 0;
 		}
 		public void add(Statistics s2) {
 			andGate += s2.andGate;
 			xorGate += s2.xorGate;
 			notGate += s2.notGate;
 			OTs += s2.OTs;
+			NumEncAlice += s2.NumEncAlice;
+			NumEncBob+=s2.NumEncBob;
+			bandwidth +=s2.bandwidth;
+		}
+		public void finalize() {
+			NumEncAlice = andGate*4+OTs*2;
+			NumEncBob= andGate*1+OTs*1;
+		}
+		
+		public Statistics newInstance() {
+			Statistics s = new Statistics();
+			s.andGate = andGate;
+			s.xorGate = xorGate;
+			s.notGate = notGate;
+			s.OTs = OTs;
+			s.NumEncAlice = NumEncAlice;
+			s.NumEncBob = NumEncBob;
+			s.bandwidth = bandwidth;
+			return s;
 		}
 	}
 	InputStream is;
@@ -48,6 +73,7 @@ public class PMCompEnv implements CompEnv<Boolean> {
 	@Override
 	public Boolean inputOfAlice(boolean in) throws Exception {
 		++statistic.OTs;
+		statistic.bandwidth+=10;
 		return f;
 	}
 
@@ -58,12 +84,14 @@ public class PMCompEnv implements CompEnv<Boolean> {
 
 	@Override
 	public boolean outputToAlice(Boolean out) throws Exception {
+		statistic.bandwidth+=10;
 		return false;
 	}
 
 	@Override
 	public Boolean and(Boolean a, Boolean b) throws Exception {
 		++statistic.andGate;
+		statistic.bandwidth += 3*10;
 		return f;
 	}
 
@@ -112,11 +140,14 @@ public class PMCompEnv implements CompEnv<Boolean> {
 
 	@Override
 	public boolean[] outputToAlice(Boolean[] out) throws Exception {
+		statistic.bandwidth+=10*out.length;
 		return Utils.tobooleanArray(out);
 	}
 
 	@Override
 	public Boolean[] inputOfAlice(boolean[] in) throws Exception {
+		statistic.OTs += in.length;
+		statistic.bandwidth+=10*2*(80+in.length);
 		return Utils.toBooleanArray(in);	
 	}
 

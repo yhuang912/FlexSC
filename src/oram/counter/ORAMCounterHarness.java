@@ -7,7 +7,7 @@ public class ORAMCounterHarness {
 	int capacity;
 	int dataSize;
 	int securityParameter;
-	Statistics statistic;
+	public Statistics statistic;
 	public ORAMCounterHarness(int logN, int capacity, int dataSize, int securityParameter) {
 		this.N = 1<<logN;
 		this.capacity = capacity;

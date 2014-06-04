@@ -1,7 +1,6 @@
 package circuits;
 
 import flexsc.CompEnv;
-import flexsc.Signal;
 
 public class FixedPointMatrixLib<T> extends FixedPointLib<T> {
 

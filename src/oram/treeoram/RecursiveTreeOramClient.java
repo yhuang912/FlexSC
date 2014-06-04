@@ -17,24 +17,23 @@ public class RecursiveTreeOramClient<T> {
 	int initialLengthOfIden;
 	int recurFactor;
 	int cutoff;
-	int capacity;
 
 	SecureRandom rng = new SecureRandom();
 	protected InputStream is;
 	protected OutputStream os;
-	public RecursiveTreeOramClient(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity, Mode m) throws Exception {
+	public RecursiveTreeOramClient(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, Mode m,
+			int securityParameter) throws Exception {
 		this.is = is;
 		this.os = os;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
-		this.capacity = capacity;
-		TreeOramClient<T>  oram = new TreeOramClient<T>(is, os, N, dataSize, Party.Alice, capacity, m);
+		TreeOramClient<T>  oram = new TreeOramClient<T>(is, os, N, dataSize, Party.Alice, m, securityParameter);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
-			oram = new TreeOramClient<T>(is, os, newN, newDataSize, Party.Alice, capacity, m);
+			oram = new TreeOramClient<T>(is, os, newN, newDataSize, Party.Alice, m, securityParameter);
 			clients.add(oram);
 		}
 		TreeOramClient<T> last = clients.get(clients.size()-1);

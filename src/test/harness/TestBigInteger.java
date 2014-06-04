@@ -18,8 +18,8 @@ import test.Utils;
 
 
 public class TestBigInteger<T> {
-	public final int LENGTH = 100;
-	final int RANGE = 100;
+	public final int LENGTH = 2048*64;
+	final int RANGE = LENGTH;
 	public abstract class Helper {
 		BigInteger intA, intB;
 		boolean[] a;
@@ -54,18 +54,18 @@ public class TestBigInteger<T> {
 				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
 				else if(h.m == Mode.COUNT) 
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);						
-
-				T[] a = gen.inputOfAlice(h.a);
-				T [] b = gen.inputOfBob(new boolean[h.b.length]);
-
+					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
 				
+				T [] a = gen.inputOfAlice(h.a);
+				
+				T[]b = gen.inputOfBob(new boolean[h.b.length]);
 				//new java.util.Scanner(System.in).nextLine();
 				T[] d = h.secureCompute(a, b, gen);
 				os.flush();
 		          
 				z = gen.outputToAlice(d);
 
+				System.out.println(((GCGen)(gen)).ands);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

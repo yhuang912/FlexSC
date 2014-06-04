@@ -2,134 +2,62 @@ package oram.clporam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import flexsc.*;
-import oram.Block;
+import oram.PlainBlock;
 import oram.TreeBasedOramParty;
 
-
 public abstract class CLPOramParty<T> extends TreeBasedOramParty<T> {
-	public BlockInBinary[] queue;
-	public final int queueCapacity = 29;
-	final int tempStashSize = 10;
+	public PlainBlock[] queue;
+	public int queueCapacity;
+	int tempStashSize;
 	int leafCapacity;
 	int nodeCapacity;
 	public CLPOramParty(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int nodeCapacity, int leafCapacity, Mode m) throws Exception {
+			Party p, int nodeCapacity, int leafCapacity, Mode m, int sp) throws Exception {
 		super(is, os, N, dataSize, p, nodeCapacity, m);
 		this.leafCapacity = leafCapacity;
 		this.nodeCapacity = nodeCapacity;
-		
+		//taking the worst case, can be tuned.
+		tempStashSize = Math.max(10, logN);
+		int t = logN;
+		queueCapacity = (int) ((2*t-10)/20.0*sp);
+		PlainBlock b;
 		if(gen != null) {
-			for(int i = this.N/2; i < this.N; ++i) {
-				tree[i] = new BlockInBinary[leafCapacity];
-				for(int j = 0; j < leafCapacity; ++j)
-					tree[i][j] = getDummyBlock();
-				
-				Block<T>[][] result = prepareBlocks(tree[i], tree[i], tree[i]);
-				tree[i] = prepareBlockInBinaries(result[0], result[1]);
-			}
+			b =  getDummyBlock(true);
 		}
 		else {
-			for(int i = this.N/2; i < this.N; ++i) {
-				tree[i] = new BlockInBinary[leafCapacity];
-				for(int j = 0; j < leafCapacity; ++j)
-					tree[i][j] = getDummyBlock2();
-				
-				BlockInBinary[] randomBucket = randomBucket(leafCapacity);
-				Block<T>[][] result = prepareBlocks(tree[i], tree[i], randomBucket);
-				tree[i] = randomBucket;
-				prepareBlockInBinaries(result[0], result[1]);			
-			}
+			b =  getDummyBlock(false);
+		}
 
+		if(m == mode.COUNT) {
+			tree[0] = new PlainBlock[leafCapacity];
+			for(int j = 0; j < leafCapacity; ++j)
+				tree[0][j] = b;
+			for(int i = this.N/2; i < this.N; ++i)
+				tree[i] = tree[0];
 		}
-		
-		queue = new BlockInBinary[queueCapacity];
+		else{
+			for(int i = 0; i < this.N; ++i)
+				for(int j = this.N/2; j < leafCapacity; ++j)
+					tree[i][j] = b;
+		}
+
+		queue = new PlainBlock[queueCapacity];
 		if(gen != null) {
 			for(int i = 0; i < queue.length; ++i) 
-				queue[i] = getDummyBlock();
-				Block<T>[][] result = prepareBlocks(queue, queue, queue);
-				queue = prepareBlockInBinaries(result[0], result[1]);
+				queue[i] = getDummyBlock(true);
 		}
 		else {
 			for(int i = 0; i < queue.length; ++i) 
-				queue[i] = getDummyBlock2();	
-				BlockInBinary[] randomBucket = randomBucket(queueCapacity);
-				Block<T>[][] result = prepareBlocks(queue, queue, randomBucket);
-				queue = randomBucket;
-				prepareBlockInBinaries(result[0], result[1]);
+				queue[i] = getDummyBlock(false);	
 		}
 	}
-	
+
 	public void flush() throws Exception{
-		for(int k = 0; k < 2; ++k) {
-			boolean[] pos = new boolean[lengthOfPos];
-			for(int i = 0; i < lengthOfPos; ++i)
-				pos[i] = commonRandom.nextBoolean();
-			flushOneTime(pos);
+		for(int k = 0; k < 3; ++k) {
+			flushOneTime(getRandomPath());
 		}
-		/*
-		while(true){
-			int a = commonRandom.nextInt(3);
-			if(a == 0)
-				return;
-			else{
-				boolean[] pos = new boolean[lengthOfPos];
-				for(int i = 0; i < lengthOfPos; ++i)
-					pos[i] = commonRandom.nextBoolean();
-				flushOneTime(pos);
-			}
-		}*/	
 	}
 	abstract public void flushOneTime(boolean[] pos) throws Exception;
-	
-	@Override
-	public BlockInBinary[][] getAPath(boolean[] path) {
-		BlockInBinary[][] result = new BlockInBinary[logN][];
-		int index = 1;
-		result[0] = tree[index];
-		for(int i = 1; i < logN; ++i) {
-			index*=2;
-			if(path[lengthOfPos-i])
-				++index;
-			result[i] = tree[index];
-		}
-		return result;
-	}
-	
-	@Override
-	public void putAPath(BlockInBinary[] blocks, boolean[] path){
-		int index = 1;
-		tree[index] = Arrays.copyOfRange(blocks, 0, nodeCapacity);
-		for(int i = 1; i < logN; ++i) {
-			index*=2;
-			if(path[lengthOfPos-i])
-				++index;
-			if(i != logN-1)
-				tree[index] = Arrays.copyOfRange(blocks, i*nodeCapacity, (i+1)*nodeCapacity);
-			else
-				tree[index] = Arrays.copyOfRange(blocks, i*nodeCapacity, i*nodeCapacity + leafCapacity);
-		}
-	}
-	
-	public Block<T>[] flatten(Block<T>[][] path) {
-		Block<T>[] result = new Block[(path.length -1) * nodeCapacity + leafCapacity];
-		int counter = 0;
-		for(int i = 0; i < path.length; ++i )
-			for(int j = 0; j < path[i].length; ++j)
-				result[counter++] = path[i][j];
-		return result;
-	}
-	
-	public BlockInBinary[] flatten(BlockInBinary[][] path) {
-		BlockInBinary[] result = new BlockInBinary[(path.length -1) * nodeCapacity + leafCapacity];
-		int counter = 0;
-		for(int i = 0; i < path.length; ++i )
-			for(int j = 0; j < path[i].length; ++j)
-				result[counter++] = path[i][j];
-		return result;
-	}
-
-	
 }
 

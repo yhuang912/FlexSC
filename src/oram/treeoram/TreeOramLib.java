@@ -23,10 +23,6 @@ public class TreeOramLib<T> extends BucketLib<T> {
 		return leadingZeros(xored);
 	}
 	
-	public Block<T> readAndRemove(Block<T>[] path, T[] iden) throws Exception {
-		return super.readAndRemove(path, iden);
-	}
-	
 	public void evitUnit(Block<T>[] top, Block<T>[] left, Block<T>[] right, int level) throws Exception {
 		Block<T> block = pop(top);
 		T toLeft = eq(block.pos[lengthOfPos-level], SIGNAL_ZERO);

@@ -1,25 +1,25 @@
-package test.oram;
+package test.oram.pathoram;
 
 import java.security.SecureRandom;
 
 import flexsc.*;
-import oram.pathoram.RecursivePathOramClient;
-import oram.pathoram.RecursivePathOramServer;
+import oram.pathoramNaive.RecursivePathOramClient;
+import oram.pathoramNaive.RecursivePathOramServer;
 
 import org.junit.Test;
 
 import test.Utils;
 
 
-public class TestPathOramRec {
-	final int N = 1<<10;
-	int recurFactor = 1<<5;
+public class TestPathOramRecNaive {
+	final int N = 1<<7;
+	int recurFactor = 4;
 	int cutoff = 1<<10;
 	int capacity = 4;
 	int dataSize = 10;
 	int writeCount = N;
 	int readCount = N;
-	public TestPathOramRec(){
+	public TestPathOramRecNaive(){
 	}
 	
 	SecureRandom rng = new SecureRandom();
@@ -32,7 +32,7 @@ public class TestPathOramRec {
 			try {
 				listen(54321);
 				
-				RecursivePathOramClient<Boolean> client = new RecursivePathOramClient<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY);
+				RecursivePathOramClient<Boolean> client = new RecursivePathOramClient<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor,  Mode.VERIFY, 80);
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					client.write(element, Utils.fromInt(element, dataSize));
@@ -76,7 +76,7 @@ public class TestPathOramRec {
 			try {
 				connect("localhost", 54321);		
 				
-				RecursivePathOramServer<Boolean> server = new RecursivePathOramServer<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY);
+				RecursivePathOramServer<Boolean> server = new RecursivePathOramServer<Boolean>(is, os, N, dataSize, capacity, cutoff, recurFactor,  Mode.VERIFY, 80);
 				for(int i = 0; i < writeCount; ++i) {
 					server.access();
 				}
@@ -137,7 +137,6 @@ public class TestPathOramRec {
 		tEva.start();
 		tGen.join();
 		printTree(gen,eva);
-		//System.out.print("\n");
 	}
 
 	public boolean[] xor(boolean[]a, boolean[] b) {

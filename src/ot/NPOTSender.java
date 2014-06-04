@@ -134,5 +134,6 @@ public class NPOTSender extends OTSender {
         	RWBigInteger.writeBI(os, msg[i][0]);
         	RWBigInteger.writeBI(os, msg[i][1]);
         }
+        os.flush();
     }
 }

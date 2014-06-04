@@ -2,67 +2,41 @@ package oram.pathoram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import flexsc.*;
 import oram.Block;
+import oram.PlainBlock;
 import test.Utils;
 
 
 public class PathOramClient<T> extends PathOramParty<T> {
 	PathOramLib<T> lib;
-	public PathOramClient(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, Mode m) throws Exception {
-		super(is, os, N, dataSize, p, m);
+	public PathOramClient(InputStream is, OutputStream os, int N, int dataSize,int cap,
+			Party p, Mode m, int sp) throws Exception {
+		super(is, os, N, dataSize, cap, p, m, sp);
 		lib = new PathOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, gen);
+		scStash = prepareBlocks(stash, stash, stash);
 	}
-	
-	public BlockInBinary access(boolean[] iden, boolean[] pos, boolean[] newPos, boolean[] data) throws Exception {
-		BlockInBinary[] blocks = flatten(getAPath(pos));
-		Block<T>[][] scPath = prepareBlocks(blocks, blocks, blocks);
-		Block<T>[][] scStash = prepareBlocks(stash, stash, stash);
-		T[] scIden = gen.inputOfAlice(iden);
-		T[] scPos = gen.inputOfAlice(newPos);
-		
-		
-		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 
-		BlockInBinary r =  outputBlock(res);
-		
-		T[] scData = res.data;
-		if(data != null)
-			scData = gen.inputOfAlice(data);
-		
-		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
-		
-		lib.add(scStash[0], scNewBlock);
-		
-		//Signal[][] debug = 
-		lib.pushDown(scPath[0], scStash[0], pos);
-		
-		blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
-		stash = prepareBlockInBinaries(scStash[0], scStash[1]);
-		putAPath(blocks, pos);
-		
-		return r;
-	}
 	T[] scIden;
 	Block<T>[][] scStash;
-	Block<T>[][] scPath;
+	Block<T>[][][] scPath;
 	boolean[] workingPos;
-	public BlockInBinary readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
+	public PlainBlock readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
 		workingPos = pos;
-		BlockInBinary[] blocks = flatten(getAPath(pos));
-		scPath = prepareBlocks(blocks, blocks, blocks);
-		scStash = prepareBlocks(stash, stash, stash);
+		PlainBlock[][] blocks = getPath(pos);
+		scPath = preparePath(blocks, blocks, blocks);
+		
 		scIden = gen.inputOfAlice(iden);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scStash[0], scIden);
 		res = lib.mux(res, res2, res.isDummy);
-		BlockInBinary b = randomBlock();
+		PlainBlock b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);
 		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
 
-		BlockInBinary r =  outputBlock(finalRes);
+		PlainBlock r =  outputBlock(finalRes);
 		return r;
 	}
 	
@@ -73,13 +47,10 @@ public class PathOramClient<T> extends PathOramParty<T> {
 		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		
 		lib.add(scStash[0], scNewBlock);
-		
-		//Signal[][] debug = 
 		lib.pushDown(scPath[0], scStash[0], pos);
 		
-		BlockInBinary[] blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
-		stash = prepareBlockInBinaries(scStash[0], scStash[1]);
-		putAPath(blocks, pos);
+		PlainBlock[][] blocks = preparePlainPath(scPath[0], scPath[1]);
+		putPath(blocks, pos);
 	}
 	
 	public boolean[] readAndRemove(int iden, boolean[] pos) throws Exception {

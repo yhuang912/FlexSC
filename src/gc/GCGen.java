@@ -4,6 +4,7 @@ import java.security.*;
 import java.io.*;
 
 import circuits.FloatFormat;
+import flexsc.Flag;
 import objects.Float.Representation;
 import ot.*;
 import test.Utils;
@@ -20,6 +21,7 @@ public class GCGen extends GCCompEnv {
 
 	long gid = 0;
 
+	public long ands = 0;
 	public GCGen(InputStream is, OutputStream os) throws Exception {
 		this.is = is;
 		this.os = os;
@@ -42,28 +44,43 @@ public class GCGen extends GCCompEnv {
 
 	public GCSignal inputOfAlice(boolean in) throws Exception {
 		GCSignal[] label = genPair();
+		long t = System.currentTimeMillis();
 		label[in ? 1 : 0].send(os);
+		Flag.OTTotalTime += (System.currentTimeMillis()-t);
 		return label[0];
 	}
+	
+	GCSignal sig = new GCSignal(true);
 
 	public GCSignal inputOfBob(boolean in) throws Exception {
 		GCSignal[] label = genPair();
+		long t = System.currentTimeMillis();
 		snd.send(label);
-		return in ? label[1] : label[0];
+		Flag.OTTotalTime += (System.currentTimeMillis()-t);
+		return label[0];
 	}
 	
 	public GCSignal[] inputOfAlice(boolean[] x) throws Exception {
 		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
 			result[i] = inputOfAlice(x[i]);
+		os.flush();
 		return result;
 	}
 
 	public GCSignal[] inputOfBob(boolean[] x) throws Exception {
+		GCSignal[][] pair = new GCSignal[x.length][2];
+		for(int i = 0; i < x.length; ++i)
+			pair[i] = genPair();
+		long t = System.currentTimeMillis();
+		snd.send(pair);
+		Flag.OTTotalTime += (System.currentTimeMillis()-t);
 		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
-			result[i] = inputOfBob(false);
+			result[i] = pair[i][0];
+
 		return result;
+
 	}
 
 	
@@ -117,6 +134,8 @@ public class GCGen extends GCCompEnv {
 	}
 	
 	public boolean outputToAlice(GCSignal out) throws Exception {
+		os.flush();
+
 		if (out.isPublic())
 			return out.v;
 		
@@ -126,7 +145,8 @@ public class GCGen extends GCCompEnv {
 		else if (lb.equals(R.xor(out)))
 			return true;
 
-		throw new Exception("bad label at final output.");
+		return false;
+//		throw new Exception("bad label at final output.");
 	}
 	
 	public double outputToAliceFixedPoint(GCSignal[] f, int offset) throws Exception{
@@ -195,28 +215,36 @@ public class GCGen extends GCCompEnv {
 
 	private void sendGTT() {
 		try {
+			long t = System.currentTimeMillis();
 			gtt[0][1].send(os);
 			gtt[1][0].send(os);
 			gtt[1][1].send(os);
+			Flag.GargleIOTime += (System.currentTimeMillis()-t);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 	}
-
+	
 	public GCSignal and(GCSignal a, GCSignal b) {
+		++ands;
+		long t = System.currentTimeMillis();
+		GCSignal res;
 		if (a.isPublic() && b.isPublic())
-			return new GCSignal(a.v && b.v);
+			res = new GCSignal(a.v && b.v);
 		else if (a.isPublic())
-			return a.v ? b : new GCSignal(false);
+			res = a.v ? b : new GCSignal(false);
 		else if (b.isPublic())
-			return b.v ? a : new GCSignal(false);
+			res = b.v ? a : new GCSignal(false);
 		else {
 			GCSignal ret = garble(a, b);
+			
 			sendGTT();
 			gid++;
-			return ret;
+			res = ret;
 		}
+		Flag.GarbleTime += (System.currentTimeMillis()-t);
+		return res;
 	}
 
 	// public BitSet or(BitSet a, BitSet b) {
@@ -227,6 +255,7 @@ public class GCGen extends GCCompEnv {
 	// return zero;
 	// }
 	//
+	GCSignal f = GCSignal.freshLabel(new SecureRandom());
 	public GCSignal xor(GCSignal a, GCSignal b) {
 		if (a.isPublic() && b.isPublic())
 			return new GCSignal(a.v ^ b.v);

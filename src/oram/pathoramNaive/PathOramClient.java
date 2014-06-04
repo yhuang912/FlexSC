@@ -2,38 +2,41 @@ package oram.pathoramNaive;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import flexsc.*;
 import oram.Block;
+import oram.PlainBlock;
 import test.Utils;
 
 
 public class PathOramClient<T> extends PathOramParty<T> {
 	PathOramLib<T> lib;
-	public PathOramClient(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, Mode m) throws Exception {
-		super(is, os, N, dataSize, p, m);
+	public PathOramClient(InputStream is, OutputStream os, int N, int dataSize, int cap,
+			Party p, Mode m, int sp) throws Exception {
+		super(is, os, N, dataSize, cap, p, m, sp);
 		lib = new PathOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, gen);
+		scStash = prepareBlocks(stash, stash, stash);
 	}
 
 	T[] scIden;
 	Block<T>[][] scStash;
-	Block<T>[][] scPath;
+	Block<T>[][][] scPath;
 	boolean[] workingPos;
-	public BlockInBinary readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
+	public PlainBlock readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
 		workingPos = pos;
-		BlockInBinary[] blocks = flatten(getAPath(pos));
-		scPath = prepareBlocks(blocks, blocks, blocks);
-		scStash = prepareBlocks(stash, stash, stash);
+		PlainBlock[][] blocks = getPath(pos);
+		scPath = preparePath(blocks, blocks, blocks);
+		
 		scIden = gen.inputOfAlice(iden);
 		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scStash[0], scIden);
 		res = lib.mux(res, res2, res.isDummy);
-		BlockInBinary b = randomBlock();
+		PlainBlock b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);
 		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
 
-		BlockInBinary r =  outputBlock(finalRes);
+		PlainBlock r =  outputBlock(finalRes);
 		return r;
 	}
 	
@@ -45,12 +48,9 @@ public class PathOramClient<T> extends PathOramParty<T> {
 
 		lib.add(scStash[0], scNewBlock); 
 		lib.pushDown(scPath[0], scStash[0], pos);
-		lib.pushDown(scPath[0], scStash[0], pos);
 		
-		
-		BlockInBinary[] blocks = prepareBlockInBinaries(scPath[0], scPath[1]);
-		stash = prepareBlockInBinaries(scStash[0], scStash[1]);
-		putAPath(blocks, pos);
+		PlainBlock[][] blocks = preparePlainPath(scPath[0], scPath[1]);
+		putPath(blocks, pos);
 	}
 	
 	public boolean[] readAndRemove(int iden, boolean[] pos) throws Exception {

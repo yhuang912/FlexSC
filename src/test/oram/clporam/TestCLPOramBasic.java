@@ -1,4 +1,4 @@
-package test.oram;
+package test.oram.clporam;
 
 import java.security.SecureRandom;
 
@@ -13,9 +13,9 @@ import test.Utils;
 
 
 public class TestCLPOramBasic {
-	final int N = 1<<10;
-	final int nodeCapacity = 6;
-	final int leafCapacity = 6;
+	final int N = 1<<5;
+	final int nodeCapacity = 4;
+	final int leafCapacity = 4;
 	int[] posMap = new int[N];
 	int writecount = N;
 	int readcount = N;
@@ -39,7 +39,7 @@ public class TestCLPOramBasic {
 				listen(54321);
 
 				int data[] = new int[N+1];
-				CLPOramBasicClient<Boolean> client = new CLPOramBasicClient<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY);
+				CLPOramBasicClient<Boolean> client = new CLPOramBasicClient<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY, 80);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				idens = new int[client.tree.length][nodeCapacity];
@@ -108,7 +108,7 @@ public class TestCLPOramBasic {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				CLPOramBasicServer<Boolean> server= new CLPOramBasicServer<Boolean>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, Mode.VERIFY);
+				CLPOramBasicServer<Boolean> server= new CLPOramBasicServer<Boolean>(is, os, N, dataSize, Party.Bob, nodeCapacity, leafCapacity, Mode.VERIFY, 80);
 				
 				idens = new int[server.tree.length][nodeCapacity];
 				du = new boolean[server.tree.length][nodeCapacity];

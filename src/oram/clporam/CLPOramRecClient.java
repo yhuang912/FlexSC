@@ -24,20 +24,20 @@ public class CLPOramRecClient<T> {
 	protected InputStream is;
 	protected OutputStream os;
 	public CLPOramRecClient(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int nodeCapacity,
-			int leafCapacity, Mode m) throws Exception {
+			int leafCapacity, Mode m, int sp) throws Exception {
 		this.is = is;
 		this.os = os;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.nodeCapacity = nodeCapacity;
 		this.leafCapacity = leafCapacity;
-		CLPOramBasicClient<T>  oram = new CLPOramBasicClient<T>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, m);
+		CLPOramBasicClient<T>  oram = new CLPOramBasicClient<T>(is, os, N, dataSize, Party.Alice, nodeCapacity, leafCapacity, m, sp);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
-			oram = new CLPOramBasicClient<T>(is, os, newN, newDataSize, Party.Alice, nodeCapacity, leafCapacity, m);
+			oram = new CLPOramBasicClient<T>(is, os, newN, newDataSize, Party.Alice, nodeCapacity, leafCapacity, m, sp);
 			clients.add(oram);
 		}
 		CLPOramBasicClient<T> last = clients.get(clients.size()-1);

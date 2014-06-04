@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
+	static int bufferSize = 60000;
 	private ServerSocket sock;
 	
 	protected InputStream is;
@@ -14,9 +15,10 @@ public class Server {
 		Socket clientSock;
         sock = new ServerSocket(port);            // create socket and bind to port
         clientSock = sock.accept();                   // wait for client to connect
+        
+        os = new BufferedOutputStream(clientSock.getOutputStream(), bufferSize);  
+        is = new BufferedInputStream( clientSock.getInputStream(), bufferSize);
 
-        os = clientSock.getOutputStream();
-        is = clientSock.getInputStream();
 	}
 
 	public void disconnect() throws Exception { 

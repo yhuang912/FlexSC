@@ -21,16 +21,12 @@ public class CLPOramLib<T> extends BucketLib<T> {
 	
 	public T[] deepestLevel(T[] pos, T[] path) throws Exception {
 		T[] xored = xor(pos, path);
-		return leadingZeros(xored);//incrementByOne(leadingZeros(xored)); 
+		return incrementByOne(leadingZeros(xored)); 
 	}
 	
 	public T[] deepestLevel(T[] pos, T[] path, T isDummy) throws Exception {
 		T[] deep = deepestLevel(pos, path);
 		return mux(deep, zeros(deep.length), isDummy);
-	}
-	
-	public Block<T> readAndRemove(Block<T>[] path, T[] iden) throws Exception {
-		return super.readAndRemove(path, iden);
 	}
 	
 	public Block<T> flushUnit(Block<T>[] top, Block<T> in, int level, T[] path, Block<T>[] tempStash) throws Exception {
@@ -50,7 +46,7 @@ public class CLPOramLib<T> extends BucketLib<T> {
 			maxdepth = mux(maxdepth, deepest[i], greater);
 		}
 		
-		T cannotPush = leq(maxdepth, toSignals(level-1, maxdepth.length));// deepestlevel is in fact the real depth-1, so we also -1 here.
+		T cannotPush = leq(maxdepth, toSignals(level, maxdepth.length));// deepestlevel is in fact the real depth-1, so we also -1 here.
 		
 		Block<T> block = conditionalReadAndRemove(top, maxIden, not(cannotPush));
 		

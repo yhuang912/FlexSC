@@ -17,19 +17,19 @@ public class RecursivePathOramServer<T> {
 	int initialLengthOfIden;
 	protected InputStream is;
 	protected OutputStream os;
-	public RecursivePathOramServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity, Mode m) throws Exception {
+	public RecursivePathOramServer(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, int capacity, Mode m, int sp) throws Exception {
 		this.is = is;
 		this.os = os;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		PathOramServer<T>  oram = new PathOramServer<T>(is, os, N, dataSize, Party.Bob, m);
+		PathOramServer<T>  oram = new PathOramServer<T>(is, os, N, dataSize,capacity, Party.Bob, m, sp);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
 		while(newN > cutoff) {
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden ) / recurFactor;
-			oram = new PathOramServer<T>(is, os, newN, newDataSize, Party.Bob, m);
+			oram = new PathOramServer<T>(is, os, newN, newDataSize,capacity, Party.Bob, m, sp);
 			servers.add(oram);
 		}
 		PathOramServer<T> last = servers.get(servers.size()-1);

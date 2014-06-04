@@ -10,13 +10,14 @@ public class Client {
 
 	public void connect(String server, int port) throws Exception {
         sock = new java.net.Socket(server, port);          // create socket and connect
-        os  = sock.getOutputStream();  
-        is  = sock.getInputStream();
+                
+        os = new BufferedOutputStream(sock.getOutputStream(), Server.bufferSize);  
+        is = new BufferedInputStream( sock.getInputStream(), Server.bufferSize);
     }
 
 	public void disconnect() throws Exception {
 		os.write(0);
-		os.flush();  
+		os.flush();
 		is.read(); // dummy write to prevent dropping connection earlier than
 				   // protocol payloads are received.
 		

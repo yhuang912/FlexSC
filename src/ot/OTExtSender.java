@@ -41,6 +41,7 @@ public class OTExtSender extends OTSender {
 	 * Everything in msgPairs are effective Sender's messages. 
 	 * 
 	 */
+	GCSignal[][] keyPairs = new GCSignal[SecurityParameter.k1][2];
     public void send(GCSignal[][] msgPairs) throws Exception {    	
     	GCSignal[][] pairs = new GCSignal[SecurityParameter.k1 + msgPairs.length][2];
     	for (int i = 0; i < SecurityParameter.k1; i++) {
@@ -55,7 +56,6 @@ public class OTExtSender extends OTSender {
     	
     	reverseAndExtend(s, keys, msgBitLength, pairs, is, os, cipher);
     	
-    	GCSignal[][] keyPairs = new GCSignal[SecurityParameter.k1][2];
     	for (int i = 0; i < SecurityParameter.k1; i++) {
     		keyPairs[i][0] = pairs[i][0];
     		keyPairs[i][1] = pairs[i][1];
@@ -75,7 +75,7 @@ public class OTExtSender extends OTSender {
     		cphPairs[i][0] = RWBigInteger.readBI(is);
     		cphPairs[i][1] = RWBigInteger.readBI(is);
 		}
-    	
+    	os.flush();
     	int numOfPairs = msgPairs.length;
 
     	BitMatrix Q = new BitMatrix(numOfPairs, SecurityParameter.k1);
