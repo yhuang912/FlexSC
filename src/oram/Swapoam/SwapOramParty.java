@@ -2,9 +2,11 @@ package oram.Swapoam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import flexsc.*;
 import oram.PlainBlock;
 import oram.TreeBasedOramParty;
+import test.Utils;
 
 
 
@@ -30,7 +32,7 @@ public abstract class SwapOramParty<T> extends TreeBasedOramParty<T> {
 	{
 		boolean [] res = new boolean[logN];
 		int temp = cnt;
-		for(int i = 0; i < res.length; ++i) {
+		for(int i = res.length-1; i >= 0; --i) {
 			res[i] = (temp&1)==1;
 			temp>>=1;
 		}

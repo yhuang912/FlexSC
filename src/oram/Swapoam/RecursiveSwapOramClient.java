@@ -121,5 +121,6 @@ public class RecursiveSwapOramClient<T> {
 		for(int i = 0; i < pos.length; ++i)
 			tmp[i] = (byte) (pos[i] ? 1 : 0);
 		os.write(tmp);
+		os.flush();
 	}
 }

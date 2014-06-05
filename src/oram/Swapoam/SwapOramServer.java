@@ -20,18 +20,16 @@ public class SwapOramServer<T> extends SwapOramParty<T> {
 		scQueue = prepareBlocks(queue, queue, randomQueue);
 	}
 
-	PlainBlock[][] randomPath = new PlainBlock[logN+1][capacity];
-
 	@Override
 	public void flushOneTime(boolean[] pos) throws Exception {
 		PlainBlock[][] blocks = getPath(pos);
-		randomPath = randomPath(blocks);
-		Block<T>[][][] scPath = preparePath(blocks, blocks, randomPath);
+		PlainBlock[][] randPath = randomPath(blocks);
+		Block<T>[][][] scPath = preparePath(blocks, blocks, randPath);
 
-		lib.flush(scPath[0], pos);
+		lib.flush(scPath[0], pos, scQueue[0]);
 		
 		preparePlainPath(scPath[0], scPath[1]);
-		putPath(randomPath, pos);
+		putPath(randPath, pos);
 	}
 
 	Block<T>[][] scQueue;
@@ -41,18 +39,17 @@ public class SwapOramServer<T> extends SwapOramParty<T> {
 		PlainBlock[][] blocks = getPath(pos);
 		PlainBlock[][] ranPath = randomPath(blocks);
 		Block<T>[][][] scPath = preparePath(blocks, blocks, ranPath);
-		
 		scIden = eva.inputOfAlice(new boolean[lengthOfIden]);
 
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
 		res = lib.mux(res, res2, res.isDummy);
+		
 		PlainBlock b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);
 		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
 		
-		blocks = randomPath;
-		blocks = preparePlainPath(scPath[0], scPath[1]);
+		preparePlainPath(scPath[0], scPath[1]);
 		putPath(ranPath, pos);
 		outputBlock(finalRes);
 	}
@@ -64,8 +61,8 @@ public class SwapOramServer<T> extends SwapOramParty<T> {
 		T[] scData = Arrays.copyOfRange(SCTmp, lengthOfPos, lengthOfData+lengthOfPos);
 
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
-
 		lib.add(scQueue[0], b);
+
 		
 		flushOneTime(nextPath());
 		flushOneTime(nextPath());

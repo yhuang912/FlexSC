@@ -47,14 +47,19 @@ public class SwapOramLib<T> extends BucketLib<T> {
 
 		T[] maxIden = bucket[0].iden;
 		T[] maxdepth = deepest[0];
+		T isDummy = bucket[0].isDummy;
 		for(int j = 1; j < capacity; ++j) {
 			T greater = leq(deepest[j], maxdepth);
+			greater = and(greater, not(bucket[j].isDummy));
 			maxIden = mux(maxIden, bucket[j].iden, greater);
 			maxdepth = mux(maxdepth, deepest[j], greater);
+			isDummy = mux(isDummy, bucket[j].isDummy, greater);
 		}
-		T[][] result = env.newTArray(2, 0);
+		T[][] result = env.newTArray(3, 0);
 		result[0] = maxIden;
 		result[1] = maxdepth;
+		result[2] = env.newTArray(1);
+		result[2][0] = isDummy;
 		return result;
 	}
 	
@@ -66,14 +71,20 @@ public class SwapOramLib<T> extends BucketLib<T> {
 
 		T[] minIden = bucket[0].iden;
 		T[] minDepth = deepest[0];
+		T isDummy = bucket[0].isDummy;
+
 		for(int j = 1; j < capacity; ++j) {
-			T less = leq(deepest[j], minIden);
+			T less = geq(deepest[j], minDepth);
+			less = and(less, not(bucket[j].isDummy));
 			minIden = mux(minIden, bucket[j].iden, less);
 			minDepth = mux(minDepth, deepest[j], less);
+			isDummy = mux(isDummy, bucket[j].isDummy, less);
 		}
-		T[][] result = env.newTArray(2, 0);
+		T[][] result = env.newTArray(3, 0);
 		result[0] = minIden;
 		result[1] = minDepth;
+		result[2] = env.newTArray(1);
+		result[2][0] = isDummy;
 		return result;
 	}
 	
@@ -90,12 +101,34 @@ public class SwapOramLib<T> extends BucketLib<T> {
 		return result2;
 	}
 	
-	public void flush(Block<T>[][] scPath, boolean[] path) throws Exception {
+	public void flush(Block<T>[][] scPath, boolean[] path, Block<T>[] scQueue) throws Exception {
 		T[] pathSignal =  env.newTArray(path.length);
 		for(int i = 0; i < path.length; ++i)
 			pathSignal[i] = path[i] ? SIGNAL_ONE : SIGNAL_ZERO;
+		{
+			T[][] max = DeepestBlock(scQueue, pathSignal);
+			T[] maxIden = max[0];
+			T[] maxdepth= max[1];
+			
+			T[][] min = SwallowestBlock(scPath[0], pathSignal);
+			T[] minIden = min[0];
+			T[] mindepth= min[1];
 
-		for(int i = 0; i < logN-1; ++i) {
+			T full = SIGNAL_ONE;
+			for(int j = 0; j < scPath[0].length; ++j)
+				full = and(full, not(scPath[0][j].isDummy));
+
+			Block<T> maxBlock = conditionalReadAndRemove(scQueue, maxIden, not(max[2][0]));
+			Block<T> minBlock = conditionalReadAndRemove(scPath[0], minIden, full);
+//			T shouldPush = and(not(max[2][0]), or(leq(maxdepth, mindepth), min[2][0]));//!!
+			and(not(max[2][0]), full)
+			
+			conditionalAdd(scPath[0], maxBlock, shouldPush);
+			conditionalAdd(scQueue, minBlock, full);			
+		}
+
+		
+		for(int i = logN; i < logN -1; ++i) {
 			T[][] max = DeepestBlock(scPath[i], pathSignal);
 			T[] maxIden = max[0];
 			T[] maxdepth= max[1];
@@ -104,7 +137,7 @@ public class SwapOramLib<T> extends BucketLib<T> {
 			T[] minIden = min[0];
 			T[] mindepth= min[1];
 
-			T cannotPush = geq(maxdepth, toSignals((1<<i)-1, maxdepth.length));
+			T cannotPush = leq(maxdepth, toSignals((1<<i)-1, maxdepth.length));
 
 			T full = SIGNAL_ONE;
 			for(int j = 0; j < scPath[i+1].length; ++j)
@@ -112,7 +145,7 @@ public class SwapOramLib<T> extends BucketLib<T> {
 
 			Block<T> maxBlock = readAndRemove(scPath[i], maxIden);
 			Block<T> minBlock = conditionalReadAndRemove(scPath[i+1], minIden, full);
-			T shouldPush = SIGNAL_ONE;//!!
+			T shouldPush = leq(maxdepth, mindepth);//!!
 			
 			conditionalAdd(scPath[i+1], maxBlock, shouldPush);
 			conditionalAdd(scPath[i], minBlock, full);			

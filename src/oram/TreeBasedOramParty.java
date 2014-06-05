@@ -119,8 +119,8 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 		for(int i = 0; i < b.length; ++i)
 			for(int j = 0; j < b[i].length; ++j)
 					tmp[cnt++] = b[i][j];
-		
 		Block<T>[] tmpResult =  inputBucketOfServer(tmp);
+
 		cnt = 0;
 		Block<T>[][] result = lib.newBlockMatrix(b.length);
 		for(int i = 0; i < b.length; ++i) {

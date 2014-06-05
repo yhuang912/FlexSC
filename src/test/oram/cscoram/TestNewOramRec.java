@@ -19,12 +19,12 @@ public class TestNewOramRec {
 	
 	class GenRunnable extends network.Server  implements Runnable{
 		int port;
-		int logN = 1<<10;
+		int logN ;
 		int N;
-		int recurFactor = 8;
-		int cutoff = 1<<10;
-		int capacity = 6;
-		int dataSize = 32;
+		int recurFactor;
+		int cutoff;
+		int capacity;
+		int dataSize;
 		int logCutoff;
 
 		GenRunnable (int port, int logN, int capacity, int dataSize, int recurFactor, int logCutoff) {
@@ -48,6 +48,7 @@ public class TestNewOramRec {
 				os.write(logCutoff);
 				os.write(capacity);
 				os.write(dataSize);
+				os.flush();
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				

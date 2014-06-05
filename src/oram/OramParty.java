@@ -2,10 +2,13 @@ package oram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Arrays;
 
 import pm.PMCompEnv;
+import rand.ISAACProvider;
 import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
@@ -29,7 +32,16 @@ public abstract class OramParty<T> {
 	public Party role;
 	public Mode mode;
 
-	protected SecureRandom rng = new SecureRandom();
+	static protected SecureRandom rng;
+	static{
+	Security.addProvider(new ISAACProvider ());
+	try {
+		rng = SecureRandom.getInstance ("ISAACRandom");
+	} catch (NoSuchAlgorithmException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
 	public BucketLib<T> lib;
 	boolean[] dummyArray;
 

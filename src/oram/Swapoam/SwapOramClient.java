@@ -23,7 +23,7 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 		PlainBlock[][] blocks = getPath(pos);
 		Block<T>[][][] scPath = preparePath(blocks, blocks, blocks);
 
-		lib.flush(scPath[0], pos);
+		lib.flush(scPath[0], pos, scQueue[0]);
 
 		blocks = preparePlainPath(scPath[0], scPath[1]);
 		putPath(blocks, pos);
@@ -34,18 +34,16 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 	public boolean[] readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
 		PlainBlock[][] blocks = getPath(pos);
 		Block<T>[][][] scPath = preparePath(blocks, blocks, blocks);
-		
 		scIden = gen.inputOfAlice(iden);
-
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
 		res = lib.mux(res, res2, res.isDummy);
 		PlainBlock b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);
 		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
+		
 		blocks = preparePlainPath(scPath[0], scPath[1]);
 		putPath(blocks, pos);
-
 		PlainBlock r = outputBlock(finalRes);
 		return r.data;
 //				return new boolean[]{true};
@@ -53,7 +51,7 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 
 
 	public void putBack(boolean[] iden, boolean[] newPos, boolean[] data) throws Exception {
-		boolean[] tmp = new boolean[newPos.length+data.length];
+		boolean[] tmp = new boolean[lengthOfPos+lengthOfData];
 		System.arraycopy(newPos, 0, tmp, 0, lengthOfPos);
 		System.arraycopy(data, 0, tmp, lengthOfPos, lengthOfData);
 
@@ -65,7 +63,7 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 
 		lib.add(scQueue[0], b);
-
+		os.flush();
 		flushOneTime(nextPath());
 		flushOneTime(nextPath());
 	}

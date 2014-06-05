@@ -2,19 +2,16 @@ package test.oram.swaporam;
 
 import flexsc.*;
 import gc.GCSignal;
-import oram.CSCOram.RecursiveCSCOramClient;
-import oram.CSCOram.RecursiveCSCOramServer;
-
+import oram.Swapoam.RecursiveSwapOramClient;
+import oram.Swapoam.RecursiveSwapOramServer;
 import org.junit.Assert;
 import org.junit.Test;
-
 import test.Utils;
-
-public class TestNewOramRec {
+public class TestSwapOramRec {
 	
 	final static int writeCount = 32;
 	final static int readCount = 32;
-	public TestNewOramRec() {
+	public TestSwapOramRec() {
 	}
 	
 	class GenRunnable extends network.Server  implements Runnable{
@@ -48,13 +45,14 @@ public class TestNewOramRec {
 				os.write(logCutoff);
 				os.write(capacity);
 				os.write(dataSize);
+				os.flush();
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				
 				System.out.println("connected");
 				double T = 0;
 				
-				RecursiveCSCOramClient<GCSignal> client = new RecursiveCSCOramClient<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY, 80);
+				RecursiveSwapOramClient<GCSignal> client = new RecursiveSwapOramClient<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
 
 				Flag.bandwidth = 0;
 				for(int i = 0; i < writeCount; ++i) {
@@ -130,7 +128,7 @@ public class TestNewOramRec {
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				System.out.println("connected");
-				RecursiveCSCOramServer<GCSignal> server = new RecursiveCSCOramServer<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY, 80);
+				RecursiveSwapOramServer<GCSignal> server = new RecursiveSwapOramServer<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
 				Flag.bandwidth = 0;
 				for(int i = 0; i < writeCount; ++i) {
 					
@@ -213,7 +211,7 @@ public class TestNewOramRec {
 	
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345, 5, 6, 32,  8, 5);
+		GenRunnable gen = new GenRunnable(12345, 20, 6, 32,  4, 10);
 		EvaRunnable eva = new EvaRunnable("localhost", 12345);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);

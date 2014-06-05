@@ -154,8 +154,8 @@ public class GCGen extends GCCompEnv {
 		else if (lb.equals(R.xor(out)))
 			return true;
 
-//		return false;
-		throw new Exception("bad label at final output.");
+		return false;
+//		throw new Exception("bad label at final output.");
 	}
 	
 	public double outputToAliceFixedPoint(GCSignal[] f, int offset) throws Exception{

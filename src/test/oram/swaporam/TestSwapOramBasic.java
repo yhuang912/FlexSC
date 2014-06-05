@@ -1,17 +1,22 @@
 package test.oram.swaporam;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
+
 import oram.Swapoam.SwapOramClient;
 import oram.Swapoam.SwapOramServer;
+
 import org.junit.Test;
+
 import flexsc.*;
+import gc.GCGen;
 import gc.GCSignal;
 import test.Utils;
 
 
 public class TestSwapOramBasic {
 	final int N = 1<<5;
-	final int capacity = 6;
+	final int capacity = 4;
 	int[] posMap = new int[N];
 	int writecount = N;
 	int readcount = N;
@@ -31,14 +36,15 @@ public class TestSwapOramBasic {
 		}
 		public int[][] idens;
 		public boolean[][] du;
+		public int[] stash;
 
 		public void run() {
 			try {
 				listen(port);
 
 				int data[] = new int[N+1];
-				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
-//				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
+//				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
+				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				
@@ -55,10 +61,12 @@ public class TestSwapOramBasic {
 					posMap[element] = newValue;
 
 					long t2 = System.currentTimeMillis() - t1;
-					System.out.println("time: "+t2/1000.0);
+//					System.out.println("time: "+t2/1000.0+" "+((GCGen)(client.gen)).ands + " "+ 1/((double)t2/((GCGen)(client.gen)).ands));
+//					((GCGen)(client.gen)).ands = 0;
 					Runtime rt = Runtime.getRuntime(); 
 				    double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
 				    System.out.println("mem: "+usedMB);
+
 
 					posMap[element] = newValue;
 				}
@@ -93,6 +101,10 @@ public class TestSwapOramBasic {
 					for(int i = 0; i < client.tree[j].length; ++i)
 						du[j][i]=client.tree[j][i].isDummy;
 				}
+				
+				stash = new int[client.queue.length];
+				for(int j = 0; j < client.queue.length; ++j)
+						stash[j]=Utils.toInt(client.queue[j].iden);
 
 				os.flush();
 
@@ -109,6 +121,7 @@ public class TestSwapOramBasic {
 		int port;
 		public int[][] idens;
 		public boolean[][] du;
+		public int[] stash;
 
 		EvaRunnable (String host, int port) {
 			this.host =  host;
@@ -119,8 +132,8 @@ public class TestSwapOramBasic {
 			try {
 				connect(host, port);
 				
-				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
-//				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
+//				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
+				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
 				
 				for(int i = 0; i < writecount; ++i) {
 					int element = i%N;
@@ -150,6 +163,10 @@ public class TestSwapOramBasic {
 						du[j][i]=server.tree[j][i].isDummy;
 				}
 				
+				
+				stash = new int[server.queue.length];
+				for(int j = 0; j < server.queue.length; ++j)
+					stash[j]=Utils.toInt(server.queue[j].iden);
 				os.flush();
 
 				disconnect();
@@ -170,6 +187,7 @@ public class TestSwapOramBasic {
 		tEva.start();
 		tGen.join();
 		printTree(gen,eva);
+		System.out.println(Arrays.toString(xor(gen.stash, eva.stash)));
 		System.out.print("\n");
 
 		System.out.println();
