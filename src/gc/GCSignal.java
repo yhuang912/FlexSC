@@ -1,16 +1,19 @@
 package gc;
 
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Arrays;
 
+import rand.ISAACProvider;
 import flexsc.Signal;
 
 public class GCSignal extends Signal {
 	static final int len = 10;
 	public byte[] bytes;
 	boolean v;
-	
+
 	static final GCSignal ZERO = new GCSignal(new byte[len]);
 
 	private GCSignal(byte[] b) { bytes = b; }

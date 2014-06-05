@@ -29,7 +29,6 @@ public class GCEva extends GCCompEnv {
 		gtt[0][0] = GCSignal.ZERO;
 	}
 
-	GCSignal sig = new GCSignal(true);
 	public GCSignal inputOfAlice(boolean in) throws Exception {
 		long t = System.currentTimeMillis();
 		GCSignal signal = GCSignal.receive(is);
@@ -183,7 +182,6 @@ public class GCEva extends GCCompEnv {
 	// return zero;
 	// }
 	//
-	GCSignal f = GCSignal.freshLabel(new SecureRandom());
 	public GCSignal xor(GCSignal a, GCSignal b) {
 		if (a.isPublic() && b.isPublic())
 			return new GCSignal(a.v ^ b.v);

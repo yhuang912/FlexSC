@@ -6,14 +6,27 @@ import gc.GCSignal;
 
 import java.math.*;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 
+import rand.ISAACProvider;
 import network.RWBigInteger;
 
 
 public class NPOTSender extends OTSender {
 
-    private static SecureRandom rnd = new SecureRandom();
+//    private static SecureRandom rnd = new SecureRandom();
+	static SecureRandom rnd;
+	static{
+	Security.addProvider(new ISAACProvider ());
+	try {
+		rnd = SecureRandom.getInstance ("ISAACRandom");
+	} catch (NoSuchAlgorithmException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
     private static final int certainty = 80;
 
     private final static int qLength = 160; //512;
@@ -106,9 +119,9 @@ public class NPOTSender extends OTSender {
         }
     }
 
+	GCSignal[][] m = new GCSignal[1][2];
     @Override
     public void send(GCSignal[] msgPair) throws Exception {
-    	GCSignal[][] m = new GCSignal[1][2];
     	m[0][0] = msgPair[0];
     	m[0][1] = msgPair[1];
     	send(m);

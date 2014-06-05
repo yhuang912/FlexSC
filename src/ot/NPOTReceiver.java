@@ -6,13 +6,26 @@ import gc.GCSignal;
 
 import java.math.*;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 
+import rand.ISAACProvider;
 import network.RWBigInteger;
 
 
 public class NPOTReceiver extends OTReceiver {
-    private static SecureRandom rnd = new SecureRandom();
+//    private static SecureRandom rnd = new SecureRandom();
+	static SecureRandom rnd;
+	static{
+	Security.addProvider(new ISAACProvider ());
+	try {
+		rnd = SecureRandom.getInstance ("ISAACRandom");
+	} catch (NoSuchAlgorithmException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
 
     private BigInteger p, q, g, C;
     private BigInteger gr;

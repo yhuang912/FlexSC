@@ -21,16 +21,13 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 	@Override
 	public void flushOneTime(boolean[] pos) throws Exception {
 		PlainBlock[][] blocks = getPath(pos);
-		globalSCPath = preparePath(blocks, blocks, blocks);
-		
-		lib.flush(globalSCPath[0], pos);
-		
-		blocks = preparePlainPath(globalSCPath[0], globalSCPath[1]);
+		Block<T>[][][] scPath = preparePath(blocks, blocks, blocks);
+
+		lib.flush(scPath[0], pos);
+
+		blocks = preparePlainPath(scPath[0], scPath[1]);
 		putPath(blocks, pos);
 	}
-
-
-	Block<T>[][][] globalSCPath;
 
 	Block<T>[][] scQueue;
 	T[] scIden;
@@ -46,7 +43,6 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 		PlainBlock b = randomBlock();
 		Block<T> scb = inputBlockOfClient(b);
 		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
-		
 		blocks = preparePlainPath(scPath[0], scPath[1]);
 		putPath(blocks, pos);
 
@@ -65,10 +61,11 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 
 		T[] scNewPos = Arrays.copyOfRange(SCTmp, 0, lengthOfPos);
 		T[] scData = Arrays.copyOfRange(SCTmp, lengthOfPos, lengthOfData+lengthOfPos);
-
+		
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 
 		lib.add(scQueue[0], b);
+
 		flushOneTime(nextPath());
 		flushOneTime(nextPath());
 	}

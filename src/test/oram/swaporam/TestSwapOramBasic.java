@@ -1,25 +1,22 @@
 package test.oram.swaporam;
 
 import java.security.SecureRandom;
-
-import oram.CSCOram.CSCOramClient;
-import oram.CSCOram.CSCOramServer;
-
+import oram.Swapoam.SwapOramClient;
+import oram.Swapoam.SwapOramServer;
 import org.junit.Test;
-
 import flexsc.*;
 import gc.GCSignal;
 import test.Utils;
 
 
-public class TestNewOramBasic {
+public class TestSwapOramBasic {
 	final int N = 1<<5;
 	final int capacity = 6;
 	int[] posMap = new int[N];
-	int writecount = 1;
-	int readcount = 1;
+	int writecount = N;
+	int readcount = N;
 	int dataSize = 32;
-	public TestNewOramBasic() {
+	public TestSwapOramBasic() {
 		SecureRandom rng = new SecureRandom();
 		for(int i = 0; i < posMap.length; ++i)
 			posMap[i] = rng.nextInt(N);
@@ -40,8 +37,8 @@ public class TestNewOramBasic {
 				listen(port);
 
 				int data[] = new int[N+1];
-//				CSCOramClient<GCSignal> client = new CSCOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
-				CSCOramClient<GCSignal> client = new CSCOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
+				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
+//				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				
@@ -54,7 +51,7 @@ public class TestNewOramBasic {
 					data[element] = 2*element+1;
 					long t1 = System.currentTimeMillis();
 					client.write(element, oldValue, newValue, Utils.fromInt(data[element], client.lengthOfData));
-					os.write(0);
+//					os.write(0);
 					posMap[element] = newValue;
 
 					long t2 = System.currentTimeMillis() - t1;
@@ -73,7 +70,7 @@ public class TestNewOramBasic {
 					System.out.println(element+" "+oldValue+" "+newValue);
 
 					boolean[] b = client.read(element, oldValue, newValue);
-					os.write(0);
+//					os.write(0);
 					posMap[element] = newValue;
 					//Assert.assertTrue(Utils.toInt(b.data) == data[element]);
 					if(Utils.toInt(b) != data[element]) {
@@ -121,23 +118,22 @@ public class TestNewOramBasic {
 		public void run() {
 			try {
 				connect(host, port);
-				System.out.print("!!");
 				
-//				CSCOramServer<GCSignal> server = new CSCOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
-				CSCOramServer<GCSignal> server = new CSCOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
+				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
+//				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
 				
 				for(int i = 0; i < writecount; ++i) {
 					int element = i%N;
 					int oldValue = posMap[element];
 					server.access(oldValue);
-					is.read();
+//					is.read();
 				}
 
 				for(int i = 0; i < readcount; ++i){
 					int element = i%N;
 					int oldValue = posMap[element];
 					server.access(oldValue);
-					is.read();
+//					is.read();
 				}
 				
 				idens = new int[server.tree.length][];

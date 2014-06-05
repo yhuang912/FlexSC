@@ -12,8 +12,8 @@ import test.Utils;
 
 public class TestNewOramRec {
 	
-	final static int writeCount = 3;
-	final static int readCount = 3;
+	final static int writeCount = 100;
+	final static int readCount = 10;
 	public TestNewOramRec() {
 	}
 	
@@ -220,7 +220,7 @@ public class TestNewOramRec {
 		tGen.start(); Thread.sleep(10);
 		tEva.start();
 		tGen.join();
-		printTree(gen,eva);
+//		printTree(gen,eva);
 		System.out.print("\n");
 
 		System.out.println();

@@ -7,12 +7,23 @@ import circuits.FloatFormat;
 import flexsc.Flag;
 import objects.Float.Representation;
 import ot.*;
+import rand.ISAACProvider;
 import test.Utils;
 
 public class GCGen extends GCCompEnv {
 
 	public final GCSignal R;
-	SecureRandom rnd = new SecureRandom();
+//	SecureRandom rnd = new SecureRandom();
+	static SecureRandom rnd;
+	static{
+	Security.addProvider(new ISAACProvider ());
+	try {
+		rnd = SecureRandom.getInstance ("ISAACRandom");
+	} catch (NoSuchAlgorithmException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
 
 	InputStream is;
 	OutputStream os;
@@ -50,8 +61,6 @@ public class GCGen extends GCCompEnv {
 		return label[0];
 	}
 	
-	GCSignal sig = new GCSignal(true);
-
 	public GCSignal inputOfBob(boolean in) throws Exception {
 		GCSignal[] label = genPair();
 		long t = System.currentTimeMillis();
@@ -145,8 +154,8 @@ public class GCGen extends GCCompEnv {
 		else if (lb.equals(R.xor(out)))
 			return true;
 
-		return false;
-//		throw new Exception("bad label at final output.");
+//		return false;
+		throw new Exception("bad label at final output.");
 	}
 	
 	public double outputToAliceFixedPoint(GCSignal[] f, int offset) throws Exception{
@@ -255,7 +264,6 @@ public class GCGen extends GCCompEnv {
 	// return zero;
 	// }
 	//
-	GCSignal f = GCSignal.freshLabel(new SecureRandom());
 	public GCSignal xor(GCSignal a, GCSignal b) {
 		if (a.isPublic() && b.isPublic())
 			return new GCSignal(a.v ^ b.v);

@@ -26,17 +26,13 @@ public class SwapOramServer<T> extends SwapOramParty<T> {
 	public void flushOneTime(boolean[] pos) throws Exception {
 		PlainBlock[][] blocks = getPath(pos);
 		randomPath = randomPath(blocks);
-		globalSCPath = preparePath(blocks, blocks, randomPath);
+		Block<T>[][][] scPath = preparePath(blocks, blocks, randomPath);
+
+		lib.flush(scPath[0], pos);
 		
-		lib.flush(globalSCPath[0], pos);
-		
-		preparePlainPath(globalSCPath[0], globalSCPath[1]);
+		preparePlainPath(scPath[0], scPath[1]);
 		putPath(randomPath, pos);
 	}
-
-
-	Block<T>[][][] globalSCPath;
-
 
 	Block<T>[][] scQueue;
 	T[] scIden;

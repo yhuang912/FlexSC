@@ -28,6 +28,7 @@ public class CVCompEnv implements CompEnv<Boolean> {
 			int re = is.read();
 			res = re == 1;
 		}
+		os.flush();
 		return new Boolean(res);
 	}
 
@@ -40,6 +41,7 @@ public class CVCompEnv implements CompEnv<Boolean> {
 			int re = is.read();
 			res = re == 1;
 		}
+		os.flush();
 		return new Boolean(res);
 	}
 

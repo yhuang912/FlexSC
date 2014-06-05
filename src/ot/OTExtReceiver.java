@@ -6,14 +6,27 @@ import gc.GCSignal;
 
 import java.math.*;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Arrays;
 
 import network.RWBigInteger;
 import ot.OTExtSender.SecurityParameter;
+import rand.ISAACProvider;
 
 public class OTExtReceiver extends OTReceiver {
-	private static SecureRandom rnd = new SecureRandom();
+//	private static SecureRandom rnd = new SecureRandom();
+	static SecureRandom rnd;
+	static{
+	Security.addProvider(new ISAACProvider ());
+	try {
+		rnd = SecureRandom.getInstance ("ISAACRandom");
+	} catch (NoSuchAlgorithmException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
 
 	private int msgBitLength;
 
@@ -54,13 +67,13 @@ public class OTExtReceiver extends OTReceiver {
 		return Arrays.copyOfRange(received, SecurityParameter.k1, received.length);
 	}
 
+	static BigInteger[][] msgPairs = new BigInteger[SecurityParameter.k1][2];
+	static BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
+
 	static GCSignal[] reverseAndExtend(GCSignal[][] keyPairs, 
 			boolean[] choices, int msgBitLength, 
 			InputStream is, OutputStream os, Cipher cipher) throws Exception {
 		
-		BigInteger[][] msgPairs = new BigInteger[SecurityParameter.k1][2];
-		BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
-
 		BitMatrix T = new BitMatrix(choices.length, SecurityParameter.k1);
 		T.initialize(rnd);
 
