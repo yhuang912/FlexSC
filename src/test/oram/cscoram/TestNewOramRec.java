@@ -48,6 +48,7 @@ public class TestNewOramRec {
 				os.write(logCutoff);
 				os.write(capacity);
 				os.write(dataSize);
+				os.flush();
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				
