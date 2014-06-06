@@ -14,7 +14,7 @@ public class TestAdd extends Test_2Input1Output<GCSignal>{
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();
-		int testCases = 10;
+		int testCases = 1;
 
 		for (int i = 0; i < testCases; i++) {
 			runThreads(new Helper(rnd.nextInt()%(1<<30), rnd.nextInt()%(1<<30), Mode.REAL) {

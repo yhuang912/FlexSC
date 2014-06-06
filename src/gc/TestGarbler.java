@@ -1,6 +1,7 @@
 package gc;
 
 import java.security.SecureRandom;
+
 import org.junit.Test;
 
 public class TestGarbler {
@@ -18,7 +19,10 @@ public class TestGarbler {
 
 	@Test
 	public void test1000() {
-		for(int i = 0; i<10000000; i++)
-			test();
+		long start = System.nanoTime();
+		for(int i = 0; i<10000*1000; i++)
+			gb.enc(a, b, 0, m);
+		long end = System.nanoTime();
+		System.out.println((end - start)*1.0/1000000);
 	}
 }
