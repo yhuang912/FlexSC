@@ -18,7 +18,9 @@ public class ISAACEngine extends SecureRandomSpi {
 	 * <code>java.security.SecureRandom</code>'s <code>getSeed()</code> method.
 	 */
 	public ISAACEngine () {
-		this.isaac = new ISAACAlgorithm (ISAACEngine.packToIntArray (SecureRandom.getSeed (1024)));
+		byte[] temp = new byte[1024];//SecureRandom.getSeed (1024);
+		new SecureRandom().nextBytes(temp);
+		this.isaac = new ISAACAlgorithm (ISAACEngine.packToIntArray (temp));
 	}
 	
 	/**
