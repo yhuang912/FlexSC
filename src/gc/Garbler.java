@@ -22,11 +22,11 @@ final class Garbler {
 	
 	
 	public GCSignal enc(GCSignal lb0, GCSignal lb1, long k, GCSignal m) {
-		return getPadding(lb0, lb1, k);//.xor(m);
+		return getPadding(lb0, lb1, k).xor(m);
 	}
 
 	public GCSignal dec(GCSignal lb0, GCSignal lb1, long k, GCSignal c) {
-		return getPadding(lb0, lb1, k);//.xor(c);
+		return getPadding(lb0, lb1, k).xor(c);
 	}
 	static byte[] a = new byte[2*16];
 	static byte[] key = {1,2,3,4,4,5,6,7,8,1,2,3,4,5,6,7,8};
@@ -38,14 +38,14 @@ final class Garbler {
 		
 //		byte[] cipherText = Aes.intel_AES_enc128_char((ByteBuffer.allocate(lb0.len+lb1.len).put(lb0.bytes).put(lb1.bytes).putLong(k)).array(), a, key, 2);
 		  sha1.update((ByteBuffer.allocate(lb0.len+lb1.len+8).put(lb0.bytes).put(lb1.bytes).putLong(k)));
-          //GCSignal ret = GCSignal.newInstance(sha1.digest());
-		  sha1.digest();
+          GCSignal ret = GCSignal.newInstance(sha1.digest());
+//		  sha1.digest();
 //      GCSignal ret = GCSignal.newInstance(cipherText);
 
 		//        sha1.update(ByteBuffer.allocate(lb0.len+lb1.len+8).put(lb0.bytes).put(lb1.bytes).putLong(k).array());
 //        GCSignal ret = GCSignal.newInstance(sha1.digest(ByteBuffer.allocate(lb0.len+lb1.len+8).put(lb0.bytes).put(lb1.bytes).putLong(k).array()));
 
-        return null;
+        return ret;
 //		return f;
     }
 //	GCSignal f = GCSignal.freshLabel(NEW SecureRandom());

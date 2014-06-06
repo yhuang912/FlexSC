@@ -4,13 +4,13 @@ package caes;
 
 public class AesWrapper {
 
-	SWIGTYPE_p_unsigned_char pt, ct, ky;
+	/*SWIGTYPE_p_unsigned_char pt, ct, ky;
 
 	public AesWrapper() {
 		pt = Aes.new_char_array(16);
 		ct = Aes.new_char_array(16);
 		ky = Aes.new_char_array(16);
-	}
+	}*/
 
 	/*finalize() {
 		Aes.delete_char_array(pt);
@@ -19,7 +19,7 @@ public class AesWrapper {
 	}*/
 
 	// key should be 128 bits
-	public short[] garble(short[] plainText, short[] key) {
+	/*public short[] garble(short[] plainText, short[] key) {
 		int inputLength = getAesLength(plainText.length);
 		//final long startTime1 = System.nanoTime();
 		int padding = (inputLength % 16 == 0) ? 0 : 1;
@@ -105,5 +105,5 @@ public class AesWrapper {
 			i++;
 		}
 		return b;
-	}
+	}*/
 }
