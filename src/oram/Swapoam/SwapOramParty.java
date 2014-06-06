@@ -17,7 +17,7 @@ public abstract class SwapOramParty<T> extends TreeBasedOramParty<T> {
 			Party p, int cap, Mode m, int sp) throws Exception {
 		super(is, os, N, dataSize, p, cap, m);
 		
-		queueCapacity = 55;
+		queueCapacity = 50;
 		queue = new PlainBlock[queueCapacity];
 		
 		for(int i = 0; i < queue.length; ++i) 

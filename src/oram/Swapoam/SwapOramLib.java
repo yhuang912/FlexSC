@@ -1,5 +1,7 @@
 package oram.Swapoam;
 
+import java.util.Arrays;
+
 import oram.Block;
 import oram.BucketLib;
 import flexsc.CompEnv;
@@ -105,6 +107,7 @@ public class SwapOramLib<T> extends BucketLib<T> {
 		T[] pathSignal =  env.newTArray(path.length);
 		for(int i = 0; i < path.length; ++i)
 			pathSignal[i] = path[i] ? SIGNAL_ONE : SIGNAL_ZERO;
+		
 		{
 			T[][] max = DeepestBlock(scQueue, pathSignal);
 			T[] maxIden = max[0];
@@ -118,17 +121,17 @@ public class SwapOramLib<T> extends BucketLib<T> {
 			for(int j = 0; j < scPath[0].length; ++j)
 				full = and(full, not(scPath[0][j].isDummy));
 
-			Block<T> maxBlock = conditionalReadAndRemove(scQueue, maxIden, not(max[2][0]));
+			T shouldPush = or(and(not(max[2][0]), leq(maxdepth, mindepth)), min[2][0]);
+			
 			Block<T> minBlock = conditionalReadAndRemove(scPath[0], minIden, full);
-//			T shouldPush = and(not(max[2][0]), or(leq(maxdepth, mindepth), min[2][0]));//!!
-			and(not(max[2][0]), full)
+			Block<T> maxBlock = conditionalReadAndRemove(scQueue, maxIden,shouldPush);
 			
 			conditionalAdd(scPath[0], maxBlock, shouldPush);
-			conditionalAdd(scQueue, minBlock, full);			
+			conditionalAdd(scQueue, minBlock, full);
 		}
 
 		
-		for(int i = logN; i < logN -1; ++i) {
+		for(int i = 0; i < logN -1; ++i) {
 			T[][] max = DeepestBlock(scPath[i], pathSignal);
 			T[] maxIden = max[0];
 			T[] maxdepth= max[1];
@@ -137,18 +140,19 @@ public class SwapOramLib<T> extends BucketLib<T> {
 			T[] minIden = min[0];
 			T[] mindepth= min[1];
 
-			T cannotPush = leq(maxdepth, toSignals((1<<i)-1, maxdepth.length));
-
 			T full = SIGNAL_ONE;
 			for(int j = 0; j < scPath[i+1].length; ++j)
 				full = and(full, not(scPath[i+1][j].isDummy));
-
-			Block<T> maxBlock = readAndRemove(scPath[i], maxIden);
+			T cannotPush = or(geq(maxdepth, toSignals((1<<(maxdepth.length-i+1))-1, maxdepth.length)), max[2][0]);
+			
+			T shouldPush = or(and(not(max[2][0]), leq(maxdepth, mindepth)), min[2][0]);
+			shouldPush = and(shouldPush, not(cannotPush));
+			
 			Block<T> minBlock = conditionalReadAndRemove(scPath[i+1], minIden, full);
-			T shouldPush = leq(maxdepth, mindepth);//!!
+			Block<T> maxBlock = conditionalReadAndRemove(scPath[i], maxIden, shouldPush);
 			
 			conditionalAdd(scPath[i+1], maxBlock, shouldPush);
-			conditionalAdd(scPath[i], minBlock, full);			
+			conditionalAdd(scPath[i], minBlock, full);
 		}
 	}
 }

@@ -19,7 +19,7 @@ public class TestSwapOramBasic {
 	final int capacity = 4;
 	int[] posMap = new int[N];
 	int writecount = N;
-	int readcount = N;
+	int readcount = N*5 ;
 	int dataSize = 32;
 	public TestSwapOramBasic() {
 		SecureRandom rng = new SecureRandom();
