@@ -216,15 +216,9 @@ SWIGEXPORT jbyteArray JNICALL Java_caes_AesJNI_intel_1AES_1enc128_1char(JNIEnv *
     arg3 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg3, 0); 
   }
   arg4 = (size_t)jarg4; 
-  //printf("before call\n");
   result = (char *)intel_AES_enc128_char(arg1,arg2,arg3,arg4);
-  //printf("result array %d\n", strlen(result));
-  if (result) jresult = (*jenv)->NewByteArray(jenv, arg4*16);
-  int i;
+    if (result) jresult = (*jenv)->NewByteArray(jenv, arg4*16);
   (*jenv)->SetByteArrayRegion(jenv, jresult, 0, arg4*16, result);
- /* for (i = 0; i < 16; i++) {
-    jresult[i] = result[i];
-  }*/
   {
     (*jenv)->ReleaseByteArrayElements(jenv, jarg1, (jbyte *) arg1, 0); 
   }
@@ -261,10 +255,8 @@ SWIGEXPORT jbyteArray JNICALL Java_caes_AesJNI_intel_1AES_1dec128_1char(JNIEnv *
     arg3 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg3, 0); 
   }
   arg4 = (size_t)jarg4; 
-  //printf("before decryption call\n");
   result = (char *)intel_AES_dec128_char(arg1,arg2,arg3,arg4);
   if (result) jresult = (*jenv)->NewByteArray(jenv, arg4*16);
-  int i;
   (*jenv)->SetByteArrayRegion(jenv, jresult, 0, arg4*16, result);
   {
     (*jenv)->ReleaseByteArrayElements(jenv, jarg1, (jbyte *) arg1, 0); 

@@ -72,30 +72,39 @@ public class TestAes {
 		System.loadLibrary("aes");
 		String ky = new String(key);
 		byte[] temp = {
+		        (byte) 0xff, (byte) 0x00, 0x69, 0x73, 0x49, 0x73, 0x41, 0x53, 0x65, 0x63, 0x72, 0x65, 0x74, 0x4b, 0x65, 0x79,
 		        (byte) 0xff, (byte) 0x00, 0x69, 0x73, 0x49, 0x73, 0x41, 0x53, 0x65, 0x63, 0x72, 0x65, 0x74, 0x4b, 0x65, 0x79
 			};
 		byte[] pt = {
+				2,65,-128,0,-127,127,70,-114,111,-74,-83,-127,63,110,41,-38,
 				2,65,-128,0,-127,127,70,-114,111,-74,-83,-127,63,110,41,-38
 		        //(byte) 0xff, (byte) 0x00, 0x69, 0x73, 0x49, 0x73, 0x41, 0x53, 0x65, 0x63, 0x72, 0x65, 0x74, 0x4b, 0x65, 0x79
 			};
 		byte[] ct = {
+				-71,98,-77,127,95,-47,115,-22,116,-97,-9,-40,-85,-105,-106,85,
 				-71,98,-77,127,95,-47,115,-22,116,-97,-9,-40,-85,-105,-106,85
 		        //(byte) 0xff, (byte) 0x00, 0x69, 0x73, 0x49, 0x73, 0x41, 0x53, 0x65, 0x63, 0x72, 0x65, 0x74, 0x4b, 0x65, 0x79
 			};
-		byte[] cipherText = Aes.intel_AES_enc128_char(pt, temp, key, 1);
-		System.out.println("Java " + cipherText.length);
-		for (int i = 0; i < cipherText.length; i++) {
-			System.out.println((byte) cipherText[i]);
+		long start = System.nanoTime();
+		for (int j = 0; j < 1000*1000*10; j++) {
+			pt[0]++;
+			byte[] cipherText = Aes.intel_AES_enc128_char(pt, temp, key, 2);
+			/*System.out.println("Java " + cipherText.length);
+			for (int i = 0; i < cipherText.length; i++) {
+				System.out.println((byte) cipherText[i]);
+			}
+			System.out.println("--------");*/
+			//byte[] plainText = Aes.intel_AES_dec128_char(cipherText, temp, key, 2);
+			// System.out.println("old " + new String(pt));
+			//System.out.println("new " + plainText);
+			/*for (int i = 0; i < plainText.length; i++) {
+				if (pt[i] != plainText[i])
+					System.out.println("Failed");
+				//System.out.println("hi" + (byte) plainText[i]);
+		
+			}*/
 		}
-		System.out.println("--------");
-		byte[] plainText = Aes.intel_AES_dec128_char(cipherText, temp, key, 1);
-		// System.out.println("old " + new String(pt));
-		//System.out.println("new " + plainText);
-		for (int i = 0; i < plainText.length; i++) {
-			if (pt[i] != plainText[i])
-				System.out.println("Failed");
-			System.out.println("hi" + (byte) plainText[i]);
-	
-		}
+		long end = System.nanoTime();
+		System.out.println("time " + (end - start)*1.0/1000000);
 	}
 }
