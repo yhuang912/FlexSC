@@ -18,7 +18,7 @@ import test.Utils;
 
 
 public class TestBigInteger<T> {
-	public final int LENGTH = 2048*64;
+	public final int LENGTH = 100000;
 	final int RANGE = LENGTH;
 	public abstract class Helper {
 		BigInteger intA, intB;

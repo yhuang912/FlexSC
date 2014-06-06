@@ -80,10 +80,11 @@ public class OTExtSender extends OTSender {
 
 	// Given s and keys, obliviously sends msgPairs which contains 'numOfPairs'
 	// pairs of strings, each of length 'msgBitLength' bits.
-	static BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
 
     static void reverseAndExtend(boolean[] s, GCSignal[] keys, 
     		int msgBitLength, GCSignal[][] msgPairs, InputStream is, OutputStream os, Cipher cipher) throws Exception {
+    	BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
+
     	for (int i = 0; i < SecurityParameter.k1; i++) {
     		cphPairs[i][0] = RWBigInteger.readBI(is);
     		cphPairs[i][1] = RWBigInteger.readBI(is);

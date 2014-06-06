@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-	static int bufferSize = 60000;
+	static int bufferSize = 600000;
 	private ServerSocket sock;
 	
 	protected InputStream is;

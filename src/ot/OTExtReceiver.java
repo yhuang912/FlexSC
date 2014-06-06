@@ -42,10 +42,11 @@ public class OTExtReceiver extends OTReceiver {
     	
 		initialize();
 	}
-	GCSignal[] keys = new GCSignal[SecurityParameter.k1];
 	boolean[] s = new boolean[SecurityParameter.k1];
 
 	public GCSignal[] receive(boolean[] choices) throws Exception {
+		GCSignal[] keys = new GCSignal[SecurityParameter.k1];
+
 		boolean[] c = new boolean[SecurityParameter.k1 + choices.length];
 		for (int i = 0; i < SecurityParameter.k1; i++) 
 			c[i] = rnd.nextBoolean();
@@ -67,12 +68,13 @@ public class OTExtReceiver extends OTReceiver {
 		return Arrays.copyOfRange(received, SecurityParameter.k1, received.length);
 	}
 
-	static BigInteger[][] msgPairs = new BigInteger[SecurityParameter.k1][2];
-	static BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
+	
 
 	static GCSignal[] reverseAndExtend(GCSignal[][] keyPairs, 
 			boolean[] choices, int msgBitLength, 
 			InputStream is, OutputStream os, Cipher cipher) throws Exception {
+		BigInteger[][] msgPairs = new BigInteger[SecurityParameter.k1][2];
+		BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];	
 		
 		BitMatrix T = new BitMatrix(choices.length, SecurityParameter.k1);
 		T.initialize(rnd);
@@ -124,6 +126,7 @@ public class OTExtReceiver extends OTReceiver {
 		}
 
 		snder.send(keyPairs);
+		os.flush();
 	}
 	
 	GCSignal[] pool;
