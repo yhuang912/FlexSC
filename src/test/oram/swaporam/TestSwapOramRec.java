@@ -12,7 +12,7 @@ public class TestSwapOramRec {
 	
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345, 20, 6, 32,  4, 10);
+		GenRunnable gen = new GenRunnable(12345, 10, 6, 32,  4, 10);
 		EvaRunnable eva = new EvaRunnable("localhost", 12345);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);

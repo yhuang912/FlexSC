@@ -29,4 +29,16 @@ public class Server {
 
 		sock.close(); 
 	}
+	
+	static public byte[] readBytes(InputStream is, int len) throws IOException
+	{
+		byte[] temp = new byte[len];
+		int remain = len;
+		remain -= is.read(temp);
+		while(0 != remain)
+		{
+			remain -= is.read(temp, 10-remain, remain);
+		}
+		return temp;
+	}
 }

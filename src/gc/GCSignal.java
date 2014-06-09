@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Arrays;
 
+import network.Server;
 import rand.ISAACProvider;
 import flexsc.Signal;
 
@@ -63,8 +64,11 @@ public class GCSignal extends Signal {
 
 	// 'send' and 'receive' are supposed to be used only for secret signals
 	public static GCSignal receive(InputStream ois) {
-		byte[] b = new byte[len];
-		try { ois.read(b);	}
+		byte[] b = null;
+		try {
+			b = Server.readBytes(ois, len);
+//			ois.read(b);	
+		}
 		catch (Exception e) { e.printStackTrace(); }
 		return new GCSignal(b);
 	}

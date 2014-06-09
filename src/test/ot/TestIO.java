@@ -48,7 +48,14 @@
 		
 						for (int i = 0; i < n; i++) {
 							byte[] temp = new byte[10];
-							is.read(temp);
+							int remain = 10;
+							remain -= is.read(temp);
+							while(0 != remain)
+							{
+								remain -= is.read(temp, 10-remain, remain);
+							}
+//							if(a != 10)
+//								System.out.println(a);
 							for(int j = 0; j < 10; ++j)
 								if(temp[j] != d){
 									System.out.println("weird!"+" "+i+" "+j+" "+temp[j]);
