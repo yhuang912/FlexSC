@@ -2,8 +2,8 @@ package oram.counter;
 
 import java.util.Arrays;
 
-import oram.Swapoam.SwapOramClient;
-import oram.Swapoam.SwapOramServer;
+import oram.swapoam.SwapOramClient;
+import oram.swapoam.SwapOramServer;
 import pm.PMCompEnv;
 import flexsc.*;
 import test.Utils;

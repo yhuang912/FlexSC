@@ -1,7 +1,7 @@
 package oram.counter;
 
-import oram.Swapoam.RecursiveSwapOramClient;
-import oram.Swapoam.RecursiveSwapOramServer;
+import oram.swapoam.RecursiveSwapOramClient;
+import oram.swapoam.RecursiveSwapOramServer;
 import pm.PMCompEnv;
 import flexsc.*;
 import test.Utils;

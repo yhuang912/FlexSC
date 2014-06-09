@@ -1,13 +1,10 @@
-package oram.Swapoam;
+package oram.swapoam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import flexsc.*;
 import oram.PlainBlock;
 import oram.TreeBasedOramParty;
-import test.Utils;
-
 
 
 public abstract class SwapOramParty<T> extends TreeBasedOramParty<T> {
@@ -17,6 +14,7 @@ public abstract class SwapOramParty<T> extends TreeBasedOramParty<T> {
 			Party p, int cap, Mode m, int sp) throws Exception {
 		super(is, os, N, dataSize, p, cap, m);
 		
+		//to be tuned
 		queueCapacity = 50;
 		queue = new PlainBlock[queueCapacity];
 		
@@ -26,8 +24,7 @@ public abstract class SwapOramParty<T> extends TreeBasedOramParty<T> {
 	
 	abstract public void flushOneTime(boolean[] pos) throws Exception;
 	int cnt = 0;	
-	 
-	//to be implemtned
+
 	boolean[] nextPath()
 	{
 		boolean [] res = new boolean[logN];

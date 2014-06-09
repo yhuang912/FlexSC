@@ -1,9 +1,8 @@
-package oram.Swapoam;
+package oram.swapoam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-
 import oram.Block;
 import oram.PlainBlock;
 import test.Utils;
@@ -12,6 +11,10 @@ import flexsc.*;
 
 public class SwapOramServer<T> extends SwapOramParty<T> {
 	SwapOramLib<T> lib;
+	Block<T>[][] scQueue;
+	T[] scIden;
+	PlainBlock[] randomQueue;
+
 	public SwapOramServer(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int cap, Mode m, int sp) throws Exception {
 		super(is, os, N, dataSize, p, cap, m, sp);
@@ -32,9 +35,6 @@ public class SwapOramServer<T> extends SwapOramParty<T> {
 		putPath(randPath, pos);
 	}
 
-	Block<T>[][] scQueue;
-	T[] scIden;
-	PlainBlock[] randomQueue;
 	public void readAndRemove(boolean[] pos) throws Exception {
 		PlainBlock[][] blocks = getPath(pos);
 		PlainBlock[][] ranPath = randomPath(blocks);
@@ -62,11 +62,10 @@ public class SwapOramServer<T> extends SwapOramParty<T> {
 
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 		lib.add(scQueue[0], b);
-
 		
 		flushOneTime(nextPath());
 		flushOneTime(nextPath());
-	}	
+	}
 
 	public void access(int pos) throws Exception {
 		readAndRemove(Utils.fromInt(pos, lengthOfPos));
@@ -76,7 +75,5 @@ public class SwapOramServer<T> extends SwapOramParty<T> {
 	public void access(boolean[] pos) throws Exception {
 		access(Utils.toInt(pos));
 	}
-
-
 
 }

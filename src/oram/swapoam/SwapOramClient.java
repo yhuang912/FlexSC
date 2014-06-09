@@ -1,4 +1,4 @@
-package oram.Swapoam;
+package oram.swapoam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +11,9 @@ import flexsc.*;
 
 public class SwapOramClient<T> extends SwapOramParty<T> {
 	SwapOramLib<T> lib;
+	Block<T>[][] scQueue;
+	T[] scIden;
+	
 	public SwapOramClient(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int cap, Mode m, int sp) throws Exception {
 		super(is, os, N, dataSize, p, cap, m, sp);
@@ -29,12 +32,12 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 		putPath(blocks, pos);
 	}
 
-	Block<T>[][] scQueue;
-	T[] scIden;
+
 	public boolean[] readAndRemove(boolean[] iden, boolean[] pos) throws Exception {
 		PlainBlock[][] blocks = getPath(pos);
 		Block<T>[][][] scPath = preparePath(blocks, blocks, blocks);
 		scIden = gen.inputOfAlice(iden);
+		
 		Block<T> res = lib.readAndRemove(scPath[0], scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue[0], scIden);
 		res = lib.mux(res, res2, res.isDummy);
@@ -46,7 +49,6 @@ public class SwapOramClient<T> extends SwapOramParty<T> {
 		putPath(blocks, pos);
 		PlainBlock r = outputBlock(finalRes);
 		return r.data;
-//				return new boolean[]{true};
 	}
 
 

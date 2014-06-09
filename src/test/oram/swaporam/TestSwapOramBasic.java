@@ -3,19 +3,18 @@ package test.oram.swaporam;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import oram.Swapoam.SwapOramClient;
-import oram.Swapoam.SwapOramServer;
+import oram.swapoam.SwapOramClient;
+import oram.swapoam.SwapOramServer;
 
 import org.junit.Test;
 
 import flexsc.*;
-import gc.GCGen;
 import gc.GCSignal;
 import test.Utils;
 
 
 public class TestSwapOramBasic {
-	final int N = 1<<5;
+	final int N = 1<<10;
 	final int capacity = 4;
 	int[] posMap = new int[N];
 	int writecount = N;

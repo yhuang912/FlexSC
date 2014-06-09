@@ -1,4 +1,4 @@
-package oram.Swapoam;
+package oram.swapoam;
 
 import java.io.IOException;
 import java.io.InputStream;

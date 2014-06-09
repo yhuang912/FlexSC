@@ -15,7 +15,7 @@ import test.Utils;
 
 
 public class TestNewOramBasic {
-	final int N = 1<<20;
+	final int N = 1<<5;
 	final int capacity = 6;
 	int[] posMap = new int[N];
 	int writecount = N;
@@ -42,8 +42,8 @@ public class TestNewOramBasic {
 				listen(port);
 
 				int data[] = new int[N+1];
-				CSCOramClient<GCSignal> client = new CSCOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
-//				CSCOramClient<GCSignal> client = new CSCOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
+//				CSCOramClient<GCSignal> client = new CSCOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
+				CSCOramClient<GCSignal> client = new CSCOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				
@@ -59,8 +59,7 @@ public class TestNewOramBasic {
 					posMap[element] = newValue;
 
 					long t2 = System.currentTimeMillis() - t1;
-					System.out.println("time: "+t2/1000.0+" "+((GCGen)(client.gen)).ands + " "+ 1/((double)t2/((GCGen)(client.gen)).ands));
-					((GCGen)(client.gen)).ands = 0;
+					System.out.println("time: "+t2/1000.0);
 					Runtime rt = Runtime.getRuntime(); 
 				    double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
 				    System.out.println("mem: "+usedMB);
@@ -124,8 +123,8 @@ public class TestNewOramBasic {
 				connect(host, port);
 				System.out.print("!!");
 				
-				CSCOramServer<GCSignal> server = new CSCOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
-//				CSCOramServer<GCSignal> server = new CSCOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
+//				CSCOramServer<GCSignal> server = new CSCOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
+				CSCOramServer<GCSignal> server = new CSCOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
 				
 				for(int i = 0; i < writecount; ++i) {
 					int element = i%N;
