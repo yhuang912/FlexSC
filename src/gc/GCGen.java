@@ -54,96 +54,57 @@ public class GCGen extends GCCompEnv {
 	}
 
 	public GCSignal inputOfAlice(boolean in) throws Exception {
+		Flag.sw.startOT();
 		GCSignal[] label = genPair();
-		long t = System.currentTimeMillis();
 		label[in ? 1 : 0].send(os);
-		Flag.OTTotalTime += (System.currentTimeMillis()-t);
+		os.flush();
+		Flag.sw.stopOT();
 		return label[0];
 	}
 	
 	public GCSignal inputOfBob(boolean in) throws Exception {
+		Flag.sw.startOT();
 		GCSignal[] label = genPair();
-		long t = System.currentTimeMillis();
 		snd.send(label);
-		Flag.OTTotalTime += (System.currentTimeMillis()-t);
+		Flag.sw.stopOT();
 		return label[0];
 	}
 	
 	public GCSignal[] inputOfAlice(boolean[] x) throws Exception {
+		Flag.sw.startOT();
+		GCSignal[][] pairs = new GCSignal[x.length][2];
 		GCSignal[] result = new GCSignal[x.length];
+		for(int i = 0; i < x.length; ++i){
+			pairs[i] = genPair();
+			result[i] = pairs[i][0];
+		}
 		for(int i = 0; i < x.length; ++i)
-			result[i] = inputOfAlice(x[i]);
+			pairs[i][x[i] ? 1 : 0].send(os);
 		os.flush();
+		Flag.sw.stopOT();
 		return result;
 	}
 
 	public GCSignal[] inputOfBob(boolean[] x) throws Exception {
+		Flag.sw.startOT();
 		GCSignal[][] pair = new GCSignal[x.length][2];
 		for(int i = 0; i < x.length; ++i)
 			pair[i] = genPair();
-		long t = System.currentTimeMillis();
 		snd.send(pair);
-		Flag.OTTotalTime += (System.currentTimeMillis()-t);
 		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
 			result[i] = pair[i][0];
-
+		Flag.sw.stopOT();
 		return result;
 
 	}
-
 	
-	public Representation<GCSignal> inputOfAliceFloatPoint(double d, int widthV, int widthP) throws Exception {
-		FloatFormat f = new FloatFormat(d, widthV, widthP);
-		GCSignal signalS = inputOfAlice(f.s);
-		GCSignal signalZ = inputOfAlice(f.z);
-		GCSignal[] v = inputOfAlice(f.v);
-		GCSignal[] p = inputOfAlice(f.p);
-		
-		return new Representation<GCSignal>(signalS, p, v, signalZ);
-	}
-	
-
-//	public Representation<GCSignal> inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
-//		GCSignal signalS = inputOfGen(f.s);
-//		GCSignal signalZ = inputOfGen(f.z);
-//		GCSignal[] v = inputOfGen(f.v);
-//		GCSignal[] p = inputOfGen(f.p);
-//		
-//		return new Representation<GCSignal>(signalS, p, v, signalZ);
-//	}	
-
-	public Representation<GCSignal> inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
-		GCSignal signalS = inputOfAlice(f.s);
-		GCSignal signalZ = inputOfAlice(f.z);
-		GCSignal[] v = inputOfAlice(f.v);
-		GCSignal[] p = inputOfAlice(f.p);
-		
-		return new Representation<GCSignal>(signalS, p, v, signalZ);
-	}	
-
-	
-	public Representation<GCSignal> inputOfBobFloatPoint(double d, int widthV, int widthP) throws Exception {
-		FloatFormat f = new FloatFormat(0, widthV, widthP);
-		GCSignal signalS = inputOfBob(false);
-		GCSignal signalZ = inputOfBob(false);
-		GCSignal[] v = inputOfBob(f.v);
-		GCSignal[] p = inputOfBob(f.p);
-		
-		return new Representation<GCSignal>(signalS, p, v, signalZ);
-	}
-
-	public GCSignal[] inputOfAliceFixedPoint(double a, int width, int offset) throws Exception {
-		GCSignal[] result = inputOfAlice(Utils.fromFixPoint(a,width,offset));
-		return result;
-	}
-	
-	public GCSignal[] inputOfBobFixedPoint(double a, int width, int offset) throws Exception {
-		return inputOfBob(new boolean[width]);
-	}
-	
+	boolean gatesRemain = false;
 	public boolean outputToAlice(GCSignal out) throws Exception {
-		os.flush();
+		if(gatesRemain){
+			gatesRemain = false;
+			os.flush();
+		}
 
 		if (out.isPublic())
 			return out.v;
@@ -178,9 +139,7 @@ public class GCGen extends GCCompEnv {
 		boolean[] p = outputToAlice(gcf.p);
 		return new FloatFormat(v, p, s, z).toDouble();
 	}
-	// public boolean transOutputToEva(BitSet out) throws Exception {
-	//
-	// }
+
 
 	private GCSignal[][] gtt = new GCSignal[2][2];
 	private GCSignal labelL[] = new GCSignal[2];
@@ -224,11 +183,11 @@ public class GCGen extends GCCompEnv {
 
 	private void sendGTT() {
 		try {
-			long t = System.currentTimeMillis();
+			Flag.sw.startGCIO();
 			gtt[0][1].send(os);
 			gtt[1][0].send(os);
 			gtt[1][1].send(os);
-			Flag.GargleIOTime += (System.currentTimeMillis()-t);
+			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -236,8 +195,7 @@ public class GCGen extends GCCompEnv {
 	}
 	
 	public GCSignal and(GCSignal a, GCSignal b) {
-		++ands;
-		long t = System.currentTimeMillis();
+		Flag.sw.startGC();
 		GCSignal res;
 		if (a.isPublic() && b.isPublic())
 			res = new GCSignal(a.v && b.v);
@@ -250,20 +208,13 @@ public class GCGen extends GCCompEnv {
 			
 			sendGTT();
 			gid++;
+			gatesRemain = true;
 			res = ret;
 		}
-		Flag.GarbleTime += (System.currentTimeMillis()-t);
+		Flag.sw.stopGC();
 		return res;
 	}
 
-	// public BitSet or(BitSet a, BitSet b) {
-	// BitSet zero = new BitSet();
-	// if (a.equals(R) || b.equals(R))
-	// return R;
-	// else
-	// return zero;
-	// }
-	//
 	public GCSignal xor(GCSignal a, GCSignal b) {
 		if (a.isPublic() && b.isPublic())
 			return new GCSignal(a.v ^ b.v);
@@ -283,4 +234,44 @@ public class GCGen extends GCCompEnv {
 			return R.xor(a);
 	}
 
+
+	
+	public Representation<GCSignal> inputOfAliceFloatPoint(double d, int widthV, int widthP) throws Exception {
+		FloatFormat f = new FloatFormat(d, widthV, widthP);
+		GCSignal signalS = inputOfAlice(f.s);
+		GCSignal signalZ = inputOfAlice(f.z);
+		GCSignal[] v = inputOfAlice(f.v);
+		GCSignal[] p = inputOfAlice(f.p);
+		
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
+	}
+
+	public Representation<GCSignal> inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
+		GCSignal signalS = inputOfAlice(f.s);
+		GCSignal signalZ = inputOfAlice(f.z);
+		GCSignal[] v = inputOfAlice(f.v);
+		GCSignal[] p = inputOfAlice(f.p);
+		
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
+	}	
+
+	
+	public Representation<GCSignal> inputOfBobFloatPoint(double d, int widthV, int widthP) throws Exception {
+		FloatFormat f = new FloatFormat(0, widthV, widthP);
+		GCSignal signalS = inputOfBob(false);
+		GCSignal signalZ = inputOfBob(false);
+		GCSignal[] v = inputOfBob(f.v);
+		GCSignal[] p = inputOfBob(f.p);
+		
+		return new Representation<GCSignal>(signalS, p, v, signalZ);
+	}
+
+	public GCSignal[] inputOfAliceFixedPoint(double a, int width, int offset) throws Exception {
+		GCSignal[] result = inputOfAlice(Utils.fromFixPoint(a,width,offset));
+		return result;
+	}
+	
+	public GCSignal[] inputOfBobFixedPoint(double a, int width, int offset) throws Exception {
+		return inputOfBob(new boolean[width]);
+	}
 }

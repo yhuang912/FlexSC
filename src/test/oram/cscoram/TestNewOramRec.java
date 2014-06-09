@@ -57,16 +57,10 @@ public class TestNewOramRec {
 				
 				RecursiveCSCOramClient<GCSignal> client = new RecursiveCSCOramClient<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
 
-				Flag.bandwidth = 0;
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					
-					long t1 = System.currentTimeMillis();
 					client.write(element, Utils.fromInt(element, dataSize));
-					long t2 = System.currentTimeMillis() - t1;
-					Flag.TotalTime += t2;
-					System.out.println("time: "+t2/1000.0);
-					T+=t2;
 					//System.gc();
 					Runtime rt = Runtime.getRuntime(); 
 				    double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
@@ -132,17 +126,8 @@ public class TestNewOramRec {
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				System.out.println("connected");
 				RecursiveCSCOramServer<GCSignal> server = new RecursiveCSCOramServer<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
-				Flag.bandwidth = 0;
 				for(int i = 0; i < writeCount; ++i) {
-					
-					long t1 = System.currentTimeMillis();
 					server.access();
-					long t2 = System.currentTimeMillis() - t1;
-					Flag.TotalTime += t2;
-					System.out.println("time: "+t2/1000.0);
-
-					
-					
 				}
 
 				for(int i = 0; i < readCount; ++i){

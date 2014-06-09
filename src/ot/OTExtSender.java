@@ -2,6 +2,7 @@
 
 package ot;
 
+import flexsc.Flag;
 import gc.GCSignal;
 
 import java.math.*;
@@ -19,7 +20,6 @@ public class OTExtSender extends OTSender {
 		public static final int k1 = 80;    // number of columns in T
     }
 
-//    private static SecureRandom rnd = new SecureRandom();
 	private static SecureRandom rnd;
 	static{
 	Security.addProvider(new ISAACProvider ());
@@ -85,11 +85,14 @@ public class OTExtSender extends OTSender {
     		int msgBitLength, GCSignal[][] msgPairs, InputStream is, OutputStream os, Cipher cipher) throws Exception {
     	BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
 
+		Flag.sw.startOTIO();
     	for (int i = 0; i < SecurityParameter.k1; i++) {
     		cphPairs[i][0] = RWBigInteger.readBI(is);
     		cphPairs[i][1] = RWBigInteger.readBI(is);
 		}
-    	os.flush();
+		Flag.sw.stopOTIO();
+
+
     	int numOfPairs = msgPairs.length;
 
     	BitMatrix Q = new BitMatrix(numOfPairs, SecurityParameter.k1);
@@ -111,17 +114,21 @@ public class OTExtSender extends OTSender {
 		    y[i][1] = cipher.enc(GCSignal.newInstance(tQ.data[i].xor(biS).toByteArray()), msgPairs[i][1], i);
 		}
 
+		Flag.sw.startOTIO();
 		for (int i = 0; i < numOfPairs; i++) {
 			y[i][0].send(os);
 			y[i][1].send(os);
 		}
-		
 		os.flush();
+		Flag.sw.stopOTIO();
+		
     }
 
     private void initialize() throws Exception {
+    	Flag.sw.startOTIO();
 		os.write(msgBitLength);
 		os.flush();
+		Flag.sw.stopOTIO();
 	
 		rcver = new NPOTReceiver(is, os);
 	

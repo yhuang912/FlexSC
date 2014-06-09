@@ -1,12 +1,9 @@
 package flexsc;
 
+import test.StopWatch;
+
 public class Flag {
-	public static long bandwidth = 0;
-	public static long TotalTime = 0;
-	public static long OTTotalTime = 0;
-	public static long OTIOTime = 0;
-	public static long GarbleTime = 0;
-	public static long GargleIOTime = 0;
+	public static StopWatch sw = new StopWatch();
 	public Flag() {
 		// TODO Auto-generated constructor stub
 	}

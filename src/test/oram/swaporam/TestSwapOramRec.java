@@ -5,7 +5,6 @@ import gc.GCSignal;
 import oram.swapoam.RecursiveSwapOramClient;
 import oram.swapoam.RecursiveSwapOramServer;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import test.Utils;
@@ -20,25 +19,23 @@ public class TestSwapOramRec {
 		tGen.start(); Thread.sleep(10);
 		tEva.start();
 		tGen.join();
-		printTree(gen,eva);
+Flag.sw.print();
 		System.out.print("\n");
-
-		System.out.println();
 	}
 	
-	final static int writeCount = 32;
-	final static int readCount = 32;
+	final static int writeCount = 10;
+	final static int readCount = 0;
 	public TestSwapOramRec() {
 	}
 	
 	class GenRunnable extends network.Server  implements Runnable{
 		int port;
-		int logN = 1<<10;
+		int logN;
 		int N;
-		int recurFactor = 8;
-		int cutoff = 1<<10;
-		int capacity = 6;
-		int dataSize = 32;
+		int recurFactor;
+		int cutoff;
+		int capacity;
+		int dataSize;
 		int logCutoff;
 
 		GenRunnable (int port, int logN, int capacity, int dataSize, int recurFactor, int logCutoff) {
@@ -51,8 +48,6 @@ public class TestSwapOramRec {
 			this.dataSize = dataSize;
 			this.capacity = capacity;
 		}
-		public int[][] idens;
-		public boolean[][] du;
 		public void run() {
 			try {
 				listen(port);
@@ -63,30 +58,25 @@ public class TestSwapOramRec {
 				os.write(capacity);
 				os.write(dataSize);
 				os.flush();
+				
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				
-				System.out.println("connected");
-				double T = 0;
-				
+				System.out.println("connected");				
 				RecursiveSwapOramClient<GCSignal> client = new RecursiveSwapOramClient<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
 
-				Flag.bandwidth = 0;
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 					
-					long t1 = System.currentTimeMillis();
+					Flag.sw.startTotal();
 					client.write(element, Utils.fromInt(element, dataSize));
-					long t2 = System.currentTimeMillis() - t1;
-					Flag.TotalTime += t2;
-					System.out.println("time: "+t2/1000.0);
-					T+=t2;
-					//System.gc();
+					Flag.sw.stopTotal();
+					Flag.sw.addCounter();
+
 					Runtime rt = Runtime.getRuntime(); 
 				    double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
 				    System.out.println("mem: "+usedMB);	
 				}
-				System.out.println("avg time : "+T/10.0);
 
 				for(int i = 0; i < readCount; ++i){
 					int element = i%N;
@@ -98,20 +88,7 @@ public class TestSwapOramRec {
 				
 				os.flush();
 
-				idens = new int[client.clients.get(0).tree.length][];
-				du = new boolean[client.clients.get(0).tree.length][];
-
-				for(int j = 1; j < client.clients.get(0).tree.length; ++j){
-					idens[j] = new int[client.clients.get(0).tree[j].length];
-					for(int i = 0; i < client.clients.get(0).tree[j].length; ++i)
-						idens[j][i]=Utils.toInt(client.clients.get(0).tree[j][i].iden);
-					}
-
-				for(int j = 1; j < client.clients.get(0).tree.length; ++j){
-					du[j] = new boolean[client.clients.get(0).tree[j].length];
-					for(int i = 0; i < client.clients.get(0).tree[j].length; ++i)
-						du[j][i]=client.clients.get(0).tree[j][i].isDummy;
-				}
+			
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -128,8 +105,6 @@ public class TestSwapOramRec {
 			this.host = host;
 			this.port = port;
 		}
-		public int[][] idens;
-		public boolean[][] du;
 		public void run() {
 			try {
 				connect(host, port);
@@ -146,38 +121,17 @@ public class TestSwapOramRec {
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				System.out.println("connected");
 				RecursiveSwapOramServer<GCSignal> server = new RecursiveSwapOramServer<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
-				Flag.bandwidth = 0;
 				for(int i = 0; i < writeCount; ++i) {
-					
-					long t1 = System.currentTimeMillis();
+					Flag.sw.startTotal();
 					server.access();
-					long t2 = System.currentTimeMillis() - t1;
-					Flag.TotalTime += t2;
-					System.out.println("time: "+t2/1000.0);
-
-					
+					Flag.sw.stopTotal();
+					Flag.sw.addCounter();
+					printStatistic();
 					
 				}
 
 				for(int i = 0; i < readCount; ++i){
 					server.access();
-				}
-				
-
-				os.flush();
-				
-				idens = new int[server.servers.get(0).tree.length][];
-				du = new boolean[server.servers.get(0).tree.length][];
-				for(int j = 1; j < server.servers.get(0).tree.length; ++j){
-					idens[j] = new int[server.servers.get(0).tree[j].length];
-					for(int i = 0; i < server.servers.get(0).tree[j].length; ++i)
-						idens[j][i]=Utils.toInt(server.servers.get(0).tree[j][i].iden);
-					}
-
-				for(int j = 1; j < server.servers.get(0).tree.length; ++j){
-					du[j] = new boolean[server.servers.get(0).tree[j].length];
-					for(int i = 0; i < server.servers.get(0).tree[j].length; ++i)
-						du[j][i]=server.servers.get(0).tree[j][i].isDummy;
 				}
 
 				disconnect();
@@ -187,43 +141,4 @@ public class TestSwapOramRec {
 			}
 		}
 	}
-
-	public boolean[] xor(boolean[]a, boolean[] b) {
-		boolean[] res = new boolean[a.length];
-		for(int i = 0; i <res.length; ++i)
-			res[i] = a[i]^b[i];
-		return res;
-	}
-
-	public int[] xor(int[]a, int[] b) {
-		int[] res = new int[a.length];
-		for(int i = 0; i <res.length; ++i)
-			res[i] = a[i]^b[i];
-		return res;
-
-	}
-	
-	public void printTree(GenRunnable gen, EvaRunnable eva) {
-		int k = 1;
-		int i = 1;
-		for(int j = 1; j < gen.idens.length; ++j) {
-			System.out.print("[");
-			int[] a = xor(gen.idens[j], eva.idens[j]);
-			boolean[] bb = xor(gen.du[j], eva.du[j]);
-			for(int p = 0; p < eva.idens[j].length; ++p)
-				if(bb[p])
-					System.out.print("d,");
-				else
-					System.out.print(a[p]+",");
-			System.out.print("]");
-			if(i == k ){
-				k = k*2;
-				i = 0;
-				System.out.print("\n");
-			}
-			++i;
-		}
-		System.out.print("\n");
-	}
-	
 }

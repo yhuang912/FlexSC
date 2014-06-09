@@ -2,6 +2,7 @@
 
 package ot;
 
+import flexsc.Flag;
 import gc.GCSignal;
 
 import java.math.*;
@@ -90,20 +91,27 @@ public class OTExtReceiver extends OTReceiver {
 					choices.length);
 		}
 
+		Flag.sw.startOTIO();
 		for (int i = 0; i < SecurityParameter.k1; i++) {
 			RWBigInteger.writeBI(os, cphPairs[i][0]);
 			RWBigInteger.writeBI(os, cphPairs[i][1]);
 		}
 		os.flush();
+		Flag.sw.stopOTIO();
+
 
 		BitMatrix tT = T.transpose();
 		GCSignal[] res = new GCSignal[choices.length];
 
 		GCSignal[][] y = new GCSignal[choices.length][2];
+		
+		Flag.sw.startOTIO();
 		for (int i = 0; i < choices.length; i++) {
 			y[i][0] = GCSignal.receive(is);
 			y[i][1] = GCSignal.receive(is);
 		}
+		Flag.sw.stopOTIO();
+
 
 		for (int i = 0; i < choices.length; i++) {
 			int sigma = choices[i] ? 1 : 0;
@@ -115,7 +123,9 @@ public class OTExtReceiver extends OTReceiver {
 	}
 
 	private void initialize() throws Exception {
+		Flag.sw.startOTIO();
 		msgBitLength = is.read();
+		Flag.sw.stopOTIO();
 
 		snder = new NPOTSender(OTExtSender.SecurityParameter.k1, is, os);
 

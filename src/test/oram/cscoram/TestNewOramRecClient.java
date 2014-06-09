@@ -12,7 +12,6 @@ public class TestNewOramRecClient {
 		EvaRunnable eva = s.new EvaRunnable("localhost", 12345);
 		
 		eva.run();
-//		System.out.println("bandwidth "+Flag.bandwidth);
-		System.out.println(Flag.GarbleTime+" "+Flag.GargleIOTime+" "+Flag.OTIOTime+" "+Flag.OTTotalTime+" "+ Flag.TotalTime);
+		Flag.sw.print();
 	}
 }

@@ -4,7 +4,7 @@ import test.oram.swaporam.TestSwapOramRec.EvaRunnable;
 import flexsc.Flag;
 
 
-public class TestNewOramRecClient {
+public class TestSwapOramRecClient {
 	
 	public static void main(String [ ] args) {
 		TestSwapOramRec s = new TestSwapOramRec();
@@ -13,7 +13,6 @@ public class TestNewOramRecClient {
 		EvaRunnable eva = s.new EvaRunnable("localhost", 12345);
 		
 		eva.run();
-//		System.out.println("bandwidth "+Flag.bandwidth);
-		System.out.println(Flag.GarbleTime+" "+Flag.GargleIOTime+" "+Flag.OTIOTime+" "+Flag.OTTotalTime+" "+ Flag.TotalTime);
+		Flag.sw.print();
 	}
 }

@@ -12,7 +12,6 @@ public class TestNewOramRecServer {
 		GenRunnable gen = c.new GenRunnable(12345, 20, 6, 32, 4, 10);
 		
 		gen.run();
-//		System.out.println("bandwidth "+Flag.bandwidth);
-		System.out.println(Flag.GarbleTime+" "+Flag.GargleIOTime+" "+Flag.OTIOTime+" "+Flag.OTTotalTime+" "+ Flag.TotalTime);
+		Flag.sw.print();
 	}
 }

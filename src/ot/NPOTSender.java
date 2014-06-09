@@ -2,6 +2,7 @@
 
 package ot;
 
+import flexsc.Flag;
 import gc.GCSignal;
 
 import java.math.*;
@@ -63,6 +64,7 @@ public class NPOTSender extends OTSender {
             r = (BigInteger) fois.readObject();
             fois.close();
 
+        	Flag.sw.startOTIO();
             RWBigInteger.writeBI(os, C);
             RWBigInteger.writeBI(os, p);
             RWBigInteger.writeBI(os, q);
@@ -70,6 +72,7 @@ public class NPOTSender extends OTSender {
             RWBigInteger.writeBI(os, gr);
             os.write(msgBitLength);
             os.flush();
+        	Flag.sw.stopOTIO();
             
             Cr = C.modPow(r, p);
         } else {
@@ -94,6 +97,7 @@ public class NPOTSender extends OTSender {
 
             System.out.println("runs to here");
             
+        	Flag.sw.startOTIO();
             RWBigInteger.writeBI(os, C);
             RWBigInteger.writeBI(os, p);
             RWBigInteger.writeBI(os, q);
@@ -101,6 +105,7 @@ public class NPOTSender extends OTSender {
             RWBigInteger.writeBI(os, gr);
             os.write(msgBitLength);
             os.flush();
+        	Flag.sw.stopOTIO();
             
             Cr = C.modPow(r, p);
 
@@ -129,8 +134,11 @@ public class NPOTSender extends OTSender {
     
     private void step1(GCSignal[][] msgPairs) throws Exception {
     	BigInteger[] pk0 = new BigInteger[msgPairs.length];
+    	Flag.sw.startOTIO();
     	for (int i = 0; i < pk0.length; i++)
     		pk0[i] = RWBigInteger.readBI(is);
+    	Flag.sw.stopOTIO();
+
     	
         BigInteger[] pk1 = new BigInteger[msgPairs.length];
         BigInteger[][] msg = new BigInteger[msgPairs.length][2];
@@ -142,11 +150,13 @@ public class NPOTSender extends OTSender {
             msg[i][0] = cipher.encrypt(pk0[i].toByteArray(), new BigInteger(msgPairs[i][0].bytes), msgBitLength);
             msg[i][1] = cipher.encrypt(pk1[i].toByteArray(), new BigInteger(msgPairs[i][1].bytes), msgBitLength);
         }
-
+    	Flag.sw.startOTIO();
         for (int i = 0; i < msg.length; i++) {
         	RWBigInteger.writeBI(os, msg[i][0]);
         	RWBigInteger.writeBI(os, msg[i][1]);
         }
         os.flush();
+    	Flag.sw.stopOTIO();
+
     }
 }
