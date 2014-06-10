@@ -5,7 +5,6 @@ package ot;
 import gc.GCSignal;
 
 import java.security.*;
-import java.util.Arrays;
 import java.math.*;
 import java.nio.ByteBuffer;
 

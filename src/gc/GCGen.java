@@ -8,6 +8,7 @@ import flexsc.Flag;
 import objects.Float.Representation;
 import ot.*;
 import rand.ISAACProvider;
+import test.StopWatch;
 import test.Utils;
 
 public class GCGen extends GCCompEnv {
@@ -31,8 +32,6 @@ public class GCGen extends GCCompEnv {
 	Garbler gb;
 
 	long gid = 0;
-
-	public long ands = 0;
 	public GCGen(InputStream is, OutputStream os) throws Exception {
 		this.is = is;
 		this.os = os;
@@ -195,6 +194,7 @@ public class GCGen extends GCCompEnv {
 	}
 	
 	public GCSignal and(GCSignal a, GCSignal b) {
+		++StopWatch.ands;
 		Flag.sw.startGC();
 		GCSignal res;
 		if (a.isPublic() && b.isPublic())

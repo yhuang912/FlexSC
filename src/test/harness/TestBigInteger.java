@@ -65,7 +65,6 @@ public class TestBigInteger<T> {
 		          
 				z = gen.outputToAlice(d);
 
-				System.out.println(((GCGen)(gen)).ands);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

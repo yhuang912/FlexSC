@@ -1,7 +1,7 @@
 package test;
 
 public class StopWatch {
-    
+    public static long ands = 0;
     double startTimeOT = 0;
     double stopTimeOT = 0;
     double elapsedTimeOT = 0;
@@ -59,9 +59,10 @@ long counter = 0;
         startTimeTotal = System.nanoTime();
     }
     
-    public void stopTotal() {
+    public double stopTotal() {
     	stopTimeTotal = System.nanoTime();
          elapsedTimeTotal += stopTimeTotal - startTimeTotal;
+         return stopTimeTotal - startTimeTotal;
    }
     
     public void addCounter(){
