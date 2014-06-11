@@ -25,7 +25,7 @@ public class Point<T> {
 		this.isDummy = isDummy ? env.ONE() : env.ZERO();
 	}
 	
-	public int dimension() {
+	public int getDimension() {
 		return coordinates.length;
 	}
 	
