@@ -62,8 +62,8 @@ public class Test_2input1outputPoint<T> {
 					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);						
 				
 				
-				Point<T> a = new Point<T>(gen, 2);
-				Point<T> b = new Point<T>(gen, 2);
+				Point<T> a = new Point<T>(gen, 2, false);
+				Point<T> b = new Point<T>(gen, 2, false);
 				for (int i = 0; i < a.getDimension(); i++) {
 					a.coordinates[i] = gen.inputOfAlice(h.a[i]);
 					b.coordinates[i] = gen.inputOfBob(new boolean[32]);
@@ -104,8 +104,8 @@ public class Test_2input1outputPoint<T> {
 				else if (h.m == Mode.COUNT) 
 					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
 
-				Point<T> a = new Point<T>(eva, 2);
-				Point<T> b = new Point<T>(eva, 2);
+				Point<T> a = new Point<T>(eva, 2, false);
+				Point<T> b = new Point<T>(eva, 2, false);
 				for (int i = 0; i < a.getDimension(); i++) {
 					a.coordinates[i] = eva.inputOfAlice(new boolean[32]);
 					b.coordinates[i] = eva.inputOfBob(h.b[i]);
