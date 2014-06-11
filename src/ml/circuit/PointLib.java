@@ -1,6 +1,5 @@
 package ml.circuit;
 
-import test.Utils;
 import ml.datastructure.Point;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
@@ -67,7 +66,7 @@ public class PointLib<T> extends IntegerLib<T> {
 		assertPointCompatibility(a, b);
 		Point<T> res = new Point<>(env, dimension, false);
 		for (int i = 0; i < dimension; i++) {
-			res.coordinates[i] = multiply(a.coordinates[i], b.coordinates[i]);
+			res.coordinates[i] = multiplyFull(a.coordinates[i], b.coordinates[i]);
 		}
 		res.isDummy = SIGNAL_ZERO;
 		return res;
