@@ -103,6 +103,8 @@ public class GCGen extends GCCompEnv {
 		if(gatesRemain){
 			gatesRemain = false;
 			os.flush();
+//			Flag.sw.ands += ands;
+//			ands = 0;
 		}
 
 		if (out.isPublic())
@@ -194,7 +196,6 @@ public class GCGen extends GCCompEnv {
 	}
 	
 	public GCSignal and(GCSignal a, GCSignal b) {
-		++StopWatch.ands;
 		Flag.sw.startGC();
 		GCSignal res;
 		if (a.isPublic() && b.isPublic())
@@ -204,6 +205,8 @@ public class GCGen extends GCCompEnv {
 		else if (b.isPublic())
 			res = b.v ? a : new GCSignal(false);
 		else {
+			++Flag.sw.ands;
+
 			GCSignal ret = garble(a, b);
 			
 			sendGTT();

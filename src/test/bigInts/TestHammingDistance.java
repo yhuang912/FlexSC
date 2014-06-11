@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import gc.GCSignal;
 
@@ -18,7 +19,7 @@ public class TestHammingDistance extends TestBigInteger<GCSignal>{
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();
-		int testCases = 1;
+		int testCases = 20;
 
 		for (int i = 0; i < testCases; i++) {
 			BigInteger a = new BigInteger(LENGTH, rnd);
@@ -37,6 +38,7 @@ public class TestHammingDistance extends TestBigInteger<GCSignal>{
 					return res;
 					}
 			});
-		}		
+		}
+		Flag.sw.print();
 	}
 }

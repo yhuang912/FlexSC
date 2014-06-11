@@ -71,8 +71,9 @@ public class TestSwapOramRec {
 
 					Flag.sw.startTotal();
 					client.write(element, Utils.fromInt(element, dataSize));
-					System.out.println(StopWatch.ands/Flag.sw.stopTotal()*1000);
-					StopWatch.ands = 0;
+					double t= Flag.sw.stopTotal();
+					System.out.println(Flag.sw.ands+" "+t/1000000000.0 + " " +Flag.sw.ands/t*1000);
+					Flag.sw.ands = 0;
 					Flag.sw.addCounter();
 
 
@@ -125,10 +126,10 @@ public class TestSwapOramRec {
 				System.out.println("connected");
 				RecursiveSwapOramServer<GCSignal> server = new RecursiveSwapOramServer<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
 				for(int i = 0; i < writeCount; ++i) {
-					Flag.sw.startTotal();
+//					Flag.sw.startTotal();
 					server.access();
-					Flag.sw.stopTotal();
-					Flag.sw.addCounter();
+//					Flag.sw.stopTotal();
+//					Flag.sw.addCounter();
 					printStatistic();
 
 				}

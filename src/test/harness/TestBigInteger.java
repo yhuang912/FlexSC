@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCEva;
@@ -18,7 +19,7 @@ import test.Utils;
 
 
 public class TestBigInteger<T> {
-	public final int LENGTH = 100000;
+	public final int LENGTH = 900;
 	final int RANGE = LENGTH;
 	public abstract class Helper {
 		BigInteger intA, intB;
@@ -56,6 +57,7 @@ public class TestBigInteger<T> {
 				else if(h.m == Mode.COUNT) 
 					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
 				
+				Flag.sw.startTotal();
 				T [] a = gen.inputOfAlice(h.a);
 				
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
@@ -64,7 +66,9 @@ public class TestBigInteger<T> {
 				os.flush();
 		          
 				z = gen.outputToAlice(d);
-
+				double t = Flag.sw.stopTotal();
+				Flag.sw.addCounter();
+//				System.out.println(t/1000000.0);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
