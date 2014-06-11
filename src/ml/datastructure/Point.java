@@ -21,7 +21,7 @@ public class Point<T> {
 		coordinates = env.newTArray(dimension, 0);
 	}
 	
-	public int dimension() {
+	public int getDimension() {
 		return coordinates.length;
 	}
 	

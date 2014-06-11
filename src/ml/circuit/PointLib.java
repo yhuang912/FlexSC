@@ -1,5 +1,6 @@
 package ml.circuit;
 
+import test.Utils;
 import ml.datastructure.Point;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
@@ -21,14 +22,15 @@ public class PointLib<T> extends IntegerLib<T> {
 		assertPointCompatibility(a, b);
 		
 		Point<T> result = new Point<>(env, dimension);
-		for(int i = 0; i < dimension; ++i)
+		for(int i = 0; i < dimension; ++i){
 			result.coordinates[i] = add(a.coordinates[i], b.coordinates[i], cin);
+		}
 		return result;
 	}
 
 	private void assertPointCompatibility(Point<T> a, Point<T> b) {
-		assert(a.dimension() == dimension && a.width() == width 
-				&& b.dimension() == dimension && b.width() == width): "bad input in point add";
+		assert(a.getDimension() == dimension && a.width() == width 
+				&& b.getDimension() == dimension && b.width() == width): "bad input in point add";
 	}
 
 	public Point<T> not(Point<T> a) {
