@@ -196,6 +196,8 @@ public class GCGen extends GCCompEnv {
 	}
 	
 	public GCSignal and(GCSignal a, GCSignal b) {
+		++Flag.sw.ands;
+
 		Flag.sw.startGC();
 		GCSignal res;
 		if (a.isPublic() && b.isPublic())
@@ -205,7 +207,6 @@ public class GCGen extends GCCompEnv {
 		else if (b.isPublic())
 			res = b.v ? a : new GCSignal(false);
 		else {
-			++Flag.sw.ands;
 
 			GCSignal ret = garble(a, b);
 			

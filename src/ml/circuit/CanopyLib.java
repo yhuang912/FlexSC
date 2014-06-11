@@ -10,24 +10,21 @@ public class CanopyLib<T> extends PointLib<T> {
 
 	public CanopyLib(CompEnv<T> e, int dimension, int width) {
 		super(e, dimension, width);
-		POINT_ZERO = new Point<>(e, dimension, width, false);
-		POINT_DUMMY = new Point<>(e, dimension, width, true);
+		POINT_ZERO = new Point<T>(e, dimension, width, false);
+		POINT_DUMMY = new Point<T>(e, dimension, width, true);
 	}
 	
 	public Point<T>[] map(Point<T>[] points, int numberOfCanopyCenters, int t1, int t2) throws Exception {
 		Point<T>[] canopyCenters = new Point[numberOfCanopyCenters];
 		for(int i = 0; i < canopyCenters.length; ++i)
 			canopyCenters[i] = POINT_DUMMY;
-		T[] t1Signal = toSignals(t1, width);
-		T[] t2Signal = toSignals(t2, width);
 		
 		T[] s0 = zeros(width);
 		Point<T> s1 = POINT_ZERO;
 		Point<T> s2 = POINT_ZERO;
 		for(int i = 0; i < points.length; ++i)
-			addPointToCanopies(canopyCenters, points[i],
-					t1Signal, t2Signal, s0, s1, s2);
-		return points;
+			addPointToCanopies(canopyCenters, points[i], toSignals(t1, width), toSignals(t2, width), s0, s1, s2);
+		return canopyCenters;
 	}
 	
 	public void addPointToCanopies(Point<T>[] canopies, Point<T> point, 
@@ -38,10 +35,11 @@ public class CanopyLib<T> extends PointLib<T> {
 			//may be able to be more precise here.
 			T[] distanceToCanopies = L2Distance(point, canopies[i]);
 			T withinT1 = leq(distanceToCanopies, t1);
+			
 			// either observe zero point or real point
 			ConditionalCanopyObserve(s0, s1, s2, point, withinT1);
 			
-			T withinT2 = not(geq(distanceToCanopies, t2));
+			T withinT2 = leq(distanceToCanopies, t2);
 			pointStronglyBound = or(pointStronglyBound, withinT2);
 		}
 		
@@ -52,7 +50,7 @@ public class CanopyLib<T> extends PointLib<T> {
 			T shouldObserve) throws Exception{
 		Point<T> p = mux(POINT_ZERO, point, shouldObserve);
 		s0 = add(s0, mux(toSignals(0, s0.length), toSignals(1, s0.length), shouldObserve));
-		s1 = add(s2, p);
+		s1 = add(s1, p);
 		s2 = add(s2, multiply(p, p));
 	}
 

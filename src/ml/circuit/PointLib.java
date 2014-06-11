@@ -1,6 +1,5 @@
 package ml.circuit;
 
-import test.Utils;
 import ml.datastructure.Point;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
@@ -80,6 +79,7 @@ public class PointLib<T> extends IntegerLib<T> {
 	public T[] L2Distance(Point<T> a, Point<T> b) throws Exception{
 		Point<T> diff = subtract(a, b);
 		Point<T> multiply = multiply(diff, diff);
+		
 		T[] result = toSignals(0, a.width());
 		for(int i = 0; i < dimension; ++i)
 			result = add(result, multiply.coordinates[i]);
