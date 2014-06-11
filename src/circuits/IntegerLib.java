@@ -24,7 +24,7 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		return res;
 	}
 
-	T[] add(T[] x, T[] y, boolean cin) throws Exception {
+	public T[] add(T[] x, T[] y, boolean cin) throws Exception {
 		assert(x != null && y != null && x.length == y.length) : "add: bad inputs.";
 		T[] res = env.newTArray(x.length);
 
@@ -95,6 +95,15 @@ public class IntegerLib<T> extends CircuitLib<T> {
 
 	//tested
 	public T[] multiply(T[] x, T[] y) throws Exception {
+		return Arrays.copyOf(multiplyInternal(x, y), x.length);//res;
+	}
+
+	// This multiplication does not truncate the length of x and y
+	public T[] multiplyFull(T[] x, T[] y) throws Exception {
+		return multiplyInternal(x, y);//res;
+	}
+
+	private T[] multiplyInternal(T[] x, T[] y) throws Exception {
 		assert(x != null && y!= null) : "multiply: bad inputs";	
 
 		T[] res = zeros(x.length+y.length);
@@ -106,7 +115,7 @@ public class IntegerLib<T> extends CircuitLib<T> {
 			res = add(res, mux(zero, longerX, y[i]));
 			longerX = leftShift(longerX);
 		}
-		return Arrays.copyOf(res, x.length);//res;
+		return res;
 	}
 
 	//tested
