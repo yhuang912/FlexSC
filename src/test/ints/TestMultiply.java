@@ -13,10 +13,10 @@ public class TestMultiply extends Test_2Input1Output<GCSignal>{
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();
-		int testCases = 10;
+		int testCases = 100;
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt()%(1<<15), rnd.nextInt()%(1<<15), Mode.REAL) {
+			runThreads(new Helper(rnd.nextInt()%(1<<30), rnd.nextInt()%(1<<30), Mode.REAL) {
 				public GCSignal[] secureCompute(GCSignal[] Signala, GCSignal[] Signalb, CompEnv<GCSignal> e) throws Exception {
 					return new IntegerLib<GCSignal>(e).multiply(Signala ,Signalb);}
 
