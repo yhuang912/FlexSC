@@ -1,5 +1,7 @@
 package oram;
 
+import java.util.Arrays;
+
 import circuits.BitonicSortLib;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
@@ -45,23 +47,37 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 	}
 	
 	public Block<T> readAndRemove(Block<T>[][] blocks, T[] iden) throws Exception {
-		Block<T>[] res = newBlockArray(blocks.length);
-		for(int i = 0; i < blocks.length; ++i)
-			res[i] = readAndRemove(blocks[i], iden);
-		return readAndRemove(res, iden);
+//		Block<T>[] res = newBlockArray(blocks.length);
+//		for(int i = 0; i < blocks.length; ++i)
+//			res[i] = readAndRemove(blocks[i], iden);
+//		return readAndRemove(res, iden);
 		
-//		RDRUnitGadget gadget = new RDRUnitGadget(env, "localhost", 11345);
-//		Object[] input = new Object[blocks.length];
-//		for(int i = 0; i < input.length; ++i)
-//			input[i] = new Object[]{blocks[i], iden};
-//		Object[] result = gadget.runGadget(gadget, input, env);
-//		Block<T>[] resultbuckets = new Block[result.length];
-//		for(int i = 0; i < result.length; ++i)
-//			resultbuckets[i]= (Block<T>) result[i];
-//		return readAndRemove(resultbuckets, iden);
+		
+		RDRUnitGadget gadget = new RDRUnitGadget(env, "localhost", 11345);
+		
+		Object[] input = new Object[] { 
+//				new Object[]{Arrays.copyOfRange(blocks, 0, blocks.length/2), iden} ,
+//				new Object[]{Arrays.copyOfRange(blocks, blocks.length/2, blocks.length) , iden}
+				new Object[]{Arrays.copyOfRange(blocks, 0, blocks.length/3), iden} ,
+				new Object[]{Arrays.copyOfRange(blocks, blocks.length/3, blocks.length*2/3), iden} ,
+				new Object[]{Arrays.copyOfRange(blocks, blocks.length*2/3, blocks.length), iden} ,
+		};
+
+		Object[] result = gadget.runGadget(gadget, input, env);
+		Block<T>[] resultbuckets = new Block[result.length];
+		for(int i = 0; i < result.length; ++i)
+			resultbuckets[i]= (Block<T>) result[i];
+		return readAndRemove(resultbuckets, iden);
 	}
 
 
+	private Block<T> readAndRemoveInternal(Block<T>[][] blocks, T[] iden) throws Exception {
+		Block<T>[] res = newBlockArray(blocks.length);
+		for(int i = 0; i < blocks.length; ++i)
+			res[i] = readAndRemove(blocks[i], iden);
+		return readAndRemove(res, iden);	
+}
+	
 	class RDRUnitGadget extends Gadget<T> {
 		private RDRUnitGadget(CompEnv<T> e, String host, int port, Object[] input) {
 			super(e, host, port, input);
@@ -73,10 +89,10 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 
 		@Override
 		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
-			Block<T>[] signala = (Block<T>[]) o[0];
+			Block<T>[][] signala = (Block<T>[][]) o[0];
 			T[] iden = (T[]) o[1];
 			BucketLib<T> lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, e);
-			return lib.readAndRemove(signala, iden);
+			return lib.readAndRemoveInternal(signala, iden);
 		}
 		
 	     protected RDRUnitGadget getGadget(CompEnv<T>e , String host, int port, Object[] inputs2) {

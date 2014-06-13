@@ -1,5 +1,6 @@
 package pm;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -207,5 +208,9 @@ public class PMCompEnv implements CompEnv<Boolean> {
 	@Override
 	public Party getParty() {
 		return p;
+	}
+	@Override
+	public void flush() throws IOException {
+		os.flush();		
 	}
 }

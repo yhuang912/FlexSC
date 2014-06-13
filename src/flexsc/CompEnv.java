@@ -36,4 +36,5 @@ public interface CompEnv<T> {
 	
 	public CompEnv<T> getNewInstance(InputStream in, OutputStream os) throws Exception;
 	public Party getParty();
+	public void flush() throws Exception;
 }

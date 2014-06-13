@@ -86,6 +86,7 @@ public class GCEva extends GCCompEnv {
 		for(int i = 0; i < result.length; ++i) {
 			if (!out[i].isPublic())
 				out[i].send(os);
+			os.flush();
 		}
 		
 		for(int i = 0; i < result.length; ++i)
@@ -221,5 +222,10 @@ public class GCEva extends GCCompEnv {
 	@Override
 	public Party getParty() { 
 		return Party.Bob;
+	}
+	
+	@Override
+	public void flush() throws IOException {
+		os.flush();		
 	}
 }

@@ -1,5 +1,6 @@
 package cv;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -169,6 +170,9 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	public Party getParty() {
 		return p;
 	}
-
+	@Override
+	public void flush() throws IOException {
+		os.flush();		
+	}
 
 }

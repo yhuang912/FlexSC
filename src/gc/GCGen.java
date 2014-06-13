@@ -14,13 +14,16 @@ import test.Utils;
 
 public class GCGen extends GCCompEnv {
 
-	public final GCSignal R;
-//	SecureRandom rnd = new SecureRandom();
+	static public GCSignal R = null;
 	static SecureRandom rnd;
+//	SecureRandom rnd = new SecureRandom();
+
 	static{
 	Security.addProvider(new ISAACProvider ());
 	try {
 		rnd = SecureRandom.getInstance ("ISAACRandom");
+		R = GCSignal.freshLabel(rnd);
+		R.setLSB();
 	} catch (NoSuchAlgorithmException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -29,6 +32,7 @@ public class GCGen extends GCCompEnv {
 
 	InputStream is;
 	OutputStream os;
+	
 	OTSender snd;
 	Garbler gb;
 
@@ -37,8 +41,6 @@ public class GCGen extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
-		R = GCSignal.freshLabel(rnd);
-		R.setLSB();
 
 		snd = new OTExtSender(80, is, os);
 //		snd = new NPOTSender(80, is, os);
@@ -49,10 +51,6 @@ public class GCGen extends GCCompEnv {
 	public GCGen(InputStream is, OutputStream os, boolean NoOT) throws Exception {
 		this.is = is;
 		this.os = os;
-
-		R = GCSignal.freshLabel(rnd);
-		R.setLSB();
-
 		gb = new Garbler();
 	}
 	
@@ -117,7 +115,6 @@ public class GCGen extends GCCompEnv {
 //			Flag.sw.ands += ands;
 //			ands = 0;
 		}
-
 		if (out.isPublic())
 			return out.v;
 		
@@ -126,7 +123,6 @@ public class GCGen extends GCCompEnv {
 			return false;
 		else if (lb.equals(R.xor(out)))
 			return true;
-
 //		return false;
 		throw new Exception("bad label at final output.");
 	}
@@ -299,5 +295,10 @@ public class GCGen extends GCCompEnv {
 	@Override
 	public Party getParty() { 
 		return Party.Alice;
+	}
+
+	@Override
+	public void flush() throws IOException {
+		os.flush();		
 	}
 }

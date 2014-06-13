@@ -1,51 +1,52 @@
 package flexsc;
 
-import java.util.Random;
-
 import gc.GCEva;
 import gc.GCGen;
-import circuits.IntegerLib;
+import gc.GCSignal;
+
+import java.util.Arrays;
+import java.util.Random;
+
 import pm.PMCompEnv;
-import cv.CVCompEnv;
 import test.Utils;
+import circuits.IntegerLib;
+import cv.CVCompEnv;
 
 
 public class Test_2Input1Output<T> {
-	
+	static int NUMBER_OF_INSTANCES = CompPool.MaxNumberTask;
+	static int PORT = 51111;
+
+
 	public class AddGadget extends Gadget<T> {
-		public AddGadget(CompEnv<T> e, String host, int port, Object[] input) {
-			super(e, host, port, input);
-		}
-
-		public AddGadget(CompEnv<T> e, String host, int port) {
-			super(e, host, port);
-		}
-
 		@Override
 		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
-			T[] signala = (T[]) o[0];
-			T[] signalb = (T[]) o[1];
-			return new IntegerLib<T>(e).add(signala ,signalb);
-		}
-		
-	    public AddGadget getGadget(CompEnv<T>e , String host, int port, Object[] inputs2) {
-			return new AddGadget(e, host, port, inputs2);	
+			T[][] x = (T[][]) o[0];
+
+			IntegerLib<T> lib =  new IntegerLib<T>(e);
+
+			T[] result = x[0];
+			for(int i = 1; i < x.length; ++i)
+				result = lib.add(result, x[i]);
+
+			return result;
 		}
 
+		public AddGadget getGadget() {
+			return new AddGadget();	
+		}
 	};
-	
+
 	public class Helper {
-		int intA, intB;
-		boolean[] a;
-		boolean[] b;
+		int[] intA, intB;
+		boolean[][] a;
 		Mode m;
-		public Helper(int aa, int bb, Mode m) {
+		public Helper(int[] aa, Mode m) {
 			this.m = m;
 			intA = aa;
-			intB = bb;
-
-			a = Utils.fromInt(aa, 32);
-			b = Utils.fromInt(bb, 32);
+			a = new boolean[aa.length][];
+			for(int i = 0; i < aa.length; ++i)
+				a[i] = Utils.fromInt(aa[i], 32);
 		}
 	}
 
@@ -67,29 +68,40 @@ public class Test_2Input1Output<T> {
 				else if(h.m == Mode.VERIFY)
 					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
 				else if(h.m == Mode.COUNT) 
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);						
+					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
+
+				T[][] Ta = gen.newTArray(h.a.length,0);
+				for(int i = 0; i < Ta.length; ++i)
+					Ta[i] = gen.inputOfBob(new boolean[32]);
+
+				CompPool<T> pool = new CompPool(gen, "localhost", PORT);
 				
-				T[] a = gen.inputOfAlice(h.a);
-				T[] b = gen.inputOfBob(new boolean[32]);
-				
-				AddGadget gadget = new AddGadget(gen, "localhost", 11345);
-				Object[] input = new Object[5];
-				for(int i = 0; i < 5; ++i)
-					input[i] = new Object[]{a, b};
-				Object[] result = gadget.runGadget(gadget, input, gen);
+				long t1 = System.nanoTime();
+
+				System.out.println("!!!!");
+				Object[] input = new Object[NUMBER_OF_INSTANCES];
+
+				for(int i = 0; i < NUMBER_OF_INSTANCES; ++i)
+					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/NUMBER_OF_INSTANCES, (i+1)*Ta.length/NUMBER_OF_INSTANCES)};
 
 
+				Object[] result = pool.runGadget( new AddGadget(), input);
 				IntegerLib<T> lib = new IntegerLib<>(gen);
 				T[] finalresult = (T[]) result[0];
 				for(int i = 1; i < result.length; ++i){
 					finalresult = lib.add(finalresult, (T[])result[i]);
 				}
-								
-//				T[] d = h.secureCompute(a, b, gen);
+
 				os.flush();
+
+				long t2 = System.nanoTime();
+				System.out.println("\n"+(t2-t1)/1000000000.0);
+
+
 
 				z = gen.outputToAlice((T[]) finalresult);
 				System.out.print(Utils.toInt(z));
+				pool.finalize();
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -117,14 +129,21 @@ public class Test_2Input1Output<T> {
 				else if (h.m == Mode.COUNT) 
 					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
 
-				T[] a = eva.inputOfAlice(new boolean[32]);
-				T[] b = eva.inputOfBob(h.b);
 
-				AddGadget gadget = new AddGadget(eva, "localhost", 11345, new Object[]{a, b});
-				Object[] input = new Object[5];
-				for(int i = 0; i < 5; ++i)
-					input[i] = new Object[]{a, b};
-				Object[] result = gadget.runGadget(gadget, input, eva);
+				T[][] Ta = eva.newTArray(h.a.length,0);
+				for(int i = 0; i < Ta.length; ++i)
+					Ta[i] = eva.inputOfBob(h.a[i]);
+
+				CompPool<T> pool = new CompPool(eva, "localhost", PORT);				
+				System.out.println("!!!!");
+				Object[] input = new Object[NUMBER_OF_INSTANCES];
+				for(int i = 0; i < NUMBER_OF_INSTANCES; ++i)
+					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/NUMBER_OF_INSTANCES, (i+1)*Ta.length/NUMBER_OF_INSTANCES)};
+				os.flush();
+
+				Object[] result = pool.runGadget( new AddGadget(), input);
+
+
 
 				IntegerLib<T> lib = new IntegerLib<>(eva);
 				T[] finalresult = (T[]) result[0];
@@ -132,14 +151,15 @@ public class Test_2Input1Output<T> {
 					finalresult = lib.add(finalresult, 
 							(T[])result[i]);
 				}
-								
+
 				os.flush();
 
 				eva.outputToAlice((T[]) finalresult);
 				os.flush();
+				pool.finalize();
 
 				disconnect();
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -158,17 +178,23 @@ public class Test_2Input1Output<T> {
 		tEva.join();	
 	}
 
-	
+
 	public static void main(String args[])throws Exception {
-		Test_2Input1Output<Boolean> tt = new Test_2Input1Output<Boolean>();
+		Mode m = Mode.REAL;
+		Test_2Input1Output<GCSignal> tt = new Test_2Input1Output<GCSignal>();
 		Random rnd = new Random();
 		int testCases = 1;
+		int res = 0;;
 
 		for (int i = 0; i < testCases; i++) {
-			tt.runThreads(tt.new Helper(1000, 2
-					, Mode.VERIFY));
+			int a[] = new int[100000];
+			for(int j = 0; j < a.length; ++j){
+				a[j] = 1;//rnd.nextInt(1000);
+				res+=a[j];
+			}
+			tt.runThreads(tt.new Helper(a, m));
 		}
-		System.out.print("!!");
+		System.out.println("res:"+res);
 	}	
 
 }

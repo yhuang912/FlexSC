@@ -14,7 +14,7 @@ import test.Utils;
 
 
 public class TestSwapOramBasic {
-	final int N = 1<<10;
+	final int N = 1<<22;
 	final int capacity = 4;
 	int[] posMap = new int[N];
 	int writecount = N;
@@ -42,8 +42,8 @@ public class TestSwapOramBasic {
 				listen(port);
 
 				int data[] = new int[N+1];
-//				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
-				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
+				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
+//				SwapOramClient<GCSignal> client = new SwapOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				
@@ -131,8 +131,8 @@ public class TestSwapOramBasic {
 			try {
 				connect(host, port);
 				
-//				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
-				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
+				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
+//				SwapOramServer<GCSignal> server = new SwapOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
 				
 				for(int i = 0; i < writecount; ++i) {
 					int element = i%N;
