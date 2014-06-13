@@ -1,24 +1,8 @@
 package flexsc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import gc.GCEva;
 import gc.GCGen;
-import gc.GCSignal;
-
-import org.junit.Test;
-
-import com.sun.org.apache.xml.internal.resolver.helpers.PublicId;
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
-
 import circuits.IntegerLib;
 import pm.PMCompEnv;
 import cv.CVCompEnv;
@@ -27,10 +11,13 @@ import test.Utils;
 
 public class Test_2Input1Output<T> {
 	
-	final int threads = 20;
-	public class AddGadget<T> extends Gadget<T> {
-		public AddGadget(CompEnv<T> e, String host, int port, Party p, Object[] input) {
-			super(e, host, port, input, p);
+	public class AddGadget extends Gadget<T> {
+		private AddGadget(CompEnv<T> e, String host, int port, Object[] input) {
+			super(e, host, port, input);
+		}
+
+		public AddGadget(CompEnv<T> e, String host, int port) {
+			super(e, host, port);
 		}
 
 		@Override
@@ -39,6 +26,11 @@ public class Test_2Input1Output<T> {
 			T[] signalb = (T[]) o[1];
 			return new IntegerLib<T>(e).add(signala ,signalb);
 		}
+		
+	    public AddGadget getGadget(CompEnv<T>e , String host, int port, Object[] inputs2) {
+			return new AddGadget(e, host, port, inputs2);	
+		}
+
 	};
 	
 	public class Helper {
@@ -78,30 +70,13 @@ public class Test_2Input1Output<T> {
 				
 				T[] a = gen.inputOfAlice(h.a);
 				T[] b = gen.inputOfBob(new boolean[32]);
-
-
-				ExecutorService executorService = Executors.newFixedThreadPool(threads);
-				ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
-
 				
-				for(int i = 0; i < threads; ++i) {
-					AddGadget<T> gadge = new AddGadget<>(gen, "localhost", 54311+i, Party.Alice, new Object[]{a, b});
-
-					Future<Object> future = executorService.submit(gadge);
-					list.add(future);
-				}
-				
-				Object[] result = new Object[threads];
-				int cnt = 0;
-				for(Future<Object> future: list) {
-					result[cnt++] = future.get();
-				}
-				
-				executorService.shutdown();
+				AddGadget gadget = new AddGadget(gen, "localhost", 11345);
+				Object[] result = gadget.runGadget(gadget, new Object[]{ new Object[]{a, b}, new Object[]{a, b} }, gen);
 
 				IntegerLib<T> lib = new IntegerLib<>(gen);
 				T[] finalresult = (T[]) result[0];
-				for(int i = 1; i < threads; ++i){
+				for(int i = 1; i < result.length; ++i){
 					finalresult = lib.add(finalresult, (T[])result[i]);
 				}
 								
@@ -140,28 +115,16 @@ public class Test_2Input1Output<T> {
 				T[] a = eva.inputOfAlice(new boolean[32]);
 				T[] b = eva.inputOfBob(h.b);
 
-				ExecutorService executorService = Executors.newFixedThreadPool(threads);
-				ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
-				
-				for(int i = 0; i < threads; ++i) {
-					AddGadget<T> gadge = new AddGadget<>(eva, "localhost", 54311+i, Party.Bob, new Object[]{a, b});
-					Future<Object> future = executorService.submit(gadge);
-					list.add(future);
-				}
-				
-				Object[] result = new Object[threads];
-				int cnt = 0;
-				for(Future<Object> future: list) {
-					result[cnt++] = future.get();
-				}
-				executorService.shutdown();
+				AddGadget gadget = new AddGadget(eva, "localhost", 11345, new Object[]{a, b});
+				Object[] result = gadget.runGadget(gadget, new Object[]{ new Object[]{a, b}, new Object[]{a, b} }, eva);
+
 				IntegerLib<T> lib = new IntegerLib<>(eva);
 				T[] finalresult = (T[]) result[0];
-				for(int i = 1; i < threads; ++i){
-					finalresult = lib.add(finalresult, (T[])result[i]);
+				for(int i = 1; i < result.length; ++i){
+					finalresult = lib.add(finalresult, 
+							(T[])result[i]);
 				}
 								
-//				T[] d = h.secureCompute(a, b, gen);
 				os.flush();
 
 				eva.outputToAlice((T[]) finalresult);

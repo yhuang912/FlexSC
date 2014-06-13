@@ -2,26 +2,38 @@ package flexsc;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import sun.net.www.content.image.gif;
+import flexsc.Test_2Input1Output.AddGadget;
 import network.Client;
 import network.Server;
 
 
-public abstract class Gadget<T> implements Callable<Object>{
-	Party party;
+public abstract class Gadget<T> implements secureComputable<T>, Callable<Object>{
 	int port;
 	String host;
 	Object[] inputs;
 	CompEnv<T>env;
-	public Gadget(CompEnv<T>e , String host, int port, Object[] input, Party p) {
+	protected Gadget(CompEnv<T>e , String host, int port, Object[] input) {
 		this.port = port;
 		this.host = host;
 		this.inputs = input;
 		this.env = e;
-		this.party = p;
+	}
+	
+	public Gadget(CompEnv<T>e , String host, int port) {
+		this.port = port;
+		this.host = host;
+		this.env = e;
 	}
 
-	public abstract Object secureCompute(CompEnv<T> e, Object[] o) throws Exception;
+//	public  Object secureCompute(CompEnv<T> e, Object[] o) throws Exception;
 
 	@Override
 	public Object call() throws Exception {
@@ -31,7 +43,7 @@ public abstract class Gadget<T> implements Callable<Object>{
 		Server server = null;
 		Client client  = null;
 		try {
-			if(party == Party.Alice){
+			if(env.getParty() == Party.Alice){
 				server = new Server();
 				server.listen(port);
 				inputStream = server.is;
@@ -44,11 +56,12 @@ public abstract class Gadget<T> implements Callable<Object>{
 				outputStream = client.os;
 			}
 
-			CompEnv<T> newEnv = env.getNewInstance(inputStream, outputStream, party);
+			CompEnv<T> newEnv = env.getNewInstance(inputStream, outputStream);
+			
 			res = secureCompute(newEnv, inputs);
 			outputStream.flush();
 
-			if (Party.Alice == party) {
+			if (Party.Alice == env.getParty()) {
 				server.disconnect();
 			} else {
 				client.disconnect();
@@ -58,6 +71,29 @@ public abstract class Gadget<T> implements Callable<Object>{
 			System.exit(1);
 		}
 		return res;
+	}
+	
+	abstract public Gadget<T> getGadget(CompEnv<T>e , String host, int port, Object[] inputs2);
+	
+	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputs, CompEnv<T> env) throws InterruptedException, ExecutionException{
+		int threads = inputs.length;
+		ExecutorService executorService = Executors.newFixedThreadPool(threads);
+		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
+		
+		for(int i = 0; i < threads; ++i) {
+			Gadget<T> gadge = g.getGadget(env, "localhost", 54311+i, (Object[]) inputs[i]);
+			Future<Object> future = executorService.submit(gadge);
+			list.add(future);
+		}
+		
+		Object[] result = new Object[threads];
+		int cnt = 0;
+		for(Future<Object> future: list) {
+			result[cnt++] = future.get();
+		}
+		executorService.shutdown();
+		return result;
+
 	}
 
 }

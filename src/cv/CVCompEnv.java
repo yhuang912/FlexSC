@@ -10,11 +10,6 @@ import test.Utils;
 import flexsc.CompEnv;
 
 public class CVCompEnv implements CompEnv<Boolean> {
-	@Override
-	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os,
-			Party p) {
-		return new CVCompEnv(in, os, p);
-	}
 	
 	InputStream is;
 	OutputStream os;
@@ -162,6 +157,17 @@ public class CVCompEnv implements CompEnv<Boolean> {
 	@Override
 	public boolean[] outputToAlice(Boolean[] out) throws Exception {
 		return Utils.tobooleanArray(out);
+	}
+
+	@Override
+	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os)
+			throws Exception {
+		return new CVCompEnv(in, os, getParty());
+	}
+
+	@Override
+	public Party getParty() {
+		return p;
 	}
 
 

@@ -200,8 +200,12 @@ public class PMCompEnv implements CompEnv<Boolean> {
 	}
 
 	@Override
-	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os,
-			Party p) {
-		return new PMCompEnv(in, os, p);
+	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os) {
+		return new PMCompEnv(in, os, this.getParty());
+	}
+
+	@Override
+	public Party getParty() {
+		return p;
 	}
 }

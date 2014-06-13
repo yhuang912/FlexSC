@@ -34,5 +34,6 @@ public interface CompEnv<T> {
 	T[][][] newTArray(int d1, int d2, int d3);
 	T newT(boolean v);
 	
-	CompEnv<T> getNewInstance(InputStream in, OutputStream os, Party p) throws Exception;
+	public CompEnv<T> getNewInstance(InputStream in, OutputStream os) throws Exception;
+	public Party getParty();
 }

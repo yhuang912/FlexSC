@@ -201,9 +201,13 @@ public class GCEva extends GCCompEnv {
 	}
 
 	@Override
-	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os,
-			Party p) throws Exception {
-		assert(p == Party.Bob):"wrong party";
+	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {
 		return new GCEva(in, os);
+	}
+
+
+	@Override
+	public Party getParty() { 
+		return Party.Bob;
 	}
 }

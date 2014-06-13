@@ -281,9 +281,13 @@ public class GCGen extends GCCompEnv {
 	}
 
 	@Override
-	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os,
-			Party p) throws Exception {
-		assert(p == Party.Alice):"wrong party";
+	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {
 		return new GCGen(in, os);
+	}
+
+
+	@Override
+	public Party getParty() { 
+		return Party.Alice;
 	}
 }
