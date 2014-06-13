@@ -1,6 +1,7 @@
 package flexsc;
 
 import java.util.Random;
+
 import gc.GCEva;
 import gc.GCGen;
 import circuits.IntegerLib;
@@ -12,7 +13,7 @@ import test.Utils;
 public class Test_2Input1Output<T> {
 	
 	public class AddGadget extends Gadget<T> {
-		private AddGadget(CompEnv<T> e, String host, int port, Object[] input) {
+		public AddGadget(CompEnv<T> e, String host, int port, Object[] input) {
 			super(e, host, port, input);
 		}
 
@@ -72,7 +73,11 @@ public class Test_2Input1Output<T> {
 				T[] b = gen.inputOfBob(new boolean[32]);
 				
 				AddGadget gadget = new AddGadget(gen, "localhost", 11345);
-				Object[] result = gadget.runGadget(gadget, new Object[]{ new Object[]{a, b}, new Object[]{a, b} }, gen);
+				Object[] input = new Object[5];
+				for(int i = 0; i < 5; ++i)
+					input[i] = new Object[]{a, b};
+				Object[] result = gadget.runGadget(gadget, input, gen);
+
 
 				IntegerLib<T> lib = new IntegerLib<>(gen);
 				T[] finalresult = (T[]) result[0];
@@ -116,7 +121,10 @@ public class Test_2Input1Output<T> {
 				T[] b = eva.inputOfBob(h.b);
 
 				AddGadget gadget = new AddGadget(eva, "localhost", 11345, new Object[]{a, b});
-				Object[] result = gadget.runGadget(gadget, new Object[]{ new Object[]{a, b}, new Object[]{a, b} }, eva);
+				Object[] input = new Object[5];
+				for(int i = 0; i < 5; ++i)
+					input[i] = new Object[]{a, b};
+				Object[] result = gadget.runGadget(gadget, input, eva);
 
 				IntegerLib<T> lib = new IntegerLib<>(eva);
 				T[] finalresult = (T[]) result[0];

@@ -46,6 +46,16 @@ public class GCGen extends GCCompEnv {
 		gb = new Garbler();
 	}
 
+	public GCGen(InputStream is, OutputStream os, boolean NoOT) throws Exception {
+		this.is = is;
+		this.os = os;
+
+		R = GCSignal.freshLabel(rnd);
+		R.setLSB();
+
+		gb = new Garbler();
+	}
+	
 	private GCSignal[] genPair() {
 		GCSignal[] label = new GCSignal[2];
 		label[0] = GCSignal.freshLabel(rnd);
@@ -282,7 +292,7 @@ public class GCGen extends GCCompEnv {
 
 	@Override
 	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {
-		return new GCGen(in, os);
+		return new GCGen(in, os, true);
 	}
 
 

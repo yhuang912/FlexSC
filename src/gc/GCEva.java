@@ -30,6 +30,18 @@ public class GCEva extends GCCompEnv {
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
 	}
+	
+	public GCEva(InputStream is, OutputStream os, boolean NoOT) throws Exception {
+		this.is = is;
+		this.os = os;
+
+		rcv = null;
+		//		rcv = new NPOTReceiver(is, os);
+		//		rcv = new FakeOTReceiver(is, os);
+		gb = new Garbler();
+		gtt[0][0] = GCSignal.ZERO;
+	}
+
 
 	public GCSignal inputOfAlice(boolean in) throws Exception {
 		Flag.sw.startOT();
@@ -202,7 +214,7 @@ public class GCEva extends GCCompEnv {
 
 	@Override
 	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {
-		return new GCEva(in, os);
+		return new GCEva(in, os, true);
 	}
 
 

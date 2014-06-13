@@ -24,7 +24,7 @@ public class TestSwapOramRec {
 		System.out.print("\n");
 	}
 
-	final static int writeCount = 10;
+	final static int writeCount = 5;
 	final static int readCount = 0;
 	public TestSwapOramRec() {
 	}

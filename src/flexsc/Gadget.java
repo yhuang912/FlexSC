@@ -73,7 +73,7 @@ public abstract class Gadget<T> implements secureComputable<T>, Callable<Object>
 		return res;
 	}
 	
-	abstract public Gadget<T> getGadget(CompEnv<T>e , String host, int port, Object[] inputs2);
+	protected abstract Gadget<T> getGadget(CompEnv<T>e , String host, int port, Object[] inputs2);
 	
 	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputs, CompEnv<T> env) throws InterruptedException, ExecutionException{
 		int threads = inputs.length;

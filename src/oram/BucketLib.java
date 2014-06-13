@@ -1,7 +1,10 @@
 package oram;
 
 import circuits.BitonicSortLib;
+import circuits.IntegerLib;
 import flexsc.CompEnv;
+import flexsc.Gadget;
+import flexsc.Test_2Input1Output.AddGadget;
 
 
 public class BucketLib<T> extends BitonicSortLib<T> {
@@ -17,7 +20,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		dummyBlock = new Block<T>(zeros(lengthOfIden), zeros(lengthOfPos), zeros(lengthOfData), SIGNAL_ONE);
 	}
 
-
+	
 	public Block<T> conditionalReadAndRemove(Block<T>[] bucket, T[] iden, T condition) throws Exception {
 		Block<T> result = dummyBlock;
 		for(int i = 0; i < bucket.length; ++i) {
@@ -46,8 +49,41 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		for(int i = 0; i < blocks.length; ++i)
 			res[i] = readAndRemove(blocks[i], iden);
 		return readAndRemove(res, iden);
+		
+//		RDRUnitGadget gadget = new RDRUnitGadget(env, "localhost", 11345);
+//		Object[] input = new Object[blocks.length];
+//		for(int i = 0; i < input.length; ++i)
+//			input[i] = new Object[]{blocks[i], iden};
+//		Object[] result = gadget.runGadget(gadget, input, env);
+//		Block<T>[] resultbuckets = new Block[result.length];
+//		for(int i = 0; i < result.length; ++i)
+//			resultbuckets[i]= (Block<T>) result[i];
+//		return readAndRemove(resultbuckets, iden);
 	}
 
+
+	class RDRUnitGadget extends Gadget<T> {
+		private RDRUnitGadget(CompEnv<T> e, String host, int port, Object[] input) {
+			super(e, host, port, input);
+		}
+
+		public RDRUnitGadget(CompEnv<T> e, String host, int port) {
+			super(e, host, port);
+		}
+
+		@Override
+		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
+			Block<T>[] signala = (Block<T>[]) o[0];
+			T[] iden = (T[]) o[1];
+			BucketLib<T> lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, e);
+			return lib.readAndRemove(signala, iden);
+		}
+		
+	     protected RDRUnitGadget getGadget(CompEnv<T>e , String host, int port, Object[] inputs2) {
+			return new RDRUnitGadget(e, host, port, inputs2);	
+		}
+
+	};
 
 	public void conditionalAdd(Block<T>[] bucket, Block<T> newBlock, T condition) throws Exception {
 		T added = not(condition);
