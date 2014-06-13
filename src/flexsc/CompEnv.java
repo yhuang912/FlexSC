@@ -1,5 +1,8 @@
 package flexsc;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import objects.Float.Representation;
 
 public interface CompEnv<T> {
@@ -30,4 +33,6 @@ public interface CompEnv<T> {
 	T[][] newTArray(int d1, int d2);
 	T[][][] newTArray(int d1, int d2, int d3);
 	T newT(boolean v);
+	
+	CompEnv<T> getNewInstance(InputStream in, OutputStream os, Party p) throws Exception;
 }

@@ -9,14 +9,23 @@ import org.apache.commons.io.output.CountingOutputStream;
 import flexsc.Flag;
 
 public class Client {
-	private Socket sock;
+	private Socket sock = null;
 	public InputStream is;
 	public OutputStream os;
 	CountingOutputStream cos;
 	CountingInputStream cis;
 
 	public void connect(String server, int port) throws Exception {
-		sock = new java.net.Socket(server, port);          // create socket and connect
+		while(true){
+			try{
+				sock = new java.net.Socket(server, port);          // create socket and connect
+				if(sock != null)
+					break;
+			}
+			catch(IOException e){
+				Thread.sleep(100);
+			}
+		}
 
 		if(Flag.countIO){
 			cos = new CountingOutputStream(sock.getOutputStream());

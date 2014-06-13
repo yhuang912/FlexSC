@@ -33,7 +33,7 @@ public class CanopyLib<T> extends PointLib<T> {
 		
 		for(int i = 0; i < canopies.length; ++i) {
 			//may be able to be more precise here.
-			T[] distanceToCanopies = L2Distance(point, canopies[i]);
+			T[] distanceToCanopies = L1Distance(point, canopies[i]);
 			T withinT1 = leq(distanceToCanopies, t1);
 			
 			// either observe zero point or real point

@@ -79,14 +79,14 @@ public class Test_NinputMoutputPoint<T> {
 				System.out.println(Flag.sw.ands);
 				z = new boolean[res.length][h.dimension][];
 				for(int i = 0; i < res.length; ++i) {
-//					System.out.print("(");
+					System.out.print("(");
 					for(int k = 0; k < h.dimension; ++k){
 						T[] temp = res[i].coordinates[k];
 						z[i][k] = gen.outputToAlice(temp);	
-//						System.out.print(Utils.toInt(z[i][k])+",");
+						System.out.print(Utils.toInt(z[i][k])+",");
 					}
 					boolean isdummy = gen.outputToAlice(res[i].isDummy);
-//					System.out.print(isdummy+")\n");
+					System.out.print(isdummy+")\n");
 				}
 				os.flush();
 
@@ -137,7 +137,7 @@ public class Test_NinputMoutputPoint<T> {
 					eva.outputToAlice(res[i].isDummy);
 				}
 				os.flush();
-
+				printStatistic();
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

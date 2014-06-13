@@ -4,11 +4,12 @@ import java.security.*;
 import java.io.*;
 
 import circuits.FloatFormat;
+import flexsc.CompEnv;
 import flexsc.Flag;
+import flexsc.Party;
 import objects.Float.Representation;
 import ot.*;
 import rand.ISAACProvider;
-import test.StopWatch;
 import test.Utils;
 
 public class GCGen extends GCCompEnv {
@@ -277,5 +278,12 @@ public class GCGen extends GCCompEnv {
 	
 	public GCSignal[] inputOfBobFixedPoint(double a, int width, int offset) throws Exception {
 		return inputOfBob(new boolean[width]);
+	}
+
+	@Override
+	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os,
+			Party p) throws Exception {
+		assert(p == Party.Alice):"wrong party";
+		return new GCGen(in, os);
 	}
 }

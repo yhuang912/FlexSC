@@ -9,8 +9,8 @@ public class Server {
 	static int bufferSize = 655360;
 	private ServerSocket sock;
 	
-	protected InputStream is;
-	protected OutputStream os;
+	public InputStream is;
+	public OutputStream os;
 	
 	public void listen(int port) throws Exception {
 		Socket clientSock;

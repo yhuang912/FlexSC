@@ -2,6 +2,7 @@ package pm;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import flexsc.*;
 import circuits.FloatFormat;
 import objects.Float.Representation;
@@ -196,5 +197,11 @@ public class PMCompEnv implements CompEnv<Boolean> {
 	public double outputToAliceFixedPoint(Boolean[] f, int offset) throws Exception {
 		boolean[] res = outputToAlice(f);
 		return  Utils.toFixPoint(res, res.length, offset);
+	}
+
+	@Override
+	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os,
+			Party p) {
+		return new PMCompEnv(in, os, p);
 	}
 }

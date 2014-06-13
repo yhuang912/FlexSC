@@ -3,8 +3,11 @@ package gc;
 import objects.Float.Representation;
 
 import java.io.*;
+
 import circuits.FloatFormat;
+import flexsc.CompEnv;
 import flexsc.Flag;
+import flexsc.Party;
 import ot.*;
 import test.Utils;
 
@@ -195,5 +198,12 @@ public class GCEva extends GCCompEnv {
 
 	public GCSignal[] inputOfGenFixPoint(int width, int offset) throws Exception {
 		return inputOfAlice(new boolean[width]);
+	}
+
+	@Override
+	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os,
+			Party p) throws Exception {
+		assert(p == Party.Bob):"wrong party";
+		return new GCEva(in, os);
 	}
 }

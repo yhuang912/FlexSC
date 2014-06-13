@@ -72,9 +72,19 @@ public class PointLib<T> extends IntegerLib<T> {
 		return res;
 	}
 	
-	/*public T[] L1Distance(Point<T> a, Point<T> b){
+	public T[] L1Distance(Point<T> a, Point<T> b) throws Exception{
+		Point<T> diff = subtract(a, b);
 		
-	}*/
+		T[] result = toSignals(0, a.width());
+		for(int i = 0; i < dimension; ++i)
+			result = add(result, absolute(diff.coordinates[i]));
+		T[] max = env.newTArray(a.width());
+		for(int i = 0; i < max.length-1; ++i)
+			max[i] = SIGNAL_ONE;
+		max[max.length-1] = SIGNAL_ZERO;
+		return mux(result, max, or(a.isDummy, b.isDummy));
+		
+	}
 
 	public T[] L2Distance(Point<T> a, Point<T> b) throws Exception{
 		Point<T> diff = subtract(a, b);
