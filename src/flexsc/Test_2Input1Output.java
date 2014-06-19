@@ -38,7 +38,7 @@ public class Test_2Input1Output<T> {
 	};
 
 	public class Helper {
-		int[] intA, intB;
+		int[] intA;
 		boolean[][] a;
 		Mode m;
 		public Helper(int[] aa, Mode m) {
