@@ -3,8 +3,8 @@ package oram.counter;
 import oram.clporam.CLPOramRecClient;
 import oram.clporam.CLPOramRecServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
 
 public class CountKaiminORAMRecursion extends ORAMCounterHarness{
 	int cutoff, recurFactor;

@@ -3,8 +3,9 @@ package oram.counter;
 import oram.treeoram.TreeOramClient;
 import oram.treeoram.TreeOramServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class CountTreeORAM extends ORAMCounterHarness{
 	public CountTreeORAM(int logN, int dataSize, int securityParameter) {

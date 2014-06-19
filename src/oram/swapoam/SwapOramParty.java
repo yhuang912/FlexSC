@@ -2,9 +2,11 @@ package oram.swapoam;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import flexsc.*;
+
 import oram.PlainBlock;
 import oram.TreeBasedOramParty;
+import flexsc.Mode;
+import flexsc.Party;
 
 
 public abstract class SwapOramParty<T> extends TreeBasedOramParty<T> {

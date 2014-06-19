@@ -2,14 +2,14 @@ package test.fixedpoints;
 
 import java.util.Random;
 
-import flexsc.*;
 //import gc.Boolean;
 import org.junit.Test;
-import test.harness.TestFixedPoint;
+
 import test.harness.TestFixedPointMatrix;
-import circuits.FixedPointLib;
 import circuits.FixedPointMatrixLib;
 import circuits.FloatMatrixLib;
+import flexsc.CompEnv;
+import flexsc.Mode;
 
 
 public class TestFixedPointMatrixInverse extends TestFixedPointMatrix<Boolean> {

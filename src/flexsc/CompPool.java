@@ -1,6 +1,4 @@
 package flexsc;
-import gc.GCGen;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -9,18 +7,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import test.Utils;
 import network.Client;
 import network.Server;
 
 public class CompPool<T> {
-	final static int MaxNumberTask = 8;
+	static int MaxNumberTask;
 
-	CompEnv<T>[] envs = new CompEnv[MaxNumberTask];
-	Server[] servers = new Server[MaxNumberTask];
-	Client[] clients = new Client[MaxNumberTask];
+	CompEnv<T>[] envs;
+	Server[] servers;
+	Client[] clients;
 	ExecutorService executorService;
 	public CompPool(CompEnv<T> env, String host, int port) throws Exception{
+		envs = new CompEnv[MaxNumberTask];
+		servers = new Server[MaxNumberTask];
+		clients = new Client[MaxNumberTask];
+
 	     executorService = Executors.newFixedThreadPool(MaxNumberTask);
 
 		for(int i = 0; i < MaxNumberTask; ++i) {
@@ -59,7 +60,6 @@ public class CompPool<T> {
 			Gadget<T> gadge = g.getGadget();
 			gadge.env = envs[i];
 			gadge.inputs = (Object[]) inputArray[i];
-
 			Future<Object> future = executorService.submit(gadge);
 			list.add(future);
 		}

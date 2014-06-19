@@ -1,11 +1,15 @@
 package test.DFT;
 
+import flexsc.CompEnv;
+import flexsc.Mode;
+import gc.GCSignal;
+
 import java.util.Random;
 
 import objects.Float.Representation;
-import flexsc.*;
-import gc.GCSignal;
+
 import org.junit.Test;
+
 import test.harness.TestDFTHarness;
 import circuits.DFTLib;
 

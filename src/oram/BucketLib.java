@@ -1,12 +1,8 @@
 package oram;
 
-import java.util.Arrays;
-
 import circuits.BitonicSortLib;
-import circuits.IntegerLib;
 import flexsc.CompEnv;
-import flexsc.Gadget;
-import flexsc.Test_2Input1Output.AddGadget;
+
 
 
 public class BucketLib<T> extends BitonicSortLib<T> {
@@ -20,6 +16,15 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		this.lengthOfIden = lengthOfIden;
 		this.lengthOfPos = lengthOfPos;
 		dummyBlock = new Block<T>(zeros(lengthOfIden), zeros(lengthOfPos), zeros(lengthOfData), SIGNAL_ONE);
+	}
+	
+	public T isFull(Block<T>[] bucket) throws Exception
+	{
+		T res = SIGNAL_ONE;
+		for(int i = 0; i < bucket.length; ++i) {
+			res = and(res, not(bucket[i].isDummy));
+		}
+		return res;
 	}
 
 	
@@ -47,12 +52,12 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 	}
 	
 	public Block<T> readAndRemove(Block<T>[][] blocks, T[] iden) throws Exception {
-//		Block<T>[] res = newBlockArray(blocks.length);
-//		for(int i = 0; i < blocks.length; ++i)
-//			res[i] = readAndRemove(blocks[i], iden);
-//		return readAndRemove(res, iden);
+		Block<T>[] res = newBlockArray(blocks.length);
+		for(int i = 0; i < blocks.length; ++i)
+			res[i] = readAndRemove(blocks[i], iden);
+		return readAndRemove(res, iden);
 		
-		
+		/*
 		RDRUnitGadget gadget = new RDRUnitGadget(env, "localhost", 11345);
 		
 		Object[] input = new Object[] { 
@@ -68,10 +73,10 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		for(int i = 0; i < result.length; ++i)
 			resultbuckets[i]= (Block<T>) result[i];
 		return readAndRemove(resultbuckets, iden);
-	}
+	*/}
 
 
-	private Block<T> readAndRemoveInternal(Block<T>[][] blocks, T[] iden) throws Exception {
+	/*private Block<T> readAndRemoveInternal(Block<T>[][] blocks, T[] iden) throws Exception {
 		Block<T>[] res = newBlockArray(blocks.length);
 		for(int i = 0; i < blocks.length; ++i)
 			res[i] = readAndRemove(blocks[i], iden);
@@ -100,7 +105,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		}
 
 	};
-
+*/
 	public void conditionalAdd(Block<T>[] bucket, Block<T> newBlock, T condition) throws Exception {
 		T added = not(condition);
 		for(int i = 0; i < bucket.length; ++i) {

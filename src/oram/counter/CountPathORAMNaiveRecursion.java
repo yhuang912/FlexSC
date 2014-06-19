@@ -1,10 +1,10 @@
 package oram.counter;
 
-import oram.pathoramNaive.RecursivePathOramServer;
 import oram.pathoramNaive.RecursivePathOramClient;
+import oram.pathoramNaive.RecursivePathOramServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
 
 public class CountPathORAMNaiveRecursion extends ORAMCounterHarness{
 	int cutoff, recurFactor;

@@ -1,16 +1,21 @@
 package gc;
 
-import java.security.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.Security;
 
+import objects.Float.Representation;
+import ot.FakeOTSender;
+import ot.OTSender;
+import rand.ISAACProvider;
+import test.Utils;
 import circuits.FloatFormat;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
-import objects.Float.Representation;
-import ot.*;
-import rand.ISAACProvider;
-import test.Utils;
 
 public class GCGen extends GCCompEnv {
 
@@ -42,9 +47,9 @@ public class GCGen extends GCCompEnv {
 		this.os = os;
 
 
-		snd = new OTExtSender(80, is, os);
+//		snd = new OTExtSender(80, is, os);
 //		snd = new NPOTSender(80, is, os);
-//		snd = new FakeOTSender(80, is, os);
+		snd = new FakeOTSender(80, is, os);
 		gb = new Garbler();
 	}
 

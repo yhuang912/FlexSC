@@ -5,8 +5,9 @@ import java.util.Arrays;
 import oram.swapoam.SwapOramClient;
 import oram.swapoam.SwapOramServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class CountSwapORAM extends ORAMCounterHarness{
 

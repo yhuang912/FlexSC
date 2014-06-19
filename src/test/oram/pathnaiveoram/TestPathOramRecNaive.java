@@ -2,13 +2,13 @@ package test.oram.pathnaiveoram;
 
 import java.security.SecureRandom;
 
-import flexsc.*;
 import oram.pathoramNaive.RecursivePathOramClient;
 import oram.pathoramNaive.RecursivePathOramServer;
 
 import org.junit.Test;
 
 import test.Utils;
+import flexsc.Mode;
 
 
 public class TestPathOramRecNaive {

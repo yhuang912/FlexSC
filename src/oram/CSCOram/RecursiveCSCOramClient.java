@@ -6,10 +6,12 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import oram.OramParty;
-import flexsc.*;
 import oram.trivialoram.TrivialOramClient;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class RecursiveCSCOramClient<T> {
 	TrivialOramClient<T> baseOram;

@@ -1,11 +1,6 @@
 package test.harness;
 
 import ml.datastructure.Point;
-
-import org.junit.Assert;
-
-import com.sun.java.swing.plaf.windows.resources.windows;
-
 import pm.PMCompEnv;
 import test.Utils;
 import cv.CVCompEnv;

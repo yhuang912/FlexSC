@@ -6,7 +6,8 @@ import java.io.OutputStream;
 import oram.Block;
 import oram.PlainBlock;
 import test.Utils;
-import flexsc.*;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class CLPOramBasicClient<T> extends CLPOramParty<T> {
 	CLPOramLib<T> lib;

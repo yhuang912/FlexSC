@@ -4,10 +4,11 @@ package oram.treeoram;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import flexsc.*;
 import oram.Block;
 import oram.PlainBlock;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class TreeOramServer<T> extends TreeOramParty<T> {
 	TreeOramLib<T> lib;

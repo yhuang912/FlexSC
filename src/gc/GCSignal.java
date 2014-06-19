@@ -1,13 +1,11 @@
 package gc;
 
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.util.Arrays;
 
 import network.Server;
-import rand.ISAACProvider;
 import flexsc.Signal;
 
 public class GCSignal extends Signal {

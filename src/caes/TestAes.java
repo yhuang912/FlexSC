@@ -2,8 +2,6 @@ package caes;
 
 import java.security.SecureRandom;
 
-import javax.crypto.spec.SecretKeySpec;
-
 
 public class TestAes {
 	private static byte[] key = {

@@ -3,11 +3,12 @@ package oram.trivialoram;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import flexsc.*;
 import oram.Block;
 import oram.OramParty;
 import oram.PlainBlock;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class TrivialOramClient<T> extends OramParty<T> {
 	public PlainBlock[] bucket;

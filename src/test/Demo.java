@@ -1,7 +1,9 @@
 package test;
 
-import java.math.*;
-import java.security.*;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.Security;
 
 import rand.ISAACProvider;
 

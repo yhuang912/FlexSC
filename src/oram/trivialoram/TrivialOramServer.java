@@ -3,11 +3,11 @@ package oram.trivialoram;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import flexsc.Mode;
-import flexsc.Party;
 import oram.Block;
 import oram.OramParty;
 import oram.PlainBlock;
+import flexsc.Mode;
+import flexsc.Party;
 
 
 public class TrivialOramServer<T> extends OramParty<T> {

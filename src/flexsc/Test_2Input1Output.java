@@ -14,7 +14,7 @@ import cv.CVCompEnv;
 
 
 public class Test_2Input1Output<T> {
-	static int NUMBER_OF_INSTANCES = CompPool.MaxNumberTask;
+	
 	static int PORT = 51111;
 
 
@@ -78,11 +78,10 @@ public class Test_2Input1Output<T> {
 				
 				long t1 = System.nanoTime();
 
-				System.out.println("!!!!");
-				Object[] input = new Object[NUMBER_OF_INSTANCES];
+				Object[] input = new Object[CompPool.MaxNumberTask];
 
-				for(int i = 0; i < NUMBER_OF_INSTANCES; ++i)
-					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/NUMBER_OF_INSTANCES, (i+1)*Ta.length/NUMBER_OF_INSTANCES)};
+				for(int i = 0; i < CompPool.MaxNumberTask; ++i)
+					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 
 
 				Object[] result = pool.runGadget( new AddGadget(), input);
@@ -95,12 +94,11 @@ public class Test_2Input1Output<T> {
 				os.flush();
 
 				long t2 = System.nanoTime();
-				System.out.println("\n"+(t2-t1)/1000000000.0);
+				System.out.println(Ta.length+"\t"+(t2-t1)/1000000000.0);
 
 
 
 				z = gen.outputToAlice((T[]) finalresult);
-				System.out.print(Utils.toInt(z));
 				pool.finalize();
 				disconnect();
 			} catch (Exception e) {
@@ -135,10 +133,9 @@ public class Test_2Input1Output<T> {
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
 				CompPool<T> pool = new CompPool(eva, "localhost", PORT);				
-				System.out.println("!!!!");
-				Object[] input = new Object[NUMBER_OF_INSTANCES];
-				for(int i = 0; i < NUMBER_OF_INSTANCES; ++i)
-					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/NUMBER_OF_INSTANCES, (i+1)*Ta.length/NUMBER_OF_INSTANCES)};
+				Object[] input = new Object[CompPool.MaxNumberTask];
+				for(int i = 0; i < CompPool.MaxNumberTask; ++i)
+					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 				os.flush();
 
 				Object[] result = pool.runGadget( new AddGadget(), input);
@@ -180,21 +177,18 @@ public class Test_2Input1Output<T> {
 
 
 	public static void main(String args[])throws Exception {
+		CompPool.MaxNumberTask = new Integer(args[0]);
 		Mode m = Mode.REAL;
 		Test_2Input1Output<GCSignal> tt = new Test_2Input1Output<GCSignal>();
 		Random rnd = new Random();
 		int testCases = 1;
 		int res = 0;;
 
-		for (int i = 0; i < testCases; i++) {
-			int a[] = new int[100000];
-			for(int j = 0; j < a.length; ++j){
-				a[j] = 1;//rnd.nextInt(1000);
-				res+=a[j];
-			}
+		for (int i = 10000; i < 100000; i+=10000) {
+			int a[] = new int[i];
 			tt.runThreads(tt.new Helper(a, m));
 		}
-		System.out.println("res:"+res);
+		
 	}	
 
 }

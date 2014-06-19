@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import flexsc.*;
-import circuits.FloatFormat;
 import objects.Float.Representation;
 import test.Utils;
+import circuits.FloatFormat;
+import flexsc.CompEnv;
+import flexsc.Party;
 
 /*
  * The computational environment for performance measurement. 

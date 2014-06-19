@@ -3,8 +3,8 @@ package oram.counter;
 import oram.CSCOram.RecursiveCSCOramClient;
 import oram.CSCOram.RecursiveCSCOramServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
 
 public class CountCSCORAMRecursion extends ORAMCounterHarness{
 	int cutoff, recurFactor,add;

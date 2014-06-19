@@ -2,7 +2,8 @@ package ot;
 
 import gc.GCSignal;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public abstract class OTSender {
 	InputStream is;

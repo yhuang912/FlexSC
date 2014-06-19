@@ -3,8 +3,8 @@ package oram.counter;
 import oram.swapoam.RecursiveSwapOramClient;
 import oram.swapoam.RecursiveSwapOramServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
 
 public class CountSwapORAMRecursion extends ORAMCounterHarness{
 	int cutoff, recurFactor,add;

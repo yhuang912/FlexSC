@@ -1,5 +1,9 @@
 package test.oram.swaporam;
 
+import flexsc.Mode;
+import flexsc.Party;
+import gc.GCSignal;
+
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -8,8 +12,6 @@ import oram.swapoam.SwapOramServer;
 
 import org.junit.Test;
 
-import flexsc.*;
-import gc.GCSignal;
 import test.Utils;
 
 

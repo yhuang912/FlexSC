@@ -1,9 +1,13 @@
 package test.ints;
 
-import java.util.Random;
-import flexsc.*;
+import flexsc.CompEnv;
+import flexsc.Mode;
 import gc.GCSignal;
+
+import java.util.Random;
+
 import org.junit.Test;
+
 import test.Utils;
 import test.harness.Test_2Input1Output;
 import circuits.IntegerLib;

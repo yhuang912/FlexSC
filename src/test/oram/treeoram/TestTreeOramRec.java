@@ -2,7 +2,6 @@ package test.oram.treeoram;
 
 import java.security.SecureRandom;
 
-import flexsc.*;
 import oram.treeoram.RecursiveTreeOramClient;
 import oram.treeoram.RecursiveTreeOramServer;
 
@@ -10,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import test.Utils;
+import flexsc.Mode;
 
 public class TestTreeOramRec {
 	final int N = 1<<5;

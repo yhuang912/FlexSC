@@ -2,12 +2,12 @@ package oram.treeoram;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import oram.Block;
 import oram.PlainBlock;
 import test.Utils;
-import flexsc.*;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class TreeOramClient<T> extends TreeOramParty<T> {
 	TreeOramLib<T> lib;

@@ -1,14 +1,16 @@
 package test.harness;
 
 import objects.Float.Representation;
-import gc.GCEva;
-import gc.GCGen;
-import flexsc.*;
 
 import org.junit.Assert;
 
 import pm.PMCompEnv;
 import cv.CVCompEnv;
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
+import gc.GCEva;
+import gc.GCGen;
 
 
 public class TestFloat<T> {

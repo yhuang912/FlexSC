@@ -7,7 +7,8 @@ import java.util.Arrays;
 import oram.Block;
 import oram.PlainBlock;
 import test.Utils;
-import flexsc.*;
+import flexsc.Mode;
+import flexsc.Party;
 
 
 public class CSCOramServer<T> extends CSCOramParty<T> {

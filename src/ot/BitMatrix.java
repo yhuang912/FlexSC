@@ -3,7 +3,7 @@
 package ot;
 
 
-import java.math.*;
+import java.math.BigInteger;
 import java.security.SecureRandom;
 
 class BitMatrix {

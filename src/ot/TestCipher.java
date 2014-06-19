@@ -2,7 +2,6 @@ package ot;
 
 import gc.GCSignal;
 
-import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import org.junit.Test;

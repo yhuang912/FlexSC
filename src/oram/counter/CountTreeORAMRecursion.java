@@ -3,8 +3,8 @@ package oram.counter;
 import oram.treeoram.RecursiveTreeOramClient;
 import oram.treeoram.RecursiveTreeOramServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
 
 public class CountTreeORAMRecursion extends ORAMCounterHarness{
 	int cutoff, recurFactor;

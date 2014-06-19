@@ -1,13 +1,14 @@
 package oram.pathoram;
 
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import flexsc.CompEnv;
 import gc.GCEva;
 import gc.GCGen;
 import gc.GCSignal;
+
+import java.util.Arrays;
+
+import org.junit.Test;
+
 import test.Utils;
 
 

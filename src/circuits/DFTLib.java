@@ -3,8 +3,8 @@ package circuits;
 // Reference: https://www.ee.columbia.edu/~ronw/code/MEAPsoft/doc/html/FFT_8java-source.html
 
 
-import flexsc.CompEnv;
 import objects.Float.Representation;
+import flexsc.CompEnv;
 
 public class DFTLib<T> extends FloatLib<T> {
 

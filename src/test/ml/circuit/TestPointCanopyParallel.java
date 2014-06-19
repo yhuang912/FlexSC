@@ -1,17 +1,15 @@
 package test.ml.circuit;
 
-import java.util.Arrays;
-
+import flexsc.CompEnv;
+import flexsc.Flag;
+import flexsc.Mode;
+import gc.GCSignal;
 import ml.circuit.CanopyLib;
 import ml.datastructure.Point;
 
 import org.junit.Test;
 
 import test.harness.Test_NinputMoutputPoint;
-import flexsc.CompEnv;
-import flexsc.Flag;
-import flexsc.Mode;
-import gc.GCSignal;
 
 public class TestPointCanopyParallel extends Test_NinputMoutputPoint<GCSignal> {
 
