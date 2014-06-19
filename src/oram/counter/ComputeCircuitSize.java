@@ -1,6 +1,7 @@
 package oram.counter;
 
 import java.util.Arrays;
+
 import pm.PMCompEnv.Statistics;
 
 public class ComputeCircuitSize {
@@ -49,7 +50,7 @@ public class ComputeCircuitSize {
 			c2=null;System.gc();
 
 
-			CountPathORAMRecursion c3 = new CountPathORAMRecursion(log, 4, dataSize, 80, cutoff, recur);
+			CountPathORAMRecursion c3 = new CountPathORAMRecursion(log, 2, dataSize, 80, cutoff, recur);
 			c3.count();
 			//			CountPathORAM c3 = new CountPathORAM(log, 4, dataSize, 80);
 			c3.statistic.finalize();
@@ -57,7 +58,7 @@ public class ComputeCircuitSize {
 			c3=null;System.gc();
 
 
-			CountPathORAMNaiveRecursion c4 = new CountPathORAMNaiveRecursion(log, 4, dataSize, 80, cutoff, recur);
+			CountPathORAMNaiveRecursion c4 = new CountPathORAMNaiveRecursion(log, 2, dataSize, 80, cutoff, recur);
 			//			CountPathORAMNaive c4 = new CountPathORAMNaive(log, 4, dataSize, 80);
 			c4.count();c4.statistic.finalize();
 			Statistics s4 = c4.statistic.newInstance();

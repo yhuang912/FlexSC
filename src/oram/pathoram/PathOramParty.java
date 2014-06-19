@@ -3,9 +3,10 @@ package oram.pathoram;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import flexsc.*;
 import oram.PlainBlock;
 import oram.TreeBasedOramParty;
+import flexsc.Mode;
+import flexsc.Party;
 
 
 public abstract class PathOramParty<T> extends TreeBasedOramParty<T> {
@@ -21,7 +22,8 @@ public abstract class PathOramParty<T> extends TreeBasedOramParty<T> {
 			lengthOfStash = (int) (0.875*sp-7);
 		else if(cap == 6)
 			lengthOfStash = (int) (0.75*sp-7);
-		else ;
+		else lengthOfStash = 30;
+
 		stash = new PlainBlock[lengthOfStash];
 		if(gen != null) {
 			for(int i = 0; i < stash.length; ++i) 

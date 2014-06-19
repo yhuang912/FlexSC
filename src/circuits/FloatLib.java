@@ -1,10 +1,9 @@
 package circuits;
 
-import flexsc.CompEnv;
-
 import java.util.Arrays;
 
 import objects.Float.Representation;
+import flexsc.CompEnv;
 
 public class FloatLib<T> extends IntegerLib<T> {
 

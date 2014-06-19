@@ -1,15 +1,17 @@
 package gc;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import objects.Float.Representation;
-
-import java.io.*;
-
+import ot.FakeOTReceiver;
+import ot.OTReceiver;
+import test.Utils;
 import circuits.FloatFormat;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
-import ot.*;
-import test.Utils;
 
 public class GCEva extends GCCompEnv {
 	InputStream is;
@@ -24,9 +26,9 @@ public class GCEva extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
-		rcv = new OTExtReceiver(is, os);
+//		rcv = new OTExtReceiver(is, os);
 		//		rcv = new NPOTReceiver(is, os);
-		//		rcv = new FakeOTReceiver(is, os);
+				rcv = new FakeOTReceiver(is, os);
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
 	}
@@ -86,8 +88,8 @@ public class GCEva extends GCCompEnv {
 		for(int i = 0; i < result.length; ++i) {
 			if (!out[i].isPublic())
 				out[i].send(os);
-			os.flush();
 		}
+		os.flush();
 		
 		for(int i = 0; i < result.length; ++i)
 			result[i] = false;

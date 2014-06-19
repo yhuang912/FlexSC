@@ -1,11 +1,12 @@
 package test.floats;
 
-import java.util.Random;
-
-import objects.Float.Representation;
 import gc.GCEva;
 import gc.GCGen;
 import gc.GCSignal;
+
+import java.util.Random;
+
+import objects.Float.Representation;
 
 import org.junit.Test;
 

@@ -5,11 +5,11 @@ import java.security.SecureRandom;
 import oram.clporam.CLPOramBasicClient;
 import oram.clporam.CLPOramBasicServer;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 
 public class TestCLPOramBasic {

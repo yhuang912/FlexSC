@@ -4,8 +4,8 @@ import gc.GCEva;
 import gc.GCGen;
 import gc.GCSignal;
 
-import org.junit.Test;
 import org.junit.Assert;
+import org.junit.Test;
 
 public class TestBinaryGates {
 	static enum GateType {AND, XOR, NOT};

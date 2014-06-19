@@ -3,8 +3,9 @@ package oram.counter;
 import oram.clporam.CLPOramBasicClient;
 import oram.clporam.CLPOramBasicServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class CountKaiminORAM extends ORAMCounterHarness{
 	public CountKaiminORAM(int logN, int capacity, int dataSize, int securityParameter) {

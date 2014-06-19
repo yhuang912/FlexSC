@@ -1,7 +1,7 @@
 package circuits;
 
-import flexsc.CompEnv;
 import objects.Float.Representation;
+import flexsc.CompEnv;
 
 public class FloatMatrixLib<T> extends FloatLib<T> {
 

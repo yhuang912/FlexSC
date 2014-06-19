@@ -1,10 +1,6 @@
 package flexsc;
 
-import gc.GCGen;
-
 import java.util.concurrent.Callable;
-
-import test.Utils;
 
 
 public abstract class Gadget<T> implements Callable<Object>{

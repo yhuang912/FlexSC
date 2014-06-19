@@ -8,8 +8,9 @@ import oram.pathoramNaive.PathOramServer;
 
 import org.junit.Test;
 
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 
 public class TestPathOramBasicNaive {

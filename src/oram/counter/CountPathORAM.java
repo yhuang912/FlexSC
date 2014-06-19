@@ -3,8 +3,9 @@ package oram.counter;
 import oram.pathoram.PathOramClient;
 import oram.pathoram.PathOramServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class CountPathORAM extends ORAMCounterHarness{
 	public CountPathORAM(int logN, int capacity, int dataSize, int securityParameter) {

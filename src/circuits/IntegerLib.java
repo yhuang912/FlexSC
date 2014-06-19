@@ -1,8 +1,8 @@
 package circuits;
 
-import flexsc.CompEnv;
-
 import java.util.Arrays;
+
+import flexsc.CompEnv;
 
 public class IntegerLib<T> extends CircuitLib<T> {
 

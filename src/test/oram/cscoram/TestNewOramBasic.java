@@ -1,16 +1,16 @@
 package test.oram.cscoram;
 
+import flexsc.Mode;
+import flexsc.Party;
+import gc.GCSignal;
+
 import java.security.SecureRandom;
 
 import oram.CSCOram.CSCOramClient;
 import oram.CSCOram.CSCOramServer;
 
 import org.junit.Test;
-import org.junit.Assert;
 
-import flexsc.*;
-import gc.GCGen;
-import gc.GCSignal;
 import test.Utils;
 
 

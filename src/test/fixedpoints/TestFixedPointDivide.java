@@ -1,10 +1,13 @@
 package test.fixedpoints;
 
+import flexsc.CompEnv;
+import flexsc.Mode;
+import gc.GCSignal;
+
 import java.util.Random;
 
-import flexsc.*;
-import gc.GCSignal;
 import org.junit.Test;
+
 import test.harness.TestFixedPoint;
 import circuits.FixedPointLib;
 

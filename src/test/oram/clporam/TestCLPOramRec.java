@@ -2,13 +2,13 @@ package test.oram.clporam;
 
 import java.security.SecureRandom;
 
-import flexsc.*;
 import oram.clporam.CLPOramRecClient;
 import oram.clporam.CLPOramRecServer;
 
 import org.junit.Test;
 
 import test.Utils;
+import flexsc.Mode;
 
 
 public class TestCLPOramRec {

@@ -1,20 +1,18 @@
 package test.harness;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
+import org.junit.Assert;
+
+import pm.PMCompEnv;
+import test.Utils;
+import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
-
-import org.junit.Assert;
-
-import pm.PMCompEnv;
-import cv.CVCompEnv;
-import test.Utils;
 
 
 

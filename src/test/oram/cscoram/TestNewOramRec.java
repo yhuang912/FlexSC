@@ -1,11 +1,10 @@
 package test.oram.cscoram;
 
-import flexsc.*;
+import flexsc.Mode;
 import gc.GCSignal;
 import oram.CSCOram.RecursiveCSCOramClient;
 import oram.CSCOram.RecursiveCSCOramServer;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import test.Utils;

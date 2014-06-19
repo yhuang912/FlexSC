@@ -1,7 +1,7 @@
 package network;
 
-import java.io.OutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
 
 public final class RWBigInteger {

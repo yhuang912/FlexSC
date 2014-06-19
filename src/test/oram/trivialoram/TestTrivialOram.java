@@ -1,10 +1,12 @@
 package test.oram.trivialoram;
 
+import flexsc.Mode;
+import gc.GCSignal;
 import oram.trivialoram.TrivialOramClient;
 import oram.trivialoram.TrivialOramServer;
+
 import org.junit.Test;
-import flexsc.*;
-import gc.GCSignal;
+
 import test.Utils;
 
 

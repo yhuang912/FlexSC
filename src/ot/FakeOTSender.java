@@ -2,7 +2,8 @@ package ot;
 
 import gc.GCSignal;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class FakeOTSender extends OTSender {
 	public FakeOTSender(int bitLen, InputStream in, OutputStream out) {
@@ -21,5 +22,6 @@ public class FakeOTSender extends OTSender {
 			m[i][0].send(os);
 			m[i][1].send(os);
 		}
+		os.flush();
 	}
 }

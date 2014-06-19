@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
-import flexsc.*;
-import oram.Block;
-import oram.PlainBlock;
 import oram.TreeBasedOramParty;
+import flexsc.Mode;
+import flexsc.Party;
 
 public abstract class TreeOramParty<T> extends TreeBasedOramParty<T> {
 	public TreeOramParty(InputStream is, OutputStream os, int N, int dataSize,

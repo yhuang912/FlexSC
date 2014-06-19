@@ -1,10 +1,13 @@
 package test.ints;
 
+import flexsc.CompEnv;
+import flexsc.Mode;
+import gc.GCSignal;
+
 import org.junit.Test;
+
 import test.harness.Test_2Input1Output;
 import circuits.CircuitLib;
-import flexsc.*;
-import gc.GCSignal;
 
 public class TestMux extends Test_2Input1Output<GCSignal>{
 

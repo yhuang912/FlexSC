@@ -5,8 +5,9 @@ import java.util.Arrays;
 import oram.CSCOram.CSCOramClient;
 import oram.CSCOram.CSCOramServer;
 import pm.PMCompEnv;
-import flexsc.*;
 import test.Utils;
+import flexsc.Mode;
+import flexsc.Party;
 
 public class CountCSCORAM extends ORAMCounterHarness{
 

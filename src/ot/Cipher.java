@@ -4,9 +4,9 @@ package ot;
 
 import gc.GCSignal;
 
-import java.security.*;
-import java.math.*;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
 
 public final class Cipher {
 	private static final int unitLength = 160; // SHA-1 has 160-bit output.

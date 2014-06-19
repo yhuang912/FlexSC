@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import flexsc.*;
+
 import oram.trivialoram.TrivialOramServer;
+import flexsc.Mode;
+import flexsc.Party;
 
 
 public class RecursivePathOramServer<T> {

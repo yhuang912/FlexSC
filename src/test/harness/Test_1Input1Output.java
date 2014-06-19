@@ -1,16 +1,15 @@
 package test.harness;
 
+import org.junit.Assert;
+
+import pm.PMCompEnv;
+import test.Utils;
+import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
-
-import org.junit.Assert;
-
-import pm.PMCompEnv;
-import cv.CVCompEnv;
-import test.Utils;
 
 
 public class Test_1Input1Output<T>{

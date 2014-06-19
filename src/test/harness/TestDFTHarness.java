@@ -3,14 +3,16 @@ package test.harness;
 import java.util.Arrays;
 
 import objects.Float.Representation;
-import flexsc.*;
-import gc.GCEva;
-import gc.GCGen;
 
 import org.junit.Assert;
 
 import pm.PMCompEnv;
 import cv.CVCompEnv;
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
+import gc.GCEva;
+import gc.GCGen;
 
 public class TestDFTHarness<T> {
 	public abstract class Helper {

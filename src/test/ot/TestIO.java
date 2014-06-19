@@ -1,9 +1,9 @@
 		package test.ot;
 		
 		import java.io.InputStream;
-		import java.io.OutputStream;
-		import java.net.ServerSocket;
-		import java.net.Socket;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 		
 		public class TestIO {
 			static final int n = 500000;

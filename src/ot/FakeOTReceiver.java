@@ -2,8 +2,8 @@ package ot;
 
 import gc.GCSignal;
 
-import java.io.*;
-import java.util.*;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class FakeOTReceiver extends OTReceiver {
 	public FakeOTReceiver(InputStream in, OutputStream out) {
