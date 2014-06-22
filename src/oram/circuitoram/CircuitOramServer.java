@@ -65,8 +65,7 @@ public class CircuitOramServer<T> extends CircuitOramParty<T> {
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 		lib.add(scQueue[0], b);
 		
-		flushOneTime(nextPath());
-		flushOneTime(nextPath());
+		ControlEviction();
 	}
 
 	public void access(int pos) throws Exception {

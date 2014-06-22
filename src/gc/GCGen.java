@@ -9,6 +9,7 @@ import java.security.Security;
 
 import objects.Float.Representation;
 import ot.FakeOTSender;
+import ot.OTExtSender;
 import ot.OTSender;
 import rand.ISAACProvider;
 import test.Utils;
@@ -47,9 +48,9 @@ public class GCGen extends GCCompEnv {
 		this.os = os;
 
 
-//		snd = new OTExtSender(80, is, os);
+		snd = new OTExtSender(80, is, os);
 //		snd = new NPOTSender(80, is, os);
-		snd = new FakeOTSender(80, is, os);
+//		snd = new FakeOTSender(80, is, os);
 		gb = new Garbler();
 	}
 

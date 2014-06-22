@@ -14,12 +14,13 @@ public class ComputeCircuitSize {
 		args = new String[5];
 		args[0] = "20";
 		args[1] = "1024";
-		args[2] = "4";
+		args[2] = "8";
 		args[3] = "1";
 
 		System.out.println(args[0]+" "+args[1]+" "+args[2]+" "+args[3]);
 		int base = new Integer(args[0]);
 		int cutoff = new Integer(args[1]);
+		cutoff*=4;
 		int recur = new Integer(args[2]);
 		int num = new Integer(args[3]);
 
@@ -36,7 +37,7 @@ public class ComputeCircuitSize {
 		for(int log = base; log < base+num; log+=1) {
 
 
-			CountCSCORAMRecursion  c1 = new CountCSCORAMRecursion(log, 6, dataSize, 80, cutoff, recur, 12345);
+			CountCircuitORAMRecursion  c1 = new CountCircuitORAMRecursion(log, 3, dataSize, 80, cutoff, recur, 12345);
 //			CountNewORAM c1 = new CountNewORAM(log, 6, dataSize, 27);
 			c1.count();c1.statistic.finalize();
 			Statistics s1 = c1.statistic.newInstance();
@@ -118,7 +119,7 @@ public class ComputeCircuitSize {
 			y3[4][log-base] = (int) (s3.bandwidth);
 			y4[4][log-base] = (int) (s4.bandwidth);
 //			//						y7[4][log-base] = (int) (s7.bandwidth);
-			y5[3][log-base] = (int) ((s5.andGate+s5.xorGate));
+			y5[4][log-base] = (int) ((s5.bandwidth));
 //			y6[4][log-base] = (int) (trivial(log,  dataSize)[1]);
 
 
@@ -127,7 +128,7 @@ public class ComputeCircuitSize {
 		for(int j = 0; j < 5; ++j){
 			if( j == 0 || j == 2 || j == 3){
 			System.out.print("hold on;\nx="+Arrays.toString(logs)+"\n");
-			System.out.print("our SCORAM="+Arrays.toString(y1[j])+"\n");
+			System.out.print("Circuit="+Arrays.toString(y1[j])+"\n");
 			System.out.print("Swap="+Arrays.toString(y2[j])+"\n");
 			System.out.print("PathSC="+Arrays.toString(y3[j])+"\n");
 			System.out.print("Path="+Arrays.toString(y4[j])+"\n");
