@@ -112,8 +112,8 @@ public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 
 		T[] cur = zeros(loglogN);
 		T curBot = SIGNAL_ONE;
-		T emptyStash = isEmpty(scQueue);
-		T[] curv = mux(stashDeepest[1], zeros(loglogN), emptyStash);
+		//		T emptyStash = isEmpty(scQueue);
+		T[] curv = stashDeepest[1];//mux(, zeros(loglogN), emptyStash);
 		deepestIden[0] = stashDeepest[0];
 		curBot = stashDeepest[2][0];
 		for(int i = 0; i < logN; ++i) {
@@ -154,7 +154,7 @@ public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 			iEQl= and(not(lBot), eq(iSignal, l));
 			T isFull;
 			if(i > 0){
-				 
+
 				isFull= isFull(scPath[i-1]);
 			}
 			else {
@@ -166,14 +166,16 @@ public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 			//begin assignment
 			target[i] = mux(target[i], c, iEQl);
 			targetBot[i] = mux(targetBot[i], cBot, iEQl);
-			cBot = mux(cBot, SIGNAL_ONE, iEQl);
-			lBot = mux(lBot, SIGNAL_ONE, iEQl);
+			if( i > 0 ){//the last one can be skipped
+				cBot = mux(cBot, SIGNAL_ONE, iEQl);
+				lBot = mux(lBot, SIGNAL_ONE, iEQl);
 
-			T secondIf = and(hasSlot, canPush);
-			l = mux(l, deepest[i], secondIf);
-			lBot = mux(lBot, deepestBot[i], secondIf);
-			c = mux(c, iSignal, secondIf);
-			cBot = mux(cBot, SIGNAL_ZERO, secondIf);
+				T secondIf = and(hasSlot, canPush);
+				l = mux(l, deepest[i], secondIf);
+				lBot = mux(lBot, deepestBot[i], secondIf);
+				c = mux(c, iSignal, secondIf);
+				cBot = mux(cBot, SIGNAL_ZERO, secondIf);
+			}
 		}
 
 
@@ -195,10 +197,10 @@ public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 			iEQl = and(iEQl, not(lBot));
 			T firstIf = and(not(hold.isDummy), iEQl);
 			Block<T> holdTmp  = copy(hold);
-			
+
 			hold.isDummy = mux(hold.isDummy, SIGNAL_ONE, firstIf);
 			lBot = mux(lBot, SIGNAL_ONE, firstIf);
-			
+
 			T notBot = not(targetBot[i+1]);
 
 			Block<T> tmp = conditionalReadAndRemove(scPath[i], deepestIden[i+1], notBot);

@@ -70,10 +70,10 @@ public class TestCircuitOramRec {
 					int element = i%N;
 
 					Flag.sw.startTotal();
+					Flag.sw.ands = 0;
 					client.write(element, Utils.fromInt(element, dataSize));
 					double t= Flag.sw.stopTotal();
 					System.out.println(Flag.sw.ands+" "+t/1000000000.0 + " " +Flag.sw.ands/t*1000);
-					Flag.sw.ands = 0;
 					Flag.sw.addCounter();
 
 

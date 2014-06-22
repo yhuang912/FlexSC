@@ -16,7 +16,7 @@ import test.Utils;
 
 
 public class TestCircuitOramBasic {
-	final int N = 1<<5;
+	final int N = 1<<7;
 	final int capacity = 3;
 	int[] posMap = new int[N];
 	int writecount = N;
