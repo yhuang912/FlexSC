@@ -28,7 +28,7 @@ public class Test_2Input1Output<T> {
 	public class AddGadget extends Gadget<T> {
 		@Override
 		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
-			long t1 = System.nanoTime();
+		//	long t1 = System.nanoTime();
 			T[][] x = (T[][]) o[0];
 
 			IntegerLib<T> lib =  new IntegerLib<T>(e);
@@ -37,13 +37,13 @@ public class Test_2Input1Output<T> {
 			for(int i = 1; i < x.length; ++i)
 				result = lib.add(result, x[i]);
 			
-			long t2 = System.nanoTime();
-			if(e instanceof GCGen)
+		//	long t2 = System.nanoTime();
+/*			if(e instanceof GCGen)
 				System.out.print("Gen");
 			else
 				System.out.print("Eva");
 			System.out.println("ThreadTime: "+(t2-t1));
-			
+*/			
 			return result;
 		}
 
@@ -75,7 +75,6 @@ public class Test_2Input1Output<T> {
 		public void run() {
 			try {
 				listen(15432);
-
 
 				CompEnv<T> gen = null;
 				if(h.m == Mode.REAL)
