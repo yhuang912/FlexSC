@@ -11,9 +11,14 @@ import flexsc.Mode;
 import gc.GCSignal;
 public class TestSwapOramRec {
 
+	public boolean useCGarble = true;
+
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345, 10, 6, 32,  4, 10);
+		if (useCGarble) {
+			System.loadLibrary("aes");
+		}
+		GenRunnable gen = new GenRunnable(12345, 20, 6, 32,  4, 10);
 		EvaRunnable eva = new EvaRunnable("localhost", 12345);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
@@ -24,7 +29,7 @@ public class TestSwapOramRec {
 		System.out.print("\n");
 	}
 
-	final static int writeCount = 5;
+	final static int writeCount = 10;
 	final static int readCount = 0;
 	public TestSwapOramRec() {
 	}

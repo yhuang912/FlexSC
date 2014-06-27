@@ -190,6 +190,9 @@ static void SWIGUNUSED SWIG_JavaThrowException(JNIEnv *jenv, SWIG_JavaExceptionC
  extern char* intel_AES_enc128_char(char *plainText, char *cipherText, char *key, size_t numBlocks);
 
  extern char* intel_AES_dec128_char(char *cipherText, char *plainText, char *key,size_t numBlocks);
+
+ extern char * garble(char* a, char* b, long long gid, char * R);
+ // extern void garble();
  
 
 #ifdef __cplusplus
@@ -217,8 +220,7 @@ SWIGEXPORT jbyteArray JNICALL Java_caes_AesJNI_intel_1AES_1enc128_1char(JNIEnv *
   }
   arg4 = (size_t)jarg4; 
   result = (char *)intel_AES_enc128_char(arg1,arg2,arg3,arg4);
-    if (result) jresult = (*jenv)->NewByteArray(jenv, arg4*16);
-  (*jenv)->SetByteArrayRegion(jenv, jresult, 0, arg4*16, result);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   {
     (*jenv)->ReleaseByteArrayElements(jenv, jarg1, (jbyte *) arg1, 0); 
   }
@@ -256,8 +258,7 @@ SWIGEXPORT jbyteArray JNICALL Java_caes_AesJNI_intel_1AES_1dec128_1char(JNIEnv *
   }
   arg4 = (size_t)jarg4; 
   result = (char *)intel_AES_dec128_char(arg1,arg2,arg3,arg4);
-  if (result) jresult = (*jenv)->NewByteArray(jenv, arg4*16);
-  (*jenv)->SetByteArrayRegion(jenv, jresult, 0, arg4*16, result);
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
   {
     (*jenv)->ReleaseByteArrayElements(jenv, jarg1, (jbyte *) arg1, 0); 
   }
@@ -266,6 +267,49 @@ SWIGEXPORT jbyteArray JNICALL Java_caes_AesJNI_intel_1AES_1dec128_1char(JNIEnv *
   }
   {
     (*jenv)->ReleaseByteArrayElements(jenv, jarg3, (jbyte *) arg3, 0); 
+  }
+  
+  
+  
+  return jresult;
+}
+
+
+SWIGEXPORT jbyteArray JNICALL Java_caes_AesJNI_garble(JNIEnv *jenv, jclass jcls, jbyteArray jarg1, jbyteArray jarg2, jlong jarg3, jbyteArray jarg4) {
+  jbyteArray jresult = 0 ;
+  char *arg1 = (char *) 0 ;
+  char *arg2 = (char *) 0 ;
+  long long arg3 ;
+  char *arg4 = (char *) 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    arg1 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg1, 0); 
+  }
+  {
+    arg2 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg2, 0); 
+  }
+  arg3 = (long long)jarg3; 
+  {
+    arg4 = (char *) (*jenv)->GetByteArrayElements(jenv, jarg4, 0); 
+  }
+  result = (char *)garble(arg1,arg2,arg3,arg4);
+  {
+    if (result) jresult = (*jenv)->NewByteArray(jenv, 50);
+    (*jenv)->SetByteArrayRegion(jenv, jresult, 0, 50, result);
+    // jresult = JCALL1(NewByteArray, jenv, 50);
+    // JCALL4(SetByteArrayRegion, jenv, jresult, 0, 50, (const jbyte*) *result);
+  }
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg1, (jbyte *) arg1, 0); 
+  }
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg2, (jbyte *) arg2, 0); 
+  }
+  {
+    (*jenv)->ReleaseByteArrayElements(jenv, jarg4, (jbyte *) arg4, 0); 
   }
   
   

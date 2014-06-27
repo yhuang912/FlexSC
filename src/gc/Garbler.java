@@ -2,12 +2,24 @@ package gc;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
+import java.util.Arrays;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 final class Garbler {
 	private MessageDigest sha1 = null;
+	private Cipher cipher = null;
+
 	Garbler() {
         try {
             sha1 = MessageDigest.getInstance("SHA-1");
+            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec secretKeySpecification = new SecretKeySpec(key, "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpecification, new IvParameterSpec(Arrays.copyOf(key, 16)));
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -20,12 +32,23 @@ final class Garbler {
 		return getPadding(lb0, lb1, k).xor(m);
 	}
 
-	public GCSignal dec(GCSignal lb0, GCSignal lb1, long k, GCSignal c) {
-		return getPadding(lb0, lb1, k).xor(c);
+	static byte b = 4;
+	public GCSignal dec(GCSignal lb0, GCSignal lb1, long k, GCSignal c) throws IllegalBlockSizeException, BadPaddingException {
+		if (GCGen.useCGarble) {
+			  cipher.update((ByteBuffer.allocate(lb0.len+lb1.len+12).put(lb0.bytes).put(lb1.bytes).putLong(k).put(b).put(b).put(b).put(b)).array());
+			 // byte[] haha = new byte[10];
+	          GCSignal ret = GCSignal.newInstance(cipher.doFinal());
+	          return ret;
+		} else {
+			return getPadding(lb0, lb1, k).xor(c);
+		}
 	}
 	
 	static byte[] a = new byte[2*16];
-	static byte[] key = {1,2,3,4,4,5,6,7,8,1,2,3,4,5,6,7,8};
+	static byte[] key = {1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8};
+	static{for(int i = 0; i < key.length; ++i)
+		key[i] += '0';
+		}
 	private GCSignal getPadding(GCSignal lb0, GCSignal lb1, long k) {
 		
 //        sha1.update(lb0.bytes);

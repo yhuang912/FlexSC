@@ -41,6 +41,7 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 
+char ky[32] = "12345678123456781234567812345678";
 
 char* intel_AES_enc128_char(char * plainText, char * cipherText, char * key, size_t numBlocks) {
   //printf("In aes\n");
@@ -59,6 +60,27 @@ char* intel_AES_enc128_char(char * plainText, char * cipherText, char * key, siz
     printf("%d %d\n", (int) cipherText[i], plainText[i]);
     }*/
   return cipherText;
+}
+
+void enc(char * a, char * b, long long gid, char * m, char * ret) {
+  char input[32];
+  char temp[32];
+  strncpy(input, a, 10);
+  strncpy(input + 10, a, 10);
+  input[20] = gid & 0xFF;
+  input[21] = (gid >> 8) & 0xFF;
+  input[22] = (gid >> 16) & 0xFF;
+  input[23] = (gid >> 24) & 0xFF;
+  input[24] = (gid >> 32) & 0xFF;
+  input[25] = (gid >> 40) & 0xFF;
+  input[26] = (gid >> 48) & 0xFF;
+  input[27] = (gid >> 56) & 0xFF;
+  input[28] = input[29] = input[30] = input[31] = 0;
+  // add bytes for long long
+  intel_AES_enc256_CBC(input, temp, ky, 1, ky);
+  // intel_AES_enc128_char(input, temp, ky, 2);
+  xor(temp, m, ret);
+  //strncpy(ret, temp, 10);
 }
 
 char* intel_AES_dec128_char(char *cipherText, char *plainText, char *key, size_t numBlocks) {

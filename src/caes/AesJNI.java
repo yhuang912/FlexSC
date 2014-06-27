@@ -11,4 +11,5 @@ package caes;
 public class AesJNI {
   public final static native byte[] intel_AES_enc128_char(byte[] jarg1, byte[] jarg2, byte[] jarg3, long jarg4);
   public final static native byte[] intel_AES_dec128_char(byte[] jarg1, byte[] jarg2, byte[] jarg3, long jarg4);
+  public final static native byte[] garble(byte[] jarg1, byte[] jarg2, long jarg3, byte[] jarg4);
 }

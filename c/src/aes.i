@@ -9,6 +9,9 @@
  extern char* intel_AES_enc128_char(char *plainText, char *cipherText, char *key, size_t numBlocks);
 
  extern char* intel_AES_dec128_char(char *cipherText, char *plainText, char *key,size_t numBlocks);
+
+ extern char * garble(char* a, char* b, long long gid, char * R);
+ // extern void garble();
  %}
  
 /*extern int test128_CBC(int n);
@@ -60,8 +63,16 @@
   // If the result was malloc()'d free it here
   }*/
 
+%typemap(out) char * garble {
+    if (result) jresult = (*jenv)->NewByteArray(jenv, 50);
+    (*jenv)->SetByteArrayRegion(jenv, jresult, 0, 50, result);
+}
+
 //extern short * get_data(unsigned char *plainText, unsigned char *key, int *data_len);
 
 extern char* intel_AES_enc128_char(char *plainText, char *cipherText, char *key, size_t numBlocks);
 
 extern char* intel_AES_dec128_char(char *cipherText, char *plainText, char *key,size_t numBlocks);
+
+extern char * garble(char* a, char *b, long long gid, char * R);
+//  extern void garble();
