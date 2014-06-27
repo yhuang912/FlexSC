@@ -17,7 +17,7 @@ import gc.GCGen;
 
 
 public class TestBigInteger<T> {
-	public final int LENGTH = 900;
+	public final int LENGTH = 10;
 	final int RANGE = LENGTH;
 	public abstract class Helper {
 		BigInteger intA, intB;

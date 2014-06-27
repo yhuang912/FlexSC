@@ -11,7 +11,7 @@ import network.Client;
 import network.Server;
 
 public class CompPool<T> {
-	static int MaxNumberTask;
+	public static int MaxNumberTask;
 
 	CompEnv<T>[] envs;
 	Server[] servers;

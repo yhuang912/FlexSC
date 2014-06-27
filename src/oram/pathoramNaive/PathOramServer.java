@@ -57,7 +57,7 @@ public class PathOramServer<T> extends PathOramParty<T> {
 		Block<T> scNewBlock = new Block<T>(scIden, scPos, scData, lib.SIGNAL_ZERO);
 		
 		lib.add(scStash[0], scNewBlock);
-		lib.pushDown(scPath[0], scStash[0], pos);
+		lib.pushDown2(scPath[0], scStash[0], pos);
 		
 		
 		PlainBlock[][] blocks = randomPath;

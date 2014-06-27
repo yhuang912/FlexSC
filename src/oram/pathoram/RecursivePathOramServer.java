@@ -11,7 +11,7 @@ import flexsc.Party;
 
 
 public class RecursivePathOramServer<T> {
-	TrivialOramServer<T> baseOram;
+	public TrivialOramServer<T> baseOram;
 	public ArrayList<PathOramServer<T>> servers = new ArrayList<>();
 	int recurFactor;
 	int cutoff;

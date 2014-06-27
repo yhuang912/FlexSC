@@ -27,15 +27,12 @@ public class IntegerLib<T> extends CircuitLib<T> {
 	public T[] add(T[] x, T[] y, boolean cin) throws Exception {
 		assert(x != null && y != null && x.length == y.length) : "add: bad inputs.";
 		T[] res = env.newTArray(x.length);
-
-//		T[] t = add(x[0], y[0], new Signal(cin));
 		T[] t = add(x[0], y[0], env.newT(cin));
 		res[0] = t[S];
 		for (int i = 0; i < x.length-1; i++) {
 			t = add(x[i+1], y[i+1], t[COUT]);
 			res[i+1] = t[S];
 		}
-
 		return res;
 	}
 
@@ -193,8 +190,8 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		}
 		result[x.length-1] = xor(x[x.length-1], reachedOneSignal[x.length-1]);
 		return mux(x, result, sign);
-		 
-		 
+
+
 	}
 
 	//tested
@@ -220,27 +217,27 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		return numberOfOnes(not(result));
 	}
 
-//	final static T[][] B = {
-//		toSignals(0x55555555),
-//		toSignals(0x33333333),
-//		toSignals(0x0F0F0F0F),
-//		toSignals(0x00FF00FF),
-//		toSignals(0x0000FFFF)
-//	};
-//
-//	public T[] numberOfOnes32(T[] x) throws Exception {
-//		assert(x!= null): "numberOfOnes : bad input";
-//		assert(x.length == 32) : "numberOfOnes : input should be of length 32";
-//
-//		T[] c = sub(x, and(rightShift(x), B[0]));//c = v - ((v >> 1) & B[0]);
-//		c = add(and(rightPublicShift(c, (1<<1) ), B[1]), and(c, B[1]));//c = ((c >> S[1]) & B[1]) + (c & B[1]);
-//		c = and(add(rightPublicShift(c, (1<<2) ), c), B[2]);//c = ((c >> S[2]) + c) & B[2];
-//		c = and(add(rightPublicShift(c, (1<<3) ), c), B[3]);//c = ((c >> S[3]) + c) & B[3];
-//		T[] result = and(add(rightPublicShift(c, (1<<4) ), c), B[4]);//c = ((c >> S[4]) + c) & B[4];
-//
-//		return result; 
-//
-//	}
+	//	final static T[][] B = {
+	//		toSignals(0x55555555),
+	//		toSignals(0x33333333),
+	//		toSignals(0x0F0F0F0F),
+	//		toSignals(0x00FF00FF),
+	//		toSignals(0x0000FFFF)
+	//	};
+	//
+	//	public T[] numberOfOnes32(T[] x) throws Exception {
+	//		assert(x!= null): "numberOfOnes : bad input";
+	//		assert(x.length == 32) : "numberOfOnes : input should be of length 32";
+	//
+	//		T[] c = sub(x, and(rightShift(x), B[0]));//c = v - ((v >> 1) & B[0]);
+	//		c = add(and(rightPublicShift(c, (1<<1) ), B[1]), and(c, B[1]));//c = ((c >> S[1]) & B[1]) + (c & B[1]);
+	//		c = and(add(rightPublicShift(c, (1<<2) ), c), B[2]);//c = ((c >> S[2]) + c) & B[2];
+	//		c = and(add(rightPublicShift(c, (1<<3) ), c), B[3]);//c = ((c >> S[3]) + c) & B[3];
+	//		T[] result = and(add(rightPublicShift(c, (1<<4) ), c), B[4]);//c = ((c >> S[4]) + c) & B[4];
+	//
+	//		return result; 
+	//
+	//	}
 
 	//tested
 	public T[] lengthOfCommenPrefix(T[] x, T [] y) throws Exception {
@@ -499,7 +496,7 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		z2Pad = leftPublicShift(z2Pad, 2*(x.length/2));
 		return add(add(z0Pad, z1), z2Pad);
 	}
-	
+
 	public T[] min(T[] x, T[] y) throws Exception {
 		T leq = leq(x, y);
 		return mux(y, x, leq);

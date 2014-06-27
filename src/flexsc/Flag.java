@@ -8,5 +8,4 @@ public class Flag {
 	public Flag() {
 		// TODO Auto-generated constructor stub
 	}
-
 }

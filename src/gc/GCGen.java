@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.util.Arrays;
 
 import objects.Float.Representation;
 import ot.FakeOTSender;
@@ -17,6 +18,7 @@ import circuits.FloatFormat;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
+import flexsc.Signal;
 
 public class GCGen extends GCCompEnv {
 
@@ -47,10 +49,9 @@ public class GCGen extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
-
-		snd = new OTExtSender(80, is, os);
+//		snd = new OTExtSender(80, is, os);
 //		snd = new NPOTSender(80, is, os);
-//		snd = new FakeOTSender(80, is, os);
+		snd = new FakeOTSender(80, is, os);
 		gb = new Garbler();
 	}
 

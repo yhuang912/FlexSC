@@ -154,7 +154,6 @@ public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 			iEQl= and(not(lBot), eq(iSignal, l));
 			T isFull;
 			if(i > 0){
-
 				isFull= isFull(scPath[i-1]);
 			}
 			else {
@@ -202,9 +201,12 @@ public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 			lBot = mux(lBot, SIGNAL_ONE, firstIf);
 
 			T notBot = not(targetBot[i+1]);
+			
+			if(i != logN-1){
+				Block<T> tmp = conditionalReadAndRemove(scPath[i], deepestIden[i+1], notBot);
+				hold = mux(hold, tmp, notBot);
+			}
 
-			Block<T> tmp = conditionalReadAndRemove(scPath[i], deepestIden[i+1], notBot);
-			hold = mux(hold, tmp, notBot);
 			l = mux(l, target[i+1], notBot);
 			lBot = mux(lBot, targetBot[i+1], notBot);
 			conditionalAdd(scPath[i], holdTmp, firstIf);

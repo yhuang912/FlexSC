@@ -51,12 +51,21 @@ public class CountCircuitORAMRecursion extends ORAMCounterHarness{
 					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					mce.statistic.flush();
 				}
+				{
+					PMCompEnv mce = (PMCompEnv)server.baseOram.eva;
+					mce.statistic.flush();
+				}
+				
 				server.access();
 //				server.access();
 				
 				for(int i = 0; i < server.servers.size(); ++i) {
 					PMCompEnv mce = (PMCompEnv)server.servers.get(i).eva;
 					statistic.add(mce.statistic);
+				}
+				{
+					PMCompEnv mce = (PMCompEnv)server.baseOram.eva;
+					statistic.add(mce.statistic);					
 				}
 //				statistic.andGate/=2;
 //				statistic.xorGate/=2;
