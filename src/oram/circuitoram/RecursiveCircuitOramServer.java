@@ -10,7 +10,7 @@ import flexsc.Mode;
 import flexsc.Party;
 
 public class RecursiveCircuitOramServer<T> {
-	TrivialOramServer<T> baseOram;
+	public TrivialOramServer<T> baseOram;
 	public ArrayList<CircuitOramServer<T>> servers = new ArrayList<>();
 	int recurFactor;
 	int cutoff;

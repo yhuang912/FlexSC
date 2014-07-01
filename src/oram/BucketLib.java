@@ -27,6 +27,14 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		return res;
 	}
 
+	public T isEmpty(Block<T>[] bucket) throws Exception
+	{
+		T res = SIGNAL_ONE;
+		for(int i = 0; i < bucket.length; ++i) {
+			res = and(res, bucket[i].isDummy);
+		}
+		return res;
+	}
 	
 	public Block<T> conditionalReadAndRemove(Block<T>[] bucket, T[] iden, T condition) throws Exception {
 		Block<T> result = dummyBlock;
@@ -196,6 +204,11 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 				result[i][j] = xor(a[i][j], b[i][j]);
 			}
 		return result;
+	}
+	
+	public Block<T> copy(Block<T> b) {
+//		return new Block<T>(copy(b.iden), copy(b.pos), copy(b.data), b.isDummy);
+		return new Block<T>(b.iden, b.pos, b.data, b.isDummy);
 	}
 	
 	@SuppressWarnings("unchecked")

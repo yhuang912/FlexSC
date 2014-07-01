@@ -38,5 +38,11 @@ public abstract class CircuitOramParty<T> extends TreeBasedOramParty<T> {
 		cnt = (cnt+1)%N;
 		return res;
 	}
+	
+	protected void ControlEviction() throws Exception {
+//		if(cnt%2 == 1)
+		flushOneTime(nextPath());
+		flushOneTime(nextPath());
+	}
 }
 

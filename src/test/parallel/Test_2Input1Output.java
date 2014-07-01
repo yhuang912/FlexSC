@@ -1,5 +1,11 @@
-package flexsc;
+	package test.parallel;
 
+import flexsc.CompEnv;
+import flexsc.CompPool;
+import flexsc.Flag;
+import flexsc.Gadget;
+import flexsc.Mode;
+import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
 import gc.GCSignal;
@@ -8,6 +14,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import pm.PMCompEnv;
+import test.StopWatch;
 import test.Utils;
 import circuits.IntegerLib;
 import cv.CVCompEnv;
@@ -21,6 +28,7 @@ public class Test_2Input1Output<T> {
 	public class AddGadget extends Gadget<T> {
 		@Override
 		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
+			long t1 = System.nanoTime();
 			T[][] x = (T[][]) o[0];
 
 			IntegerLib<T> lib =  new IntegerLib<T>(e);
@@ -28,7 +36,14 @@ public class Test_2Input1Output<T> {
 			T[] result = x[0];
 			for(int i = 1; i < x.length; ++i)
 				result = lib.add(result, x[i]);
-
+			
+			long t2 = System.nanoTime();
+			if(e instanceof GCGen)
+				System.out.print("Gen");
+			else
+				System.out.print("Eva");
+			System.out.println("ThreadTime: "+(t2-t1));
+			
 			return result;
 		}
 
@@ -177,16 +192,17 @@ public class Test_2Input1Output<T> {
 
 
 	public static void main(String args[])throws Exception {
-		CompPool.MaxNumberTask = new Integer(args[0]);
+		CompPool.MaxNumberTask = 2;//new Integer(args[0]);
 		Mode m = Mode.REAL;
 		Test_2Input1Output<GCSignal> tt = new Test_2Input1Output<GCSignal>();
-		Random rnd = new Random();
-		int testCases = 1;
-		int res = 0;;
 
-		for (int i = 10000; i < 100000; i+=10000) {
+
+		for (int i = 100000; i < 100000; i+=100000) {
 			int a[] = new int[i];
 			tt.runThreads(tt.new Helper(a, m));
+			Flag.sw.addCounter();
+			Flag.sw.print();
+			Flag.sw.flush();
 		}
 		
 	}	

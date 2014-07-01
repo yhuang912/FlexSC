@@ -10,7 +10,7 @@ import flexsc.Mode;
 import flexsc.Party;
 
 public class RecursiveTreeOramServer<T> {
-	TrivialOramServer<T> baseOram;
+	public TrivialOramServer<T> baseOram;
 	public ArrayList<TreeOramServer<T>> servers = new ArrayList<>();
 	int recurFactor;
 	int cutoff;

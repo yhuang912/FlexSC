@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import objects.Float.Representation;
 import ot.FakeOTSender;
+import ot.OTExtSender;
 import ot.OTSender;
 import rand.ISAACProvider;
 import test.Utils;
@@ -18,10 +19,11 @@ import circuits.FloatFormat;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
+import flexsc.Signal;
 
 public class GCGen extends GCCompEnv {
 
-	public static boolean useCGarble = true;
+	public static boolean useCGarble = false;
 
 	static public GCSignal R = null;
 	static SecureRandom rnd;
@@ -49,7 +51,6 @@ public class GCGen extends GCCompEnv {
 	public GCGen(InputStream is, OutputStream os) throws Exception {
 		this.is = is;
 		this.os = os;
-
 
 		//snd = new OTExtSender(80, is, os);
 //		snd = new NPOTSender(80, is, os);

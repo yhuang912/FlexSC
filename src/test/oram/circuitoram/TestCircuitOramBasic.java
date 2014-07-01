@@ -16,11 +16,11 @@ import test.Utils;
 
 
 public class TestCircuitOramBasic {
-	final int N = 1<<22;
-	final int capacity = 4;
+	final int N = 1<<7;
+	final int capacity = 3;
 	int[] posMap = new int[N];
 	int writecount = N;
-	int readcount = N*5 ;
+	int readcount = N*10;
 	int dataSize = 32;
 	public TestCircuitOramBasic() {
 		SecureRandom rng = new SecureRandom();
@@ -44,8 +44,8 @@ public class TestCircuitOramBasic {
 				listen(port);
 
 				int data[] = new int[N+1];
-				CircuitOramClient<GCSignal> client = new CircuitOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
-//				CircuitOramClient<GCSignal> client = new CircuitOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
+//				CircuitOramClient<GCSignal> client = new CircuitOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
+				CircuitOramClient<GCSignal> client = new CircuitOramClient<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.VERIFY, 80);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				
@@ -58,8 +58,10 @@ public class TestCircuitOramBasic {
 					data[element] = 2*element+1;
 					long t1 = System.currentTimeMillis();
 					client.write(element, oldValue, newValue, Utils.fromInt(data[element], client.lengthOfData));
-//					os.write(0);
+					os.write(0);
 					posMap[element] = newValue;
+					os.flush();
+
 
 					long t2 = System.currentTimeMillis() - t1;
 //					System.out.println("time: "+t2/1000.0+" "+((GCGen)(client.gen)).ands + " "+ 1/((double)t2/((GCGen)(client.gen)).ands));
@@ -79,8 +81,10 @@ public class TestCircuitOramBasic {
 					System.out.println(element+" "+oldValue+" "+newValue);
 
 					boolean[] b = client.read(element, oldValue, newValue);
-//					os.write(0);
+					os.write(0);
 					posMap[element] = newValue;
+					os.flush();
+
 					//Assert.assertTrue(Utils.toInt(b.data) == data[element]);
 					if(Utils.toInt(b) != data[element]) {
 						System.out.println("inconsistent: "+element+" "+Utils.toInt(b) + " "+data[element]+" "+posMap[element]);
@@ -133,21 +137,21 @@ public class TestCircuitOramBasic {
 			try {
 				connect(host, port);
 				
-				CircuitOramServer<GCSignal> server = new CircuitOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
-//				CircuitOramServer<GCSignal> server = new CircuitOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
+//				CircuitOramServer<GCSignal> server = new CircuitOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
+				CircuitOramServer<GCSignal> server = new CircuitOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.VERIFY, 80);
 				
 				for(int i = 0; i < writecount; ++i) {
 					int element = i%N;
 					int oldValue = posMap[element];
 					server.access(oldValue);
-//					is.read();
+					is.read();
 				}
 
 				for(int i = 0; i < readcount; ++i){
 					int element = i%N;
 					int oldValue = posMap[element];
 					server.access(oldValue);
-//					is.read();
+					is.read();
 				}
 				
 				idens = new int[server.tree.length][];
@@ -178,10 +182,10 @@ public class TestCircuitOramBasic {
 		}
 	}
 	
+	GenRunnable gen = new GenRunnable(1234);
+	EvaRunnable eva = new EvaRunnable("localhost", 1234);
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(1234);
-		EvaRunnable eva = new EvaRunnable("localhost", 1234);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
 		tGen.start(); Thread.sleep(10);

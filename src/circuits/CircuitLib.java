@@ -1,5 +1,7 @@
 package circuits;
 
+import java.util.Arrays;
+
 import flexsc.CompEnv;
 
 public class CircuitLib<T> {
@@ -142,5 +144,9 @@ public class CircuitLib<T> {
 		for(int i = 0; i < a.length && i < length; ++i)
 			res[i] = a[i];
 		return res;
+	}
+	
+	public T[] copy(T[] x) {
+		return Arrays.copyOf(x, x.length);
 	}
 }

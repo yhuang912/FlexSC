@@ -9,6 +9,7 @@ import javax.crypto.IllegalBlockSizeException;
 
 import objects.Float.Representation;
 import ot.FakeOTReceiver;
+import ot.OTExtReceiver;
 import ot.OTReceiver;
 import test.Utils;
 import circuits.FloatFormat;

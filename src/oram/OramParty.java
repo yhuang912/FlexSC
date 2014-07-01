@@ -55,10 +55,11 @@ public abstract class OramParty<T> {
 			a*=2;
 			++logN;
 		}
+		--logN;
 
 		this.N = 1<<logN;
 		lengthOfData = dataSize;
-		lengthOfIden = logN-1;
+		lengthOfIden = logN;
 		lengthOfPos = logN-1;
 		role = p;
 		mode = m;

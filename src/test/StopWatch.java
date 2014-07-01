@@ -21,7 +21,7 @@ public class StopWatch {
     double startTimeGCIO = 0;
     double stopTimeGCIO = 0;
     double elapsedTimeGCIO = 0;
-    boolean countTime = false;
+    boolean countTime = true;
 long counter = 0;
     public void startOT() {
     	if(countTime)
@@ -79,12 +79,37 @@ long counter = 0;
     	++counter;
     }
     
+    public void flush() {
+        ands = 0;
+        startTimeOT = 0;
+        stopTimeOT = 0;
+        elapsedTimeOT = 0;
+
+        startTimeGC = 0;
+        stopTimeGC = 0;
+        elapsedTimeGC = 0;
+
+        startTimeTotal = 0;
+        stopTimeTotal = 0;
+        elapsedTimeTotal = 0;
+
+        startTimeOTIO = 0;
+        stopTimeOTIO = 0;
+        elapsedTimeOTIO = 0;
+
+        startTimeGCIO = 0;
+        stopTimeGCIO = 0;
+        elapsedTimeGCIO = 0;
+        counter = 0;
+
+    }
+    
     public void print(){
-    	System.out.println("*************************\n"+
-    elapsedTimeTotal/1000000000.0/counter+" "+
-    (elapsedTimeGC-elapsedTimeGCIO)/1000000000.0/counter+" "+
+    	System.out.println("Total Time \t GC CPU Time\t GCIO Time\t OTCPU Time\t OTIO Time\n");
+    	System.out.println(elapsedTimeTotal/1000000000.0/counter+"\t"+
+    (elapsedTimeGC-elapsedTimeGCIO)/1000000000.0/counter+"\t"+
     elapsedTimeGCIO/1000000000.0/counter+" "+
-    (elapsedTimeOT-elapsedTimeOTIO)/1000000000.0/counter+" "+
+    (elapsedTimeOT-elapsedTimeOTIO)/1000000000.0/counter+"\t"+
     elapsedTimeOTIO/1000000000.0/counter+"\n");
     }
 }

@@ -67,8 +67,7 @@ public class CircuitOramClient<T> extends CircuitOramParty<T> {
 
 		lib.add(scQueue[0], b);
 		os.flush();
-		flushOneTime(nextPath());
-		flushOneTime(nextPath());
+		ControlEviction();
 	}
 
 	public boolean[] readAndRemove(int iden, boolean[] pos) throws Exception {
