@@ -14,6 +14,7 @@ import ot.OTExtSender;
 import ot.OTSender;
 import rand.ISAACProvider;
 import test.Utils;
+import caes.Aes;
 import circuits.FloatFormat;
 import flexsc.CompEnv;
 import flexsc.Flag;
@@ -21,6 +22,8 @@ import flexsc.Party;
 import flexsc.Signal;
 
 public class GCGen extends GCCompEnv {
+
+	public static boolean useCGarble = false;
 
 	static public GCSignal R = null;
 	static SecureRandom rnd;
@@ -49,8 +52,8 @@ public class GCGen extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
+
 		snd = new OTExtSender(80, is, os);
-//		snd = new NPOTSender(80, is, os);
 //		snd = new FakeOTSender(80, is, os);
 		gb = new Garbler();
 	}
@@ -130,8 +133,8 @@ public class GCGen extends GCCompEnv {
 			return false;
 		else if (lb.equals(R.xor(out)))
 			return true;
-//		return false;
-		throw new Exception("bad label at final output.");
+		return false;
+		//throw new Exception("bad label at final output.");
 	}
 	
 	public double outputToAliceFixedPoint(GCSignal[] f, int offset) throws Exception{
@@ -159,6 +162,16 @@ public class GCGen extends GCCompEnv {
 	private GCSignal[][] gtt = new GCSignal[2][2];
 	private GCSignal labelL[] = new GCSignal[2];
 	private GCSignal labelR[] = new GCSignal[2];
+
+	private GCSignal garbleInC(GCSignal a, GCSignal b) {
+		byte[] garbledValues = Aes.garble(a.bytes, b.bytes, gid, R.bytes);
+		assert(garbledValues.length == 50) : "Did not receive correct number of bytes in garbleInC";
+		for (int i = 0; i < 4; i++) {
+			// gtt[i >> 1][i % 2] = GCSignal.newInstance(Arrays.copyOfRange(garbledValues, i * GCSignal.len, (i+1) * GCSignal.len));
+			gtt[i >> 1][i % 2] = new GCSignal(Arrays.copyOfRange(garbledValues, i * GCSignal.len, (i+1) * GCSignal.len));
+		}
+		return new GCSignal(Arrays.copyOfRange(garbledValues, 40, 50));
+	}
 
 	private GCSignal garble(GCSignal a, GCSignal b) {
 		labelL[0] = a;
@@ -222,7 +235,12 @@ public class GCGen extends GCCompEnv {
 			res = b.v ? a : new GCSignal(false);
 		else {
 
-			GCSignal ret = garble(a, b);
+			GCSignal ret;
+			if (useCGarble) {
+			  ret = garbleInC(a, b);
+			} else {
+			  ret = garble(a, b);
+			}
 			
 			sendGTT();
 			gid++;

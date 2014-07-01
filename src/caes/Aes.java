@@ -17,4 +17,8 @@ public class Aes {
     return AesJNI.intel_AES_dec128_char(cipherText, plainText, key, numBlocks);
   }
 
+  public static byte[] garble(byte[] a, byte[] b, long gid, byte[] R) {
+    return AesJNI.garble(a, b, gid, R);
+  }
+
 }

@@ -15,7 +15,7 @@ public class GCSignal extends Signal {
 
 	static final GCSignal ZERO = new GCSignal(new byte[len]);
 
-	private GCSignal(byte[] b) { bytes = b; }
+	public GCSignal(byte[] b) { bytes = b; }
 	
 	public GCSignal(boolean b) { v = b; }
 	
@@ -24,7 +24,7 @@ public class GCSignal extends Signal {
 		rnd.nextBytes(b);
 		return new GCSignal(b);
 	}
-	
+
 	public static GCSignal newInstance(byte[] bs) {
 		assert (bs.length <= len) : "Losing entropy when constructing signals.";
 		byte[] b = new byte[len];

@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+
 import objects.Float.Representation;
 import ot.FakeOTReceiver;
 import ot.OTExtReceiver;
@@ -27,8 +30,8 @@ public class GCEva extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
+
 		rcv = new OTExtReceiver(is, os);
-		//		rcv = new NPOTReceiver(is, os);
 //				rcv = new FakeOTReceiver(is, os);
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
@@ -123,7 +126,7 @@ public class GCEva extends GCCompEnv {
 		}
 	}
 
-	public GCSignal and(GCSignal a, GCSignal b) {
+	public GCSignal and(GCSignal a, GCSignal b) throws IllegalBlockSizeException, BadPaddingException {
 		Flag.sw.startGC();
 
 		GCSignal res;
