@@ -27,9 +27,9 @@ public class GCEva extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
-//		rcv = new OTExtReceiver(is, os);
+		rcv = new OTExtReceiver(is, os);
 		//		rcv = new NPOTReceiver(is, os);
-				rcv = new FakeOTReceiver(is, os);
+//				rcv = new FakeOTReceiver(is, os);
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
 	}
@@ -39,8 +39,6 @@ public class GCEva extends GCCompEnv {
 		this.os = os;
 
 		rcv = null;
-		//		rcv = new NPOTReceiver(is, os);
-		//		rcv = new FakeOTReceiver(is, os);
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
 	}

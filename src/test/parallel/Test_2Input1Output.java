@@ -9,12 +9,8 @@ import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
 import gc.GCSignal;
-
 import java.util.Arrays;
-import java.util.Random;
-
 import pm.PMCompEnv;
-import test.StopWatch;
 import test.Utils;
 import circuits.IntegerLib;
 import cv.CVCompEnv;
@@ -28,7 +24,6 @@ public class Test_2Input1Output<T> {
 	public class AddGadget extends Gadget<T> {
 		@Override
 		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
-		//	long t1 = System.nanoTime();
 			T[][] x = (T[][]) o[0];
 
 			IntegerLib<T> lib =  new IntegerLib<T>(e);
@@ -36,19 +31,8 @@ public class Test_2Input1Output<T> {
 			T[] result = x[0];
 			for(int i = 1; i < x.length; ++i)
 				result = lib.add(result, x[i]);
-			
-		//	long t2 = System.nanoTime();
-/*			if(e instanceof GCGen)
-				System.out.print("Gen");
-			else
-				System.out.print("Eva");
-			System.out.println("ThreadTime: "+(t2-t1));
-*/			
+		
 			return result;
-		}
-
-		public AddGadget getGadget() {
-			return new AddGadget();	
 		}
 	};
 
@@ -113,6 +97,7 @@ public class Test_2Input1Output<T> {
 
 
 				z = gen.outputToAlice((T[]) finalresult);
+				System.out.println("result:"+Utils.toInt(z));
 				pool.finalize();
 				disconnect();
 			} catch (Exception e) {
@@ -148,6 +133,7 @@ public class Test_2Input1Output<T> {
 
 				CompPool<T> pool = new CompPool(eva, "localhost", PORT);				
 				Object[] input = new Object[CompPool.MaxNumberTask];
+
 				for(int i = 0; i < CompPool.MaxNumberTask; ++i)
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 				os.flush();
@@ -192,12 +178,13 @@ public class Test_2Input1Output<T> {
 
 	public static void main(String args[])throws Exception {
 		CompPool.MaxNumberTask = 2;//new Integer(args[0]);
+
 		Mode m = Mode.REAL;
 		Test_2Input1Output<GCSignal> tt = new Test_2Input1Output<GCSignal>();
 
-
-		for (int i = 100000; i < 100000; i+=100000) {
+		for (int i = 100; i <= 100; i+=100) {
 			int a[] = new int[i];
+			a[0] = 1;
 			tt.runThreads(tt.new Helper(a, m));
 			Flag.sw.addCounter();
 			Flag.sw.print();

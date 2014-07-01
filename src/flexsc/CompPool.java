@@ -1,4 +1,5 @@
 package flexsc;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class CompPool<T> {
 	Server[] servers;
 	Client[] clients;
 	ExecutorService executorService;
+	@SuppressWarnings("unchecked")
 	public CompPool(CompEnv<T> env, String host, int port) throws Exception{
 		envs = new CompEnv[MaxNumberTask];
 		servers = new Server[MaxNumberTask];
@@ -51,13 +53,12 @@ public class CompPool<T> {
 				clients[i].disconnect();
 		}
 		executorService.shutdown();
-
 	}
 
 	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputArray) throws InterruptedException, ExecutionException{
 		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
 		for(int i = 0; i < inputArray.length; ++i) {
-			Gadget<T> gadge = g.getGadget();
+			Gadget<T> gadge = g.clone();
 			gadge.env = envs[i];
 			gadge.inputs = (Object[]) inputArray[i];
 			Future<Object> future = executorService.submit(gadge);

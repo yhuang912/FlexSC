@@ -49,9 +49,9 @@ public class GCGen extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
-//		snd = new OTExtSender(80, is, os);
+		snd = new OTExtSender(80, is, os);
 //		snd = new NPOTSender(80, is, os);
-		snd = new FakeOTSender(80, is, os);
+//		snd = new FakeOTSender(80, is, os);
 		gb = new Garbler();
 	}
 
