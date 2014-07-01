@@ -14,7 +14,7 @@ public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
 
 
 		for (int i = 1; i <= 10; i+=1) {
-			int a[] = new int[1000000];
+			int a[] = new int[10000000];
 			Helper h = tt.new Helper(a, m);
 			
 			EvaRunnable eva = tt.new EvaRunnable(h);
