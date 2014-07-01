@@ -17,9 +17,9 @@ final class Garbler {
 	Garbler() {
         try {
             sha1 = MessageDigest.getInstance("SHA-1");
-            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            SecretKeySpec secretKeySpecification = new SecretKeySpec(key, "AES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpecification, new IvParameterSpec(Arrays.copyOf(key, 16)));
+//            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+//            SecretKeySpec secretKeySpecification = new SecretKeySpec(key, "AES");
+//            cipher.init(Cipher.DECRYPT_MODE, secretKeySpecification, new IvParameterSpec(Arrays.copyOf(key, 16)));
         }
         catch (Exception e) {
             e.printStackTrace();
