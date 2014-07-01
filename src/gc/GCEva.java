@@ -30,9 +30,11 @@ public class GCEva extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
-
-		rcv = new OTExtReceiver(is, os);
-//				rcv = new FakeOTReceiver(is, os);
+		if(Flag.FakeOT)
+			rcv = new FakeOTReceiver(is, os);
+		else
+			rcv = new OTExtReceiver(is, os);
+		
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
 	}
@@ -105,11 +107,6 @@ public class GCEva extends GCCompEnv {
 		boolean[] p = outputToAlice(gcf.p);
 		return new FloatFormat(v, p, s, z).toDouble();
 	}
-
-
-	// public boolean transOutputToEva(Label out) throws Exception {
-	//
-	// }
 
 	private GCSignal[][] gtt = new GCSignal[2][2];
 

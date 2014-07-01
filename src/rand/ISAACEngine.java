@@ -9,6 +9,10 @@ import java.security.SecureRandomSpi;
  * @author Daniel Berlin
  */
 public class ISAACEngine extends SecureRandomSpi {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ISAACAlgorithm isaac;
 	private byte[]         remainder;
 	private int            remCount = 0;

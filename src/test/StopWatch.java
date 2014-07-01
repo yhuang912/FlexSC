@@ -1,5 +1,7 @@
 package test;
 
+import flexsc.Flag;
+
 public class StopWatch {
     public long ands = 0;
     double startTimeOT = 0;
@@ -21,7 +23,7 @@ public class StopWatch {
     double startTimeGCIO = 0;
     double stopTimeGCIO = 0;
     double elapsedTimeGCIO = 0;
-    boolean countTime = true;
+    boolean countTime = Flag.CountTime;
 long counter = 0;
     public void startOT() {
     	if(countTime)

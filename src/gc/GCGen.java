@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.util.Arrays;
 
 import objects.Float.Representation;
 import ot.FakeOTSender;
@@ -14,36 +13,31 @@ import ot.OTExtSender;
 import ot.OTSender;
 import rand.ISAACProvider;
 import test.Utils;
-import caes.Aes;
 import circuits.FloatFormat;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
-import flexsc.Signal;
 
 public class GCGen extends GCCompEnv {
 
-	public static boolean useCGarble = false;
-
 	static public GCSignal R = null;
 	static SecureRandom rnd;
-//	SecureRandom rnd = new SecureRandom();
 
 	static{
-	Security.addProvider(new ISAACProvider ());
-	try {
-		rnd = SecureRandom.getInstance ("ISAACRandom");
-		R = GCSignal.freshLabel(rnd);
-		R.setLSB();
-	} catch (NoSuchAlgorithmException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+		Security.addProvider(new ISAACProvider ());
+		try {
+			rnd = SecureRandom.getInstance ("ISAACRandom");
+			R = GCSignal.freshLabel(rnd);
+			R.setLSB();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	InputStream is;
 	OutputStream os;
-	
+
 	OTSender snd;
 	Garbler gb;
 
@@ -52,9 +46,10 @@ public class GCGen extends GCCompEnv {
 		this.is = is;
 		this.os = os;
 
-
-		snd = new OTExtSender(80, is, os);
-//		snd = new FakeOTSender(80, is, os);
+		if(Flag.FakeOT)
+			snd = new FakeOTSender(80, is, os);
+		else
+			snd = new OTExtSender(80, is, os);
 		gb = new Garbler();
 	}
 
@@ -63,7 +58,7 @@ public class GCGen extends GCCompEnv {
 		this.os = os;
 		gb = new Garbler();
 	}
-	
+
 	private GCSignal[] genPair() {
 		GCSignal[] label = new GCSignal[2];
 		label[0] = GCSignal.freshLabel(rnd);
@@ -79,7 +74,7 @@ public class GCGen extends GCCompEnv {
 		Flag.sw.stopOT();
 		return label[0];
 	}
-	
+
 	public GCSignal inputOfBob(boolean in) throws Exception {
 		Flag.sw.startOT();
 		GCSignal[] label = genPair();
@@ -87,7 +82,7 @@ public class GCGen extends GCCompEnv {
 		Flag.sw.stopOT();
 		return label[0];
 	}
-	
+
 	public GCSignal[] inputOfAlice(boolean[] x) throws Exception {
 		Flag.sw.startOT();
 		GCSignal[][] pairs = new GCSignal[x.length][2];
@@ -116,18 +111,18 @@ public class GCGen extends GCCompEnv {
 		return result;
 
 	}
-	
+
 	boolean gatesRemain = false;
 	public boolean outputToAlice(GCSignal out) throws Exception {
 		if(gatesRemain){
 			gatesRemain = false;
 			os.flush();
-//			Flag.sw.ands += ands;
-//			ands = 0;
+			//			Flag.sw.ands += ands;
+			//			ands = 0;
 		}
 		if (out.isPublic())
 			return out.v;
-		
+
 		GCSignal lb = GCSignal.receive(is);
 		if (lb.equals(out))
 			return false;
@@ -136,12 +131,12 @@ public class GCGen extends GCCompEnv {
 		return false;
 		//throw new Exception("bad label at final output.");
 	}
-	
+
 	public double outputToAliceFixedPoint(GCSignal[] f, int offset) throws Exception{
 		boolean[] res = outputToAlice(f);
 		return  Utils.toFixPoint(res, res.length, offset);
 	}
-	
+
 	public boolean[] outputToAlice(GCSignal[] out) throws Exception {
 		boolean [] result = new boolean[out.length];
 		for(int i = 0; i < result.length; ++i) {
@@ -162,16 +157,6 @@ public class GCGen extends GCCompEnv {
 	private GCSignal[][] gtt = new GCSignal[2][2];
 	private GCSignal labelL[] = new GCSignal[2];
 	private GCSignal labelR[] = new GCSignal[2];
-
-	private GCSignal garbleInC(GCSignal a, GCSignal b) {
-		byte[] garbledValues = Aes.garble(a.bytes, b.bytes, gid, R.bytes);
-		assert(garbledValues.length == 50) : "Did not receive correct number of bytes in garbleInC";
-		for (int i = 0; i < 4; i++) {
-			// gtt[i >> 1][i % 2] = GCSignal.newInstance(Arrays.copyOfRange(garbledValues, i * GCSignal.len, (i+1) * GCSignal.len));
-			gtt[i >> 1][i % 2] = new GCSignal(Arrays.copyOfRange(garbledValues, i * GCSignal.len, (i+1) * GCSignal.len));
-		}
-		return new GCSignal(Arrays.copyOfRange(garbledValues, 40, 50));
-	}
 
 	private GCSignal garble(GCSignal a, GCSignal b) {
 		labelL[0] = a;
@@ -221,7 +206,7 @@ public class GCGen extends GCCompEnv {
 			System.exit(1);
 		}
 	}
-	
+
 	public GCSignal and(GCSignal a, GCSignal b) {
 		++Flag.sw.ands;
 
@@ -236,12 +221,8 @@ public class GCGen extends GCCompEnv {
 		else {
 
 			GCSignal ret;
-			if (useCGarble) {
-			  ret = garbleInC(a, b);
-			} else {
-			  ret = garble(a, b);
-			}
-			
+			ret = garble(a, b);
+
 			sendGTT();
 			gid++;
 			gatesRemain = true;
@@ -256,11 +237,11 @@ public class GCGen extends GCCompEnv {
 			return new GCSignal(a.v ^ b.v);
 		else if (a.isPublic())
 			return a.v ? not(b) : new GCSignal(b);
-		else if (b.isPublic())
-			return b.v ? not(a) : new GCSignal(a);
-		else {
-			return a.xor(b);
-		}
+			else if (b.isPublic())
+				return b.v ? not(a) : new GCSignal(a);
+				else {
+					return a.xor(b);
+				}
 	}
 
 	public GCSignal not(GCSignal a) {
@@ -271,14 +252,14 @@ public class GCGen extends GCCompEnv {
 	}
 
 
-	
+
 	public Representation<GCSignal> inputOfAliceFloatPoint(double d, int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(d, widthV, widthP);
 		GCSignal signalS = inputOfAlice(f.s);
 		GCSignal signalZ = inputOfAlice(f.z);
 		GCSignal[] v = inputOfAlice(f.v);
 		GCSignal[] p = inputOfAlice(f.p);
-		
+
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 
@@ -287,18 +268,18 @@ public class GCGen extends GCCompEnv {
 		GCSignal signalZ = inputOfAlice(f.z);
 		GCSignal[] v = inputOfAlice(f.v);
 		GCSignal[] p = inputOfAlice(f.p);
-		
+
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}	
 
-	
+
 	public Representation<GCSignal> inputOfBobFloatPoint(double d, int widthV, int widthP) throws Exception {
 		FloatFormat f = new FloatFormat(0, widthV, widthP);
 		GCSignal signalS = inputOfBob(false);
 		GCSignal signalZ = inputOfBob(false);
 		GCSignal[] v = inputOfBob(f.v);
 		GCSignal[] p = inputOfBob(f.p);
-		
+
 		return new Representation<GCSignal>(signalS, p, v, signalZ);
 	}
 
@@ -306,7 +287,7 @@ public class GCGen extends GCCompEnv {
 		GCSignal[] result = inputOfAlice(Utils.fromFixPoint(a,width,offset));
 		return result;
 	}
-	
+
 	public GCSignal[] inputOfBobFixedPoint(double a, int width, int offset) throws Exception {
 		return inputOfBob(new boolean[width]);
 	}
