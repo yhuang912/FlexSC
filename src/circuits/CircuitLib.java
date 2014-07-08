@@ -139,7 +139,7 @@ public class CircuitLib<T> {
 		return ret;
 	}
 	
-	protected T[] padSignal(T[] a, int length) {
+	public T[] padSignal(T[] a, int length) {
 		T[] res = zeros(length);
 		for(int i = 0; i < a.length && i < length; ++i)
 			res[i] = a[i];

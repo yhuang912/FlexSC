@@ -25,7 +25,6 @@ public class TestAddingNoNetwork {
 		d = lib.multiply(a, d);
 		
 		boolean[] z = gen.outputToAlice(d);
-
 		System.out.println(Utils.toInt(z));
 	}
 }

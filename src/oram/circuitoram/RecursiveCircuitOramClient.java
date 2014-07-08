@@ -66,7 +66,7 @@ public class RecursiveCircuitOramClient<T> {
 	public boolean[][] travelToDeep(int iden, int level) throws Exception {
 		if(level == clients.size()) {
 			boolean[] baseMap = baseOram.readAndRemove(subIdentifier(iden, baseOram));
-			int ithPos = iden/(1<<baseOram.lengthOfIden);
+			int ithPos = iden>>baseOram.lengthOfIden;//iden/(1<<baseOram.lengthOfIden);
 			int start = ithPos*clients.get(level-1).lengthOfPos;
 			int end = (ithPos+1)*clients.get(level-1).lengthOfPos;
 			boolean[] pos = extract(baseMap, start, end);
@@ -84,7 +84,7 @@ public class RecursiveCircuitOramClient<T> {
 			
 			sendBooleans(poses[0]);
 			boolean[] data = currentOram.readAndRemove(subIdentifier(iden, currentOram), poses[0]);
-			int ithPos = iden/(1<<currentOram.lengthOfIden);
+			int ithPos = iden>>currentOram.lengthOfIden;//iden/(1<<currentOram.lengthOfIden);
 			int start = ithPos*clients.get(level-1).lengthOfPos;
 			int end = (ithPos+1)*clients.get(level-1).lengthOfPos;
 			
@@ -97,7 +97,7 @@ public class RecursiveCircuitOramClient<T> {
 	}
 	
 	public int subIdentifier(int iden, OramParty<T> o) {
-		int a = (iden % (1<<o.lengthOfIden)) ;
+		int a = iden & ((1<<o.lengthOfIden)-1);//(iden % (1<<o.lengthOfIden)) ;
 		return a;
 	}
 	

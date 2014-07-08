@@ -6,7 +6,6 @@ import oram.TreeBasedOramLib;
 import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Party;
-import gc.GCGen;
 
 public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 	int logN;
