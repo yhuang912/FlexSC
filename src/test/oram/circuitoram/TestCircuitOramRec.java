@@ -13,7 +13,7 @@ public class TestCircuitOramRec {
 
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345, 8, 3, 32,  2, 3);
+		GenRunnable gen = new GenRunnable(12345, 20, 3, 32,  8, 10);
 		EvaRunnable eva = new EvaRunnable("localhost", 12345);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
@@ -24,7 +24,7 @@ public class TestCircuitOramRec {
 		System.out.print("\n");
 	}
 
-	final static int writeCount = 1<<8;
+	final static int writeCount = 1<<5;
 	final static int readCount = 100;
 	public TestCircuitOramRec() {
 	}
@@ -64,7 +64,7 @@ public class TestCircuitOramRec {
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 
 				System.out.println("connected");				
-				RecursiveCircuitOramClient<GCSignal> client = new RecursiveCircuitOramClient<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY, 80);
+				RecursiveCircuitOramClient<GCSignal> client = new RecursiveCircuitOramClient<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
 
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
@@ -124,7 +124,7 @@ public class TestCircuitOramRec {
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				System.out.println("connected");
-				RecursiveCircuitOramServer<GCSignal> server = new RecursiveCircuitOramServer<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY, 80);
+				RecursiveCircuitOramServer<GCSignal> server = new RecursiveCircuitOramServer<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
 				for(int i = 0; i < writeCount; ++i) {
 //					Flag.sw.startTotal();
 					server.access();

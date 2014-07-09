@@ -33,12 +33,13 @@ public class RecursiveCircuitOramClient<T> {
 		this.capacity = capacity;
 		CircuitOramClient<T>  oram = new CircuitOramClient<T>(is, os, N, dataSize, Party.Alice, capacity, m, sp);
 		clients.add(oram);
-		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
+		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1<<oram.lengthOfIden)/recurFactor;
 		while(newN > cutoff) {
-			newDataSize = oram.lengthOfPos * recurFactor;
-			newN = (1<<oram.lengthOfIden)  / recurFactor;
+			
 			oram = new CircuitOramClient<T>(is, os, newN, newDataSize, Party.Alice, capacity, m, sp);
 			clients.add(oram);
+			newN = (1<<oram.lengthOfIden)  / recurFactor;
+			newDataSize = oram.lengthOfPos * recurFactor;
 		}
 		CircuitOramClient<T> last = clients.get(clients.size()-1);
 		baseOram = new TrivialOramClient<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, m);

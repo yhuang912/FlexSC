@@ -32,13 +32,13 @@ public class ComputeCircuitSize {
 		long[][] y5 = new long[5][num];
 		long[][] y6 = new long[5][num];
 		long[][] y7 = new long[5][num];
-		int dataSize = 10;
+		int dataSize = 7;
 
 		for(int log = base; log < base+num; log+=1) {
 
 
-//			CountCircuitORAM  c1 = new CountCircuitORAM(log, 3, dataSize, 80);
-			CountCircuitORAMRecursion c1 = new CountCircuitORAMRecursion(log, 3, dataSize, 80, cutoff, recur);
+			CountCircuitORAM  c1 = new CountCircuitORAM(log, 3, dataSize, 80);
+//			CountCircuitORAMRecursion c1 = new CountCircuitORAMRecursion(log, 3, dataSize, 80, cutoff, recur);
 //			CountNewORAM c1 = new CountNewORAM(log, 6, dataSize, 27);
 			c1.count();c1.statistic.finalize();
 			Statistics s1 = c1.statistic.newInstance();
@@ -68,10 +68,10 @@ public class ComputeCircuitSize {
 			c4=null;System.gc();
 
 			
-//			CountTreeORAMRecursion c5 = new CountTreeORAMRecursion(log, 120, dataSize, 80, cutoff, recur);
+			CountTreeORAMRecursion c5 = new CountTreeORAMRecursion(log, 120, dataSize, 80, cutoff, recur);
 //			CountTreeORAM c5 = new CountTreeORAM(log, dataSize, 80);
 
-			CountKaiminORAMRecursion c5 = new CountKaiminORAMRecursion(log, 4, dataSize, 80, cutoff, recur);
+//			CountKaiminORAMRecursion c5 = new CountKaiminORAMRecursion(log, 4, dataSize, 80, cutoff, recur);
 			c5.count();c5.statistic.finalize();
 			Statistics s5 = c5.statistic.newInstance();
 			c5=null;System.gc();

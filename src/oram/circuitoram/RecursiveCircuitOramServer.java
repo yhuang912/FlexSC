@@ -28,12 +28,12 @@ public class RecursiveCircuitOramServer<T> {
 		System.out.print(capacity);
 		CircuitOramServer<T>  oram = new CircuitOramServer<T>(is, os, N, dataSize, Party.Bob, capacity,  m, sp);
 		servers.add(oram);
-		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);
+		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1<<oram.lengthOfIden)/recurFactor;
 		while(newN > cutoff) {
-			newDataSize = oram.lengthOfPos * recurFactor;
-			newN = (1<<oram.lengthOfIden ) / recurFactor;
 			oram = new CircuitOramServer<T>(is, os, newN, newDataSize, Party.Bob, capacity,  m, sp);
 			servers.add(oram);
+			newDataSize = oram.lengthOfPos * recurFactor;
+			newN = (1<<oram.lengthOfIden ) / recurFactor;
 		}
 		CircuitOramServer<T> last = servers.get(servers.size()-1);
 		baseOram = new TrivialOramServer<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, m);

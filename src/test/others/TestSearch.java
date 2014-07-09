@@ -24,7 +24,6 @@ public class TestSearch {
 			try {
 				listen(54321);
 
-
 				GCGen gen = new GCGen(is, os);
 				
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(gen);

@@ -17,7 +17,7 @@ public class TestCircuitOramBasic {
 	final int capacity = 3;
 	int[] posMap = new int[N];
 	int writecount = N;
-	int readcount = 10*N;
+	int readcount = N;
 	int dataSize = 32;
 	public TestCircuitOramBasic() {
 		SecureRandom rng = new SecureRandom();
@@ -98,7 +98,7 @@ public class TestCircuitOramBasic {
 				for(int j = 1; j < client.tree.length; ++j){
 					idens[j] = new int[client.tree[j].length];
 					for(int i = 0; i < client.tree[j].length; ++i)
-						idens[j][i]=(int) client.tree[j][i].iden;
+						idens[j][i]=Utils.toInt(client.tree[j][i].iden);
 					}
 
 				for(int j = 1; j < client.tree.length; ++j){
@@ -109,7 +109,7 @@ public class TestCircuitOramBasic {
 				
 				stash = new int[client.queue.length];
 				for(int j = 0; j < client.queue.length; ++j)
-						stash[j]=(int) client.queue[j].iden;
+						stash[j]=Utils.toInt(client.queue[j].iden);
 
 				os.flush();
 
@@ -167,7 +167,7 @@ public class TestCircuitOramBasic {
 				for(int j = 1; j < server.tree.length; ++j){
 					idens[j] = new int[server.tree[j].length];
 					for(int i = 0; i < server.tree[j].length; ++i)
-						idens[j][i]=(int)server.tree[j][i].iden;
+						idens[j][i]=Utils.toInt(server.tree[j][i].iden);
 					}
 
 				for(int j = 1; j < server.tree.length; ++j){
@@ -179,7 +179,7 @@ public class TestCircuitOramBasic {
 				
 				stash = new int[server.queue.length];
 				for(int j = 0; j < server.queue.length; ++j)
-					stash[j]=(int)server.queue[j].iden;
+					stash[j]=Utils.toInt(server.queue[j].iden);
 				os.flush();
 
 				disconnect();

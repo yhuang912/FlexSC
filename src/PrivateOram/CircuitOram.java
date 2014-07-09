@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import oram.Block;
+import oram.PlainBlock;
 import flexsc.Mode;
 import flexsc.Party;
 

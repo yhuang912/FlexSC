@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import oram.Block;
+import oram.PlainBlock;
+import test.Utils;
 import flexsc.Mode;
 import flexsc.Party;
 
@@ -19,7 +21,7 @@ public class TrivialPrivateOram<T> extends OramParty<T> {
 		bucket = new PlainBlock[capacity];
 		
 		for(int i = 0; i < bucket.length; ++i){
-			bucket[i] = getDummyBlock(true);
+			bucket[i] = getDummyBlock(role == Party.Alice);
 		}
 		result = prepareBlocks(bucket, bucket);
 	}
@@ -33,9 +35,13 @@ public class TrivialPrivateOram<T> extends OramParty<T> {
 	
 	public T[] readAndRemove(T[] scIden) throws Exception {		
 		Block<T> res = lib.readAndRemove(result, scIden);
-		PlainBlock b = randomBlock();
-		Block<T> scb = inputBlockOfClient(b);
-		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
+		PlainBlock b1 = randomBlock();
+//		System.out.println(b1.data);
+//		PlainBlock b2 = randomBlock();
+		Block<T> scb1 = inputBlockOfClient(b1);
+//		Block<T> scb2 = inputBlockOfClient(b2);
+		Block<T>finalRes = lib.mux(res, scb1, res.isDummy);
+//		System.out.println(Utils.toInt(env.outputToAlice(scb1.data)));
 
 		return finalRes.data;
 	}
@@ -44,6 +50,7 @@ public class TrivialPrivateOram<T> extends OramParty<T> {
 		scIden = Arrays.copyOf(scIden, lengthOfIden);
 		T[] r = readAndRemove(scIden);
 		putBack(scIden, r);
+
 		return r;
 	}
 	

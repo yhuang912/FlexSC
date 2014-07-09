@@ -59,8 +59,7 @@ public class TreeOramClient<T> extends TreeOramParty<T> {
 		if(mode == mode.COUNT)
 			index = 0;
 		Block<T>[][][] triple = prepareBlocksTriple(index);				
-		lib.evitUnit(triple[0][0], triple[0][1],triple[0][2],
-					 level);
+		lib.evitUnit(triple[0][0], triple[0][1],triple[0][2],level);
 		
 		tree[index] = preparePlainBlocks(triple[0][0], triple[1][0]);
 		tree[index*2] = preparePlainBlocks(triple[0][1], triple[1][1]);

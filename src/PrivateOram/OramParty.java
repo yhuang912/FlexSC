@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import oram.Block;
 import oram.BucketLib;
+import oram.PlainBlock;
 import pm.PMCompEnv;
 import rand.ISAACProvider;
 import cv.CVCompEnv;
@@ -116,21 +117,13 @@ public abstract class OramParty<T> {
 	public Block<T>[] prepareBlocks(PlainBlock[] clientBlock, PlainBlock[] serverBlock) throws Exception {
 		Block<T>[] s = inputBucketOfServer(serverBlock);
 		Block<T>[] c = inputBucketOfClient(clientBlock);
-//		Block<T>[] r = inputBucketOfServer(randomBlock);
-
-		Block<T>[] xor = lib.xor(s, c);
-//		return new Block[][]{xor, r};
-		return xor;
+		return lib.xor(s, c);
 	}
 
 	public Block<T> prepareBlock(PlainBlock clientBlock, PlainBlock serverBlock/*, PlainBlock randomBlock*/) throws Exception {
 		Block<T> s = inputBlockOfServer(serverBlock);
 		Block<T> c = inputBlockOfClient(clientBlock);
-//		Block<T> r = inputBlockOfServer(randomBlock);
-
-		Block<T> xor = lib.xor(s, c);
-//		return new Block[]{xor, r};
-		return xor;
+		return lib.xor(s, c);
 	}
 
 
@@ -146,13 +139,13 @@ public abstract class OramParty<T> {
 
 
 	public Block<T> inputBlockOfServer(PlainBlock b) throws Exception {
-		T[] TArray = env.inputOfBob(dummyArray);
+		T[] TArray = env.inputOfBob(b.toBooleanArray());
 		return new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
 
 	}
 
 	public Block<T> inputBlockOfClient(PlainBlock b) throws Exception {
-		T[] TArray = env.inputOfAlice(dummyArray);		
+		T[] TArray = env.inputOfAlice(b.toBooleanArray());		
 		return new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
 	}
 
@@ -169,12 +162,12 @@ public abstract class OramParty<T> {
 
 	public Block<T>[] inputBucketOfServer(PlainBlock[] b) throws Exception {
 //		System.out.println(b.length);
-		T[] TArray = env.inputOfBob(PlainBlock.toBooleanArray(b, lengthOfIden, lengthOfPos, lengthOfData));
+		T[] TArray = env.inputOfBob(PlainBlock.toBooleanArray(b));
 		return toBlocks(TArray, lengthOfIden, lengthOfPos, lengthOfData, b.length);//new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
 	}
 
 	public Block<T>[] inputBucketOfClient(PlainBlock[] b) throws Exception {
-		T[] TArray = env.inputOfAlice(PlainBlock.toBooleanArray(b, lengthOfIden, lengthOfPos, lengthOfData));
+		T[] TArray = env.inputOfAlice(PlainBlock.toBooleanArray(b));
 		os.flush();
 		return toBlocks(TArray, lengthOfIden, lengthOfPos, lengthOfData, b.length);
 	}
@@ -222,15 +215,13 @@ public abstract class OramParty<T> {
 		PlainBlock result = getDummyBlock(true);
 		if(mode == Mode.COUNT)
 			return result;
-
 		for(int i = 0; i < lengthOfIden; ++i)
-			result.iden = rng.nextLong();
+			result.iden[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfPos; ++i)
-			result.pos = rng.nextLong();
+			result.pos[i] = rng.nextBoolean();
 		for(int i = 0; i < lengthOfData; ++i)
-			result.data = rng.nextLong();//rng.nextBoolean();
+			result.data[i] = rng.nextBoolean();
 		result.isDummy = rng.nextBoolean();
-
 		return result;
 	}
 
