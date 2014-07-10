@@ -44,24 +44,25 @@ public class RecursiveCircuitOram<T> {
 	}
 
 	//with default params
-	public RecursiveCircuitOram(InputStream is, OutputStream os, int N, int dataSize, Mode m, int sp, Party p) throws Exception {
+	public RecursiveCircuitOram(InputStream is, OutputStream os, int N, int dataSize, Party p) throws Exception {
 		this.p = p;
 		this.is = is;
 		this.os = os;
 		this.cutoff = 512;
 		this.recurFactor = 4;
 		this.capacity = 3;
-		CircuitOram<T>  oram = new CircuitOram<T>(is, os, N, dataSize, p, capacity, m, sp);
+		int sp = 80;
+		CircuitOram<T>  oram = new CircuitOram<T>(is, os, N, dataSize, p, capacity, Mode.REAL, sp);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1<<oram.lengthOfIden)/recurFactor;
 		while(newN > cutoff) {
-			oram = new CircuitOram<T>(is, os, newN, newDataSize, p, capacity, m, sp);
+			oram = new CircuitOram<T>(is, os, newN, newDataSize, p, capacity, Mode.REAL, sp);
 			clients.add(oram);
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
 		}
 		CircuitOram<T> last = clients.get(clients.size()-1);
-		baseOram = new TrivialPrivateOram<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, m, p);
+		baseOram = new TrivialPrivateOram<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, Mode.REAL, p);
 	}
 
 	
