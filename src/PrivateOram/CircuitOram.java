@@ -15,7 +15,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 	int cnt = 0;	
 	public PlainBlock[] queue;
 	public int queueCapacity;
-	
+
 	boolean[] nextPath()
 	{
 		boolean [] res = new boolean[logN];
@@ -28,21 +28,21 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		return res;
 	}
 
-	
+
 	public CircuitOram(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int cap, Mode m, int sp) throws Exception {
 		super(is, os, N, dataSize, p, cap, m);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, env);
 		queueCapacity = 30;
 		queue = new PlainBlock[queueCapacity];
-		
+
 		for(int i = 0; i < queue.length; ++i) 
 			queue[i] = getDummyBlock(p == Party.Alice);
 
 		scQueue = prepareBlocks(queue, queue);		
-		
+
 	}
-	
+
 	protected void ControlEviction() throws Exception {
 		flushOneTime(nextPath());
 		flushOneTime(nextPath());
@@ -60,21 +60,28 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 	}
 
 
-	public T[] readAndRemove(T[] scIden, boolean[] pos) throws Exception {
+	public T[] readAndRemove(T[] scIden, boolean[] pos, boolean RandomWhenNotFound) throws Exception {
 		PlainBlock[][] blocks = getPath(pos);
 		Block<T>[][] scPath = preparePath(blocks, blocks);
 
-		
+
 		Block<T> res = lib.readAndRemove(scPath, scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue, scIden);
 		res = lib.mux(res, res2, res.isDummy);
-		PlainBlock b = randomBlock();	
-		Block<T> scb = inputBlockOfClient(b);
-		Block<T>finalRes = lib.mux(res, scb, res.isDummy);
-
+		
 		blocks = preparePlainPath(scPath);
 		putPath(blocks, pos);
-		return finalRes.data;
+
+		if(RandomWhenNotFound) {
+			PlainBlock b = randomBlock();	
+			Block<T> scb = inputBlockOfClient(b);
+			Block<T>finalRes = lib.mux(res, scb, res.isDummy);
+
+			return finalRes.data;
+		}
+		else{
+			return lib.mux(res.data, lib.zeros(res.data.length),res.isDummy);
+		}
 	}
 
 
@@ -88,14 +95,14 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 
 	public T[] read(T[] scIden, boolean[] pos, T[] scNewPos) throws Exception {
 		scIden = Arrays.copyOf(scIden, lengthOfIden);
-		T[] r = readAndRemove(scIden, pos);
+		T[] r = readAndRemove(scIden, pos, false);
 		putBack(scIden, scNewPos, r);
 		return r;
 	}
-
+	
 	public void write(T[] scIden, boolean[] pos, T[] scNewPos, T[] scData) throws Exception {
 		scIden = Arrays.copyOf(scIden, lengthOfIden);
-		readAndRemove(scIden, pos);
+		readAndRemove(scIden, pos, true);
 		putBack(scIden, scNewPos, scData);
 	}
 

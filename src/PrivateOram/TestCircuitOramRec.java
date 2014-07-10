@@ -6,12 +6,12 @@ import test.Utils;
 import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
-//import gc.Boolean;
+import gc.GCSignal;
 public class TestCircuitOramRec {
 
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345, 6, 3, 32,  8, 4);
+		GenRunnable gen = new GenRunnable(12345, 20, 3, 32,  4, 7);
 		EvaRunnable eva = new EvaRunnable("localhost", 12345);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
@@ -22,8 +22,8 @@ public class TestCircuitOramRec {
 		System.out.print("\n");
 	}
 
-	final static int writeCount = 1<<6;
-	final static int readCount = 1000;
+	final static int writeCount = 1<<4;
+	final static int readCount = 1<<6;
 	public TestCircuitOramRec() {
 	}
 
@@ -62,14 +62,14 @@ public class TestCircuitOramRec {
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 
 				System.out.println("connected");				
-				RecursiveCircuitOram<Boolean> client = new RecursiveCircuitOram<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY, 80, Party.Alice);
+				RecursiveCircuitOram<GCSignal> client = new RecursiveCircuitOram<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80, Party.Alice);
 
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
 
 					Flag.sw.startTotal();
 					Flag.sw.ands = 0;
-					Boolean[] scData = client.baseOram.env.inputOfAlice(Utils.fromInt(element, dataSize));
+					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils.fromInt(element, dataSize));
 					os.flush();
 					client.write(client.baseOram.lib.toSignals(element), scData);
 					double t = Flag.sw.stopTotal();
@@ -84,7 +84,7 @@ public class TestCircuitOramRec {
 
 				for(int i = 0; i < readCount; ++i){
 					int element = i%N;
-					Boolean[] scb = client.read(client.baseOram.lib.toSignals(element));
+					GCSignal[] scb = client.read(client.baseOram.lib.toSignals(element));
 					boolean[] b = client.baseOram.env.outputToAlice(scb);
 
 					//Assert.assertTrue(Utils.toInt(b) == element);
@@ -126,11 +126,11 @@ public class TestCircuitOramRec {
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				System.out.println("connected");
-				RecursiveCircuitOram<Boolean> server = new RecursiveCircuitOram<Boolean>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.VERIFY, 80, Party.Bob);
+				RecursiveCircuitOram<GCSignal> server = new RecursiveCircuitOram<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80, Party.Bob);
 				for(int i = 0; i < writeCount; ++i) {
 //					Flag.sw.startTotal();
 					int element = i%N;
-					Boolean[] scData = server.baseOram.env.inputOfAlice(new boolean[dataSize]);
+					GCSignal[] scData = server.baseOram.env.inputOfAlice(new boolean[dataSize]);
 					server.write(server.baseOram.lib.toSignals(element), scData);
 //					Flag.sw.stopTotal();
 //					Flag.sw.addCounter();
@@ -140,7 +140,7 @@ public class TestCircuitOramRec {
 
 				for(int i = 0; i < readCount; ++i){
 					int element = i%N;
-					Boolean[] scb = server.read(server.baseOram.lib.toSignals(element));
+					GCSignal[] scb = server.read(server.baseOram.lib.toSignals(element));
 					server.baseOram.env.outputToAlice(scb);
 				}
 
