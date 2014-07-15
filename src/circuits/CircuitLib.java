@@ -3,6 +3,7 @@ package circuits;
 import java.util.Arrays;
 
 import flexsc.CompEnv;
+import gc.GCSignal;
 
 public class CircuitLib<T> {
 	protected CompEnv<T> env;
@@ -34,6 +35,16 @@ public class CircuitLib<T> {
 		return toSignals(value, 32);
 	}
 
+	/*
+	 * If GCSignal is being passed to toSignals (happens because of subtle issues 
+	 * in the RAMSCCompiler), then don't do anything just return that value. 
+	 * I know this is super hacky, so I'll try to fix the internal issues with the 
+	 * compiler itself, but this is probably a quick fix for now.
+	*/
+	public GCSignal[] toSignals(GCSignal[] value) {
+		return value;
+	}
+	
 	public T[] zeros(int length) {
 		T[] result = env.newTArray(length);
 		for (int i = 0; i < length; ++i) {
