@@ -42,6 +42,16 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		return add(x, y, false);
 	}
 
+	public T[] sub(T x, T y) throws Exception{
+		T[] ax = env.newTArray(2);
+		ax[1] = SIGNAL_ZERO;
+		ax[0] = x;
+		T[] ay = env.newTArray(2);
+		ay[1] = SIGNAL_ZERO;
+		ay[0] = y;
+		return sub(x, y);
+	}
+	
 	//tested
 	public T[] sub(T[] x, T[] y) throws Exception {
 		assert(x != null && y != null && x.length == y.length) : "sub: bad inputs.";
