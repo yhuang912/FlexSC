@@ -23,7 +23,7 @@ public class TestSort  extends TestSortHarness<GCSignal>{
 			for(int j = 0; j < a.length; ++j)
 				a[j] = rnd.nextInt()%(1<<30);
 			
-			runThreads(new Helper(a, Mode.REAL) {
+			Helper helper = new Helper(a, Mode.REAL) {
 				public GCSignal[][] secureCompute(GCSignal[][] Signala, CompEnv<GCSignal> e) throws Exception {
 					BitonicSortLib<GCSignal> lib =  new BitonicSortLib<GCSignal>(e);
 					lib.sort(Signala, lib.SIGNAL_ONE);
@@ -35,7 +35,8 @@ public class TestSort  extends TestSortHarness<GCSignal>{
 					Arrays.sort(intA);
 					return intA;
 				}
-			});
+			};
+			runThreads(helper);
 		}		
 	}
 

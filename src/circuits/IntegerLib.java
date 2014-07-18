@@ -2,7 +2,9 @@ package circuits;
 
 import java.util.Arrays;
 
+import test.Utils;
 import flexsc.CompEnv;
+import flexsc.Party;
 
 public class IntegerLib<T> extends CircuitLib<T> {
 
@@ -510,5 +512,24 @@ public class IntegerLib<T> extends CircuitLib<T> {
 	public T[] min(T[] x, T[] y) throws Exception {
 		T leq = leq(x, y);
 		return mux(y, x, leq);
+	}
+
+	public T[] integerSqrt(T[] x) throws Exception {
+		T[] rem = zeros(x.length);
+		T[] root = zeros(x.length);
+		for (int i = 0; i < x.length/2; i++) {
+			root = leftShift(root);
+			rem = add(leftPublicShift(rem, 2), rightPublicShift(x, x.length - 2));
+			//if (Party.Alice.equals(env.getParty()))
+			//		System.out.println(Utils.toInt(Utils.tobooleanArray((Boolean[]) root)) + "\t" + Utils.toInt(Utils.tobooleanArray((Boolean[]) rem)));
+			x = leftPublicShift(x, 2);
+			T[] oldRoot = root;
+			root = incrementByOne(root);
+			T isRootSmaller = leq(root, rem);
+			T[] remMinusRoot = sub(rem, root);
+			rem = mux(rem, remMinusRoot, isRootSmaller);
+			root = mux(oldRoot, incrementByOne(root), isRootSmaller);
+		}
+		return rightShift(root);
 	}
 }
