@@ -31,7 +31,7 @@ public class Test_2Input1Output<T> {
 			T[] result = x[0];
 			for(int i = 1; i < x.length; ++i)
 				result = lib.add(result, x[i]);
-		
+
 			return result;
 		}
 	};

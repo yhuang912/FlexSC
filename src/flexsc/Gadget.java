@@ -20,7 +20,7 @@ public abstract class Gadget<T> implements Callable<Object>, Cloneable{
 		}
 		return res;
 	}
-	
+
 	public Gadget<T> clone() { 
 		try { 
 			@SuppressWarnings("unchecked")
