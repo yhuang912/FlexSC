@@ -4,8 +4,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
 
-import flexsc.CompEnv;
 import rand.ISAACProvider;
+import flexsc.CompEnv;
 
 public class ObliviousDataStructure<T> {
 	public static SecureRandom rnd;

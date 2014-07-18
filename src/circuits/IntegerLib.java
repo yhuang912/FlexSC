@@ -2,9 +2,7 @@ package circuits;
 
 import java.util.Arrays;
 
-import test.Utils;
 import flexsc.CompEnv;
-import flexsc.Party;
 
 public class IntegerLib<T> extends CircuitLib<T> {
 

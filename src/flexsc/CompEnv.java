@@ -7,11 +7,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import cv.CVCompEnv;
-import circuits.FloatFormat;
 import objects.Float.Representation;
 import pm.PMCompEnv;
 import test.Utils;
+import circuits.FloatFormat;
+import cv.CVCompEnv;
 
 public abstract class CompEnv<T> {
 	public static CompEnv getEnv(Mode mode, Party p, InputStream is, OutputStream os) throws Exception{

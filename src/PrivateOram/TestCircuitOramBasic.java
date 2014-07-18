@@ -1,16 +1,15 @@
 package PrivateOram;
 
-import flexsc.CompEnv;
-import flexsc.Mode;
-import flexsc.Party;
-import gc.GCSignal;
-
 import java.security.SecureRandom;
 import java.util.Arrays;
 
 import org.junit.Test;
 
 import test.Utils;
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
+import gc.GCSignal;
 
 
 public class TestCircuitOramBasic {

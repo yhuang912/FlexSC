@@ -1,6 +1,6 @@
 package test.others;
 
-import java.util.*; 
+import java.util.Random;
 
 public class RandomizeShellSort {
 	public static final int C=1; // number of region compare-exchange repetitions

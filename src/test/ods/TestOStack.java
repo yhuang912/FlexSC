@@ -1,15 +1,16 @@
 package test.ods;
 
-import org.junit.Test;
-
-import circuits.IntegerLib;
-import ods.ostack.OStack;
-import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
+import ods.ostack.OStack;
+
+import org.junit.Test;
+
+import test.Utils;
+import circuits.IntegerLib;
 
 public class TestOStack {
 
@@ -21,10 +22,12 @@ public class TestOStack {
 //		res = ostack.pop();
 //		res = ostack.pop();
 		ostack.access(lib.SIGNAL_ZERO, lib.toSignals(111));
+		ostack.access(lib.SIGNAL_ONE, lib.toSignals(444));
 		ostack.access(lib.SIGNAL_ZERO, lib.toSignals(222));
 		ostack.access(lib.SIGNAL_ZERO, lib.toSignals(333));
-		ostack.access(lib.SIGNAL_ONE, lib.toSignals(444));
-		ostack.access(lib.SIGNAL_ONE, lib.toSignals(444));
+		
+
+//		ostack.access(lib.SIGNAL_ONE, lib.toSignals(444));
 		return ostack.access(lib.SIGNAL_ONE, lib.toSignals(444));
 	}
 	
@@ -41,7 +44,7 @@ public class TestOStack {
 				OStack<GCSignal> ostack = new OStack<>(env, 1<<20, 32);
 				GCSignal[] res = compute(ostack, lib);
 				int resInt = Utils.toInt(env.outputToAlice(res));
-				System.out.print(resInt + "\n" +Flag.sw.ands/6);
+				System.out.print(resInt + "\n" +Flag.sw.ands/5);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

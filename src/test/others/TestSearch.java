@@ -1,12 +1,13 @@
 package test.others;
 
-import java.util.Random;
-
-import circuits.IntegerLib;
-import test.Utils;
 import gc.GCEva;
 import gc.GCGen;
 import gc.GCSignal;
+
+import java.util.Random;
+
+import test.Utils;
+import circuits.IntegerLib;
 
 
 public class TestSearch {

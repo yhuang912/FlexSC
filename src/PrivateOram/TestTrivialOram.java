@@ -1,13 +1,12 @@
 package PrivateOram;
 
+import org.junit.Test;
+
+import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
-
-import org.junit.Test;
-
-import test.Utils;
 
 
 public class TestTrivialOram {

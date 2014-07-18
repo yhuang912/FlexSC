@@ -1,7 +1,9 @@
 package test.harness;
 
 import java.math.BigInteger;
+
 import org.junit.Assert;
+
 import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Mode;

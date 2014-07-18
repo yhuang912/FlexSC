@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import objects.Float.Representation;
 import test.Utils;
 import circuits.FloatFormat;
-import flexsc.CompEnv;
-import flexsc.Party;
 
 public class MinimumCompEnv extends CompEnv<Boolean> {
 	

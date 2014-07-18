@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import PrivateOram.CircuitOramLib;
 import oram.Block;
 import oram.PlainBlock;
 import flexsc.CompEnv;
