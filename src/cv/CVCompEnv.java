@@ -6,11 +6,12 @@ import java.io.OutputStream;
 import test.Utils;
 import flexsc.BooleanCompEnv;
 import flexsc.CompEnv;
+import flexsc.Mode;
 import flexsc.Party;
 
 public class CVCompEnv extends BooleanCompEnv {	
 	public CVCompEnv(InputStream is, OutputStream os, Party p) {
-		super(is, os);
+		super(is, os, p, Mode.VERIFY);
 		this.p = p;
 	}
 	

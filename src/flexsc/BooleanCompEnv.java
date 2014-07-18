@@ -5,8 +5,8 @@ import java.io.OutputStream;
 
 public abstract class BooleanCompEnv extends CompEnv<Boolean> {
 	
-	public BooleanCompEnv(InputStream is, OutputStream os) {
-		super(is, os);
+	public BooleanCompEnv(InputStream is, OutputStream os, Party p, Mode m) {
+		super(is, os, p, m);
 	}
 
 	@Override

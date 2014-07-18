@@ -13,7 +13,7 @@ import flexsc.Party;
 public class MinimumCompEnv extends CompEnv<Boolean> {
 	
 	public MinimumCompEnv(InputStream is, OutputStream os, Party p) {
-		super(is, os);
+		super(is, os, p, Mode.VERIFY);
 	}
 	
 	@Override

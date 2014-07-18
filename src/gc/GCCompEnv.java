@@ -4,10 +4,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
 
 public abstract class GCCompEnv extends CompEnv<GCSignal> {
-	public GCCompEnv(InputStream is, OutputStream os) {
-		super(is, os);
+	public GCCompEnv(InputStream is, OutputStream os, Party p) {
+		super(is, os, p, Mode.REAL);
 	}
 
 	public GCSignal ONE() {

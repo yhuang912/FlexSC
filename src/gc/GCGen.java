@@ -35,8 +35,7 @@ public class GCGen extends GCCompEnv {
 
 	long gid = 0;
 	public GCGen(InputStream is, OutputStream os) throws Exception {
-		super(is, os);
-		p = Party.Alice;
+		super(is, os, Party.Alice);
 		
 		if(Flag.FakeOT)
 			snd = new FakeOTSender(80, is, os);
@@ -46,9 +45,7 @@ public class GCGen extends GCCompEnv {
 	}
 
 	public GCGen(InputStream is, OutputStream os, boolean NoOT) throws Exception {
-		super(is, os);
-		p = Party.Alice;
-		
+		super(is, os, Party.Alice);		
 		gb = new Garbler();
 	}
 

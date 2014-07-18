@@ -19,8 +19,7 @@ public class GCEva extends GCCompEnv {
 	long gid = 0;
 
 	public GCEva(InputStream is, OutputStream os) throws Exception {
-		super(is, os);
-		p = Party.Bob;
+		super(is, os, Party.Bob);
 
 		if(Flag.FakeOT)
 			rcv = new FakeOTReceiver(is, os);
@@ -32,7 +31,7 @@ public class GCEva extends GCCompEnv {
 	}
 	
 	public GCEva(InputStream is, OutputStream os, boolean NoOT) throws Exception {
-		super(is, os);
+		super(is, os, Party.Bob);
 
 		rcv = null;
 		gb = new Garbler();

@@ -30,9 +30,12 @@ public abstract class CompEnv<T> {
 	public InputStream is;
 	public OutputStream os;
 	public Party p;
-	public CompEnv(InputStream is, OutputStream os) {
+	public Mode m;
+	public CompEnv(InputStream is, OutputStream os, Party p, Mode m) {
 		this.is = is;
 		this.os = os;
+		this.m = m;
+		this.p = p;
 	}
 	
 	public abstract T inputOfAlice(boolean in) throws Exception;
