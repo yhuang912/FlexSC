@@ -26,7 +26,7 @@ public abstract class OramParty<T> {
 	protected InputStream is;
 	protected OutputStream os;
 	public CompEnv<T> env;
-	public Party role;
+	public Party p;
 	public Mode mode;
 
 	static protected SecureRandom rng;
@@ -42,10 +42,10 @@ public abstract class OramParty<T> {
 	public BucketLib<T> lib;
 	boolean[] dummyArray;
 
-	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p, Mode m) throws Exception {
-
-		this.is = is;
-		this.os = os;
+	public OramParty(CompEnv<T> env, int N, int dataSize) throws Exception {
+		this.env = env;
+		this.is = env.is;
+		this.os = env.os;
 
 		this.dataSize = dataSize;
 		long a = 1;logN=1;
@@ -60,15 +60,16 @@ public abstract class OramParty<T> {
 		lengthOfData = dataSize;
 		lengthOfIden = logN;
 		lengthOfPos = logN-1;
-		role = p;
-		mode = m;
+		p = env.p;
+		mode = env.m;
 		init();
 
 	}
 
-	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p, int lengthOfPos, Mode m) throws Exception {
-		this.is = is;
-		this.os = os;
+	public OramParty(CompEnv<T> env, int N, int dataSize, int lengthOfPos) throws Exception {
+		this.env = env;
+		this.is = env.is;
+		this.os = env.os;
 
 		this.dataSize = dataSize;
 		int a = 1;logN=1;
@@ -81,18 +82,16 @@ public abstract class OramParty<T> {
 		lengthOfData = dataSize;
 		lengthOfIden = logN;
 		this.lengthOfPos = lengthOfPos;
-		role = p;
-		mode = m;
+		p = env.p;
+		mode = env.m;
 		init();
 
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void init() throws Exception {
 		dummyArray = new boolean[lengthOfIden+lengthOfPos+lengthOfData+1];
 		for(int i = 0; i < dummyArray.length; ++i)
 			dummyArray[i] = false;
-		env = CompEnv.getEnv(mode, role, is, os);
 		lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, env);
 	}
 

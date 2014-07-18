@@ -26,8 +26,8 @@ public class TestOStack {
 		ostack.access(lib.SIGNAL_ONE, lib.toSignals(444));
 		ostack.access(lib.SIGNAL_ONE, lib.toSignals(444));
 		return ostack.access(lib.SIGNAL_ONE, lib.toSignals(444));
-		
 	}
+	
 	class GenRunnable extends network.Server implements Runnable {
 		boolean[] z;
 		GenRunnable () {
@@ -38,7 +38,7 @@ public class TestOStack {
 				listen(54321);
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
-				OStack<GCSignal> ostack = new OStack<>(env, 100, 32);
+				OStack<GCSignal> ostack = new OStack<>(env, 1<<20, 32);
 				GCSignal[] res = compute(ostack, lib);
 				int resInt = Utils.toInt(env.outputToAlice(res));
 				System.out.print(resInt + "\n" +Flag.sw.ands/6);
@@ -59,7 +59,7 @@ public class TestOStack {
 				connect("localhost", 54321);
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
-				OStack<GCSignal> ostack = new OStack<>(env, 100, 32);
+				OStack<GCSignal> ostack = new OStack<>(env, 1<<20, 32);
 				GCSignal[] res = compute(ostack, lib);
 				env.outputToAlice(res);
 

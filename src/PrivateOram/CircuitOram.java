@@ -4,8 +4,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import PrivateOram.CircuitOramLib;
 import oram.Block;
 import oram.PlainBlock;
+import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 
@@ -31,7 +33,21 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 
 	public CircuitOram(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int cap, Mode m, int sp) throws Exception {
-		super(is, os, N, dataSize, p, cap, m);
+		super(CompEnv.getEnv(m, p, is, os), N, dataSize, cap);
+		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, env);
+		queueCapacity = 30;
+		queue = new PlainBlock[queueCapacity];
+
+		for(int i = 0; i < queue.length; ++i) 
+			queue[i] = getDummyBlock(p == Party.Alice);
+
+		scQueue = prepareBlocks(queue, queue);		
+
+	}
+	
+	public CircuitOram(CompEnv<T> env, int N, int dataSize,
+			 int cap, int sp) throws Exception {
+		super(env, N, dataSize, cap);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, env);
 		queueCapacity = 30;
 		queue = new PlainBlock[queueCapacity];

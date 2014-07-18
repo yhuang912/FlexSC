@@ -1,26 +1,23 @@
 package PrivateOram;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
-
 import oram.Block;
 import oram.PlainBlock;
-import flexsc.Mode;
+import flexsc.CompEnv;
 import flexsc.Party;
 
 public class TrivialPrivateOram<T> extends OramParty<T> {
 	public PlainBlock[] bucket;
 	Block<T>[] result;
 	int capacity;
-	public TrivialPrivateOram(InputStream is, OutputStream os, int N,
-			int dataSize, Mode m, Party p) throws Exception {
-		super(is, os, N, dataSize, p, 1, m);
+	public TrivialPrivateOram(CompEnv<T> env, int N,
+			int dataSize) throws Exception {
+		super(env, N, dataSize, 1);
 		this.capacity = N;
 		bucket = new PlainBlock[capacity];
 		
 		for(int i = 0; i < bucket.length; ++i){
-			bucket[i] = getDummyBlock(role == Party.Alice);
+			bucket[i] = getDummyBlock(p == Party.Alice);
 		}
 		result = prepareBlocks(bucket, bucket);
 	}

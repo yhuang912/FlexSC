@@ -1,5 +1,6 @@
 package PrivateOram;
 
+import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
@@ -41,7 +42,8 @@ public class TestCircuitOramBasic {
 				listen(port);
 
 				int data[] = new int[N+1];
-				CircuitOram<GCSignal> client = new CircuitOram<GCSignal>(is, os, N, dataSize, Party.Alice, capacity, Mode.REAL, 80);
+				CompEnv env = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
+				CircuitOram<GCSignal> client = new CircuitOram<GCSignal>(env, N, dataSize,capacity, 80);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				
@@ -138,7 +140,9 @@ public class TestCircuitOramBasic {
 				connect(host, port);
 				
 //				CircuitOramServer<GCSignal> server = new CircuitOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
-				CircuitOram<GCSignal> server = new CircuitOram<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
+				CompEnv env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
+				CircuitOram<GCSignal> server = new CircuitOram<GCSignal>(env, N, dataSize,capacity, 80);
+
 
 				for(int i = 0; i < writecount; ++i) {
 					int element = i%N;

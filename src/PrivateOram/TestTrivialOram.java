@@ -1,5 +1,6 @@
 package PrivateOram;
 
+import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
@@ -28,7 +29,8 @@ public class TestTrivialOram {
 				listen(port);
 
 				int data[] = new int[N+1];
-				TrivialPrivateOram<GCSignal> client = new TrivialPrivateOram<GCSignal>(is, os, N, dataSize, Mode.REAL, Party.Alice);
+				CompEnv<GCSignal> gen = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
+				TrivialPrivateOram<GCSignal> client = new TrivialPrivateOram<GCSignal>(gen, N, dataSize);
 //				TrivialOramClient<Boolean> client = new TrivialOramClient<Boolean>(is, os, N, dataSize, Mode.VERIFY);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
@@ -78,8 +80,10 @@ public class TestTrivialOram {
 
 		public void run() {
 			try {
-				connect(host, port);				
-				TrivialPrivateOram<GCSignal> server = new TrivialPrivateOram<GCSignal>(is, os, N, dataSize, Mode.REAL, Party.Bob);
+				connect(host, port);			
+				
+				CompEnv<GCSignal> eva = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
+				TrivialPrivateOram<GCSignal> server = new TrivialPrivateOram<GCSignal>(eva, N, dataSize);
 //				TrivialOramServer<Boolean> server = new TrivialOramServer<Boolean>(is, os, N, dataSize, Mode.VERIFY);
 				
 				

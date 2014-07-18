@@ -6,7 +6,7 @@ import java.util.Arrays;
 import ods.ObliviousDataStructure;
 import oram.BucketLib;
 import test.Utils;
-import PrivateOramPreview.CircuitOram;
+import PrivateOram.CircuitOram;
 import flexsc.CompEnv;
 
 public class OStack<T> extends ObliviousDataStructure<T> {

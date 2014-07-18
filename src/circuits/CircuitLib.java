@@ -40,7 +40,6 @@ public class CircuitLib<T> {
 		T[] alice = env.inputOfAlice(res); 
 		T[] bob = env.inputOfBob(res);
 		return xor(alice, bob);
-//		return baseOram.env.inputOfAlice(res);
 	}
 
 	public boolean[] getBooleans(T[] x) throws Exception {
@@ -49,7 +48,7 @@ public class CircuitLib<T> {
 	
 	public boolean[] syncBooleans(boolean[] pos) throws IOException {
 		if(env.getParty() == Party.Alice){
-			//send pos to server
+			//send pos to bob
 			env.os.write(new byte[]{(byte) pos.length});
 			byte[] tmp = new byte[pos.length];
 			for(int i = 0; i < pos.length; ++i)
