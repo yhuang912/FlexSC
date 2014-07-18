@@ -1,6 +1,7 @@
 package test.others;
 
 import java.util.Random;
+
 import circuits.IntegerLib;
 import test.Utils;
 import gc.GCEva;
@@ -9,7 +10,34 @@ import gc.GCSignal;
 
 
 public class TestSearch {
-
+	
+	public GCSignal[] search(IntegerLib<GCSignal> lib, GCSignal[] x, GCSignal[] y, int n) throws Exception{
+		GCSignal[] l = lib.toSignals(0, 32);
+		GCSignal[] r = lib.toSignals(n, 32);
+		int i = n;
+		while(i > 1) {
+			//mid = (l + r) / 2;
+			GCSignal[] mid = lib.add(l, r);
+			mid = lib.rightPublicShift(mid, 1);
+			//mid*mid+y <= x
+			GCSignal[] mmm = lib.multiply(mid, mid);
+			mmm = lib.add(mmm, y);
+			GCSignal guard = lib.leq(mmm, x);
+			
+			//if statement
+			l = lib.mux(l, mid, guard);
+			r = lib.mux(r, mid, lib.not(guard));
+			
+			i = (i + 1) / 2;					
+		}
+	    GCSignal[] lml = lib.multiply(l, l);
+	    lml = lib.add(lml, y);
+	    GCSignal guard = lib.eq(lml, x);
+	    
+	    //if statement
+	    GCSignal[] ret = lib.mux(lib.toSignals(0,32), l, guard);
+		return ret;
+	}
 
 	class GenRunnable extends network.Server implements Runnable {
 		boolean[] z;
@@ -20,44 +48,17 @@ public class TestSearch {
 			this.n= n;
 		}
 
+		
 		public void run() {
 			try {
 				listen(54321);
-
 				GCGen gen = new GCGen(is, os);
-				
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(gen);
 				GCSignal[] y = gen.inputOfAlice(Utils.fromInt(inty, 32));
 				GCSignal[] x = gen.inputOfBob(new boolean[32]);
-				GCSignal[] l = lib.toSignals(0, 32);
-				GCSignal[] r = lib.toSignals(n, 32);
-				int i = n;
-				while(i > 1) {
-					//mid = (l + r) / 2;
-					GCSignal[] mid = lib.add(l, r);
-					mid = lib.rightPublicShift(mid, 1);
-					//mid*mid+y <= x
-					GCSignal[] mmm = lib.multiply(mid, mid);
-					mmm = lib.add(mmm, y);
-					GCSignal guard = lib.leq(mmm, x);
-					
-					//if statement
-					l = lib.mux(l, mid, guard);
-					r = lib.mux(r, mid, lib.not(guard));
-					
-					i = (i + 1) / 2;					
-				}
-			    GCSignal[] lml = lib.multiply(l, l);
-			    lml = lib.add(lml, y);
-			    GCSignal guard = lib.eq(lml, x);
-			    
-			    //if statement
-			    GCSignal[] ret = lib.mux(lib.toSignals(0,32), l, guard);
-				
+				GCSignal[] ret = search(lib, x, y, n);
 				os.flush();
-
 				z = gen.outputToAlice(ret);
-
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -81,37 +82,9 @@ public class TestSearch {
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(eva);
 				GCSignal[] y = eva.inputOfAlice(new boolean[32]);
 				GCSignal[] x = eva.inputOfBob(Utils.fromInt(intx, 32));
-				GCSignal[] l = lib.toSignals(0, 32);
-				GCSignal[] r = lib.toSignals(n, 32);
-				int i = n;
-				while(i > 1) {
-					//mid = (l + r) / 2;
-					GCSignal[] mid = lib.add(l, r);
-					mid = lib.rightPublicShift(mid, 1);
-					//mid*mid+y <= x
-					GCSignal[] mmm = lib.multiply(mid, mid);
-					mmm = lib.add(mmm, y);
-					GCSignal guard = lib.leq(mmm, x);
-					
-					//if statement
-					l = lib.mux(l, mid, guard);
-					r = lib.mux(r, mid, lib.not(guard));
-					
-					i = (i + 1) / 2;					
-				}
-			    GCSignal[] lml = lib.multiply(l, l);
-			    lml = lib.add(lml, y);
-			    GCSignal guard = lib.eq(lml, x);
-			    
-			    //if statement
-			    GCSignal[] ret = lib.mux(lib.toSignals(0,32), l, guard);
-				
-				os.flush();
-
+				GCSignal[] ret = search(lib, x, y, n);
 				eva.outputToAlice(ret);
-
 				os.flush();
-
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -130,9 +103,7 @@ public class TestSearch {
 		tGen.join();
 		tEva.join();
 
-
 		System.out.println(search(n,y,x)+" "+Utils.toSignedInt(gen.z));
-		
 	}
 	
 	public static void main(String[] args) throws Exception
@@ -144,7 +115,7 @@ public class TestSearch {
 		test.runThreads(n, x, y);
 	}
 
-	public int search(int n,  int y,  int x) {
+	static public int search(int n,  int y,  int x) {
 		int i;
 		int l;
 		int r;

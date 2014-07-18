@@ -1,15 +1,11 @@
 package test.harness;
 
 import ml.datastructure.Point;
-import pm.PMCompEnv;
 import test.Utils;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
 
 public class Test_NinputMoutputPoint<T> {
 	public abstract class Helper {
@@ -49,15 +45,8 @@ public class Test_NinputMoutputPoint<T> {
 			try {
 				listen(54321);
 
-
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT) 
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);						
-
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);						
 
 				Point<T>[] a = new Point[h.numberOfPoints];
 				for(int i = 0; i < a.length; ++i)
@@ -70,7 +59,7 @@ public class Test_NinputMoutputPoint<T> {
 
 				Point<T>[] res = h.secureCompute(a, gen);
 					
-				GCGen g = (GCGen)gen;
+//				GCGen g = (GCGen)gen;
 				System.out.println(Flag.sw.ands);
 				z = new boolean[res.length][h.dimension][];
 				for(int i = 0; i < res.length; ++i) {
@@ -101,17 +90,11 @@ public class Test_NinputMoutputPoint<T> {
 
 		public void run() {
 			try {
-				connect("localhost", 54321);				
-
-				CompEnv<T> eva = null;
-
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is ,os, Party.Bob);
-				else if (h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
-
+				connect("localhost", 54321);	
+				
+				@SuppressWarnings("unchecked")
+				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
+				
 				Point<T>[] a = new Point[h.numberOfPoints];
 				for(int i = 0; i < a.length; ++i)
 					a[i] = new Point<>(eva, h.dimension, h.width, false);
@@ -120,7 +103,6 @@ public class Test_NinputMoutputPoint<T> {
 						a[i].coordinates[k] = eva.inputOfAlice(new boolean[h.width]);
 					}				
 				}				
-
 
 				Point<T>[] res = h.secureCompute(a, eva);
 

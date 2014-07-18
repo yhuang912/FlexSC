@@ -2,15 +2,10 @@ package test.harness;
 
 import org.junit.Assert;
 
-import pm.PMCompEnv;
 import test.Utils;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
-
 
 public class Test_1Input1Output<T>{
 	public abstract class Helper {
@@ -37,23 +32,12 @@ public class Test_1Input1Output<T>{
 		public void run() {
 			try {
 				listen(54321);
-
-				CompEnv<T> gen = null;
-
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);				
-				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);			
-				
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
 				T[] a = gen.inputOfBob(new boolean[32]);
-				 
 				T[] d = h.secureCompute(a, gen);
 				os.flush();
-
 				z = gen.outputToAlice(d);
-
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -71,21 +55,12 @@ public class Test_1Input1Output<T>{
 		public void run() {
 			try {
 				connect("localhost", 54321);
-
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL) 
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
-
+				@SuppressWarnings("unchecked")
+				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 				T[] a = eva.inputOfBob(h.a);
 				T[] d = h.secureCompute(a, eva);
-				
 				eva.outputToAlice(d);
 				os.flush();
-
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

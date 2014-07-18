@@ -10,7 +10,7 @@ import flexsc.Mode;
 import flexsc.Party;
 
 public class CircuitOram<T> extends TreeBasedOramParty<T> {
-	CircuitOramLib<T> lib;
+	public CircuitOramLib<T> lib;
 	Block<T>[] scQueue;
 	int cnt = 0;	
 	public PlainBlock[] queue;
@@ -104,6 +104,28 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		scIden = Arrays.copyOf(scIden, lengthOfIden);
 		readAndRemove(scIden, pos, true);
 		putBack(scIden, scNewPos, scData);
+	}
+	
+	public T[] conditionalReadAndRemove(T[] scIden, boolean[] pos, T condition) throws Exception {
+		PlainBlock[][] blocks = getPath(pos);
+		Block<T>[][] scPath = preparePath(blocks, blocks);
+
+		Block<T> res = lib.conditionalReadAndRemove(scPath, scIden, condition);
+		Block<T> res2 = lib.conditionalReadAndRemove(scQueue, scIden, condition);
+		res = lib.mux(res, res2, res.isDummy);
+		
+		blocks = preparePlainPath(scPath);
+		putPath(blocks, pos);
+
+		return res.data;
+	}
+
+
+	public void conditionalPutBack(T[] scIden, T[] scNewPos, T[] scData, T condition) throws Exception {
+		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
+		lib.conditionalAdd(scQueue, b, condition);
+		os.flush();
+		ControlEviction();
 	}
 
 }

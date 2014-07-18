@@ -1,8 +1,15 @@
 package gc;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import flexsc.CompEnv;
 
-public abstract class GCCompEnv implements CompEnv<GCSignal> {
+public abstract class GCCompEnv extends CompEnv<GCSignal> {
+	public GCCompEnv(InputStream is, OutputStream os) {
+		super(is, os);
+	}
+
 	public GCSignal ONE() {
 		return new GCSignal(true);
 	}

@@ -10,9 +10,10 @@ import circuits.FloatFormat;
 import flexsc.CompEnv;
 import flexsc.Party;
 
-public class MinimumCompEnv implements CompEnv<Boolean> {
+public class MinimumCompEnv extends CompEnv<Boolean> {
 	
 	public MinimumCompEnv(InputStream is, OutputStream os, Party p) {
+		super(is, os);
 	}
 	
 	@Override

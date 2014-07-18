@@ -58,6 +58,13 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		}
 		return result;
 	}
+
+	public Block<T> conditionalReadAndRemove(Block<T>[][] blocks, T[] iden, T condition) throws Exception {
+		Block<T>[] res = newBlockArray(blocks.length);
+		for(int i = 0; i < blocks.length; ++i)
+			res[i] = conditionalReadAndRemove(blocks[i], iden, condition);
+		return conditionalReadAndRemove(res, iden, condition);		
+	}
 	
 	public Block<T> readAndRemove(Block<T>[][] blocks, T[] iden) throws Exception {
 		Block<T>[] res = newBlockArray(blocks.length);

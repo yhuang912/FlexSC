@@ -6,18 +6,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Arrays;
-
 import oram.Block;
 import oram.BucketLib;
 import oram.PlainBlock;
-import pm.PMCompEnv;
 import rand.ISAACProvider;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
 
 public abstract class OramParty<T> {
 	public int N;
@@ -31,7 +26,6 @@ public abstract class OramParty<T> {
 	protected InputStream is;
 	protected OutputStream os;
 	public CompEnv<T> env;
-	//public CompEnv<T> eva;
 	public Party role;
 	public Mode mode;
 
@@ -92,26 +86,14 @@ public abstract class OramParty<T> {
 		init();
 
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public void init() throws Exception {
 		dummyArray = new boolean[lengthOfIden+lengthOfPos+lengthOfData+1];
 		for(int i = 0; i < dummyArray.length; ++i)
 			dummyArray[i] = false;
-
-		
-		if(mode == Mode.REAL)
-			if(role == Party.Bob)
-				env = (CompEnv<T>) new GCEva(is, os);
-			else
-				env = (CompEnv<T>) new GCGen(is, os);
-		else if(mode == Mode.VERIFY)
-			env = (CompEnv<T>) new CVCompEnv(is,os, role);
-		else if(mode == Mode.COUNT)
-			env = (CompEnv<T>) new PMCompEnv(is,os, role);
-		
+		env = CompEnv.getEnv(mode, role, is, os);
 		lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, env);
-
 	}
 
 	public Block<T>[] prepareBlocks(PlainBlock[] clientBlock, PlainBlock[] serverBlock) throws Exception {

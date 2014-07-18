@@ -1,4 +1,4 @@
-package test;
+package test.ints;
 
 import flexsc.CompEnv;
 import flexsc.Mode;
