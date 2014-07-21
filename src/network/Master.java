@@ -54,7 +54,7 @@ public class Master {
 		//CompEnv.getEnv(Mode.REAL, Party.Alice, null, null);
 		//IntegerLib<GCSignal> lib = new IntegerLib<>(e);
 		int length = 32;
-		GCSignal[][] a = new GCSignal[MACHINES][];
+		GCSignal[][] a = new GCSignal[MACHINES][length];
 		for (int k = 0; k < LOG_MACHINES; k++) {
 			for (int j = 0; j < MACHINES; j++) {
 				// TODO(kartiknayak): remove hardcoded length
@@ -66,10 +66,10 @@ public class Master {
 				int to = j - (1 << k);
 				GCSignal[] data = new GCSignal[length];
 				for (int i = 0; i < length; i++) {
-					data[i] = (GCSignal) GCSignal.ZERO();
-				}
-				if (to >= 0) {
-					data = a[j];
+					data[i] = (GCSignal) GCSignal.ZERO;
+					if (to >= 0) {
+						data[i] = a[j][i];
+					}
 				}
 				to = (to + MACHINES) % MACHINES;
 				for (int i = 0; i < length; i++) {

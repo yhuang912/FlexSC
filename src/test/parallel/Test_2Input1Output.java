@@ -34,8 +34,8 @@ public class Test_2Input1Output<T> {
 			for(int i = 1; i < x.length; ++i)
 				result = lib.add(result, x[i]);
 
-			System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) result)));
-			// prefixSum(result, lib);
+			// System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) result)));
+			prefixSum(result, lib);
 			return null;
 		}
 
@@ -80,9 +80,7 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
-				System.out.println("Gen runnable started");
 				listen(15432);
-				System.out.println("Gen runnable connected");
 
 				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
 
@@ -90,7 +88,6 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = gen.inputOfBob(new boolean[32]);
 
-				System.out.println("Generator OT done");
 				CompPool<T> pool = new CompPool(gen, "localhost", PORT, MASTER_GEN_PORT);
 				
 				long t1 = System.nanoTime();
@@ -101,7 +98,6 @@ public class Test_2Input1Output<T> {
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 
 
-				System.out.println("Generator comp pool established");
 				Object[] result = pool.runGadget( new AddGadget(), input);
 				IntegerLib<T> lib = new IntegerLib<>(gen);
 				/*T[] finalresult = (T[]) result[0];
@@ -135,9 +131,7 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
-				System.out.println("Eval runnable started");
 				connect("localhost", 15432);				
-				System.out.println("Eva runnable connected");
 
 				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 
@@ -145,7 +139,6 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
-				System.out.println("Evaluator OT done");
 				CompPool<T> pool = new CompPool(eva, "localhost", PORT, MASTER_EVA_PORT);				
 				Object[] input = new Object[CompPool.MaxNumberTask];
 
@@ -153,7 +146,6 @@ public class Test_2Input1Output<T> {
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 				os.flush();
 				
-				System.out.println("Evaluator Comp pool established");
 				Object[] result = pool.runGadget( new AddGadget(), input);
 
 				IntegerLib<T> lib = new IntegerLib<>(eva);

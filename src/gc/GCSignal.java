@@ -13,7 +13,7 @@ public class GCSignal extends Signal {
 	public byte[] bytes;
 	boolean v;
 
-	static final GCSignal ZERO = new GCSignal(new byte[len]);
+	public static final GCSignal ZERO = new GCSignal(new byte[len]);
 
 	public GCSignal(byte[] b) { bytes = b; }
 	
@@ -56,7 +56,9 @@ public class GCSignal extends Signal {
 	
 	// 'send' and 'receive' are supposed to be used only for secret signals
 	public void send(OutputStream os) {
-		try { os.write(bytes);}
+		try {
+			os.write(bytes);
+		}
 		catch (Exception e) { e.printStackTrace(); }
 	}
 
@@ -65,12 +67,12 @@ public class GCSignal extends Signal {
 		byte[] b = null;
 		try {
 			b = Server.readBytes(ois, len);
-//			ois.read(b);	
+			//	ois.read(b);	
 		}
 		catch (Exception e) { e.printStackTrace(); }
 		return new GCSignal(b);
 	}
-	
+
 	@Override
 	public boolean equals(Object lb) {
 		if (this == lb)

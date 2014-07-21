@@ -5,15 +5,19 @@ import flexsc.Mode;
 import gc.GCSignal;
 
 public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
+	static int ARRAY_LENGTH = 100000;
+	static Mode MODE = Mode.REAL;
 
 	public static void main(String args[])throws Exception {
 		// CompPool.MaxNumberTask = new Integer(args[0]);
-		Mode m = Mode.REAL;
+		Mode m = MODE;
 		Test_2Input1Output_eva tt = new Test_2Input1Output_eva();
 
 
 		//for (int i = 1; i <= 10; i+=1) {
-			int a[] = new int[1000];
+			int a[] = new int[ARRAY_LENGTH];
+			for (int i = 0; i < a.length; i++)
+				a[i] = 1;
 			Helper h = tt.new Helper(a, m);
 			
 			EvaRunnable eva = tt.new EvaRunnable(h);
