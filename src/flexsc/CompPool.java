@@ -9,17 +9,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import network.Client;
+import network.Master;
 import network.Server;
 
 public class CompPool<T> {
-	public static int MaxNumberTask;
+	public final static int MaxNumberTask = Master.MACHINES;
 
 	CompEnv<T>[] envs;
 	Server[] servers;
 	Client[] clients;
 	ExecutorService executorService;
+	int masterPort;
+
 	@SuppressWarnings("unchecked")
-	public CompPool(CompEnv<T> env, String host, int port) throws Exception{
+	public CompPool(CompEnv<T> env, String host, int port, int masterPort) throws Exception{
 		envs = new CompEnv[MaxNumberTask];
 		servers = new Server[MaxNumberTask];
 		clients = new Client[MaxNumberTask];
@@ -43,6 +46,7 @@ public class CompPool<T> {
 			}
 			envs[i]= env.getNewInstance(inputStream, outputStream);
 		}
+		this.masterPort = masterPort;
 	}
 
 	public void finalize() throws Exception{
@@ -61,6 +65,7 @@ public class CompPool<T> {
 			Gadget<T> gadge = g.clone();
 			gadge.env = envs[i];
 			gadge.inputs = (Object[]) inputArray[i];
+			gadge.port = masterPort + i;
 			Future<Object> future = executorService.submit(gadge);
 			list.add(future);
 		}

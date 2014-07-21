@@ -22,7 +22,7 @@ public class Server {
         clientSock = sock.accept();                   // wait for client to connect
         
         os = new BufferedOutputStream(clientSock.getOutputStream(), bufferSize);  
-        is = new BufferedInputStream( clientSock.getInputStream(), bufferSize);
+        is = new BufferedInputStream(clientSock.getInputStream(), bufferSize);
 
 	}
 

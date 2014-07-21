@@ -2,29 +2,30 @@
 
 import java.util.Arrays;
 
-import pm.PMCompEnv;
+import network.Master;
 import test.Utils;
 import circuits.IntegerLib;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.CompPool;
 import flexsc.Flag;
 import flexsc.Gadget;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
 import gc.GCSignal;
 
 
 public class Test_2Input1Output<T> {
 	
 	static int PORT = 51111;
+	static int MASTER_GEN_PORT = 30000;
+	static int MASTER_EVA_PORT = 40000;
 
 
 	public class AddGadget extends Gadget<T> {
 		@Override
-		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
+		public Object secureCompute(CompEnv<T> e, Object[] o, int port) throws Exception {
+			connectToMaster("localhost", port);
+
 			T[][] x = (T[][]) o[0];
 
 			IntegerLib<T> lib =  new IntegerLib<T>(e);
@@ -33,7 +34,27 @@ public class Test_2Input1Output<T> {
 			for(int i = 1; i < x.length; ++i)
 				result = lib.add(result, x[i]);
 
-			return result;
+			System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) result)));
+			// prefixSum(result, lib);
+			return null;
+		}
+
+		private void prefixSum(T[] sum, IntegerLib<T> lib) throws Exception {
+			GCSignal[] prefixSum = (GCSignal[]) sum;
+			for (int k = 0; k < Master.LOG_MACHINES; k++) {
+				for (int i = 0; i < prefixSum.length; i++) {
+					prefixSum[i].send(masterOs);
+				}
+				// masterOs.write(sum);
+				masterOs.flush();
+				GCSignal[] read = new GCSignal[prefixSum.length];
+				for (int i = 0; i < prefixSum.length; i++) {
+					read[i] = GCSignal.receive(masterIs);
+				}
+				prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
+			}
+			System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
+			disconnectFromMaster();
 		}
 	};
 
@@ -59,21 +80,18 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
+				System.out.println("Gen runnable started");
 				listen(15432);
+				System.out.println("Gen runnable connected");
 
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT) 
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
+				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
 
-				T[][] Ta = gen.newTArray(h.a.length,0);
+				T[][] Ta = gen.newTArray(h.a.length, 0);
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = gen.inputOfBob(new boolean[32]);
 
-				CompPool<T> pool = new CompPool(gen, "localhost", PORT);
+				System.out.println("Generator OT done");
+				CompPool<T> pool = new CompPool(gen, "localhost", PORT, MASTER_GEN_PORT);
 				
 				long t1 = System.nanoTime();
 
@@ -83,12 +101,13 @@ public class Test_2Input1Output<T> {
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 
 
+				System.out.println("Generator comp pool established");
 				Object[] result = pool.runGadget( new AddGadget(), input);
 				IntegerLib<T> lib = new IntegerLib<>(gen);
-				T[] finalresult = (T[]) result[0];
+				/*T[] finalresult = (T[]) result[0];
 				for(int i = 1; i < result.length; ++i){
 					finalresult = lib.add(finalresult, (T[])result[i]);
-				}
+				}*/
 
 				os.flush();
 
@@ -97,8 +116,8 @@ public class Test_2Input1Output<T> {
 
 
 
-				z = gen.outputToAlice((T[]) finalresult);
-				System.out.println("result:"+Utils.toInt(z));
+				/*z = gen.outputToAlice((T[]) finalresult);
+				System.out.println("result:"+Utils.toInt(z));*/
 				pool.finalize();
 				disconnect();
 			} catch (Exception e) {
@@ -116,43 +135,37 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
+				System.out.println("Eval runnable started");
 				connect("localhost", 15432);				
+				System.out.println("Eva runnable connected");
 
-				CompEnv<T> eva = null;
+				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is ,os, Party.Bob);
-				else if (h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
-
-
-				T[][] Ta = eva.newTArray(h.a.length,0);
+				T[][] Ta = eva.newTArray(h.a.length, 0);
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
-				CompPool<T> pool = new CompPool(eva, "localhost", PORT);				
+				System.out.println("Evaluator OT done");
+				CompPool<T> pool = new CompPool(eva, "localhost", PORT, MASTER_EVA_PORT);				
 				Object[] input = new Object[CompPool.MaxNumberTask];
 
 				for(int i = 0; i < CompPool.MaxNumberTask; ++i)
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 				os.flush();
-
+				
+				System.out.println("Evaluator Comp pool established");
 				Object[] result = pool.runGadget( new AddGadget(), input);
 
-
-
 				IntegerLib<T> lib = new IntegerLib<>(eva);
-				T[] finalresult = (T[]) result[0];
+				/*T[] finalresult = (T[]) result[0];
 				for(int i = 1; i < result.length; ++i){
 					finalresult = lib.add(finalresult, 
 							(T[])result[i]);
-				}
+				}*/
 
 				os.flush();
 
-				eva.outputToAlice((T[]) finalresult);
+				//eva.outputToAlice((T[]) finalresult);
 				os.flush();
 				pool.finalize();
 
@@ -178,7 +191,7 @@ public class Test_2Input1Output<T> {
 
 
 	public static void main(String args[])throws Exception {
-		CompPool.MaxNumberTask = 2;//new Integer(args[0]);
+		// CompPool.MaxNumberTask = 2;//new Integer(args[0]);
 
 		Mode m = Mode.REAL;
 		Test_2Input1Output<GCSignal> tt = new Test_2Input1Output<GCSignal>();

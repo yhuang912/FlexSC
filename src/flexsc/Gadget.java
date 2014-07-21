@@ -2,17 +2,20 @@ package flexsc;
 
 import java.util.concurrent.Callable;
 
-public abstract class Gadget<T> implements Callable<Object>, Cloneable{
+import network.Machine;
+
+public abstract class Gadget<T> extends Machine implements Callable<Object>, Cloneable {
 	Object[] inputs;
 	CompEnv<T> env;
+	int port;
 
-	abstract public  Object secureCompute(CompEnv<T> e, Object[] o) throws Exception;
+	abstract public Object secureCompute(CompEnv<T> e, Object[] o, int port) throws Exception;
 
 	@Override
 	public Object call() throws Exception {
 		Object res = null;
 		try {
-			res = secureCompute(env, inputs);
+			res = secureCompute(env, inputs, port);
 			env.flush();
 		} catch (Exception e) {
 			e.printStackTrace();

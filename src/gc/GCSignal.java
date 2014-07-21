@@ -88,13 +88,11 @@ public class GCSignal extends Signal {
 		return str.toString();
 	}
 
-	@Override
-	public Signal ONE() {
+	public static Signal ONE() {
 		return new GCSignal(true);
 	}
 
-	@Override
-	public Signal ZERO() {
+	public static Signal ZERO() {
 		return new GCSignal(false);
 	}
 }
