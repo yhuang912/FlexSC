@@ -10,14 +10,10 @@ import java.util.Arrays;
 import oram.Block;
 import oram.BucketLib;
 import oram.PlainBlock;
-import pm.PMCompEnv;
 import rand.ISAACProvider;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
 
 public abstract class OramParty<T> {
 	public int N;
@@ -31,8 +27,7 @@ public abstract class OramParty<T> {
 	protected InputStream is;
 	protected OutputStream os;
 	public CompEnv<T> env;
-	//public CompEnv<T> eva;
-	public Party role;
+	public Party p;
 	public Mode mode;
 
 	static protected SecureRandom rng;
@@ -48,10 +43,10 @@ public abstract class OramParty<T> {
 	public BucketLib<T> lib;
 	boolean[] dummyArray;
 
-	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p, Mode m) throws Exception {
-
-		this.is = is;
-		this.os = os;
+	public OramParty(CompEnv<T> env, int N, int dataSize) throws Exception {
+		this.env = env;
+		this.is = env.is;
+		this.os = env.os;
 
 		this.dataSize = dataSize;
 		long a = 1;logN=1;
@@ -66,15 +61,16 @@ public abstract class OramParty<T> {
 		lengthOfData = dataSize;
 		lengthOfIden = logN;
 		lengthOfPos = logN-1;
-		role = p;
-		mode = m;
+		p = env.p;
+		mode = env.m;
 		init();
 
 	}
 
-	public OramParty(InputStream is, OutputStream os, int N, int dataSize, Party p, int lengthOfPos, Mode m) throws Exception {
-		this.is = is;
-		this.os = os;
+	public OramParty(CompEnv<T> env, int N, int dataSize, int lengthOfPos) throws Exception {
+		this.env = env;
+		this.is = env.is;
+		this.os = env.os;
 
 		this.dataSize = dataSize;
 		int a = 1;logN=1;
@@ -87,31 +83,17 @@ public abstract class OramParty<T> {
 		lengthOfData = dataSize;
 		lengthOfIden = logN;
 		this.lengthOfPos = lengthOfPos;
-		role = p;
-		mode = m;
+		p = env.p;
+		mode = env.m;
 		init();
 
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	public void init() throws Exception {
 		dummyArray = new boolean[lengthOfIden+lengthOfPos+lengthOfData+1];
 		for(int i = 0; i < dummyArray.length; ++i)
 			dummyArray[i] = false;
-
-		
-		if(mode == Mode.REAL)
-			if(role == Party.Bob)
-				env = (CompEnv<T>) new GCEva(is, os);
-			else
-				env = (CompEnv<T>) new GCGen(is, os);
-		else if(mode == Mode.VERIFY)
-			env = (CompEnv<T>) new CVCompEnv(is,os, role);
-		else if(mode == Mode.COUNT)
-			env = (CompEnv<T>) new PMCompEnv(is,os, role);
-		
 		lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, env);
-
 	}
 
 	public Block<T>[] prepareBlocks(PlainBlock[] clientBlock, PlainBlock[] serverBlock) throws Exception {

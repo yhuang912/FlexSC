@@ -1,11 +1,12 @@
 package PrivateOram;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 
@@ -21,30 +22,53 @@ public class RecursiveCircuitOram<T> {
 	protected InputStream is;
 	protected OutputStream os;
 	Party p;
-	public RecursiveCircuitOram(InputStream is, OutputStream os, int N, int dataSize, int cutoff, int recurFactor, 
-			int capacity, Mode m, int sp, Party p) throws Exception {
-		this.p = p;
-		this.is = is;
-		this.os = os;
+	public RecursiveCircuitOram(CompEnv<T> env, int N, int dataSize, int cutoff, int recurFactor, 
+			int capacity,int sp) throws Exception {
+		this.is = env.is;
+		this.os = env.os;
+		this.p = env.p;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		CircuitOram<T>  oram = new CircuitOram<T>(is, os, N, dataSize, p, capacity, m, sp);
+		CircuitOram<T>  oram = new CircuitOram<T>(env, N, dataSize, capacity, sp);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1<<oram.lengthOfIden)/recurFactor;
 		while(newN > cutoff) {
-			oram = new CircuitOram<T>(is, os, newN, newDataSize, p, capacity, m, sp);
+			oram = new CircuitOram<T>(env, newN, newDataSize, capacity, sp);
 			clients.add(oram);
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
 		}
 		CircuitOram<T> last = clients.get(clients.size()-1);
-		baseOram = new TrivialPrivateOram<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, m, p);
+		baseOram = new TrivialPrivateOram<T>(env, (1<<last.lengthOfIden), last.lengthOfPos);
 //		System.out.println(clients.size());
 	}
 
 	//with default params
+	public RecursiveCircuitOram(CompEnv<T> env, int N, int dataSize) throws Exception {
+		this.p = env.p;
+		this.is = env.is;
+		this.os = env.os;
+		this.cutoff = 512;
+		this.recurFactor = 4;
+		this.capacity = 3;
+		int sp = 80;
+		CircuitOram<T>  oram = new CircuitOram<T>(env, N, dataSize, capacity, sp);
+		clients.add(oram);
+		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1<<oram.lengthOfIden)/recurFactor;
+		while(newN > cutoff) {
+			oram = new CircuitOram<T>(env, newN, newDataSize, capacity, sp);
+			clients.add(oram);
+			newDataSize = oram.lengthOfPos * recurFactor;
+			newN = (1<<oram.lengthOfIden)  / recurFactor;
+		}
+		CircuitOram<T> last = clients.get(clients.size()-1);
+		baseOram = new TrivialPrivateOram<T>(env, (1<<last.lengthOfIden), last.lengthOfPos);
+	}
+
+	//with default params
 	public RecursiveCircuitOram(InputStream is, OutputStream os, int N, int dataSize, Party p) throws Exception {
+		CompEnv env = CompEnv.getEnv(Mode.REAL, p, is, os);
 		this.p = p;
 		this.is = is;
 		this.os = os;
@@ -52,19 +76,18 @@ public class RecursiveCircuitOram<T> {
 		this.recurFactor = 4;
 		this.capacity = 3;
 		int sp = 80;
-		CircuitOram<T>  oram = new CircuitOram<T>(is, os, N, dataSize, p, capacity, Mode.REAL, sp);
+		CircuitOram<T>  oram = new CircuitOram<T>(env, N, dataSize, capacity, sp);
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1<<oram.lengthOfIden)/recurFactor;
 		while(newN > cutoff) {
-			oram = new CircuitOram<T>(is, os, newN, newDataSize, p, capacity, Mode.REAL, sp);
+			oram = new CircuitOram<T>(env, newN, newDataSize, capacity, sp);
 			clients.add(oram);
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1<<oram.lengthOfIden)  / recurFactor;
 		}
 		CircuitOram<T> last = clients.get(clients.size()-1);
-		baseOram = new TrivialPrivateOram<T>(is, os, (1<<last.lengthOfIden), last.lengthOfPos, Mode.REAL, p);
+		baseOram = new TrivialPrivateOram<T>(env, (1<<last.lengthOfIden), last.lengthOfPos);
 	}
-
 	
 	public T[] read(T[] iden) throws Exception {
 		T[][] poses = travelToDeep(iden, 1);
@@ -72,7 +95,7 @@ public class RecursiveCircuitOram<T> {
 
 //		boolean[] oldPos = clients.get(clients.size()-1).env.outputToAlice(poses[0]);
 		boolean[] oldPos = baseOram.env.outputToAlice(poses[0]);
-		oldPos = syncBooleans(oldPos);
+		oldPos = baseOram.lib.syncBooleans(oldPos);
 //		System.out.println("read " + Utils.toInt(oldPos));// + " "+Utils.toInt(poses[1]));
 		T[] res = currentOram.read(iden, oldPos, poses[1]);
 		return res;
@@ -84,7 +107,7 @@ public class RecursiveCircuitOram<T> {
 
 //		boolean[] oldPos = clients.get(clients.size()-1).env.outputToAlice(poses[0]);
 		boolean[] oldPos = baseOram.env.outputToAlice(poses[0]);
-		oldPos = syncBooleans(oldPos);
+		oldPos = baseOram.lib.syncBooleans(oldPos);
 //		System.out.println("write " + Utils.toInt(oldPos));// + " "+Utils.toInt(poses[1]));
 		currentOram.write(iden, oldPos, poses[1], data);
 	}
@@ -96,7 +119,7 @@ public class RecursiveCircuitOram<T> {
 			
 			T[] pos = extract(baseMap, ithPos, clients.get(level-1).lengthOfPos);
 			
-			T[] newPos = randBools(clients.get(level-1).lengthOfPos);
+			T[] newPos = baseOram.lib.randBools(rng, clients.get(level-1).lengthOfPos);
 			put(baseMap, ithPos, newPos);
 			baseOram.putBack(subIdentifier(iden, baseOram), baseMap);
 			os.flush();
@@ -112,13 +135,13 @@ public class RecursiveCircuitOram<T> {
 			//System.out.println(" tr "+level+" "+iden+" "+Utils.toInt(poses[0]) + " "+Utils.toInt(poses[1]));
 			//			sendBooleans(poses[0]);
 			boolean[] oldPos = clients.get(clients.size()-1).env.outputToAlice(poses[0]);
-			oldPos = syncBooleans(oldPos);
+			oldPos = baseOram.lib.syncBooleans(oldPos);
 
 			T[] data = currentOram.readAndRemove(subIdentifier(iden, currentOram), oldPos, true);
 			T[] ithPos = currentOram.lib.rightPublicShift(iden, currentOram.lengthOfIden);//iden>>currentOram.lengthOfIden;//iden/(1<<currentOram.lengthOfIden);
 
 			T[] pos = extract(data, ithPos, clients.get(level-1).lengthOfPos);
-			T[] tmpNewPos = randBools(clients.get(level-1).lengthOfPos);
+			T[] tmpNewPos = baseOram.lib.randBools(rng, clients.get(level-1).lengthOfPos);
 			put(data, ithPos, tmpNewPos);
 			currentOram.putBack(subIdentifier(iden, currentOram), poses[1], data);
 			T[][] result = currentOram.env.newTArray(2, 0);
@@ -152,36 +175,6 @@ public class RecursiveCircuitOram<T> {
 		}
 	}
 
-	public T[] randBools(int length) throws Exception {
-		boolean[] res = new boolean[length];
-		for(int i = 0; i < length; ++i)
-			res[i] = rng.nextBoolean();
-		T[] alice = baseOram.env.inputOfAlice(res); 
-		T[] bob = baseOram.env.inputOfBob(res);
-		return baseOram.lib.xor(alice, bob);
-//		return baseOram.env.inputOfAlice(res);
-	}
 
-	boolean[] syncBooleans(boolean[] pos) throws IOException {
-		if(p == Party.Alice){
-			//send pos to server
-			os.write(new byte[]{(byte) pos.length});
-			byte[] tmp = new byte[pos.length];
-			for(int i = 0; i < pos.length; ++i)
-				tmp[i] = (byte) (pos[i] ? 1 : 0);
-			os.write(tmp);
-			os.flush();
-		}
-		else {
-			byte[] l = new byte[1];
-			is.read(l);
-			byte tmp[] = new byte[l[0]];
-			is.read(tmp);
-			pos = new boolean[l[0]];
-			for(int k = 0; k < tmp.length; ++k) {
-				pos[k] = ((tmp[k] - 1) == 0);
-			}
-		}
-		return pos;
-	}
+
 }

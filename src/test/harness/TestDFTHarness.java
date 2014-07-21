@@ -6,13 +6,9 @@ import objects.Float.Representation;
 
 import org.junit.Assert;
 
-import pm.PMCompEnv;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
 
 public class TestDFTHarness<T> {
 	public abstract class Helper {
@@ -38,15 +34,8 @@ public class TestDFTHarness<T> {
 		public void run() {
 			try {
 				listen(54321);
-
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
-				
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);				
 
 				Representation<T>[] fgc1 = new Representation[h.a.length];
 				Representation<T>[] fgc2 = new Representation[h.b.length];
@@ -85,15 +74,8 @@ public class TestDFTHarness<T> {
 		public void run() {
 			try {
 				connect("localhost", 54321);	
-
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
-
+				@SuppressWarnings("unchecked")
+				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 
 				Representation<T>[] fgc1 = new Representation[h.a.length];
 				Representation<T>[] fgc2 = new Representation[h.b.length];

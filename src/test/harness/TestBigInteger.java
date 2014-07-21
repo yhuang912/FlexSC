@@ -4,15 +4,10 @@ import java.math.BigInteger;
 
 import org.junit.Assert;
 
-import pm.PMCompEnv;
 import test.Utils;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
-import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
 
 
 
@@ -46,27 +41,15 @@ public class TestBigInteger<T> {
 		public void run() {
 			try {
 				listen(54321);
-
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT) 
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
 				
-				Flag.sw.startTotal();
 				T [] a = gen.inputOfAlice(h.a);
-				
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
-				//new java.util.Scanner(System.in).nextLine();
 				T[] d = h.secureCompute(a, b, gen);
 				os.flush();
 		          
 				z = gen.outputToAlice(d);
-				double t = Flag.sw.stopTotal();
-				Flag.sw.addCounter();
-//				System.out.println(t/1000000.0);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -84,15 +67,9 @@ public class TestBigInteger<T> {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is ,os, Party.Bob);
-				else if (h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
-
+				@SuppressWarnings("unchecked")
+				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
+				
 				T [] a = eva.inputOfAlice(new boolean[h.a.length]);
 				T [] b = eva.inputOfBob(h.b);
 				

@@ -1,7 +1,5 @@
 package caes;
 
-import gc.GCSignal;
-
 import java.security.SecureRandom;
 
 //if (result) jresult = (*jenv)->NewByteArray(jenv, 50);

@@ -7,7 +7,7 @@ import java.security.Security;
 
 import rand.ISAACProvider;
 
-public class Demo {
+public class TestISAACRandom {
 	public static void main(String[] args) throws NoSuchAlgorithmException {
 		// Add the provider to make Java aware of ISAAC
 		Security.addProvider (new ISAACProvider ());

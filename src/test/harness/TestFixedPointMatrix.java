@@ -2,13 +2,9 @@ package test.harness;
 
 import org.junit.Assert;
 
-import pm.PMCompEnv;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
 
 
 public class TestFixedPointMatrix<T> {
@@ -37,15 +33,9 @@ public class TestFixedPointMatrix<T> {
 		public void run() {
 			try {
 				listen(54321);
-
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
-
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
+				
 				T[][][] fgc1 = gen.newTArray(h.a.length, h.a[0].length, len);
 				T[][][] fgc2 = gen.newTArray(h.b.length, h.b[0].length, len);
 				for(int i = 0; i < h.a.length; ++i)
@@ -81,15 +71,8 @@ public class TestFixedPointMatrix<T> {
 		public void run() {
 			try {
 				connect("localhost", 54321);	
-
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
-
+				@SuppressWarnings("unchecked")
+				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 				
 				T[][][] fgc1 = eva.newTArray(h.a.length, h.a[0].length, len);
 				T[][][] fgc2 = eva.newTArray(h.b.length, h.b[0].length, len);

@@ -1,8 +1,11 @@
 package circuits;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
 
 import flexsc.CompEnv;
+import flexsc.Party;
 import gc.GCSignal;
 
 public class CircuitLib<T> {
@@ -30,6 +33,42 @@ public class CircuitLib<T> {
 		return result;
 	}
 
+	public T[] randBools(Random rng, int length) throws Exception {
+		boolean[] res = new boolean[length];
+		for(int i = 0; i < length; ++i)
+			res[i] = rng.nextBoolean();
+		T[] alice = env.inputOfAlice(res); 
+		T[] bob = env.inputOfBob(res);
+		return xor(alice, bob);
+	}
+
+	public boolean[] getBooleans(T[] x) throws Exception {
+		return env.outputToAlice(x);
+	}
+	
+	public boolean[] syncBooleans(boolean[] pos) throws IOException {
+		if(env.getParty() == Party.Alice){
+			//send pos to bob
+			env.os.write(new byte[]{(byte) pos.length});
+			byte[] tmp = new byte[pos.length];
+			for(int i = 0; i < pos.length; ++i)
+				tmp[i] = (byte) (pos[i] ? 1 : 0);
+			env.os.write(tmp);
+			env.os.flush();
+		}
+		else {
+			byte[] l = new byte[1];
+			env.is.read(l);
+			byte tmp[] = new byte[l[0]];
+			env.is.read(tmp);
+			pos = new boolean[l[0]];
+			for(int k = 0; k < tmp.length; ++k) {
+				pos[k] = ((tmp[k] - 1) == 0);
+			}
+		}
+		return pos;
+	}
+	
 	// Defaults to 32 bit constants.
 	public T[] toSignals(int value) {
 		return toSignals(value, 32);

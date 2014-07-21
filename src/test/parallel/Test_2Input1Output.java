@@ -1,5 +1,11 @@
 	package test.parallel;
 
+import java.util.Arrays;
+
+import pm.PMCompEnv;
+import test.Utils;
+import circuits.IntegerLib;
+import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.CompPool;
 import flexsc.Flag;
@@ -9,11 +15,6 @@ import flexsc.Party;
 import gc.GCEva;
 import gc.GCGen;
 import gc.GCSignal;
-import java.util.Arrays;
-import pm.PMCompEnv;
-import test.Utils;
-import circuits.IntegerLib;
-import cv.CVCompEnv;
 
 
 public class Test_2Input1Output<T> {

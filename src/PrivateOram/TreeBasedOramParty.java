@@ -1,21 +1,19 @@
 package PrivateOram;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import oram.Block;
 import oram.PlainBlock;
-import flexsc.Mode;
+import flexsc.CompEnv;
 import flexsc.Party;
 
 
 public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	public PlainBlock[][] tree;
 	protected int capacity;
-	public TreeBasedOramParty(InputStream is, OutputStream os, int N, int dataSize,
-			Party p, int capacity, Mode m) throws Exception {
-		super(is, os, N, dataSize, p, m);
+	public TreeBasedOramParty(CompEnv<T> env, int N, int dataSize,
+			int capacity) throws Exception {
+		super(env,  N, dataSize);
 		this.capacity = capacity;
 
 		tree  = new PlainBlock[this.N][capacity];
@@ -53,7 +51,7 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	}
 
 	public boolean[] getRandomPath() throws IOException{
-		if(role == Party.Alice) {
+		if(p == Party.Alice) {
 			boolean[] pos = new boolean[lengthOfPos];
 			for(int i = 0; i < lengthOfPos; ++i) {
 				pos[i] = rng.nextBoolean();
@@ -142,7 +140,7 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 		os.flush();
 		PlainBlock[][] result = outputBuckets(lib.xor(blocks, randomSCPath));
 		os.flush();
-		if(role == Party.Alice)
+		if(p == Party.Alice)
 			return result;
 		else return randomPath;
 	}

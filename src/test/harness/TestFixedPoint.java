@@ -2,13 +2,9 @@ package test.harness;
 
 import org.junit.Assert;
 
-import pm.PMCompEnv;
-import cv.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
 
 
 public class TestFixedPoint<T> {
@@ -37,15 +33,9 @@ public class TestFixedPoint<T> {
 		public void run() {
 			try {
 				listen(54321);
-
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
-
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
+				
 				T[] fgc1 = gen.inputOfAliceFixedPoint(h.a, len, offset);
 				T[] fgc2 = gen.inputOfBobFixedPoint(0, len, offset);
 				T[] re = h.secureCompute(fgc1, fgc2, offset, gen);
@@ -70,15 +60,8 @@ public class TestFixedPoint<T> {
 		public void run() {
 			try {
 				connect("localhost", 54321);	
-
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
-
+				@SuppressWarnings("unchecked")
+				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 				
 				T[] fgc1 = eva.inputOfAliceFixedPoint(0, len, offset);
 				T[] fgc2 = eva.inputOfBobFixedPoint(h.b, len, offset);

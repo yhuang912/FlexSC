@@ -3,6 +3,7 @@ package PrivateOram;
 import org.junit.Test;
 
 import test.Utils;
+import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
@@ -61,8 +62,9 @@ public class TestCircuitOramRec {
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 
-				System.out.println("connected");				
-				RecursiveCircuitOram<GCSignal> client = new RecursiveCircuitOram<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80, Party.Alice);
+				System.out.println("connected");		
+				CompEnv env = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
+				RecursiveCircuitOram<GCSignal> client = new RecursiveCircuitOram<GCSignal>(env, N, dataSize, cutoff, recurFactor, capacity,  80);
 
 				for(int i = 0; i < writeCount; ++i) {
 					int element = i%N;
@@ -126,7 +128,8 @@ public class TestCircuitOramRec {
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
 				System.out.println("connected");
-				RecursiveCircuitOram<GCSignal> server = new RecursiveCircuitOram<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80, Party.Bob);
+				CompEnv env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
+				RecursiveCircuitOram<GCSignal> server = new RecursiveCircuitOram<GCSignal>(env, N, dataSize, cutoff, recurFactor, capacity,  80);
 				for(int i = 0; i < writeCount; ++i) {
 //					Flag.sw.startTotal();
 					int element = i%N;

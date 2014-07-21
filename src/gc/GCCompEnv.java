@@ -1,8 +1,17 @@
 package gc;
 
-import flexsc.CompEnv;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public abstract class GCCompEnv implements CompEnv<GCSignal> {
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
+
+public abstract class GCCompEnv extends CompEnv<GCSignal> {
+	public GCCompEnv(InputStream is, OutputStream os, Party p) {
+		super(is, os, p, Mode.REAL);
+	}
+
 	public GCSignal ONE() {
 		return new GCSignal(true);
 	}

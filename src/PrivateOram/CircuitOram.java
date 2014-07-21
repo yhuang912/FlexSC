@@ -6,11 +6,12 @@ import java.util.Arrays;
 
 import oram.Block;
 import oram.PlainBlock;
+import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 
 public class CircuitOram<T> extends TreeBasedOramParty<T> {
-	CircuitOramLib<T> lib;
+	public CircuitOramLib<T> lib;
 	Block<T>[] scQueue;
 	int cnt = 0;	
 	public PlainBlock[] queue;
@@ -31,7 +32,21 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 
 	public CircuitOram(InputStream is, OutputStream os, int N, int dataSize,
 			Party p, int cap, Mode m, int sp) throws Exception {
-		super(is, os, N, dataSize, p, cap, m);
+		super(CompEnv.getEnv(m, p, is, os), N, dataSize, cap);
+		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, env);
+		queueCapacity = 30;
+		queue = new PlainBlock[queueCapacity];
+
+		for(int i = 0; i < queue.length; ++i) 
+			queue[i] = getDummyBlock(p == Party.Alice);
+
+		scQueue = prepareBlocks(queue, queue);		
+
+	}
+	
+	public CircuitOram(CompEnv<T> env, int N, int dataSize,
+			 int cap, int sp) throws Exception {
+		super(env, N, dataSize, cap);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, env);
 		queueCapacity = 30;
 		queue = new PlainBlock[queueCapacity];
@@ -104,6 +119,28 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		scIden = Arrays.copyOf(scIden, lengthOfIden);
 		readAndRemove(scIden, pos, true);
 		putBack(scIden, scNewPos, scData);
+	}
+	
+	public T[] conditionalReadAndRemove(T[] scIden, boolean[] pos, T condition) throws Exception {
+		PlainBlock[][] blocks = getPath(pos);
+		Block<T>[][] scPath = preparePath(blocks, blocks);
+
+		Block<T> res = lib.conditionalReadAndRemove(scPath, scIden, condition);
+		Block<T> res2 = lib.conditionalReadAndRemove(scQueue, scIden, condition);
+		res = lib.mux(res, res2, res.isDummy);
+		
+		blocks = preparePlainPath(scPath);
+		putPath(blocks, pos);
+
+		return res.data;
+	}
+
+
+	public void conditionalPutBack(T[] scIden, T[] scNewPos, T[] scData, T condition) throws Exception {
+		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
+		lib.conditionalAdd(scQueue, b, condition);
+		os.flush();
+		ControlEviction();
 	}
 
 }

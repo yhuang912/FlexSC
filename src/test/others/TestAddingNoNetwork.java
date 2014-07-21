@@ -2,8 +2,8 @@ package test.others;
 
 import java.util.Random;
 
-import circuits.IntegerLib;
 import test.Utils;
+import circuits.IntegerLib;
 import flexsc.MinimumCompEnv;
 
 public class TestAddingNoNetwork {

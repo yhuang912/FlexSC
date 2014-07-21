@@ -1,13 +1,14 @@
 package test.others;
 
+import flexsc.Party;
+import gc.GCSignal;
+
 import java.util.Random;
 
 import org.junit.Test;
 
-import PrivateOram.RecursiveCircuitOram;
 import test.Utils;
-import flexsc.Party;
-import gc.GCSignal;
+import PrivateOram.RecursiveCircuitOram;
 public class TestOram {
 
 	static int N = 100;
