@@ -8,7 +8,7 @@ public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
 	static int ARRAY_LENGTH = 100000;
 	static Mode MODE = Mode.REAL;
 
-	public static void main(String args[])throws Exception {
+	public static void main(String args[]) throws Exception {
 		// CompPool.MaxNumberTask = new Integer(args[0]);
 		Mode m = MODE;
 		Test_2Input1Output_eva tt = new Test_2Input1Output_eva();
