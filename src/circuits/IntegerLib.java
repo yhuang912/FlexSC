@@ -137,7 +137,6 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		return mux(x, result, x[x.length-1]);
 	}
 
-
 	//tested
 	public T[] divide(T[] x, T[] y) throws Exception {
 		T[] absoluteX = absolute(x);
@@ -159,8 +158,9 @@ public class IntegerLib<T> extends CircuitLib<T> {
 
 			divisor = rightShift(divisor);
 		}
-		//return quotient;
-		return addSign(quotient, xor(x[x.length-1], y[y.length-1]));
+
+//		return quotient;
+		return addSign(Arrays.copyOf(quotient, x.length), xor(x[x.length-1], y[y.length-1]));
 	}
 
 

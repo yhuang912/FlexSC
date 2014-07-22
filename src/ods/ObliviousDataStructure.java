@@ -9,7 +9,8 @@ import flexsc.CompEnv;
 
 public class ObliviousDataStructure<T> {
 	public static SecureRandom rnd;
-	public int sp = 80;
+	final public int sp = 80;
+	final public int capacity = 3;
 
 	static{
 		Security.addProvider(new ISAACProvider ());

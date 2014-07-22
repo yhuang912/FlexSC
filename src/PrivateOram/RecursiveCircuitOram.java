@@ -24,6 +24,16 @@ public class RecursiveCircuitOram<T> {
 	Party p;
 	public RecursiveCircuitOram(CompEnv<T> env, int N, int dataSize, int cutoff, int recurFactor, 
 			int capacity,int sp) throws Exception {
+		init(env, N, dataSize, cutoff, recurFactor, capacity, sp);
+	}
+	
+	//with default params
+	public RecursiveCircuitOram(CompEnv<T> env, int N, int dataSize) throws Exception {
+		init(env, N, dataSize, 256, 8, 3, 80);
+	}
+	
+	void init(CompEnv<T> env, int N, int dataSize, int cutoff, int recurFactor, 
+			int capacity,int sp) throws Exception {
 		this.is = env.is;
 		this.os = env.os;
 		this.p = env.p;
@@ -41,34 +51,12 @@ public class RecursiveCircuitOram<T> {
 		}
 		CircuitOram<T> last = clients.get(clients.size()-1);
 		baseOram = new TrivialPrivateOram<T>(env, (1<<last.lengthOfIden), last.lengthOfPos);
-//		System.out.println(clients.size());
 	}
 
 	//with default params
-	public RecursiveCircuitOram(CompEnv<T> env, int N, int dataSize) throws Exception {
-		this.p = env.p;
-		this.is = env.is;
-		this.os = env.os;
-		this.cutoff = 512;
-		this.recurFactor = 4;
-		this.capacity = 3;
-		int sp = 80;
-		CircuitOram<T>  oram = new CircuitOram<T>(env, N, dataSize, capacity, sp);
-		clients.add(oram);
-		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1<<oram.lengthOfIden)/recurFactor;
-		while(newN > cutoff) {
-			oram = new CircuitOram<T>(env, newN, newDataSize, capacity, sp);
-			clients.add(oram);
-			newDataSize = oram.lengthOfPos * recurFactor;
-			newN = (1<<oram.lengthOfIden)  / recurFactor;
-		}
-		CircuitOram<T> last = clients.get(clients.size()-1);
-		baseOram = new TrivialPrivateOram<T>(env, (1<<last.lengthOfIden), last.lengthOfPos);
-	}
-
-	//with default params
+	// will be deprecated.
 	public RecursiveCircuitOram(InputStream is, OutputStream os, int N, int dataSize, Party p) throws Exception {
-		CompEnv env = CompEnv.getEnv(Mode.REAL, p, is, os);
+		CompEnv env = CompEnv.getEnv(Mode.COUNT, p, is, os);
 		this.p = p;
 		this.is = is;
 		this.os = os;

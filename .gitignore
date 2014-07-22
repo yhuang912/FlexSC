@@ -4,4 +4,7 @@
 *.war
 *.ear
 /bin
+NPOTKey
+.classpath
+.project
 /bin1/

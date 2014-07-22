@@ -14,6 +14,7 @@ import circuits.FloatFormat;
 import cv.CVCompEnv;
 
 public abstract class CompEnv<T> {
+	@SuppressWarnings("rawtypes")
 	public static CompEnv getEnv(Mode mode, Party p, InputStream is, OutputStream os) throws Exception{
 		if(mode == Mode.REAL)
 			if(p == Party.Bob)

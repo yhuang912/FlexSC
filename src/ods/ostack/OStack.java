@@ -11,7 +11,6 @@ import flexsc.CompEnv;
 
 public class OStack<T> extends ObliviousDataStructure<T> {
 	CircuitOram<T> oram;
-	final int capacity = 3;
 	BucketLib<T> lib;
 	T[] top;
 	T[] counter;

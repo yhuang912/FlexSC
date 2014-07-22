@@ -62,7 +62,6 @@ public class TestOram {
 			try {
 				listen(54321);
 				RecursiveCircuitOram<GCSignal> client = new RecursiveCircuitOram<GCSignal>(is, os, N, dataSize, Party.Alice);
-
 				for(int i = 0; i < x.length; ++i) {
 					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils.fromInt(x[i], dataSize));
 					client.write(client.baseOram.lib.toSignals(i), scData);
