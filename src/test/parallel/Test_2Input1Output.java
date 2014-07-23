@@ -1,4 +1,4 @@
-	package test.parallel;
+package test.parallel;
 
 import java.util.Arrays;
 
@@ -15,16 +15,21 @@ import gc.GCSignal;
 
 
 public class Test_2Input1Output<T> {
-	
-	static int PORT = 51111;
-	static int MASTER_GEN_PORT = 30000;
-	static int MASTER_EVA_PORT = 40000;
 
+	int ORIGINAL_PORT = 15432;
+	static int PORT = 51111;
+	int START_PORT;
+
+	public Test_2Input1Output(int startPort) {
+		START_PORT = startPort;
+	}
 
 	public class AddGadget extends Gadget<T> {
+
 		@Override
-		public Object secureCompute(CompEnv<T> e, Object[] o, int port) throws Exception {
-			connectToMaster("localhost", port);
+		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
+			connectMachines();
+			// connectToPeer("localhost", port);
 
 			T[][] x = (T[][]) o[0];
 
@@ -40,21 +45,31 @@ public class Test_2Input1Output<T> {
 		}
 
 		private void prefixSum(T[] sum, IntegerLib<T> lib) throws Exception {
+			int noOfIncomingConnections = numberOfIncomingConnections;
+			int noOfOutgoingConnections = numberOfOutgoingConnections;
 			GCSignal[] prefixSum = (GCSignal[]) sum;
 			for (int k = 0; k < Master.LOG_MACHINES; k++) {
-				for (int i = 0; i < prefixSum.length; i++) {
-					prefixSum[i].send(masterOs);
+				if (noOfOutgoingConnections > 0) {
+					for (int i = 0; i < prefixSum.length; i++) {
+						prefixSum[i].send(peerOsClient[k]);
+					}
+					peerOsClient[k].flush();
+					noOfOutgoingConnections--;
+				}
+				// Thread.sleep(5000);
+				if (noOfIncomingConnections > 0) {
+					GCSignal[] read = new GCSignal[prefixSum.length];
+					for (int i = 0; i < prefixSum.length; i++) {
+						read[i] = GCSignal.receive(peerIsServer[k]);
+					}
+					prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
+					noOfIncomingConnections--;
 				}
 				// masterOs.write(sum);
-				masterOs.flush();
-				GCSignal[] read = new GCSignal[prefixSum.length];
-				for (int i = 0; i < prefixSum.length; i++) {
-					read[i] = GCSignal.receive(masterIs);
-				}
-				prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
+				System.out.println("Iteration = " + k);
 			}
 			System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
-			disconnectFromMaster();
+			// disconnectFromPeers();
 		}
 	};
 
@@ -80,7 +95,7 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
-				listen(15432);
+				listen(ORIGINAL_PORT);
 
 				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
 
@@ -88,7 +103,7 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = gen.inputOfBob(new boolean[32]);
 
-				CompPool<T> pool = new CompPool(gen, "localhost", PORT, MASTER_GEN_PORT);
+				CompPool<T> pool = new CompPool(gen, "localhost", PORT);
 				
 				long t1 = System.nanoTime();
 
@@ -97,8 +112,9 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < CompPool.MaxNumberTask; ++i)
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 
+				System.out.println("Gen comp pool established");
 
-				Object[] result = pool.runGadget( new AddGadget(), input);
+				Object[] result = pool.runGadget(new AddGadget(), input, START_PORT);
 				IntegerLib<T> lib = new IntegerLib<>(gen);
 				/*T[] finalresult = (T[]) result[0];
 				for(int i = 1; i < result.length; ++i){
@@ -131,7 +147,7 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
-				connect("localhost", 15432);				
+				connect("localhost", ORIGINAL_PORT);				
 
 				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 
@@ -139,14 +155,15 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
-				CompPool<T> pool = new CompPool(eva, "localhost", PORT, MASTER_EVA_PORT);				
+				CompPool<T> pool = new CompPool(eva, "localhost", PORT);				
 				Object[] input = new Object[CompPool.MaxNumberTask];
 
 				for(int i = 0; i < CompPool.MaxNumberTask; ++i)
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
 				os.flush();
-				
-				Object[] result = pool.runGadget( new AddGadget(), input);
+
+				System.out.println("Eva comp pool established");
+				Object[] result = pool.runGadget(new AddGadget(), input, START_PORT + 10000);
 
 				IntegerLib<T> lib = new IntegerLib<>(eva);
 				/*T[] finalresult = (T[]) result[0];
@@ -182,7 +199,7 @@ public class Test_2Input1Output<T> {
 	}
 
 
-	public static void main(String args[])throws Exception {
+	/*public static void main(String args[])throws Exception {
 		// CompPool.MaxNumberTask = 2;//new Integer(args[0]);
 
 		Mode m = Mode.REAL;
@@ -197,6 +214,6 @@ public class Test_2Input1Output<T> {
 			Flag.sw.flush();
 		}
 		
-	}	
+	}	*/
 
 }

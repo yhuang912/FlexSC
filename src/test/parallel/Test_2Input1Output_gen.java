@@ -6,11 +6,16 @@ import gc.GCSignal;
 
 public class Test_2Input1Output_gen extends Test_2Input1Output<GCSignal>{
 
+	public Test_2Input1Output_gen(int startPort) {
+		super(startPort);
+	}
+
 	public static void main(String args[])throws Exception {
 		// CompPool.MaxNumberTask = new Integer(args[0]);
 
+		int startPort = Integer.parseInt(args[0]);
 		Mode m = Test_2Input1Output_eva.MODE;
-		Test_2Input1Output_gen tt = new Test_2Input1Output_gen();
+		Test_2Input1Output_gen tt = new Test_2Input1Output_gen(startPort);
 
 
 		//for (int i = 1; i <= 10; i+=1) {

@@ -7,15 +7,14 @@ import network.Machine;
 public abstract class Gadget<T> extends Machine implements Callable<Object>, Cloneable {
 	Object[] inputs;
 	CompEnv<T> env;
-	int port;
 
-	abstract public Object secureCompute(CompEnv<T> e, Object[] o, int port) throws Exception;
+	abstract public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception;
 
 	@Override
 	public Object call() throws Exception {
 		Object res = null;
 		try {
-			res = secureCompute(env, inputs, port);
+			res = secureCompute(env, inputs);
 			env.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -24,18 +23,16 @@ public abstract class Gadget<T> extends Machine implements Callable<Object>, Clo
 		return res;
 	}
 
-	public Gadget<T> clone() { 
-		try { 
+	public Gadget<T> clone() {
+		try {
 			@SuppressWarnings("unchecked")
 			Gadget<T> res = (Gadget<T>) super.clone();
 			res.inputs = null;
 			res.env = null;
 			return res;
-
-		} catch(CloneNotSupportedException e) { 
-			System.out.println("Cloning not allowed."); 
-			return this; 
+		} catch(CloneNotSupportedException e) {
+			System.out.println("Cloning not allowed.");
+			return this;
 		}
 	}
-
 }

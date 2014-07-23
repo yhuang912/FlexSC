@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class Server {
-	static int bufferSize = 655360;
+	static int BUFFER_SIZE = 655360;
 	private ServerSocket sock;
 	
 	public InputStream is;
@@ -21,8 +21,8 @@ public class Server {
         sock = new ServerSocket(port);            // create socket and bind to port
         clientSock = sock.accept();                   // wait for client to connect
         
-        os = new BufferedOutputStream(clientSock.getOutputStream(), bufferSize);  
-        is = new BufferedInputStream(clientSock.getInputStream(), bufferSize);
+        os = new BufferedOutputStream(clientSock.getOutputStream(), BUFFER_SIZE);  
+        is = new BufferedInputStream(clientSock.getInputStream(), BUFFER_SIZE);
 
 	}
 
@@ -40,12 +40,13 @@ public class Server {
 		byte[] temp = new byte[len];
 		int remain = len;
 		remain -= is.read(temp);
-		while(0 != remain)
+		while(0 < remain)
 		{
 			remain -= is.read(temp, len-remain, remain);
 		}
 		return temp;
 	}
+
 	static public byte[] readBytes(InputStream is) throws IOException
 	{
 		byte[] lenBytes = readBytes(is, 4);

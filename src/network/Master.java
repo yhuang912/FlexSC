@@ -20,7 +20,6 @@ public class Master {
 	static int BUFFER_SIZE = 655360;
 	public static int MACHINES = 4;
 	public static int LOG_MACHINES = (int) Math.ceil(Math.log(MACHINES));
-	static int START_PORT;
 
 	private ServerSocket[] serverSocket;
 	public InputStream[] is;
@@ -82,9 +81,8 @@ public class Master {
 
 	public static void main(String args[]) throws Exception {
 		Master master = new Master();
-		master.START_PORT = Integer.parseInt(args[0]);
 		for (int i = 0; i < MACHINES; i++) {
-			master.listen(master.START_PORT + i, i);
+			master.listen(63254 + i, i);
 		}
 		System.out.println("connected");
 		master.func();

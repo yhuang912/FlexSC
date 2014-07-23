@@ -19,10 +19,9 @@ public class CompPool<T> {
 	Server[] servers;
 	Client[] clients;
 	ExecutorService executorService;
-	int masterPort;
 
 	@SuppressWarnings("unchecked")
-	public CompPool(CompEnv<T> env, String host, int port, int masterPort) throws Exception{
+	public CompPool(CompEnv<T> env, String host, int port) throws Exception{
 		envs = new CompEnv[MaxNumberTask];
 		servers = new Server[MaxNumberTask];
 		clients = new Client[MaxNumberTask];
@@ -46,7 +45,6 @@ public class CompPool<T> {
 			}
 			envs[i]= env.getNewInstance(inputStream, outputStream);
 		}
-		this.masterPort = masterPort;
 	}
 
 	public void finalize() throws Exception{
@@ -59,13 +57,14 @@ public class CompPool<T> {
 		executorService.shutdown();
 	}
 
-	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputArray) throws InterruptedException, ExecutionException{
+	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputArray, int startPort) throws InterruptedException, ExecutionException{
 		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
 		for(int i = 0; i < inputArray.length; ++i) {
 			Gadget<T> gadge = g.clone();
 			gadge.env = envs[i];
 			gadge.inputs = (Object[]) inputArray[i];
-			gadge.port = masterPort + i;
+			gadge.setMachineId(i);
+			gadge.setStartPort(startPort);
 			Future<Object> future = executorService.submit(gadge);
 			list.add(future);
 		}
