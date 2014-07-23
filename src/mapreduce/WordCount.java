@@ -22,7 +22,7 @@ public class WordCount<T> extends MapReduceBackEnd<T>{
 	
 	@Override
 	public KeyValue map(T[] inputs) throws Exception {
-		return new KeyValue(inputs, lib.toSignals(1,10));
+		return new KeyValue(inputs, lib.toSignals(1, 10));
 	}
 
 	@Override
@@ -41,8 +41,8 @@ public class WordCount<T> extends MapReduceBackEnd<T>{
 		for(int i = 0; i < length; ++i)
 			a[i] = rnd.nextInt(4);
 		
-		GenRunnable gen = new GenRunnable();
-		EvaRunnable eva = new EvaRunnable(a);
+		GenRunnable gen = new GenRunnable(a);
+		EvaRunnable eva = new EvaRunnable();
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
 		tGen.start(); Thread.sleep(5);
@@ -55,7 +55,9 @@ public class WordCount<T> extends MapReduceBackEnd<T>{
 	
 	static class GenRunnable extends network.Server implements Runnable {
 		int[] z;
-		GenRunnable () {
+		int[] intB;
+		GenRunnable (int[] b) {
+			this.intB = b;
 		}
 		public void run() {
 			try {
@@ -65,7 +67,7 @@ public class WordCount<T> extends MapReduceBackEnd<T>{
 				
 				GCSignal[][] scb = new GCSignal[length][];
 				for(int i = 0; i < scb.length; ++i)
-					scb[i] = gen.inputOfBob(new boolean[32]);
+					scb[i] = gen.inputOfAlice(Utils.fromInt(intB[i], 32));
 
 				WordCount<GCSignal> wc = new WordCount<GCSignal>(gen);
 				GCSignal[][] res = wc.MapReduce(scb);
@@ -82,9 +84,7 @@ public class WordCount<T> extends MapReduceBackEnd<T>{
 	}
 
 	static class EvaRunnable extends network.Client implements Runnable {
-		int[] intB;
-		EvaRunnable (int[] b) {
-			this.intB = b;
+		EvaRunnable () {
 		}
 
 		public void run() {
@@ -93,9 +93,9 @@ public class WordCount<T> extends MapReduceBackEnd<T>{
 
 				GCEva eva = new GCEva(is, os);
 				
-				GCSignal[][] scb = new GCSignal[intB.length][];
+				GCSignal[][] scb = new GCSignal[length][];
 				for(int i = 0; i < scb.length; ++i)
-					scb[i] = eva.inputOfBob(Utils.fromInt(intB[i], 32));
+					scb[i] = eva.inputOfAlice(new boolean[32]);
 
 				WordCount<GCSignal> wc = new WordCount<GCSignal>(eva);
 				GCSignal[][] res = wc.MapReduce(scb);

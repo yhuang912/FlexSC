@@ -23,7 +23,7 @@ public abstract class MapReduceBackEnd<T> {
 	abstract public KeyValue map(T[] inputs) throws Exception;
 	abstract public T[] reduce(T[] value1, T[] value2) throws Exception;
 	
-	public T[][] MapReduce(T[][] inputs) throws Exception{
+	public T[][] MapReduce(T[][] inputs) throws Exception {
 		T[][] mappedKeys = env.newTArray(inputs.length, 0);
 		T[][] mappedValues = env.newTArray(inputs.length, 0);
 		for(int i = 0; i < inputs.length; ++i){
