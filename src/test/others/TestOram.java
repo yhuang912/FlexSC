@@ -1,5 +1,7 @@
 package test.others;
 
+import flexsc.CompEnv;
+import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
 
@@ -61,7 +63,8 @@ public class TestOram {
 		public void run() {
 			try {
 				listen(54321);
-				RecursiveCircuitOram<GCSignal> client = new RecursiveCircuitOram<GCSignal>(is, os, N, dataSize, Party.Alice);
+				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
+				RecursiveCircuitOram<GCSignal> client = new RecursiveCircuitOram<GCSignal>(env, N, dataSize);
 				for(int i = 0; i < x.length; ++i) {
 					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils.fromInt(x[i], dataSize));
 					client.write(client.baseOram.lib.toSignals(i), scData);
@@ -93,7 +96,9 @@ public class TestOram {
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				RecursiveCircuitOram<GCSignal> server = new RecursiveCircuitOram<GCSignal>(is, os, N, dataSize, Party.Bob);
+				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
+				RecursiveCircuitOram<GCSignal> server = new RecursiveCircuitOram<GCSignal>(env, N, dataSize);
+
 				
 				for(int i = 0; i < N; ++i) {
 					GCSignal[] scData = server.baseOram.env.inputOfAlice(new boolean[dataSize]);
