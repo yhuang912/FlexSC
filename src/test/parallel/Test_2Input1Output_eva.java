@@ -5,7 +5,7 @@ import flexsc.Mode;
 import gc.GCSignal;
 
 public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
-	static int ARRAY_LENGTH = 1000;
+	static int ARRAY_LENGTH = 100000;
 	static Mode MODE = Mode.REAL;
 
 	public Test_2Input1Output_eva(int startPort) {
@@ -14,7 +14,7 @@ public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
 
 	public static void main(String args[]) throws Exception {
 		// CompPool.MaxNumberTask = new Integer(args[0]);
-		int startPort = 34000;//Integer.parseInt(args[0]);
+		int startPort = 54000;//Integer.parseInt(args[0]);
 		Mode m = MODE;
 		Test_2Input1Output_eva tt = new Test_2Input1Output_eva(startPort);
 

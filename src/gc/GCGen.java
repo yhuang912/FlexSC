@@ -1,5 +1,6 @@
 package gc;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
@@ -114,13 +115,39 @@ public class GCGen extends GCCompEnv {
 		if (out.isPublic())
 			return out.v;
 
-		GCSignal lb = GCSignal.receive(is);
+		GCSignal lb = receive(is);
 		if (lb.equals(out))
 			return false;
 		else if (lb.equals(R.xor(out)))
 			return true;
 //		return false;
 		throw new Exception("bad label at final output.");
+	}
+
+	private GCSignal receive(InputStream ois) {
+		byte[] b = null;
+		try {
+			b = readBytes(ois, GCSignal.len);
+			//	ois.read(b);	
+		}
+		catch (Exception e) { e.printStackTrace(); }
+		return new GCSignal(b);
+	}
+
+	private byte[] readBytes(InputStream is, int len) throws IOException
+	{
+		byte[] temp = new byte[len];
+		int remain = len;
+		// System.out.println("remain out " + remain);
+		while(0 < remain)
+		{
+			// System.out.println("GCGen read = " + remain + " " + len);
+			int readBytes = is.read(temp, len-remain, remain);
+			if (readBytes != -1) {
+				remain -= readBytes;
+			}
+		}
+		return temp;
 	}
 
 //	public double outputToAliceFixedPoint(GCSignal[] f, int offset) throws Exception{

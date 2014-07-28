@@ -1,5 +1,7 @@
 package test.parallel;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import network.Master;
@@ -16,8 +18,8 @@ import gc.GCSignal;
 
 public class Test_2Input1Output<T> {
 
-	int ORIGINAL_PORT = 15432;
-	static int PORT = 51111;
+	int ORIGINAL_PORT = 54322;
+	static int PORT = 51122;
 	int START_PORT;
 
 	public Test_2Input1Output(int startPort) {
@@ -60,7 +62,7 @@ public class Test_2Input1Output<T> {
 				if (noOfIncomingConnections > 0) {
 					GCSignal[] read = new GCSignal[prefixSum.length];
 					for (int i = 0; i < prefixSum.length; i++) {
-						read[i] = GCSignal.receive(peerIsServer[k]);
+						read[i] = receive(peerIsServer[k]);
 					}
 					prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
 					noOfIncomingConnections--;
@@ -68,8 +70,36 @@ public class Test_2Input1Output<T> {
 				// masterOs.write(sum);
 				System.out.println("Iteration = " + k);
 			}
-			System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
+			// System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
+			Thread.sleep(10000);
+			System.out.println("Threads done");
 			// disconnectFromPeers();
+		}
+
+		private GCSignal receive(InputStream ois) {
+			byte[] b = null;
+			try {
+				b = readBytes(ois, GCSignal.len);
+				//	ois.read(b);	
+			}
+			catch (Exception e) { e.printStackTrace(); }
+			return new GCSignal(b);
+		}
+
+		private byte[] readBytes(InputStream is, int len) throws IOException
+		{
+			byte[] temp = new byte[len];
+			int remain = len;
+			// System.out.println("remain out " + remain);
+			while(0 < remain)
+			{
+				// System.out.println("test read = " + remain + " " + len);
+				int readBytes = is.read(temp, len-remain, remain);
+				if (readBytes != -1) {
+					remain -= readBytes;
+				}
+			}
+			return temp;
 		}
 	};
 
@@ -97,6 +127,7 @@ public class Test_2Input1Output<T> {
 			try {
 				listen(ORIGINAL_PORT);
 
+				System.out.println("Initial connect gen");
 				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
 
 				T[][] Ta = gen.newTArray(h.a.length, 0);
@@ -115,23 +146,23 @@ public class Test_2Input1Output<T> {
 				System.out.println("Gen comp pool established");
 
 				Object[] result = pool.runGadget(new AddGadget(), input, START_PORT);
-				IntegerLib<T> lib = new IntegerLib<>(gen);
+				// IntegerLib<T> lib = new IntegerLib<>(gen);
 				/*T[] finalresult = (T[]) result[0];
 				for(int i = 1; i < result.length; ++i){
 					finalresult = lib.add(finalresult, (T[])result[i]);
 				}*/
 
-				os.flush();
+				// os.flush();
 
-				long t2 = System.nanoTime();
-				System.out.println(Ta.length+"\t"+(t2-t1)/1000000000.0);
+				// long t2 = System.nanoTime();
+				// System.out.println(Ta.length+"\t"+(t2-t1)/1000000000.0);
 
 
 
 				/*z = gen.outputToAlice((T[]) finalresult);
 				System.out.println("result:"+Utils.toInt(z));*/
-				pool.finalize();
-				disconnect();
+				// pool.finalize();
+				// disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -149,6 +180,7 @@ public class Test_2Input1Output<T> {
 			try {
 				connect("localhost", ORIGINAL_PORT);				
 
+				System.out.println("Initial connect eva");
 				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 
 				T[][] Ta = eva.newTArray(h.a.length, 0);
@@ -165,20 +197,20 @@ public class Test_2Input1Output<T> {
 				System.out.println("Eva comp pool established");
 				Object[] result = pool.runGadget(new AddGadget(), input, START_PORT + 10000);
 
-				IntegerLib<T> lib = new IntegerLib<>(eva);
+				// IntegerLib<T> lib = new IntegerLib<>(eva);
 				/*T[] finalresult = (T[]) result[0];
 				for(int i = 1; i < result.length; ++i){
 					finalresult = lib.add(finalresult, 
 							(T[])result[i]);
 				}*/
 
-				os.flush();
+				// os.flush();
 
 				//eva.outputToAlice((T[]) finalresult);
-				os.flush();
-				pool.finalize();
+				// os.flush();
+				// pool.finalize();
 
-				disconnect();
+				// disconnect();
 
 			} catch (Exception e) {
 				e.printStackTrace();

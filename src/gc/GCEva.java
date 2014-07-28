@@ -1,11 +1,13 @@
 package gc;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 
+import network.Server;
 import ot.FakeOTReceiver;
 import ot.OTExtReceiver;
 import ot.OTReceiver;
@@ -104,14 +106,40 @@ public class GCEva extends GCCompEnv {
 	private void receiveGTT() {
 		try {
 			Flag.sw.startGCIO();
-			gtt[0][1] = GCSignal.receive(is);
-			gtt[1][0] = GCSignal.receive(is);
-			gtt[1][1] = GCSignal.receive(is);
+			gtt[0][1] = receive(is);
+			gtt[1][0] = receive(is);
+			gtt[1][1] = receive(is);
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+
+	private GCSignal receive(InputStream ois) {
+		byte[] b = null;
+		try {
+			b = readBytes(ois, GCSignal.len);
+			//	ois.read(b);	
+		}
+		catch (Exception e) { e.printStackTrace(); }
+		return new GCSignal(b);
+	}
+
+	private byte[] readBytes(InputStream is, int len) throws IOException
+	{
+		byte[] temp = new byte[len];
+		int remain = len;
+		// System.out.println("remain out " + remain);
+		while(0 < remain)
+		{
+			// System.out.println("GCEva read = " + remain + " " + len);
+			int readBytes = is.read(temp, len-remain, remain);
+			if (readBytes != -1) {
+				remain -= readBytes;
+			}
+		}
+		return temp;
 	}
 
 	public GCSignal and(GCSignal a, GCSignal b) throws IllegalBlockSizeException, BadPaddingException {
