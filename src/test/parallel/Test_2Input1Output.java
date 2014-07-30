@@ -70,10 +70,10 @@ public class Test_2Input1Output<T> {
 				// masterOs.write(sum);
 				System.out.println("Iteration = " + k);
 			}
-			System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
-			System.out.println("Thread done");
-			Thread.sleep(30000);
-			disconnectFromPeers();
+			// System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
+			Thread.sleep(10000);
+			System.out.println("Threads done");
+			// disconnectFromPeers();
 		}
 
 		private GCSignal receive(InputStream ois) {
@@ -161,9 +161,8 @@ public class Test_2Input1Output<T> {
 
 				/*z = gen.outputToAlice((T[]) finalresult);
 				System.out.println("result:"+Utils.toInt(z));*/
-				System.out.println("removing Corelinks");
-				pool.finalize();
-				disconnect();
+				// pool.finalize();
+				// disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -209,10 +208,9 @@ public class Test_2Input1Output<T> {
 
 				//eva.outputToAlice((T[]) finalresult);
 				// os.flush();
-				System.out.println("removing Corelinks");
-				pool.finalize();
+				// pool.finalize();
 
-				disconnect();
+				// disconnect();
 
 			} catch (Exception e) {
 				e.printStackTrace();
