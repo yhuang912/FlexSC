@@ -48,6 +48,7 @@ public class CompPool<T> {
 	}
 
 	public void finalize() throws Exception{
+		System.out.println("disconnecting");
 		for(int i = 0; i < MaxNumberTask; ++i){
 			if(servers[i] != null)
 				servers[i].disconnect();

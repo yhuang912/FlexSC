@@ -15,6 +15,7 @@ public class Machine {
 	public OutputStream[] peerOsClient;
 	private Socket[] peerSocket;
 	private ServerSocket[] peerServerSocket;
+	private Socket[] clientSock;
 	protected int machineId;
 	protected int numberOfIncomingConnections;
 	protected int numberOfOutgoingConnections;
@@ -27,6 +28,7 @@ public class Machine {
 		peerOsClient = new BufferedOutputStream[Master.LOG_MACHINES];
 		peerSocket = new Socket[Master.LOG_MACHINES];
 		peerServerSocket = new ServerSocket[Master.LOG_MACHINES];
+		clientSock = new Socket[Master.LOG_MACHINES];
 	}
 
 	public void setMachineId(int machineId) {
@@ -36,12 +38,12 @@ public class Machine {
 	}
 
 	public void listenFromPeer(int port, int index) throws Exception {
-		Socket clientSock;
 		peerServerSocket[index] = new ServerSocket(port);            // create socket and bind to port
-        clientSock = peerServerSocket[index].accept();                   // wait for client to connect
+        clientSock[index] = peerServerSocket[index].accept();                   // wait for client to connect
 
-        peerOsServer[index] = new BufferedOutputStream(clientSock.getOutputStream(), Master.BUFFER_SIZE);  
-        peerIsServer[index] = new BufferedInputStream(clientSock.getInputStream(), Master.BUFFER_SIZE);
+        peerOsServer[index] = new BufferedOutputStream(clientSock[index].getOutputStream(), Master.BUFFER_SIZE);  
+        peerIsServer[index] = new BufferedInputStream(clientSock[index].getInputStream(), Master.BUFFER_SIZE);
+        //System.out.println(peerIsServer[index].read());
 	}
 
 	public void connectToPeer(String server, int port, int index) throws Exception {
@@ -51,13 +53,16 @@ public class Machine {
 				if(peerSocket[index] != null)
 					break;
 			}
-			catch(IOException e){
+			catch(Exception e){
 				Thread.sleep(100);
 			}
 		}
 
 		peerOsClient[index] = new BufferedOutputStream(peerSocket[index].getOutputStream(), Master.BUFFER_SIZE);  
 		peerIsClient[index] = new BufferedInputStream(peerSocket[index].getInputStream(), Master.BUFFER_SIZE);
+		//peerOsClient[index].write(10);
+		//peerOsClient[index].flush();
+		System.out.println("Gracefully exiting connect to peer " + port);
 	}
 
 	public void connectMachines() throws Exception {
@@ -90,7 +95,18 @@ public class Machine {
 	}
 
 	public void disconnectFromPeers() throws Exception {
-		for (int i = 0; i < Master.LOG_MACHINES; i++) {
+		while (true) {
+			int read = peerIsClient[0].read();
+			if (read != -1)
+				break;
+			else {
+				Thread.sleep(1000);
+			}
+		}
+		System.out.println("disconnecting...");
+		/* for (int i = 0; i < Master.LOG_MACHINES; i++) {
+			peerIsServer[i].read();
+
 			peerOsClient[i].write(0);
 			peerOsClient[i].flush(); // dummy I/O to prevent dropping connection earlier than
 			// protocol payloads are received.
@@ -99,7 +115,7 @@ public class Machine {
 			peerOsServer[i].write(0);
 			peerOsServer[i].flush();
 			peerServerSocket[i].close();
-		}
+		} */
 	}
 
 	/* public static void main(String args[]) throws Exception {

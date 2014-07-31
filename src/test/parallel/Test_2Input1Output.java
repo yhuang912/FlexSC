@@ -1,5 +1,6 @@
 package test.parallel;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -9,7 +10,6 @@ import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.CompPool;
-import flexsc.Flag;
 import flexsc.Gadget;
 import flexsc.Mode;
 import flexsc.Party;
@@ -51,29 +51,45 @@ public class Test_2Input1Output<T> {
 			int noOfOutgoingConnections = numberOfOutgoingConnections;
 			GCSignal[] prefixSum = (GCSignal[]) sum;
 			for (int k = 0; k < Master.LOG_MACHINES; k++) {
-				if (noOfOutgoingConnections > 0) {
-					for (int i = 0; i < prefixSum.length; i++) {
-						prefixSum[i].send(peerOsClient[k]);
+				synchronized(this) {
+					if (noOfOutgoingConnections > 0) {
+						for (int i = 0; i < prefixSum.length; i++) {
+							prefixSum[i].send(peerOsClient[k]);
+						}
+						try {
+							System.out.println(" flushing " + machineId);
+							((BufferedOutputStream) peerOsClient[k]).flush();
+							System.out.println(" flushing' " + machineId);
+						} catch (IOException e) {
+							System.out.println(" hahhdhhah " + machineId + " Iteration = " + k);
+							e.printStackTrace();
+						}
+						noOfOutgoingConnections--;
 					}
-					peerOsClient[k].flush();
-					noOfOutgoingConnections--;
 				}
+				// System.out.println(machineId + " Sent Iteration = " + k);
 				// Thread.sleep(5000);
-				if (noOfIncomingConnections > 0) {
-					GCSignal[] read = new GCSignal[prefixSum.length];
-					for (int i = 0; i < prefixSum.length; i++) {
-						read[i] = receive(peerIsServer[k]);
+				synchronized(this) {
+					System.out.println(" Listening " + machineId + " Iteration = " + k);
+					if (noOfIncomingConnections > 0) {
+						GCSignal[] read = new GCSignal[prefixSum.length];
+						for (int i = 0; i < prefixSum.length; i++) {
+							read[i] = receive(peerIsServer[k]);
+						}
+						prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
+						noOfIncomingConnections--;
 					}
-					prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
-					noOfIncomingConnections--;
 				}
 				// masterOs.write(sum);
-				System.out.println("Iteration = " + k);
+				System.out.println(machineId + " Iteration = " + k);
 			}
-			// System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
-			Thread.sleep(10000);
-			System.out.println("Threads done");
-			// disconnectFromPeers();
+			synchronized(this) {
+				System.out.println(machineId + " Iterations done");
+				System.out.println(machineId + " Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
+				// Thread.sleep(10000);
+				System.out.println("Threads done " + machineId);
+			}
+			disconnectFromPeers();
 		}
 
 		private GCSignal receive(InputStream ois) {
@@ -86,7 +102,7 @@ public class Test_2Input1Output<T> {
 			return new GCSignal(b);
 		}
 
-		private byte[] readBytes(InputStream is, int len) throws IOException
+		private byte[] readBytes(InputStream is, int len) throws IOException, InterruptedException
 		{
 			byte[] temp = new byte[len];
 			int remain = len;
@@ -97,7 +113,9 @@ public class Test_2Input1Output<T> {
 				int readBytes = is.read(temp, len-remain, remain);
 				if (readBytes != -1) {
 					remain -= readBytes;
-				}
+				}/* else {
+					Thread.sleep(1000);
+				}*/
 			}
 			return temp;
 		}

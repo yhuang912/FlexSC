@@ -20,7 +20,7 @@ public class GCGen extends GCCompEnv {
 	static public GCSignal R = null;
 	static SecureRandom rnd;
 
-	static{
+	static {
 		Security.addProvider(new ISAACProvider ());
 		try {
 			rnd = SecureRandom.getInstance ("ISAACRandom");
@@ -121,7 +121,9 @@ public class GCGen extends GCCompEnv {
 		else if (lb.equals(R.xor(out)))
 			return true;
 //		return false;
-		throw new Exception("bad label at final output.");
+		System.out.println("bad label at final output");
+		return false;
+		// throw new Exception("bad label at final output.");
 	}
 
 	private GCSignal receive(InputStream ois) {
@@ -134,7 +136,7 @@ public class GCGen extends GCCompEnv {
 		return new GCSignal(b);
 	}
 
-	private byte[] readBytes(InputStream is, int len) throws IOException
+	private byte[] readBytes(InputStream is, int len) throws IOException, InterruptedException
 	{
 		byte[] temp = new byte[len];
 		int remain = len;
@@ -145,6 +147,8 @@ public class GCGen extends GCCompEnv {
 			int readBytes = is.read(temp, len-remain, remain);
 			if (readBytes != -1) {
 				remain -= readBytes;
+			} else {
+				Thread.sleep(1000);
 			}
 		}
 		return temp;
@@ -156,10 +160,12 @@ public class GCGen extends GCCompEnv {
 //	}
 
 	public boolean[] outputToAlice(GCSignal[] out) throws Exception {
+		System.out.println("outputToAlice");
 		boolean [] result = new boolean[out.length];
 		for(int i = 0; i < result.length; ++i) {
 			result[i] = outputToAlice(out[i]);
 		}
+		System.out.println("outputToAlice 2");
 		return result;
 	}
 
