@@ -1,20 +1,15 @@
 package network;
 
-import flexsc.CompEnv;
-import flexsc.Mode;
-import flexsc.Party;
 import gc.GCSignal;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import circuits.IntegerLib;
-
-import com.sun.corba.se.spi.extension.ZeroPortPolicy;
+import java.nio.ByteBuffer;
 
 public class Master {
 	static int BUFFER_SIZE = 655360;
@@ -43,7 +38,7 @@ public class Master {
 
 	public void disconnect() throws Exception {
 		for (int i = 0; i < MACHINES; i++) {
-			os[i].write(0);
+			writeInt(os[i], 0);
 			os[i].flush(); // dummy I/O to prevent dropping connection earlier than
 			// protocol payloads are received.
 			serverSocket[i].close();
@@ -80,14 +75,80 @@ public class Master {
 		}
 	}
 
+	public void connect(int peerPort) throws Exception {
+		for (int i = 0; i < MACHINES; i++) {
+			writeInt(os[i], Command.SET_MACHINE_ID.getValue());
+			writeInt(os[i], i); // assume MACHINES < 256
+			writeInt(os[i], peerPort);
+			os[i].flush();
+		}
+		for (int i = 0; i < MACHINES - 1; i++) {
+			writeInt(os[i], Command.LISTEN.getValue());
+			os[i].flush();
+		}
+
+		for (int i = 0; i < MACHINES - 1; i++) {
+			readResponse(i);
+		}
+
+		System.out.println("Everyone started listening!");
+		for (int i = MACHINES - 1; i > 0; i--) {
+			writeInt(os[i], Command.CONNECT.getValue());
+			os[i].flush();
+
+			readResponse(i);
+			System.out.println("Reached " + i);
+		}
+
+		for (int i = 0; i < MACHINES; i++) {
+			writeInt(os[i], Command.COMPUTE.getValue());
+			os[i].flush();
+		}
+	}
+
+	private void readResponse(int machineId) throws IOException, Exception {
+		int ret = readInt(is[machineId]);
+		if (ret == -1) {
+			throw new Exception("Why is ret -1?");
+		}
+		if (ret != 1) {
+			throw new Exception("Slave listen failed");
+		}
+	}
+
 	public static void main(String args[]) throws Exception {
 		Master master = new Master();
-		master.START_PORT = Integer.parseInt(args[0]);
+		Master.START_PORT = Integer.parseInt(args[0]);
+		int peerPort = Integer.parseInt(args[1]);
 		for (int i = 0; i < MACHINES; i++) {
-			master.listen(master.START_PORT + i, i);
+			master.listen(Master.START_PORT + i, i);
 		}
-		System.out.println("connected");
-		master.func();
-		master.disconnect();
+		System.out.println("connected master");
+		master.connect(peerPort);
+		System.out.println("master says connections successful");
+		/*while (true) {
+			
+		}*/
+		// master.disconnect();
+	}
+
+	public static byte[] readBytes(InputStream is, int len) throws IOException {
+		byte[] temp = new byte[len];
+		int remain = len;
+		remain -= is.read(temp);
+		while(0 != remain) {
+			remain -= is.read(temp, len-remain, remain);
+		}
+		return temp;
+	}
+
+	public static int readInt(InputStream is) throws IOException
+	{
+		byte[] lenBytes = readBytes(is, 4);
+		return ByteBuffer.wrap(lenBytes).getInt();
+	}
+
+	public static void writeInt(OutputStream os, int data) throws IOException {
+		os.write(ByteBuffer.allocate(4).putInt(data).array());
 	}
 }

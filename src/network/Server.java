@@ -27,7 +27,7 @@ public class Server {
 	}
 
 	public void disconnect() throws Exception { 
-		is.read(); 
+		is.read();
 		os.write(0);
 		os.flush(); // dummy I/O to prevent dropping connection earlier than
 					// protocol payloads are received.
@@ -35,13 +35,11 @@ public class Server {
 		sock.close(); 
 	}
 	
-	static public byte[] readBytes(InputStream is, int len) throws IOException
-	{
+	static public byte[] readBytes(InputStream is, int len) throws IOException {
 		byte[] temp = new byte[len];
 		int remain = len;
 		remain -= is.read(temp);
-		while(0 != remain)
-		{
+		while(0 != remain) {
 			remain -= is.read(temp, len-remain, remain);
 		}
 		return temp;
