@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Machine {
+public abstract class Machine {
 	public static String LOCALHOST = "localhost";
 	public InputStream masterIs;
 	public OutputStream masterOs;
@@ -57,6 +57,9 @@ public class Machine {
 		this.machineId = machineId;
 		this.numberOfIncomingConnections = getNumberOfIncomingConnections(machineId);
 		this.numberOfOutgoingConnections = getNumberOfIncomingConnections(Master.MACHINES - machineId - 1);
+		if (machineId == Master.MACHINES - 1) {
+			System.out.println("out in " + numberOfOutgoingConnections + " " + numberOfIncomingConnections);
+		}
 		this.peerPort = peerPort;
 	}
 
@@ -84,6 +87,7 @@ public class Machine {
 				System.out.println(machineId + ": Accepted a connection from " + id + ". Stored at index " + index);
 				peerIsDown[index] = is;
 				peerOsDown[index] = os;
+				System.out.println(machineId + ": " + id + " peerIsDown " + peerIsDown[index].hashCode());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}  
@@ -100,7 +104,11 @@ public class Machine {
 				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Master.BUFFER_SIZE);
 				Master.writeInt(peerOsUp[i], machineId);
 				peerOsUp[i].flush();
+				System.out.println(machineId + ": " + (machineId - (1 << i)) + "peerOsUp " + peerOsUp[i].hashCode());
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				System.out.println("out in " + numberOfOutgoingConnections + " " + numberOfIncomingConnections + " " + i);
 				e.printStackTrace();
 			}
 		}

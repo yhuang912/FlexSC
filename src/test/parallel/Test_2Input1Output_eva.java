@@ -1,5 +1,6 @@
 package test.parallel;
 
+import network.Master;
 import flexsc.Flag;
 import flexsc.Mode;
 import gc.GCSignal;
@@ -19,13 +20,14 @@ public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
 			/*for (int i = 0; i < a.length; i++) {
 			a[i] = a.length/4 + 1;
 			} */
-			for(int k = 0; k < 4; ++k){
-				for(int i = 0; i < a.length/4; ++i)
+			for(int k = 0; k < Master.MACHINES; ++k){
+				for(int i = 0; i < a.length/Master.MACHINES; ++i)
 				{
 					if (i == 0)
-						a[k*a.length/4+i] = 1 << ((5 - (k + 1)) - 1);
+						// a[k*a.length/Master.MACHINES + i] = 1 << ((Master.MACHINES - k) - 1);
+						a[k*a.length/Master.MACHINES + i] = ((Master.MACHINES - k) - 1);
 					else 
-						a[k*a.length/4+i] = 0;
+						a[k*a.length/Master.MACHINES + i] = 0;
 				}
 			}
 			Helper h = tt.new Helper(a, m);

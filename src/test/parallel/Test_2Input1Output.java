@@ -46,47 +46,43 @@ public class Test_2Input1Output<T> {
 			int noOfOutgoingConnections = numberOfOutgoingConnections;
 			GCSignal[] prefixSum = (GCSignal[]) sum;
 			for (int k = 0; k < Master.LOG_MACHINES; k++) {
-				synchronized(this) {
-					if (noOfOutgoingConnections > 0) {
-						for (int i = 0; i < prefixSum.length; i++) {
-							prefixSum[i].send(peerOsUp[k]);
-						}
-						try {
-							// System.out.println(" flushing " + machineId);
-							((BufferedOutputStream) peerOsUp[k]).flush();
-							// System.out.println(" flushing' " + machineId);
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						noOfOutgoingConnections--;
-						System.out.println(machineId + ": Sent " + Utils.toInt(lib.getBooleans((T[]) prefixSum)) + " Iteration " + k);
-						System.out.flush();
+				if (noOfOutgoingConnections > 0) {
+					for (int i = 0; i < prefixSum.length; i++) {
+						prefixSum[i].send(peerOsUp[k]);
 					}
+					try {
+						// System.out.println(" flushing " + machineId);
+						((BufferedOutputStream) peerOsUp[k]).flush();
+						// System.out.println(" flushing' " + machineId);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					noOfOutgoingConnections--;
+					System.out.println(machineId + ": Sent " + Utils.toInt(lib.getBooleans((T[]) prefixSum)) + " Iteration " + k + ". peerOsUp " + peerOsUp[k].hashCode());
+					System.out.flush();
 				}
 				// System.out.println(machineId + " Sent Iteration = " + k);
 				// Thread.sleep(5000);
 				// System.out.println(" Listening " + machineId + " Iteration = " + k);
-				synchronized(this) {
-					if (noOfIncomingConnections > 0) {
-						GCSignal[] read = new GCSignal[prefixSum.length];
-						for (int i = 0; i < prefixSum.length; i++) {
-							read[i] = GCSignal.receive(peerIsDown[k]);
-						}
-						try {
-							System.out.println(machineId + ": read " + Utils.toInt(lib.getBooleans((T[]) read)) + " Iteration " + k);
-							System.out.flush();
-						} catch (Exception e) {
-							System.out.println(machineId + ": Failed at iteration " + k);
-							e.printStackTrace();
-							System.out.flush();
-						}
-						prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
-						noOfIncomingConnections--;
+				if (noOfIncomingConnections > 0) {
+					GCSignal[] read = new GCSignal[prefixSum.length];
+					for (int i = 0; i < prefixSum.length; i++) {
+						read[i] = GCSignal.receive(peerIsDown[k]);
 					}
+					try {
+						System.out.println(machineId + ": read " + Utils.toInt(lib.getBooleans((T[]) read)) + " Iteration " 
+					+ k + ". peerIsDown " + peerIsDown[k].hashCode());
+						System.out.flush();
+					} catch (Exception e) {
+						System.out.println(machineId + ": Failed at iteration " + k);
+						e.printStackTrace();
+						System.out.flush();
+					}
+					prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
+					noOfIncomingConnections--;
 				}
 				// masterOs.write(sum);
 				// System.out.println(machineId + " Iteration = " + k);
-				Thread.sleep(10000);
 			}
 			// System.out.println(machineId + " Iterations done");
 			System.out.println(machineId + " Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));

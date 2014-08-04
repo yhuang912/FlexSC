@@ -13,8 +13,8 @@ import java.nio.ByteBuffer;
 
 public class Master {
 	static int BUFFER_SIZE = 655360;
-	public static int MACHINES = 4;
-	public static int LOG_MACHINES = (int) Math.ceil(Math.log(MACHINES));
+	public static int MACHINES = 32;
+	public static int LOG_MACHINES = Machine.log2(MACHINES);
 	static int START_PORT;
 
 	private ServerSocket[] serverSocket;

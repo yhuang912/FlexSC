@@ -40,8 +40,7 @@ public class Server {
 		byte[] temp = new byte[len];
 		int remain = len;
 		// System.out.println("remain out " + remain);
-		while(0 < remain)
-		{
+		while(0 < remain) {
 			// System.out.println("test read = " + remain + " " + len);
 			int readBytes = is.read(temp, len-remain, remain);
 			if (readBytes != -1) {
