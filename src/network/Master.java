@@ -78,7 +78,7 @@ public class Master {
 	public void connect(int peerPort) throws Exception {
 		for (int i = 0; i < MACHINES; i++) {
 			writeInt(os[i], Command.SET_MACHINE_ID.getValue());
-			writeInt(os[i], i); // assume MACHINES < 256
+			writeInt(os[i], i);
 			writeInt(os[i], peerPort);
 			os[i].flush();
 		}
@@ -132,6 +132,25 @@ public class Master {
 		// master.disconnect();
 	}
 
+	private static byte[] readBytes(InputStream is, int len) throws IOException
+	{
+		byte[] temp = new byte[len];
+		int remain = len;
+		// System.out.println("remain out " + remain);
+		while(0 < remain)
+		{
+			// System.out.println("test read = " + remain + " " + len);
+			int readBytes = is.read(temp, len-remain, remain);
+			if (readBytes != -1) {
+				remain -= readBytes;
+			}/* else {
+				Thread.sleep(1000);
+			}*/
+		}
+		return temp;
+	}
+
+	/*
 	public static byte[] readBytes(InputStream is, int len) throws IOException {
 		byte[] temp = new byte[len];
 		int remain = len;
@@ -140,7 +159,7 @@ public class Master {
 			remain -= is.read(temp, len-remain, remain);
 		}
 		return temp;
-	}
+	}*/
 
 	public static int readInt(InputStream is) throws IOException
 	{

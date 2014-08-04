@@ -15,8 +15,18 @@ public class Test_2Input1Output_gen extends Test_2Input1Output<GCSignal>{
 
 		//for (int i = 1; i <= 10; i+=1) {
 			int a[] = new int[Test_2Input1Output_eva.ARRAY_LENGTH];
-			for (int i = 0; i < a.length; i++)
-				a[i] = 1;
+			/*for (int i = 0; i < a.length; i++) {
+				a[i] = a.length/4 + 1;
+			} */
+			for(int k = 0; k < 4; ++k){
+				for(int i = 0; i < a.length/4; ++i)
+				{
+					if (i == 0)
+						a[k*a.length/4+i] = 1 << ((5 - (k + 1)) - 1);
+					else 
+						a[k*a.length/4+i] = 0;
+				}
+			}
 			Helper h = tt.new Helper(a, m);
 			
 			GenRunnable gen = tt.new GenRunnable(h);

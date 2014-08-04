@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 
 public class Machine {
 	public static String LOCALHOST = "localhost";
@@ -81,8 +80,8 @@ public class Machine {
 				os = new BufferedOutputStream(clientSock.getOutputStream(), Master.BUFFER_SIZE);
 				is = new BufferedInputStream(clientSock.getInputStream(), Master.BUFFER_SIZE);
 				int id = Master.readInt(is);
-				System.out.println(machineId + ": Accepted a connection from " + id);
 				int index = log2(id - machineId);
+				System.out.println(machineId + ": Accepted a connection from " + id + ". Stored at index " + index);
 				peerIsDown[index] = is;
 				peerOsDown[index] = os;
 			} catch (IOException e) {
@@ -93,7 +92,7 @@ public class Machine {
 
 	public void connectToPeers() throws InterruptedException {
 		for (int i = 0; i < numberOfOutgoingConnections; i++) {
-			System.out.println(machineId + ": I'm trying to connect to " + (machineId - (1 << i)) + " at " + (peerPort + machineId - (1 << i)));
+			System.out.println(machineId + ": I'm trying to connect to " + (machineId - (1 << i)) + " at " + (peerPort + machineId - (1 << i)) + ". Storing connection at " + i);
 			// System.out.println(machineId + ": I have " + (numberOfOutgoingConnections - i) + " remaining");
 			Socket peerSocket = connect(LOCALHOST, peerPort + machineId - (1 << i));
 			try {
