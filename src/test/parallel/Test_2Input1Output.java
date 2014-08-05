@@ -1,17 +1,15 @@
-	package test.parallel;
+package test.parallel;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
+import network.Constants;
 import network.Master;
 import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.CompPool;
 import flexsc.Flag;
-import flexsc.Gadget;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
@@ -22,12 +20,14 @@ public class Test_2Input1Output<T> {
 	static int PORT = 51111;
 	static int MASTER_GEN_PORT;
 	static int MASTER_EVA_PORT;
+	static int THREAD_MASTER_SERVER_CLIENT_PORT = 15432;
 
 
 	public class Helper {
 		int[] intA;
 		boolean[][] a;
 		Mode m;
+
 		public Helper(int[] aa, Mode m) {
 			this.m = m;
 			intA = aa;
@@ -46,7 +46,7 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
-				listen(15432);
+				listen(THREAD_MASTER_SERVER_CLIENT_PORT);
 
 				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
 
@@ -54,7 +54,7 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = gen.inputOfBob(new boolean[32]);
 
-				CompPool<T> pool = new CompPool(gen, "localhost", PORT, MASTER_GEN_PORT);
+				CompPool<T> pool = new CompPool(gen, Constants.LOCALHOST, PORT, MASTER_GEN_PORT);
 				
 				long t1 = System.nanoTime();
 
@@ -64,7 +64,7 @@ public class Test_2Input1Output<T> {
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/Master.MACHINES, (i+1)*Ta.length/Master.MACHINES)};
 
 
-				Object[] result = pool.runGadget( new AddGadget(), input);
+				Object[] result = pool.runGadget("test.parallel.AddGadget", input);
 				IntegerLib<T> lib = new IntegerLib<>(gen);
 
 				os.flush();
@@ -93,7 +93,7 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
-				connect("localhost", 15432);				
+				connect(Constants.LOCALHOST, THREAD_MASTER_SERVER_CLIENT_PORT);				
 
 				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 
@@ -101,14 +101,14 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
-				CompPool<T> pool = new CompPool(eva, "localhost", PORT, MASTER_EVA_PORT);				
+				CompPool<T> pool = new CompPool(eva, Constants.LOCALHOST, PORT, MASTER_EVA_PORT);				
 				Object[] input = new Object[Master.MACHINES];
 
 				for(int i = 0; i < Master.MACHINES; ++i)
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/Master.MACHINES, (i+1)*Ta.length/Master.MACHINES)};
 				os.flush();
 				
-				Object[] result = pool.runGadget( new AddGadget(), input);
+				Object[] result = pool.runGadget("test.parallel.AddGadget", input);
 
 				IntegerLib<T> lib = new IntegerLib<>(eva);
 

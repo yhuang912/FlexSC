@@ -57,10 +57,10 @@ public class CompPool<T> {
 		executorService.shutdown();
 	}
 
-	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputArray) throws InterruptedException, ExecutionException, ClassNotFoundException, InstantiationException, IllegalAccessException{
+	public <G extends Gadget<T>> Object[] runGadget(String gadget, Object[] inputArray) throws InterruptedException, ExecutionException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
 		for(int i = 0; i < inputArray.length; ++i) {
-			Class c = Class.forName("test.parallel.AddGadget");
+			Class c = Class.forName(gadget);
 			Gadget<T> gadge = (Gadget<T>) c.newInstance();
 			gadge.env = envs[i];
 			gadge.inputs = (Object[]) inputArray[i];

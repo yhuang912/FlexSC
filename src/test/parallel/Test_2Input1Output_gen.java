@@ -12,7 +12,6 @@ public class Test_2Input1Output_gen extends Test_2Input1Output<GCSignal>{
 		Mode m = Test_2Input1Output_eva.MODE;
 		Test_2Input1Output_gen tt = new Test_2Input1Output_gen();
 
-
 		int a[] = new int[Test_2Input1Output_eva.ARRAY_LENGTH];
 		Helper h = tt.new Helper(a, m);
 		
@@ -21,12 +20,8 @@ public class Test_2Input1Output_gen extends Test_2Input1Output<GCSignal>{
 		Thread tGen = new Thread(gen);
 		tGen.start(); Thread.sleep(5);
 		tGen.join();
-
 		
 		Flag.sw.addCounter();
 		Flag.sw.print();
-
-		
 	}	
-
 }

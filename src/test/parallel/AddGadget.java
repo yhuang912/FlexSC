@@ -53,7 +53,7 @@ public class AddGadget<T> extends Gadget<T> {
 				noOfIncomingConnections--;
 			}
 		}
-		System.out.println(machineId + " Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
+		debug("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
 		// disconnectFromPeers();
 	}
 }
