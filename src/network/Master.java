@@ -70,7 +70,7 @@ public class Master {
 		}
 	}
 
-	public void connect(int peerPort) throws Exception {
+	public void setUp(int peerPort) throws Exception {
 		// set machineId for each of the machines
 		for (int i = 0; i < MACHINES; i++) {
 			NetworkUtil.writeInt(os[i], Command.SET_MACHINE_ID.getValue());
@@ -125,7 +125,7 @@ public class Master {
 			master.listen(Master.START_PORT + i, i);
 		}
 		System.out.println("Connected to master");
-		master.connect(peerPort);
+		master.setUp(peerPort);
 		System.out.println("Connections successful");
 	}
 }

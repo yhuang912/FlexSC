@@ -19,14 +19,13 @@ public class Client {
 	CountingOutputStream cos;
 	CountingInputStream cis;
 
-	public void connect(String server, int port) throws Exception {
+	public void connect(String server, int port) throws InterruptedException, IOException {
 		while(true){
 			try{
 				sock = new java.net.Socket(server, port);          // create socket and connect
 				if(sock != null)
 					break;
-			}
-			catch(IOException e){
+			} catch(IOException e){
 				Thread.sleep(100);
 			}
 		}

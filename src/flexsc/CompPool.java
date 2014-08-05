@@ -1,5 +1,6 @@
 package flexsc;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class CompPool<T> {
 	int masterPort;
 
 	@SuppressWarnings("unchecked")
-	public CompPool(CompEnv<T> env, String host, int port, int masterPort) throws Exception{
+	public CompPool(CompEnv<T> env, String host, int port, int masterPort) throws IOException, InterruptedException {
 		envs = new CompEnv[Master.MACHINES];
 		servers = new Server[Master.MACHINES];
 		clients = new Client[Master.MACHINES];

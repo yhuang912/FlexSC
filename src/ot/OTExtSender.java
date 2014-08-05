@@ -5,6 +5,7 @@ package ot;
 import flexsc.Flag;
 import gc.GCSignal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -37,7 +38,7 @@ public class OTExtSender extends OTSender {
     
 	Cipher cipher;
 	
-    public OTExtSender(int msgBitLength, InputStream in, OutputStream out) throws Exception {
+    public OTExtSender(int msgBitLength, InputStream in, OutputStream out) throws IOException {
     	super(msgBitLength, in, out);
     	
     	cipher = new Cipher();
@@ -56,7 +57,7 @@ public class OTExtSender extends OTSender {
 	 * 
 	 */
 	GCSignal[][] keyPairs = new GCSignal[SecurityParameter.k1][2];
-    public void send(GCSignal[][] msgPairs) throws Exception {    	
+    public void send(GCSignal[][] msgPairs) throws IOException  {    	
     	GCSignal[][] pairs = new GCSignal[SecurityParameter.k1 + msgPairs.length][2];
     	for (int i = 0; i < SecurityParameter.k1; i++) {
     		pairs[i][0] = GCSignal.freshLabel(rnd);
@@ -83,7 +84,7 @@ public class OTExtSender extends OTSender {
 	// pairs of strings, each of length 'msgBitLength' bits.
 
     static void reverseAndExtend(boolean[] s, GCSignal[] keys, 
-    		int msgBitLength, GCSignal[][] msgPairs, InputStream is, OutputStream os, Cipher cipher) throws Exception {
+    		int msgBitLength, GCSignal[][] msgPairs, InputStream is, OutputStream os, Cipher cipher) throws IOException {
     	BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
 
 		Flag.sw.startOTIO();
@@ -125,7 +126,7 @@ public class OTExtSender extends OTSender {
 		
     }
 
-    private void initialize() throws Exception {
+    private void initialize() throws IOException {
     	Flag.sw.startOTIO();
 		os.write(msgBitLength);
 		os.flush();

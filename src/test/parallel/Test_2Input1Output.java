@@ -1,5 +1,6 @@
 package test.parallel;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
@@ -123,9 +124,16 @@ public class Test_2Input1Output<T> {
 			} catch(ExecutionException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 				System.out.println("Gadget probably does not exist. Reflection issue");
 				e.printStackTrace();
-			} catch (Exception e) {
+			} catch(IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}/* catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);
+			} */ catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}

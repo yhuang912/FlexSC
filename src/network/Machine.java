@@ -10,7 +10,7 @@ import java.net.Socket;
 
 public abstract class Machine {
 	public static String LOCALHOST = "localhost";
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	public InputStream masterIs;
 	public OutputStream masterOs;
 	private Socket masterSocket;

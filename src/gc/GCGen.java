@@ -1,5 +1,6 @@
 package gc;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
@@ -35,7 +36,7 @@ public class GCGen extends GCCompEnv {
 	Garbler gb;
 
 	long gid = 0;
-	public GCGen(InputStream is, OutputStream os) throws Exception {
+	public GCGen(InputStream is, OutputStream os) throws IOException {
 		super(is, os, Party.Alice);
 		
 		if(Flag.FakeOT)
@@ -45,7 +46,7 @@ public class GCGen extends GCCompEnv {
 		gb = new Garbler();
 	}
 
-	public GCGen(InputStream is, OutputStream os, boolean NoOT) throws Exception {
+	public GCGen(InputStream is, OutputStream os, boolean NoOT) {
 		super(is, os, Party.Alice);		
 		gb = new Garbler();
 	}
@@ -282,7 +283,7 @@ public class GCGen extends GCCompEnv {
 //	}
 
 	@Override
-	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {
+	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) {
 		return new GCGen(in, os, true);
 	}
 }

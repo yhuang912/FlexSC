@@ -2,6 +2,7 @@ package ot;
 
 import gc.GCSignal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -16,5 +17,5 @@ public abstract class OTReceiver {
 	}
 	
 	public abstract GCSignal receive(boolean c) throws Exception;
-	public abstract GCSignal[] receive(boolean[] c) throws Exception;
+	public abstract GCSignal[] receive(boolean[] c) throws IOException;
 }

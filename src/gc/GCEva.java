@@ -1,5 +1,6 @@
 package gc;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -20,7 +21,7 @@ public class GCEva extends GCCompEnv {
 	public int nonFreeGate = 0;
 	long gid = 0;
 
-	public GCEva(InputStream is, OutputStream os) throws Exception {
+	public GCEva(InputStream is, OutputStream os) throws ClassNotFoundException, IOException {
 		super(is, os, Party.Bob);
 
 		if(Flag.FakeOT)
@@ -32,7 +33,7 @@ public class GCEva extends GCCompEnv {
 		gtt[0][0] = GCSignal.ZERO;
 	}
 	
-	public GCEva(InputStream is, OutputStream os, boolean NoOT) throws Exception {
+	public GCEva(InputStream is, OutputStream os, boolean NoOT) {
 		super(is, os, Party.Bob);
 
 		rcv = null;
@@ -205,7 +206,7 @@ public class GCEva extends GCCompEnv {
 //	}
 
 	@Override
-	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {
+	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) {
 		return new GCEva(in, os, true);
 	}
 }

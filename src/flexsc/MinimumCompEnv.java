@@ -138,8 +138,7 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 
 	@Override
-	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os)
-			throws Exception {
+	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os) {
 		return new MinimumCompEnv(in, os, getParty());
 	}
 

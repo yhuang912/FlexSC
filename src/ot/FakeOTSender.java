@@ -2,6 +2,7 @@ package ot;
 
 import gc.GCSignal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -11,13 +12,13 @@ public class FakeOTSender extends OTSender {
 	}
 	
 	@Override
-	public void send(GCSignal[] m) throws Exception {
+	public void send(GCSignal[] m) {
 		m[0].send(os);
 		m[1].send(os);
 	}
 
 	@Override
-	public void send(GCSignal[][] m) throws Exception {
+	public void send(GCSignal[][] m) throws IOException {
 		for (int i = 0; i < m.length; i++) {
 			m[i][0].send(os);
 			m[i][1].send(os);

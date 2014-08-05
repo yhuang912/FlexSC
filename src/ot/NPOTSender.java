@@ -8,6 +8,7 @@ import gc.GCSignal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -45,18 +46,18 @@ public class NPOTSender extends OTSender {
 	Cipher cipher;
 	
     public NPOTSender(int msgBitLength, InputStream is,
-                      OutputStream os) throws Exception {
+                      OutputStream os) throws ClassNotFoundException, IOException {
     	super(msgBitLength, is, os);
     	cipher = new Cipher();
     	
         initialize();
     }
 
-    public void send(GCSignal[][] msgPairs) throws Exception {
+    public void send(GCSignal[][] msgPairs) throws IOException {
         step1(msgPairs);
     }
 
-    private void initialize() throws Exception {
+    private void initialize() throws IOException, ClassNotFoundException {
         File keyfile = new File("NPOTKey");
         if (keyfile.exists()) {
             FileInputStream fin = new FileInputStream(keyfile);
@@ -132,13 +133,13 @@ public class NPOTSender extends OTSender {
 
 	GCSignal[][] m = new GCSignal[1][2];
     @Override
-    public void send(GCSignal[] msgPair) throws Exception {
+    public void send(GCSignal[] msgPair) throws IOException {
     	m[0][0] = msgPair[0];
     	m[0][1] = msgPair[1];
     	send(m);
     }
     
-    private void step1(GCSignal[][] msgPairs) throws Exception {
+    private void step1(GCSignal[][] msgPairs) throws IOException {
     	BigInteger[] pk0 = new BigInteger[msgPairs.length];
     	Flag.sw.startOTIO();
     	for (int i = 0; i < pk0.length; i++)

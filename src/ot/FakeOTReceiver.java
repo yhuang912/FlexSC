@@ -11,7 +11,7 @@ public class FakeOTReceiver extends OTReceiver {
 	}
 	
 	@Override
-	public GCSignal receive(boolean c) throws Exception {
+	public GCSignal receive(boolean c) {
 		GCSignal[] m = new GCSignal[2];
 		m[0] = GCSignal.receive(is);
 		m[1] = GCSignal.receive(is);
@@ -19,7 +19,7 @@ public class FakeOTReceiver extends OTReceiver {
 	}
 
 	@Override
-	public GCSignal[] receive(boolean[] c) throws Exception {
+	public GCSignal[] receive(boolean[] c) {
 		GCSignal[] res = new GCSignal[c.length];
 		for (int i = 0; i < c.length; i++) {
 			GCSignal[] m = new GCSignal[2];

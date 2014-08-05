@@ -3,6 +3,7 @@ package flexsc;
 import gc.GCEva;
 import gc.GCGen;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import circuits.FloatFormat;
 import cv.CVCompEnv;
 
 public abstract class CompEnv<T> {
-	public static CompEnv getEnv(Mode mode, Party p, InputStream is, OutputStream os) throws Exception{
+	public static CompEnv getEnv(Mode mode, Party p, InputStream is, OutputStream os) throws IOException, ClassNotFoundException {
 		if(mode == Mode.REAL)
 			if(p == Party.Bob)
 				return new GCEva(is, os);
@@ -58,7 +59,7 @@ public abstract class CompEnv<T> {
 	public abstract T[][][] newTArray(int d1, int d2, int d3);
 	public abstract T newT(boolean v);
 	
-	abstract public CompEnv<T> getNewInstance(InputStream in, OutputStream os) throws Exception;
+	abstract public CompEnv<T> getNewInstance(InputStream in, OutputStream os);
 	public Party getParty(){
 		return p;
 	}

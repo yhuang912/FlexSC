@@ -5,6 +5,7 @@ package ot;
 import flexsc.Flag;
 import gc.GCSignal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -38,7 +39,7 @@ public class NPOTReceiver extends OTReceiver {
 
 	Cipher cipher;
 	
-    public NPOTReceiver(InputStream in, OutputStream out) throws Exception {
+    public NPOTReceiver(InputStream in, OutputStream out) throws IOException {
     	super(in, out);
     	
     	cipher = new Cipher();
@@ -47,16 +48,16 @@ public class NPOTReceiver extends OTReceiver {
     }
 
     @Override
-    public GCSignal receive(boolean c) throws Exception {
+    public GCSignal receive(boolean c) throws IOException {
     	return receive(new boolean[]{c})[0];
     }
 
-    public GCSignal[] receive(boolean[] choices) throws Exception {
+    public GCSignal[] receive(boolean[] choices) throws IOException {
         step1(choices);
         return step2(choices);
     }
     
-    private void initialize() throws Exception {
+    private void initialize() throws IOException {
     	Flag.sw.startOTIO();
     	C = RWBigInteger.readBI(is);
         p  = RWBigInteger.readBI(is);
@@ -67,7 +68,7 @@ public class NPOTReceiver extends OTReceiver {
     	Flag.sw.stopOTIO();
     }
 
-    private void step1(boolean[] choices) throws Exception {
+    private void step1(boolean[] choices) throws IOException {
     	keys = new BigInteger[choices.length];
         pk = new BigInteger[choices.length][2];
         BigInteger[] pk0 = new BigInteger[choices.length];
@@ -92,7 +93,7 @@ public class NPOTReceiver extends OTReceiver {
 
     }
 
-    private GCSignal[] step2(boolean[] choices) throws Exception {
+    private GCSignal[] step2(boolean[] choices) {
     	BigInteger[][] msg = new BigInteger[choices.length][2];
     	Flag.sw.startOTIO();
     	for (int i = 0; i < choices.length; i++) {

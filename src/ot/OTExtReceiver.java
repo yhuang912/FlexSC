@@ -5,6 +5,7 @@ package ot;
 import flexsc.Flag;
 import gc.GCSignal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -37,16 +38,17 @@ public class OTExtReceiver extends OTReceiver {
  
 	Cipher cipher;
 	
-	public OTExtReceiver(InputStream in, OutputStream out) throws Exception {
+	public OTExtReceiver(InputStream in, OutputStream out) throws ClassNotFoundException, IOException {
 		super(in, out);
 
     	cipher = new Cipher();
     	
 		initialize();
 	}
+
 	boolean[] s = new boolean[SecurityParameter.k1];
 
-	public GCSignal[] receive(boolean[] choices) throws Exception {
+	public GCSignal[] receive(boolean[] choices) throws IOException {
 		GCSignal[] keys = new GCSignal[SecurityParameter.k1];
 
 		boolean[] c = new boolean[SecurityParameter.k1 + choices.length];
@@ -74,7 +76,7 @@ public class OTExtReceiver extends OTReceiver {
 
 	static GCSignal[] reverseAndExtend(GCSignal[][] keyPairs, 
 			boolean[] choices, int msgBitLength, 
-			InputStream is, OutputStream os, Cipher cipher) throws Exception {
+			InputStream is, OutputStream os, Cipher cipher) throws IOException {
 		BigInteger[][] msgPairs = new BigInteger[SecurityParameter.k1][2];
 		BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];	
 		
@@ -123,7 +125,7 @@ public class OTExtReceiver extends OTReceiver {
 		return res;
 	}
 
-	private void initialize() throws Exception {
+	private void initialize() throws IOException, ClassNotFoundException {
 		Flag.sw.startOTIO();
 		msgBitLength = is.read();
 		Flag.sw.stopOTIO();
