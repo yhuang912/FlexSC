@@ -34,42 +34,4 @@ public class Server {
 
 		sock.close(); 
 	}
-
-	/*public static byte[] readBytes(InputStream is, int len) throws IOException
-	{
-		byte[] temp = new byte[len];
-		int remain = len;
-		// System.out.println("remain out " + remain);
-		while(0 < remain) {
-			// System.out.println("test read = " + remain + " " + len);
-			int readBytes = is.read(temp, len-remain, remain);
-			if (readBytes != -1) {
-				remain -= readBytes;
-			}
-		}
-		return temp;
-	}*/
-
-	/*
-	static public byte[] readBytes(InputStream is, int len) throws IOException {
-		byte[] temp = new byte[len];
-		int remain = len;
-		remain -= is.read(temp);
-		while(0 != remain) {
-			remain -= is.read(temp, len-remain, remain);
-		}
-		return temp;
-	}*/
-
-	/* static public byte[] readBytes(InputStream is) throws IOException
-	{
-		byte[] lenBytes = readBytes(is, 4);
-		int len = ByteBuffer.wrap(lenBytes).getInt();
-		return readBytes(is, len);
-	}
-	
-	static public void writeByte(OutputStream os, byte[] data) throws IOException {
-		os.write(ByteBuffer.allocate(4).putInt(data.length).array());
-		os.write(data);
-	}*/
 }

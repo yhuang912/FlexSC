@@ -33,13 +33,13 @@ public abstract class Machine {
 	protected void connect(int masterPort) throws Exception {
 		connectToMaster(LOCALHOST, masterPort);
 		while(true) {
-			Command command = Command.valueOf(Master.readInt(masterIs));
+			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
 			switch(command) {
 				case LISTEN: System.out.println(machineId + ": listen triggered");
 					         listenFromPeer(peerPort + machineId);
 							 break;
-				case SET_MACHINE_ID: int id = Master.readInt(masterIs);
-									 int peerPort = Master.readInt(masterIs);
+				case SET_MACHINE_ID: int id = NetworkUtil.readInt(masterIs);
+									 int peerPort = NetworkUtil.readInt(masterIs);
 									 setMachineId(id, peerPort);
 									 break;
 				case CONNECT: connectToPeers();
@@ -69,7 +69,7 @@ public abstract class Machine {
         	System.out.println(machineId + ": Port listening from " + port);
 			serverSocket = new ServerSocket(port);
 			// Send Ack to Master before accept
-			Master.writeInt(masterOs, 1);
+			NetworkUtil.writeInt(masterOs, 1);
 			masterOs.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -82,7 +82,7 @@ public abstract class Machine {
 				OutputStream os;
 				os = new BufferedOutputStream(clientSock.getOutputStream(), Master.BUFFER_SIZE);
 				is = new BufferedInputStream(clientSock.getInputStream(), Master.BUFFER_SIZE);
-				int id = Master.readInt(is);
+				int id = NetworkUtil.readInt(is);
 				int index = log2(id - machineId);
 				System.out.println(machineId + ": Accepted a connection from " + id + ". Stored at index " + index);
 				peerIsDown[index] = is;
@@ -102,7 +102,7 @@ public abstract class Machine {
 			try {
 				peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Master.BUFFER_SIZE);
 				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Master.BUFFER_SIZE);
-				Master.writeInt(peerOsUp[i], machineId);
+				NetworkUtil.writeInt(peerOsUp[i], machineId);
 				peerOsUp[i].flush();
 				System.out.println(machineId + ": " + (machineId - (1 << i)) + "peerOsUp " + peerOsUp[i].hashCode());
 			} catch (IOException e) {
@@ -114,7 +114,7 @@ public abstract class Machine {
 		}
 		System.out.println(machineId + ": I'm done connecting ");
 		try {
-			Master.writeInt(masterOs, 1 /* SUCCESS */);
+			NetworkUtil.writeInt(masterOs, Response.SUCCESS.getValue());
 			masterOs.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -154,24 +154,6 @@ public abstract class Machine {
 		masterSocket.close();
 	}
 
-	/* public static void main(String args[]) throws Exception {
-		int machineId = Integer.parseInt(args[0]);
-		Machine newMachine = new Machine();
-		newMachine.connectToMaster("localhost", Master.START_PORT + machineId);
-		System.out.println("connected");
-		newMachine.prefixSum(Integer.parseInt(args[1]));
-		newMachine.disconnect();
-	}
-
-	public void prefixSum(int sum) throws Exception {
-		for (int k = 0; k < Master.LOG_MACHINES; k++) {
-			masterOs.write(sum);
-			masterOs.flush();
-			sum += masterIs.read();
-		}
-		System.out.println("Sum = " + sum);
-	} */
-
 	private int getNumberOfIncomingConnections(int machineId) {
 		int k = 0;
 		while (true) {
@@ -188,24 +170,4 @@ public abstract class Machine {
 	    }
 	    return 31 - Integer.numberOfLeadingZeros(n);
 	}
-
-	/*public byte[] readBytes(InputStream is, int len) throws IOException {
-		byte[] temp = new byte[len];
-		int remain = len;
-		remain -= is.read(temp);
-		while(0 != remain) {
-			remain -= is.read(temp, len-remain, remain);
-		}
-		return temp;
-	}
-
-	public int readInt(InputStream is) throws IOException
-	{
-		byte[] lenBytes = readBytes(is, 4);
-		return ByteBuffer.wrap(lenBytes).getInt();
-	}
-
-	public void writeInt(OutputStream os, int data) throws IOException {
-		os.write(ByteBuffer.allocate(4).putInt(data).array());
-	}*/
 }

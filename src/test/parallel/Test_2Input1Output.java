@@ -51,9 +51,7 @@ public class Test_2Input1Output<T> {
 						prefixSum[i].send(peerOsUp[k]);
 					}
 					try {
-						// System.out.println(" flushing " + machineId);
 						((BufferedOutputStream) peerOsUp[k]).flush();
-						// System.out.println(" flushing' " + machineId);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -61,9 +59,6 @@ public class Test_2Input1Output<T> {
 					System.out.println(machineId + ": Sent " + Utils.toInt(lib.getBooleans((T[]) prefixSum)) + " Iteration " + k + ". peerOsUp " + peerOsUp[k].hashCode());
 					System.out.flush();
 				}
-				// System.out.println(machineId + " Sent Iteration = " + k);
-				// Thread.sleep(5000);
-				// System.out.println(" Listening " + machineId + " Iteration = " + k);
 				if (noOfIncomingConnections > 0) {
 					GCSignal[] read = new GCSignal[prefixSum.length];
 					for (int i = 0; i < prefixSum.length; i++) {
