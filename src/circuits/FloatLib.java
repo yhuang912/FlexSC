@@ -11,7 +11,7 @@ public class FloatLib<T> extends IntegerLib<T> {
 		super(e);
 	}
 	
-	public Representation<T> one(Representation<T> a) throws Exception {
+	public Representation<T> one(Representation<T> a) {
 		T[] v = zeros(a.v.length);
 		v[v.length-1] = SIGNAL_ONE;
 		
@@ -22,7 +22,7 @@ public class FloatLib<T> extends IntegerLib<T> {
 		return result;
 	}
 	
-	public Representation<T> zero(Representation<T> a) throws Exception {
+	public Representation<T> zero(Representation<T> a) {
 		T[] v = zeros(a.v.length);
 		T[] p = zeros(a.p.length);
 		
@@ -30,14 +30,14 @@ public class FloatLib<T> extends IntegerLib<T> {
 		return result;
 	}
 	
-	public Representation<T> zero(int lengthV, int lengthP) throws Exception {
+	public Representation<T> zero(int lengthV, int lengthP) {
 		T[] v = zeros(lengthV);
 		T[] p = zeros(lengthP);
 		Representation<T> result = new Representation<T>(SIGNAL_ZERO, p, v, SIGNAL_ONE);
 		return result;
 	}	
 	
-	public Representation<T> multiply(Representation<T> a, Representation<T> b) throws Exception {
+	public Representation<T> multiply(Representation<T> a, Representation<T> b) {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
 		T new_z = or(a.z, b.z);
@@ -57,7 +57,7 @@ public class FloatLib<T> extends IntegerLib<T> {
 		return new Representation<T>(new_s, new_p, new_v, new_z);
 	}
 	
-	public Representation<T> divide(Representation<T> a, Representation<T> b) throws Exception {
+	public Representation<T> divide(Representation<T> a, Representation<T> b) {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
 		T new_z = a.z;
@@ -73,7 +73,7 @@ public class FloatLib<T> extends IntegerLib<T> {
 		
 		T[] leadingzero = leadingZeros(a_div_b);
 		T[] ShiftAmount = sub( toSignals(2*newLength-length), padSignal(leadingzero,32));
-		T[] normalized_av = mux( rightPrivateShift(a_div_b, ShiftAmount), 
+		T[] normalized_av = mux(rightPrivateShift(a_div_b, ShiftAmount), 
 		leftPrivateShift(a_div_b, twosComplement(ShiftAmount)), ShiftAmount[ShiftAmount.length-1] );
 
 		T[] new_v = Arrays.copyOfRange(normalized_av, 0, length);
@@ -99,7 +99,7 @@ public class FloatLib<T> extends IntegerLib<T> {
 	/* does not handle the case like 100000001 + 10000000001. fix later.
 	 * -> fix is newlengthV : 2->3.
 	 * */
-	public Representation<T> add(Representation<T> a, Representation<T> b) throws Exception {
+	public Representation<T> add(Representation<T> a, Representation<T> b) {
 		assert(a.compatiable(b)) :"floats not compatible";
 		
 		int lengthV = a.v.length;
@@ -170,14 +170,14 @@ public class FloatLib<T> extends IntegerLib<T> {
 //		return null;
 //	}
 	
-	public Representation<T> sub(Representation<T> a, Representation<T> b) throws Exception {
+	public Representation<T> sub(Representation<T> a, Representation<T> b) {
 		assert(a.compatiable(b)) :"floats not compatible";
 		Representation<T> negB = b.clone();
 		negB.s = not(negB.s);
 		return add(a, negB);
 	}
 	
-	public Representation<T> mux(Representation<T> a, Representation<T> b, T s) throws Exception{
+	public Representation<T> mux(Representation<T> a, Representation<T> b, T s) {
 		return new Representation<T>(mux(a.s, b.s, s), 
 						mux(a.p, b.p, s), 
 						mux(a.v, b.v, s), 

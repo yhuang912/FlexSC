@@ -12,7 +12,7 @@ import circuits.CircuitLib;
 public class TestMux extends Test_2Input1Output<GCSignal>{
 
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		int testCases = 10;
 
 		for (int i = 0; i < testCases; i++) {

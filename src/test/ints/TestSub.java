@@ -15,7 +15,7 @@ import circuits.IntegerLib;
 public class TestSub extends Test_2Input1Output<GCSignal>{
 
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		Random rnd = new Random();
 		int testCases = 10;
 

@@ -73,8 +73,7 @@ public abstract class CompEnv<T> {
 		os.flush();
 	}
 	
-	public Representation<T> inputOfBobFloatPoint(double d, int widthV, int widthP)
-			throws Exception {
+	public Representation<T> inputOfBobFloatPoint(double d, int widthV, int widthP) throws IOException {
 		FloatFormat f = new FloatFormat(d, widthV, widthP);
 		boolean[] data = new boolean[2+f.v.length+f.p.length];
 		System.arraycopy(f.p, 0, data, 0, f.p.length);
@@ -103,7 +102,7 @@ public abstract class CompEnv<T> {
 				scData[data.length-1]);
 	}
 
-	public double outputToAliceFloatPoint(Representation<T> re) throws Exception {
+	public double outputToAliceFloatPoint(Representation<T> re) throws IOException, BadLabelException {
 		boolean s = outputToAlice(re.s);
 		boolean z = outputToAlice(re.z);
 		boolean[] v = outputToAlice(re.v);
@@ -112,17 +111,15 @@ public abstract class CompEnv<T> {
 	}
 
 
-	public T[] inputOfBobFixedPoint(double d, int width, int offset)
-			throws Exception {
+	public T[] inputOfBobFixedPoint(double d, int width, int offset) throws IOException {
 		return inputOfBob(Utils.fromFixPoint(d,width,offset));
 	}
 
-	public T[] inputOfAliceFixedPoint(double d, int width, int offset)
-			throws Exception {
+	public T[] inputOfAliceFixedPoint(double d, int width, int offset) throws IOException {
 		return inputOfAlice(Utils.fromFixPoint(d,width,offset));
 	}
 
-	public double outputToAliceFixedPoint(T[] f, int offset) throws Exception {
+	public double outputToAliceFixedPoint(T[] f, int offset) throws IOException, BadLabelException {
 		boolean[] res = outputToAlice(f);
 		return  Utils.toFixPoint(res, res.length, offset);
 	}

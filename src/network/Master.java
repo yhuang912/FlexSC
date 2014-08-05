@@ -25,7 +25,7 @@ public class Master {
 		os = new OutputStream[MACHINES];
 	}
 
-	public void listen(int port, int index) throws Exception {
+	public void listen(int port, int index) throws IOException {
 		Socket clientSock;
         serverSocket[index] = new ServerSocket(port);            // create socket and bind to port
         clientSock = serverSocket[index].accept();                   // wait for client to connect
@@ -34,7 +34,7 @@ public class Master {
         is[index] = new BufferedInputStream(clientSock.getInputStream(), Constants.BUFFER_SIZE);
 	}
 
-	public void disconnect() throws Exception {
+	public void disconnect() throws IOException {
 		for (int i = 0; i < MACHINES; i++) {
 			NetworkUtil.writeInt(os[i], 0);
 			os[i].flush(); // dummy I/O to prevent dropping connection earlier than
@@ -43,7 +43,7 @@ public class Master {
 		}
 	}
 
-	public void func() throws Exception {
+	public void func() throws IOException {
 		int length = 32;
 		GCSignal[][] a = new GCSignal[MACHINES][length];
 		for (int k = 0; k < LOG_MACHINES; k++) {
@@ -70,7 +70,7 @@ public class Master {
 		}
 	}
 
-	public void setUp(int peerPort) throws Exception {
+	public void setUp(int peerPort) throws IOException, BadResponseException {
 		// set machineId for each of the machines
 		for (int i = 0; i < MACHINES; i++) {
 			NetworkUtil.writeInt(os[i], Command.SET_MACHINE_ID.getValue());
@@ -107,17 +107,17 @@ public class Master {
 		}
 	}
 
-	private void readResponse(int machineId) throws IOException, Exception {
+	private void readResponse(int machineId) throws IOException, BadResponseException{
 		int ret = NetworkUtil.readInt(is[machineId]);
 		if (ret == -1) {
-			throw new Exception("Why is ret -1?");
+			throw new BadResponseException("Why is ret -1?");
 		}
 		if (ret != Response.SUCCESS.getValue()) {
-			throw new Exception("Slave listen failed");
+			throw new BadResponseException("Slave listen failed");
 		}
 	}
 
-	public static void main(String args[]) throws Exception {
+	public static void main(String args[]) throws IOException, BadResponseException {
 		Master master = new Master();
 		Master.START_PORT = Integer.parseInt(args[0]);
 		int peerPort = Integer.parseInt(args[1]);

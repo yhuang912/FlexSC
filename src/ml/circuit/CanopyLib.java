@@ -14,7 +14,7 @@ public class CanopyLib<T> extends PointLib<T> {
 		POINT_DUMMY = new Point<T>(e, dimension, width, true);
 	}
 	
-	public Point<T>[] map(Point<T>[] points, int numberOfCanopyCenters, int t1, int t2) throws Exception {
+	public Point<T>[] map(Point<T>[] points, int numberOfCanopyCenters, int t1, int t2) {
 		Point<T>[] canopyCenters = new Point[numberOfCanopyCenters];
 		for(int i = 0; i < canopyCenters.length; ++i)
 			canopyCenters[i] = POINT_DUMMY;
@@ -28,7 +28,7 @@ public class CanopyLib<T> extends PointLib<T> {
 	}
 	
 	public void addPointToCanopies(Point<T>[] canopies, Point<T> point, 
-			T[] t1, T[] t2, T[] s0, Point<T> s1, Point<T> s2) throws Exception {
+			T[] t1, T[] t2, T[] s0, Point<T> s1, Point<T> s2) {
 		T pointStronglyBound = SIGNAL_ZERO;
 		
 		for(int i = 0; i < canopies.length; ++i) {
@@ -47,7 +47,7 @@ public class CanopyLib<T> extends PointLib<T> {
 	}
 	
 	public void ConditionalCanopyObserve(T[] s0, Point<T>s1, Point<T>s2, Point<T> point,
-			T shouldObserve) throws Exception{
+			T shouldObserve) {
 		Point<T> p = mux(POINT_ZERO, point, shouldObserve);
 		s0 = add(s0, mux(toSignals(0, s0.length), toSignals(1, s0.length), shouldObserve));
 		s1 = add(s1, p);
@@ -55,7 +55,7 @@ public class CanopyLib<T> extends PointLib<T> {
 	}
 
 	public void ConditionalCanopyAdd(Point<T>[] canopies, Point<T> point,
-			T condition) throws Exception {
+			T condition) {
 		T added = not(condition);
 		for(int i = 0; i < canopies.length; ++i) {
 			T emptySlot = canopies[i].isDummy;

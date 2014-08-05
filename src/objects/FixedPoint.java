@@ -10,29 +10,29 @@ public class FixedPoint<T extends Signal> {
 	int offset;
 	FixedPointLib<T> lib;
 	
-	public FixedPoint(CompEnv<T> env, T[] s, int offset) throws Exception {
+	public FixedPoint(CompEnv<T> env, T[] s, int offset) {
 		this.env = env;
 		lib = new FixedPointLib<T>(env);
 		content = s;
 		this.offset = offset;
 	}
 	
-	FixedPoint<T> add(FixedPoint<T> b) throws Exception {
+	FixedPoint<T> add(FixedPoint<T> b) {
 		T[] result = lib.add(this.content, b.content,offset);
 		return new FixedPoint<T>(env, result,offset);
 	}
 
-	FixedPoint<T> sub(FixedPoint<T> b) throws Exception {
+	FixedPoint<T> sub(FixedPoint<T> b) {
 		T[] result = lib.sub(this.content, b.content, offset);
 		return new FixedPoint<T>(env, result,offset);
 	}
 
-	FixedPoint<T> multiply(FixedPoint<T> b) throws Exception {
+	FixedPoint<T> multiply(FixedPoint<T> b) {
 		T[] result = lib.multiply(this.content, b.content,offset);
 		return new FixedPoint<T>(env, result,offset);
 	}
 	
-	FixedPoint<T> divide(FixedPoint<T> b) throws Exception {
+	FixedPoint<T> divide(FixedPoint<T> b) {
 		T[] result = lib.divide(this.content, b.content,offset);
 		return new FixedPoint<T>(env, result,offset);
 	}

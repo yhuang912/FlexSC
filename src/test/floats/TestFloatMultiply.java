@@ -16,7 +16,7 @@ import circuits.FloatLib;
 public class TestFloatMultiply extends TestFloat<GCSignal> {
 
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		Random rng = new Random();
 		int testCases = 100;
 

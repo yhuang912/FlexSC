@@ -8,7 +8,7 @@ public class FixedPointMatrixLib<T> extends FixedPointLib<T> {
 		super(e);
 	}
 	
-	public T[][][] add(T[][][] a, T[][][] b, int offset) throws Exception {
+	public T[][][] add(T[][][] a, T[][][] b, int offset) {
 		int n = a.length;
 		int m = a[0].length;
 		int l = a[0][0].length;
@@ -20,7 +20,7 @@ public class FixedPointMatrixLib<T> extends FixedPointLib<T> {
 		return result;
 	}
 	
-	public T[][][] multiply(T[][][] a, T[][][] b, int offset) throws Exception {
+	public T[][][] multiply(T[][][] a, T[][][] b, int offset) {
 		int n = a.length;
 		int m = a[0].length;
 		int l = b[0].length;
@@ -58,7 +58,7 @@ public class FixedPointMatrixLib<T> extends FixedPointLib<T> {
 	}
 	
 
-	public T[][][] fastInverse(T[][][] m, int offset) throws Exception {
+	public T[][][] fastInverse(T[][][] m, int offset) {
 		int dimension = m.length;
 		int width = m[0][0].length;
 //		T[][][] extended = new T[dimension][2*dimension][width];
@@ -82,7 +82,7 @@ public class FixedPointMatrixLib<T> extends FixedPointLib<T> {
 		return result;
 	}
 	
-	public T[][] Solve(T[][][] A, T[][]b, int offset) throws Exception {
+	public T[][] Solve(T[][][] A, T[][]b, int offset) {
 		int dimension = A.length;
 		int width = A[0][0].length;
 //		T[][][] extended = new T[dimension][1+dimension][width];
@@ -101,7 +101,7 @@ public class FixedPointMatrixLib<T> extends FixedPointLib<T> {
 		return result;
 	}
 	
-	public T[][][] rref(T[][][] m, int offset) throws Exception {
+	public T[][][] rref(T[][][] m, int offset) {
 //		T[][][] result = new T[m.length][m[0].length][m[0][0].length];
 		T[][][] result = env.newTArray(m.length, m[0].length, m[0][0].length);
 		for (int r = 0; r < m.length; ++r)

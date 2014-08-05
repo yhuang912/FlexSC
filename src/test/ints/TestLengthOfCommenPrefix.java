@@ -43,7 +43,7 @@ public class TestLengthOfCommenPrefix extends Test_2Input1Output<GCSignal>{
 		return res;
 	}
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		Random rnd = new Random();
 		int testCases = 1000;
 

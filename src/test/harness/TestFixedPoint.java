@@ -78,7 +78,7 @@ public class TestFixedPoint<T> {
 		}
 	}
 
-	public void runThreads(Helper h) throws Exception {
+	public void runThreads(Helper h) throws InterruptedException {
 		GenRunnable gen = new GenRunnable(h);
 		EvaRunnable eva = new EvaRunnable(h);
 

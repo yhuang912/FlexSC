@@ -18,8 +18,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		dummyBlock = new Block<T>(zeros(lengthOfIden), zeros(lengthOfPos), zeros(lengthOfData), SIGNAL_ONE);
 	}
 	
-	public T isFull(Block<T>[] bucket) throws Exception
-	{
+	public T isFull(Block<T>[] bucket) {
 		T res = SIGNAL_ONE;
 		for(int i = 0; i < bucket.length; ++i) {
 			res = and(res, not(bucket[i].isDummy));
@@ -27,8 +26,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		return res;
 	}
 
-	public T isEmpty(Block<T>[] bucket) throws Exception
-	{
+	public T isEmpty(Block<T>[] bucket) {
 		T res = SIGNAL_ONE;
 		for(int i = 0; i < bucket.length; ++i) {
 			res = and(res, bucket[i].isDummy);
@@ -36,7 +34,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		return res;
 	}
 	
-	public Block<T> conditionalReadAndRemove(Block<T>[] bucket, T[] iden, T condition) throws Exception {
+	public Block<T> conditionalReadAndRemove(Block<T>[] bucket, T[] iden, T condition) {
 		Block<T> result = dummyBlock;
 		for(int i = 0; i < bucket.length; ++i) {
 			T match = eq(iden, bucket[i].iden);
@@ -48,7 +46,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		return result;
 	}
 
-	public Block<T> readAndRemove(Block<T>[] bucket, T[] iden) throws Exception {
+	public Block<T> readAndRemove(Block<T>[] bucket, T[] iden) {
 		Block<T> result = dummyBlock;
 		for(int i = 0; i < bucket.length; ++i) {
 			T match = eq(iden, bucket[i].iden);
@@ -59,14 +57,14 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		return result;
 	}
 
-	public Block<T> conditionalReadAndRemove(Block<T>[][] blocks, T[] iden, T condition) throws Exception {
+	public Block<T> conditionalReadAndRemove(Block<T>[][] blocks, T[] iden, T condition) {
 		Block<T>[] res = newBlockArray(blocks.length);
 		for(int i = 0; i < blocks.length; ++i)
 			res[i] = conditionalReadAndRemove(blocks[i], iden, condition);
 		return conditionalReadAndRemove(res, iden, condition);		
 	}
 	
-	public Block<T> readAndRemove(Block<T>[][] blocks, T[] iden) throws Exception {
+	public Block<T> readAndRemove(Block<T>[][] blocks, T[] iden) {
 		Block<T>[] res = newBlockArray(blocks.length);
 		for(int i = 0; i < blocks.length; ++i)
 			res[i] = readAndRemove(blocks[i], iden);
@@ -91,7 +89,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 	*/}
 
 
-	/*private Block<T> readAndRemoveInternal(Block<T>[][] blocks, T[] iden) throws Exception {
+	/*private Block<T> readAndRemoveInternal(Block<T>[][] blocks, T[] iden) {
 		Block<T>[] res = newBlockArray(blocks.length);
 		for(int i = 0; i < blocks.length; ++i)
 			res[i] = readAndRemove(blocks[i], iden);
@@ -108,7 +106,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		}
 
 		@Override
-		public Object secureCompute(CompEnv<T> e, Object[] o) throws Exception {
+		public Object secureCompute(CompEnv<T> e, Object[] o) {
 			Block<T>[][] signala = (Block<T>[][]) o[0];
 			T[] iden = (T[]) o[1];
 			BucketLib<T> lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, e);
@@ -121,7 +119,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 
 	};
 */
-	public void conditionalAdd(Block<T>[] bucket, Block<T> newBlock, T condition) throws Exception {
+	public void conditionalAdd(Block<T>[] bucket, Block<T> newBlock, T condition) {
 		T added = not(condition);
 		for(int i = 0; i < bucket.length; ++i) {
 			T match = and( not(bucket[i].isDummy), eq(newBlock.iden, bucket[i].iden) );
@@ -135,7 +133,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		}
 	}
 
-	public void add(Block<T>[] bucket, Block<T> newBlock) throws Exception {
+	public void add(Block<T>[] bucket, Block<T> newBlock) {
 		T added = SIGNAL_ZERO;
 		for(int i = 0; i < bucket.length; ++i) {
 			T match = and( not(bucket[i].isDummy), eq(newBlock.iden, bucket[i].iden) );
@@ -151,7 +149,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 
 	}
 
-	public Block<T> pop(Block<T>[] bucket) throws Exception {
+	public Block<T> pop(Block<T>[] bucket) {
 		Block<T> result = dummyBlock;
 		T poped = SIGNAL_ZERO;// condition=T => shouldpop => set to poped;
 		for(int i = 0; i < bucket.length; ++i) {
@@ -165,7 +163,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		return result;
 	}
 
-	public Block<T> conditionalPop(Block<T>[] bucket, T condition) throws Exception {
+	public Block<T> conditionalPop(Block<T>[] bucket, T condition) {
 		Block<T> result = dummyBlock;
 		T poped = not(condition);// condition=T => shouldpop => set to poped;
 		for(int i = 0; i < bucket.length; ++i) {
@@ -179,7 +177,7 @@ public class BucketLib<T> extends BitonicSortLib<T> {
 		return result;
 	}
 
-	public Block<T> mux(Block<T> a, Block<T> b, T choose) throws Exception {
+	public Block<T> mux(Block<T> a, Block<T> b, T choose) {
 		T[] iden = mux(a.iden, b.iden, choose);
 		T[] pos = mux(a.pos, b.pos, choose);
 		T[] data = mux(a.data, b.data, choose);

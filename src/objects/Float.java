@@ -33,28 +33,28 @@ public class Float<T extends Signal> {
 	}
 	
 	
-	public Float(CompEnv<T> env, Representation<T> content) throws Exception {
+	public Float(CompEnv<T> env, Representation<T> content) {
 		this.env = env;
 		lib = new FloatLib<T>(env);
 		this.content = content;
 	}
 	
-	Float<T> add(Float<T> b) throws Exception {
+	Float<T> add(Float<T> b) {
 		Representation<T> result = lib.add(this.content, b.content);
 		return new Float<T>(env, result);
 	}
 
-	Float<T> sub(Float<T> b) throws Exception {
+	Float<T> sub(Float<T> b) {
 		Representation<T> result = lib.sub(this.content, b.content);
 		return new Float<T>(env, result);
 	}
 
-	Float<T> multiply(Float<T> b) throws Exception {
+	Float<T> multiply(Float<T> b) {
 		Representation<T> result = lib.multiply(this.content, b.content);
 		return new Float<T>(env, result);
 	}
 	
-	Float<T> divide(Float<T> b) throws Exception {
+	Float<T> divide(Float<T> b) {
 		Representation<T> result = lib.divide(this.content, b.content);
 		return new Float<T>(env, result);
 	}

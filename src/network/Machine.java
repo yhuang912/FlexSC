@@ -32,7 +32,7 @@ public abstract class Machine {
 		peerOsDown = new BufferedOutputStream[Master.LOG_MACHINES];
 	}
 
-	protected void connect(int masterPort) throws Exception {
+	protected void connect(int masterPort) throws InterruptedException, IOException, BadCommandException {
 		connectToMaster(LOCALHOST, masterPort);
 		while(true) {
 			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
@@ -49,7 +49,7 @@ public abstract class Machine {
 							  break;
 				case COMPUTE: return;
 				default:
-					throw new Exception("Unknown command. Default switch case");
+					throw new BadCommandException("Unknown command. Default switch case");
 			}
 		}
 	}
@@ -145,7 +145,7 @@ public abstract class Machine {
 		return socket;
 	}
 
-	public void disconnectFromMaster() throws Exception {
+	public void disconnectFromMaster() throws IOException {
 		masterOs.write(0);
 		masterOs.flush(); // dummy I/O to prevent dropping connection earlier than
 		// protocol payloads are received.

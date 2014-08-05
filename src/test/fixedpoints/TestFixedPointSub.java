@@ -15,7 +15,7 @@ import circuits.FixedPointLib;
 public class TestFixedPointSub extends TestFixedPoint<GCSignal> {
 
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		Random rng = new Random();
 		int testCases = 10;
 

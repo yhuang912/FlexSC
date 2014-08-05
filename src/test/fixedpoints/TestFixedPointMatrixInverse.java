@@ -2,6 +2,7 @@ package test.fixedpoints;
 
 import java.util.Random;
 
+
 //import gc.Boolean;
 import org.junit.Test;
 
@@ -15,7 +16,7 @@ import flexsc.Mode;
 public class TestFixedPointMatrixInverse extends TestFixedPointMatrix<Boolean> {
 
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		Random rng = new Random();
 		int testCases = 10;
 
@@ -30,8 +31,7 @@ public class TestFixedPointMatrixInverse extends TestFixedPointMatrix<Boolean> {
 
 				@Override
 				public Boolean[][][] secureCompute(Boolean[][][] a,
-						Boolean[][][] b, int offset, CompEnv<Boolean> env)
-						throws Exception {
+						Boolean[][][] b, int offset, CompEnv<Boolean> env) {
 					FixedPointMatrixLib<Boolean> lib = new FixedPointMatrixLib<Boolean>(env);
 					return lib.fastInverse(a, offset);
 				}

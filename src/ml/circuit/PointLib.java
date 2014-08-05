@@ -13,11 +13,11 @@ public class PointLib<T> extends IntegerLib<T> {
 		this.width = width;
 	}
 
-	public Point<T> add(Point<T> a, Point<T> b) throws Exception {
+	public Point<T> add(Point<T> a, Point<T> b) {
 		return addInternal(a, b, false /* cin */);
 	}
 
-	private Point<T> addInternal(Point<T> a, Point<T> b, boolean cin) throws Exception {
+	private Point<T> addInternal(Point<T> a, Point<T> b, boolean cin) {
 		assertPointCompatibility(a, b);
 
 		Point<T> result = new Point<>(env, dimension, false);
@@ -40,7 +40,7 @@ public class PointLib<T> extends IntegerLib<T> {
 		return result;
 	}
 
-	public Point<T> mux(Point<T> a, Point<T> b, T c) throws Exception {
+	public Point<T> mux(Point<T> a, Point<T> b, T c) {
 		Point<T> res = new Point<>(env, dimension, false);
 		for (int i = 0; i < dimension; i++) {
 			res.coordinates[i] = mux(a.coordinates[i], b.coordinates[i], c);
@@ -49,11 +49,11 @@ public class PointLib<T> extends IntegerLib<T> {
 		return res;
 	}
 
-	public Point<T> subtract(Point<T>a, Point<T> b) throws Exception {
+	public Point<T> subtract(Point<T>a, Point<T> b) {
 		return addInternal(a, not(b), true /* cin */);
 	}
 	
-	public T[] innerProduct(Point<T> a, Point<T> b) throws Exception {
+	public T[] innerProduct(Point<T> a, Point<T> b) {
 		assertPointCompatibility(a, b);
 		T[] result = zeros(width * 2); // This should depend on the dimension as well?
 		for (int i = 0; i < dimension; i++) {
@@ -62,7 +62,7 @@ public class PointLib<T> extends IntegerLib<T> {
 		return result;
 	}
 	
-	public Point<T> multiply(Point<T> a, Point<T> b) throws Exception {
+	public Point<T> multiply(Point<T> a, Point<T> b) {
 		assertPointCompatibility(a, b);
 		Point<T> res = new Point<>(env, dimension, false);
 		for (int i = 0; i < dimension; i++) {
@@ -72,7 +72,7 @@ public class PointLib<T> extends IntegerLib<T> {
 		return res;
 	}
 	
-	public T[] L1Distance(Point<T> a, Point<T> b) throws Exception{
+	public T[] L1Distance(Point<T> a, Point<T> b) {
 		Point<T> diff = subtract(a, b);
 		
 		T[] result = toSignals(0, a.width());
@@ -86,7 +86,7 @@ public class PointLib<T> extends IntegerLib<T> {
 		
 	}
 
-	public T[] L2Distance(Point<T> a, Point<T> b) throws Exception{
+	public T[] L2Distance(Point<T> a, Point<T> b) {
 		Point<T> diff = subtract(a, b);
 		Point<T> multiply = multiply(diff, diff);
 		

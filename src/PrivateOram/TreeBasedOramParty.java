@@ -6,13 +6,13 @@ import oram.Block;
 import oram.PlainBlock;
 import flexsc.CompEnv;
 import flexsc.Party;
+import gc.BadLabelException;
 
 
 public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	public PlainBlock[][] tree;
 	protected int capacity;
-	public TreeBasedOramParty(CompEnv<T> env, int N, int dataSize,
-			int capacity) throws Exception {
+	public TreeBasedOramParty(CompEnv<T> env, int N, int dataSize, int capacity) {
 		super(env,  N, dataSize);
 		this.capacity = capacity;
 
@@ -73,15 +73,13 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	}
 
 
-	public Block<T>[][] preparePath(PlainBlock[][] clientBlock, PlainBlock[][] serverBlock
-
-			) throws Exception {
+	public Block<T>[][] preparePath(PlainBlock[][] clientBlock, PlainBlock[][] serverBlock) throws IOException {
 		Block<T>[][] s = inputPathOfServer(serverBlock);
 		Block<T>[][] c = inputPathOfClient(clientBlock);
 		return  lib.xor(s, c);
 	}
 
-	public Block<T>[][] inputPathOfClient(PlainBlock[][] b) throws Exception {
+	public Block<T>[][] inputPathOfClient(PlainBlock[][] b) throws IOException {
 		int length = 0;
 		for(int i = 0; i < b.length; ++i)
 			length += b[i].length;
@@ -104,7 +102,7 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 		return result;
 	}
 
-	public Block<T>[][] inputPathOfServer(PlainBlock[][] b) throws Exception{
+	public Block<T>[][] inputPathOfServer(PlainBlock[][] b) throws IOException {
 		int length = 0;
 		for(int i = 0; i < b.length; ++i)
 			length += b[i].length;
@@ -127,7 +125,7 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	}
 
 
-	public PlainBlock[][] preparePlainPath(Block<T>[][] blocks) throws Exception {
+	public PlainBlock[][] preparePlainPath(Block<T>[][] blocks) throws IOException, BadLabelException {
 		Block<T> [][] randomSCPath = lib.newBlockMatrix(blocks.length);
 
 		// this part can potentially be much better :)!!! io!

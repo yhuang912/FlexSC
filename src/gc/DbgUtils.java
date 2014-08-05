@@ -9,8 +9,7 @@ public class DbgUtils {
 			System.err.println(msg);
 	}
 	
-	static void debugVal(CompEnv<GCSignal> env, GCSignal bs, String msg)
-			throws Exception {
+	static void debugVal(CompEnv<GCSignal> env, GCSignal bs, String msg) throws BadLabelException {
 		if (env instanceof GCGen) {
 			bs.send(((GCGen) env).os);
 			((GCGen) env).R.send(((GCGen) env).os);
@@ -23,7 +22,7 @@ public class DbgUtils {
 			else if (bs.equals(R.xor(glb)))
 				x = 1;
 			else
-				throw new Exception(String.format("bad label: %s",
+				throw new BadLabelException(String.format("bad label: %s",
 						bs.toHexStr()));
 			System.out.println(String.format("%s = %d", msg, x));
 

@@ -14,7 +14,7 @@ import flexsc.Mode;
 public class TestPointAdd extends Test_2input1outputPoint<Boolean> {
 
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		Random rnd = new Random();
 		int testCases = 1;
 

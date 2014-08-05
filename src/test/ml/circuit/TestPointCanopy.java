@@ -14,7 +14,7 @@ import test.harness.Test_NinputMoutputPoint;
 public class TestPointCanopy extends Test_NinputMoutputPoint<GCSignal> {
 
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		int testCases = 1;
 
 		int b[][] = {{1,1}, {1,0}, {2,2}, {10,10}, {10,13}, {10, 13}, {10, 15}, {23, 45},{23, 41},{23, 42}};

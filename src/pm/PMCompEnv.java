@@ -134,48 +134,6 @@ public class PMCompEnv extends BooleanCompEnv {
 		return Utils.toBooleanArray(in);
 	}
 
-//	@Override
-//	public Representation<Boolean> inputOfBobFloatPoint(double d, int widthV, int widthP)
-//			throws Exception {
-//		FloatFormat f = new FloatFormat(d, 23, 9);
-//		Representation<Boolean> result = 
-//				new Representation<Boolean>(f.s, Utils.toBooleanArray(f.p), Utils.toBooleanArray(f.v), f.z);
-//		return result;
-//	}
-//
-//	@Override
-//	public Representation<Boolean> inputOfAliceFloatPoint(double d, int widthV, int widthP)
-//			throws Exception {
-//		FloatFormat f = new FloatFormat(d, 23, 9);
-//		Representation<Boolean> result = 
-//				new Representation<Boolean>(f.s, Utils.toBooleanArray(f.p), Utils.toBooleanArray(f.v), f.z);
-//		return result;
-//	}
-//
-//	@Override
-//	public double outputToAliceFloatPoint(Representation<Boolean> f) throws Exception {
-//		FloatFormat d = new FloatFormat(Utils.tobooleanArray(f.v), Utils.tobooleanArray(f.p), f.s, f.z);
-//		return d.toDouble();
-//	}
-//
-//	@Override
-//	public Boolean[] inputOfBobFixedPoint(double d, int width, int offset)
-//			throws Exception {
-//		return inputOfBob(Utils.fromFixPoint(d,width,offset));
-//	}
-//
-//	@Override
-//	public Boolean[] inputOfAliceFixedPoint(double d, int width, int offset)
-//			throws Exception {
-//		return inputOfBob(Utils.fromFixPoint(d,width,offset));
-//	}
-//
-//	@Override
-//	public double outputToAliceFixedPoint(Boolean[] f, int offset) throws Exception {
-//		boolean[] res = outputToAlice(f);
-//		return  Utils.toFixPoint(res, res.length, offset);
-//	}
-
 	@Override
 	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os) {
 		return new PMCompEnv(in, os, this.getParty());

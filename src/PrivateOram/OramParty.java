@@ -1,5 +1,6 @@
 package PrivateOram;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
@@ -14,6 +15,7 @@ import rand.ISAACProvider;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
+import gc.BadLabelException;
 
 public abstract class OramParty<T> {
 	public int N;
@@ -43,7 +45,7 @@ public abstract class OramParty<T> {
 	public BucketLib<T> lib;
 	boolean[] dummyArray;
 
-	public OramParty(CompEnv<T> env, int N, int dataSize) throws Exception {
+	public OramParty(CompEnv<T> env, int N, int dataSize) {
 		this.env = env;
 		this.is = env.is;
 		this.os = env.os;
@@ -89,14 +91,14 @@ public abstract class OramParty<T> {
 
 	}
 	
-	public void init() throws Exception {
+	public void init() {
 		dummyArray = new boolean[lengthOfIden+lengthOfPos+lengthOfData+1];
 		for(int i = 0; i < dummyArray.length; ++i)
 			dummyArray[i] = false;
 		lib = new BucketLib<T>(lengthOfIden, lengthOfPos, lengthOfData, env);
 	}
 
-	public Block<T>[] prepareBlocks(PlainBlock[] clientBlock, PlainBlock[] serverBlock) throws Exception {
+	public Block<T>[] prepareBlocks(PlainBlock[] clientBlock, PlainBlock[] serverBlock) throws IOException {
 		Block<T>[] s = inputBucketOfServer(serverBlock);
 		Block<T>[] c = inputBucketOfClient(clientBlock);
 		return lib.xor(s, c);
@@ -109,7 +111,7 @@ public abstract class OramParty<T> {
 	}
 
 
-	public PlainBlock preparePlainBlock(Block<T> blocks, Block<T> randomBlock) throws Exception {
+	public PlainBlock preparePlainBlock(Block<T> blocks, Block<T> randomBlock) throws IOException, BadLabelException {
 		PlainBlock result = outputBlock(lib.xor(blocks, randomBlock));
 		return result;	
 	}
@@ -120,13 +122,13 @@ public abstract class OramParty<T> {
 	}
 
 
-	public Block<T> inputBlockOfServer(PlainBlock b) throws Exception {
+	public Block<T> inputBlockOfServer(PlainBlock b) throws IOException {
 		T[] TArray = env.inputOfBob(b.toBooleanArray());
 		return new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
 
 	}
 
-	public Block<T> inputBlockOfClient(PlainBlock b) throws Exception {
+	public Block<T> inputBlockOfClient(PlainBlock b) throws IOException {
 		T[] TArray = env.inputOfAlice(b.toBooleanArray());		
 		return new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
 	}
@@ -142,20 +144,20 @@ public abstract class OramParty<T> {
 		return result;
 	}
 
-	public Block<T>[] inputBucketOfServer(PlainBlock[] b) throws Exception {
+	public Block<T>[] inputBucketOfServer(PlainBlock[] b) throws IOException {
 //		System.out.println(b.length);
 		T[] TArray = env.inputOfBob(PlainBlock.toBooleanArray(b));
 		return toBlocks(TArray, lengthOfIden, lengthOfPos, lengthOfData, b.length);//new Block<T>(TArray, lengthOfIden,lengthOfPos,lengthOfData);
 	}
 
-	public Block<T>[] inputBucketOfClient(PlainBlock[] b) throws Exception {
+	public Block<T>[] inputBucketOfClient(PlainBlock[] b) throws IOException {
 		T[] TArray = env.inputOfAlice(PlainBlock.toBooleanArray(b));
 		os.flush();
 		return toBlocks(TArray, lengthOfIden, lengthOfPos, lengthOfData, b.length);
 	}
 
 
-	public PlainBlock outputBlock(Block<T> b) throws Exception {
+	public PlainBlock outputBlock(Block<T> b) throws IOException, BadLabelException {
 		boolean[] iden = env.outputToAlice(b.iden);
 		boolean[] pos = env.outputToAlice(b.pos);
 		boolean[] data = env.outputToAlice(b.data);
@@ -164,14 +166,14 @@ public abstract class OramParty<T> {
 		return new PlainBlock(iden, pos, data, isDummy);
 	}
 
-	public PlainBlock[] outputBucket(Block<T>[] b) throws Exception {
+	public PlainBlock[] outputBucket(Block<T>[] b) throws IOException, BadLabelException {
 		PlainBlock[] result = new PlainBlock[b.length];
 		for(int i = 0; i < b.length; ++i)
 			result[i] = outputBlock(b[i]);
 		return result;
 	}
 
-	public PlainBlock[][] outputBuckets(Block<T>[][] b) throws Exception {
+	public PlainBlock[][] outputBuckets(Block<T>[][] b) throws IOException, BadLabelException {
 		PlainBlock[][] result = new PlainBlock[b.length][];
 		for(int i = 0; i < b.length; ++i)
 			result[i] = outputBucket(b[i]);

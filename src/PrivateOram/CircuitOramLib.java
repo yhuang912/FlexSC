@@ -18,12 +18,12 @@ public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 		this.capacity = capacity;
 	}
 
-	public T[] deepestLevellocal(T[] pos, T[] path) throws Exception {
+	public T[] deepestLevellocal(T[] pos, T[] path) {
 		T[] xored = xor(pos, path);
 		return leadingZeros(xored);
 	}
 
-	public T[][] deepestBlockShort(Block<T>[] bucket, T[]pathSignal) throws Exception {
+	public T[][] deepestBlockShort(Block<T>[] bucket, T[]pathSignal) {
 		T[][] deepest = env.newTArray(bucket.length, 0);//;new T[nodeCapacity][];
 		for(int j = 0; j < bucket.length; ++j){
 			deepest[j] = deepestLevellocal(bucket[j].pos, pathSignal);
@@ -92,7 +92,7 @@ public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
 	}
 
 
-	public void flush(Block<T>[][] scPath, boolean[] path, Block<T>[] scQueue) throws Exception {
+	public void flush(Block<T>[][] scPath, boolean[] path, Block<T>[] scQueue) {
 		//make path to signal
 		T[] pathSignal =  env.newTArray(path.length);
 		for(int i = 0; i < path.length; ++i)

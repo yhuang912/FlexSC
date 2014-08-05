@@ -91,8 +91,7 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 
 	@Override
-	public Representation<Boolean> inputOfBobFloatPoint(double d, int widthV, int widthP)
-			throws Exception {
+	public Representation<Boolean> inputOfBobFloatPoint(double d, int widthV, int widthP) {
 		FloatFormat f = new FloatFormat(d, 23, 9);
 		Representation<Boolean> result = 
 				new Representation<Boolean>(f.s, Utils.toBooleanArray(f.p), Utils.toBooleanArray(f.v), f.z);
@@ -100,8 +99,7 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 
 	@Override
-	public Representation<Boolean> inputOfAliceFloatPoint(double d, int widthV, int widthP)
-			throws Exception {
+	public Representation<Boolean> inputOfAliceFloatPoint(double d, int widthV, int widthP) {
 		FloatFormat f = new FloatFormat(d, 23, 9);
 		Representation<Boolean> result = 
 				new Representation<Boolean>(f.s, Utils.toBooleanArray(f.p), Utils.toBooleanArray(f.v), f.z);
@@ -109,25 +107,23 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 
 	@Override
-	public double outputToAliceFloatPoint(Representation<Boolean> f) throws Exception {
+	public double outputToAliceFloatPoint(Representation<Boolean> f) {
 		FloatFormat d = new FloatFormat(Utils.tobooleanArray(f.v), Utils.tobooleanArray(f.p), f.s, f.z);
 		return d.toDouble();
 	}
 
 	@Override
-	public Boolean[] inputOfBobFixedPoint(double d, int width, int offset)
-			throws Exception {
+	public Boolean[] inputOfBobFixedPoint(double d, int width, int offset) {
 		return inputOfBob(Utils.fromFixPoint(d,width,offset));
 	}
 
 	@Override
-	public Boolean[] inputOfAliceFixedPoint(double d, int width, int offset)
-			throws Exception {
+	public Boolean[] inputOfAliceFixedPoint(double d, int width, int offset) {
 		return inputOfBob(Utils.fromFixPoint(d,width,offset));
 	}
 
 	@Override
-	public double outputToAliceFixedPoint(Boolean[] f, int offset) throws Exception {
+	public double outputToAliceFixedPoint(Boolean[] f, int offset) {
 		boolean[] res = outputToAlice(f);
 		return  Utils.toFixPoint(res, res.length, offset);
 	}

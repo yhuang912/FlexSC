@@ -15,7 +15,7 @@ import circuits.IntegerLib;
 
 public class TestBigIntegerKaratsubaMultiply extends TestBigInteger<GCSignal> {
 		@Test
-		public void testAllCases() throws Exception {
+		public void testAllCases() throws InterruptedException {
 			Random rnd = new Random();
 			int testCases = 10;
 			for (int i = 0; i < testCases; i++) {

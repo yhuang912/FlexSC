@@ -69,7 +69,7 @@ public class Test_1Input1Output<T>{
 		}
 	}
 
-	public void runThreads(Helper helper) throws Exception {
+	public void runThreads(Helper helper) throws InterruptedException {
 		GenRunnable gen = new GenRunnable(helper);
 		EvaRunnable eva = new EvaRunnable(helper);
 		Thread tGen = new Thread(gen);

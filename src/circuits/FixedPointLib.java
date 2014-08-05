@@ -11,20 +11,20 @@ public class FixedPointLib<T> extends IntegerLib<T> {
 		super(e);
 	}
 	
-	public T[] add(T[] x, T[] y, int offset) throws Exception {
+	public T[] add(T[] x, T[] y, int offset) {
 		return add(x, y);
 	}
 	
-	public T[] sub(T[] x, T[] y, int offset) throws Exception{
+	public T[] sub(T[] x, T[] y, int offset) {
 		return sub(x, y);
 	}
 	
-	public T[] multiply(T[] x, T[] y, int offset) throws Exception{
+	public T[] multiply(T[] x, T[] y, int offset) {
 		T[] res = unSignedMultiply(x, y);
 		return Arrays.copyOfRange(res, offset, offset+x.length);
 	}
 	
-	public T[] divide(T[] x, T[] y, int offset) throws Exception {
+	public T[] divide(T[] x, T[] y, int offset) {
 		int newLength = x.length*2;
 		T[] padX = padSignal(x, newLength);
 		padX = leftPublicShift(padX, newLength-x.length);

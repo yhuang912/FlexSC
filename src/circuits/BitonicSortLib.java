@@ -46,11 +46,11 @@ public class BitonicSortLib<T> extends IntegerLib<T>
     }
  
     
-    public void sort(T[][] a, T isAscending) throws Exception {
+    public void sort(T[][] a, T isAscending) {
         bitonicSort(a, 0, a.length, isAscending);
     }
 
-    private void bitonicSort(T[][]key, int lo, int n, T dir) throws Exception {
+    private void bitonicSort(T[][]key, int lo, int n, T dir) {
         if (n > 1) {
             int m=n/2;
             bitonicSort(key, lo, m, not(dir));
@@ -59,7 +59,7 @@ public class BitonicSortLib<T> extends IntegerLib<T>
         }
     }
 
-    private void bitonicMerge(T[][] key, int lo, int n, T dir) throws Exception {
+    private void bitonicMerge(T[][] key, int lo, int n, T dir) {
         if (n > 1) {
             int m=greatestPowerOfTwoLessThan(n);
             for (int i = lo; i < lo + n - m; i++)
@@ -69,7 +69,7 @@ public class BitonicSortLib<T> extends IntegerLib<T>
         }
     }
 
-    private void compare(T[][] key, int i, int j, T dir) throws Exception {
+    private void compare(T[][] key, int i, int j, T dir) {
     	T greater = not(leq(key[i], key[j]));
     	T swap = eq(greater, dir);
     	T[] ki = mux(key[i], key[j], swap);

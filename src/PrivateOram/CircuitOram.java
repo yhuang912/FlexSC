@@ -1,5 +1,6 @@
 package PrivateOram;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import oram.PlainBlock;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
+import gc.BadLabelException;
 
 public class CircuitOram<T> extends TreeBasedOramParty<T> {
 	public CircuitOramLib<T> lib;
@@ -44,8 +46,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 
 	}
 	
-	public CircuitOram(CompEnv<T> env, int N, int dataSize,
-			 int cap, int sp) throws Exception {
+	public CircuitOram(CompEnv<T> env, int N, int dataSize, int cap, int sp) throws IOException {
 		super(env, N, dataSize, cap);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData, logN, capacity, env);
 		queueCapacity = 30;
@@ -58,13 +59,13 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 
 	}
 
-	protected void ControlEviction() throws Exception {
+	protected void ControlEviction() throws IOException, BadLabelException {
 		flushOneTime(nextPath());
 		flushOneTime(nextPath());
 	}
 
 
-	public void flushOneTime(boolean[] pos) throws Exception {
+	public void flushOneTime(boolean[] pos) throws IOException, BadLabelException {
 		PlainBlock[][] blocks = getPath(pos);
 		Block<T>[][] scPath = preparePath(blocks, blocks);
 

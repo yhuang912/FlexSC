@@ -75,7 +75,7 @@ public class TestBinaryGates {
 		}
 	}
 
-	public void test1Case(boolean x, boolean y, GateType type) throws Exception {
+	public void test1Case(boolean x, boolean y, GateType type) throws InterruptedException {
 		GenRunnable gen = new GenRunnable(x, type);
 		EvaRunnable eva = new EvaRunnable(y, type);
 		Thread tGen = new Thread(gen);

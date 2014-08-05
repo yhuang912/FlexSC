@@ -19,7 +19,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		return new Representation[len1][len2];
 	}
 	
-	public Representation<T>[][] add(Representation<T>[][] a, Representation<T>[][] b) throws Exception {
+	public Representation<T>[][] add(Representation<T>[][] a, Representation<T>[][] b) {
 		int n = a.length;
 		int m = a[0].length;
 		Representation<T> result[][] = representationMatrix(n, m);//new Representation[n][m];
@@ -29,7 +29,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		return result;
 	}
 	
-	public Representation<T>[][] multiply(Representation<T>[][] a, Representation<T>[][] b) throws Exception {
+	public Representation<T>[][] multiply(Representation<T>[][] a, Representation<T>[][] b)  {
 		int n = a.length;
 		int m = a[0].length;
 		int l = b[0].length;
@@ -63,7 +63,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		return result;
 	}
 	
-	public Representation<T> determinant(Representation<T>[][] a) throws Exception{
+	public Representation<T> determinant(Representation<T>[][] a) {
 		if(a.length == 1)
 			return a[0][0];
 		if(a.length == 2){
@@ -82,7 +82,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		}
 	}
 	
-	public Representation<T>[][] createSubMatrix(Representation<T>[][] a, int row, int col) throws Exception {
+	public Representation<T>[][] createSubMatrix(Representation<T>[][] a, int row, int col)  {
 		int n = a.length;
 		int m = a[0].length;
 		int r = -1;
@@ -101,7 +101,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		return result;
 	}
 			
-	public Representation<T>[][] inverse(Representation<T>[][] a) throws Exception {
+	public Representation<T>[][] inverse(Representation<T>[][] a)  {
 		Representation<T>[][] result = transpose(cofactor(a));
 		
 		Representation<T> c = determinant(a);
@@ -112,7 +112,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		return result;
 	}
 	
-	public Representation<T>[][] cofactor(Representation<T>[][] a) throws Exception  {
+	public Representation<T>[][] cofactor(Representation<T>[][] a)   {
 		int n = a.length;
 		int m = a[0].length;
 		Representation<T> result[][] = representationMatrix(n, m);
@@ -126,7 +126,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		return result;
 	}
 	
-	public Representation<T>[][] fastInverse(Representation<T>[][] m) throws Exception {
+	public Representation<T>[][] fastInverse(Representation<T>[][] m)  {
 		int dimension = m.length;
 		Representation<T>[][] extended = representationMatrix(dimension, 2*dimension);
 		Representation<T> zeroFloat = publicFloat(0, m[0][0].v.length, m[0][0].p.length);
@@ -147,7 +147,7 @@ public class FloatMatrixLib<T> extends FloatLib<T> {
 		return result;
 	}
 	
-	public Representation<T>[][] rref(Representation<T>[][] m) throws Exception {
+	public Representation<T>[][] rref(Representation<T>[][] m)  {
 		Representation<T>[][] result = representationMatrix(m.length, m[0].length);
 		for (int r = 0; r < m.length; ++r)
 	        for (int c = 0; c < m[r].length; ++c)

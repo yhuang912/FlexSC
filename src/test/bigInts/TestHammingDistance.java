@@ -17,7 +17,7 @@ import circuits.IntegerLib;
 public class TestHammingDistance extends TestBigInteger<GCSignal>{
 
 	@Test
-	public void testAllCases() throws Exception {
+	public void testAllCases() throws InterruptedException {
 		Random rnd = new Random();
 		int testCases = 20;
 

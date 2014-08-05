@@ -17,7 +17,7 @@ import circuits.DFTLib;
 public class TestDFT extends TestDFTHarness<GCSignal> {
 
 @Test
-public void testAllCases() throws Exception {
+public void testAllCases() throws InterruptedException {
 	Random rng = new Random();
 	
 	double[] real = new double[LENGTH];
@@ -33,7 +33,7 @@ public void testAllCases() throws Exception {
 				new Helper(real, img, Mode.REAL) {
 			@Override
 			public void secureCompute(Representation<GCSignal>[] a, Representation<GCSignal>[] b,
-					CompEnv<GCSignal> env) throws Exception {
+					CompEnv<GCSignal> env) {
 				new DFTLib<GCSignal>(env).FFT(a, b);
 			}
 

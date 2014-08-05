@@ -12,7 +12,7 @@ public class DFTLib<T> extends FloatLib<T> {
 		super(e);
 	}
 	
-	public void InverseFDFT(Representation<T>[]x, Representation<T>[] y) throws Exception {
+	public void InverseFDFT(Representation<T>[]x, Representation<T>[] y) {
 		FFT(x,y);
 		Representation<T> invN = divide(publicFloat(1, x[0].v.length, x[0].p.length),
 				publicFloat(x.length, x[0].v.length, x[0].p.length)
@@ -24,7 +24,7 @@ public class DFTLib<T> extends FloatLib<T> {
 			y[i] = multiply(invN, y[i]);
 	}
 	
-	public void FFT(Representation<T>[] x, Representation<T>[] y) throws Exception {
+	public void FFT(Representation<T>[] x, Representation<T>[] y) {
 		int lengthV = x[0].v.length, lengthP = x[0].p.length;;
 		int n = x.length;
 		int m = (int)(Math.log(n) / Math.log(2));
