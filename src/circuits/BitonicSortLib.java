@@ -8,11 +8,11 @@ public class BitonicSortLib<T> extends IntegerLib<T>
 		super(e);
 	}
 
-    public void sortWithPayload(T[][] a, T[][] data, T isAscending) throws Exception {
+    public void sortWithPayload(T[][] a, T[][] data, T isAscending) {
         bitonicSortWithPayload(a, data, 0, a.length, isAscending);
     }
 
-    private void bitonicSortWithPayload(T[][]key, T[][] data, int lo, int n, T dir) throws Exception {
+    private void bitonicSortWithPayload(T[][]key, T[][] data, int lo, int n, T dir) {
         if (n > 1) {
             int m=n/2;
             bitonicSortWithPayload(key, data, lo, m, not(dir));
@@ -21,7 +21,7 @@ public class BitonicSortLib<T> extends IntegerLib<T>
         }
     }
 
-    private void bitonicMergeWithPayload(T[][] key, T[][] data, int lo, int n, T dir) throws Exception {
+    private void bitonicMergeWithPayload(T[][] key, T[][] data, int lo, int n, T dir) {
         if (n > 1) {
             int m=greatestPowerOfTwoLessThan(n);
             for (int i = lo; i < lo + n - m; i++)
@@ -31,7 +31,7 @@ public class BitonicSortLib<T> extends IntegerLib<T>
         }
     }
 
-    private void compareWithPayload(T[][] key, T[][] data, int i, int j, T dir) throws Exception {
+    private void compareWithPayload(T[][] key, T[][] data, int i, int j, T dir) {
     	T greater = not(leq(key[i], key[j]));
     	T swap = eq(greater, dir);
     	T[] ki = mux(key[i], key[j], swap);

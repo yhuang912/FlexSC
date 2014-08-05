@@ -88,7 +88,7 @@ public class CVCompEnv extends BooleanCompEnv {
 	}
 
 	@Override
-	public boolean[] outputToAlice(Boolean[] out) throws Exception {
+	public boolean[] outputToAlice(Boolean[] out) {
 		return Utils.tobooleanArray(out);
 	}
 

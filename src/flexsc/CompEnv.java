@@ -50,7 +50,7 @@ public abstract class CompEnv<T> {
 	
 	public abstract T[] inputOfAlice(boolean[] in) throws IOException;
 	public abstract T[] inputOfBob(boolean[] in) throws IOException;
-	public abstract boolean[] outputToAlice(T[] out) throws Exception;
+	public abstract boolean[] outputToAlice(T[] out) throws IOException, BadLabelException;
 	
 	public abstract T and(T a, T b);
 	public abstract T xor(T a, T b);

@@ -6,6 +6,7 @@ import java.util.Random;
 
 import flexsc.CompEnv;
 import flexsc.Party;
+import gc.BadLabelException;
 import gc.GCSignal;
 
 public class CircuitLib<T> {
@@ -33,7 +34,7 @@ public class CircuitLib<T> {
 		return result;
 	}
 
-	public T[] randBools(Random rng, int length) throws Exception {
+	public T[] randBools(Random rng, int length) throws IOException {
 		boolean[] res = new boolean[length];
 		for(int i = 0; i < length; ++i)
 			res[i] = rng.nextBoolean();
@@ -42,7 +43,7 @@ public class CircuitLib<T> {
 		return xor(alice, bob);
 	}
 
-	public boolean[] getBooleans(T[] x) throws Exception {
+	public boolean[] getBooleans(T[] x) throws IOException, BadLabelException {
 		return env.outputToAlice(x);
 	}
 	
@@ -103,13 +104,13 @@ public class CircuitLib<T> {
 	/*
 	 * Basic logical operations on Signal and Signal[]
 	 */
-	public T and(T x, T y) throws Exception {
+	public T and(T x, T y) {
 		assert (x != null && y != null) : "CircuitLib.and: bad inputs";
 
 		return env.and(x, y);
 	}
 
-	public T[] and(T[] x, T[] y) throws Exception {
+	public T[] and(T[] x, T[] y) {
 		assert (x != null && y != null && x.length == y.length) : "CircuitLib.and[]: bad inputs";
 
 		T[] result = env.newTArray(x.length);
@@ -152,13 +153,13 @@ public class CircuitLib<T> {
 		return result;
 	}
 
-	public T or(T x, T y) throws Exception {
+	public T or(T x, T y) {
 		assert (x != null && y != null) : "CircuitLib.or: bad inputs";
 
 		return xor(xor(x, y), and(x, y)); // http://stackoverflow.com/a/2443029
 	}
 
-	public T[] or(T[] x, T[] y) throws Exception {
+	public T[] or(T[] x, T[] y) {
 		assert (x != null && y != null && x.length == y.length) : "CircuitLib.or[]: bad inputs";
 
 		T[] result = env.newTArray(x.length);
@@ -171,7 +172,7 @@ public class CircuitLib<T> {
 	/*
 	 * Output x when c == 0; Otherwise output y.
 	 */
-	public T mux(T x, T y, T c) throws Exception {
+	public T mux(T x, T y, T c) {
 		assert (x != null && y != null && c != null) : "CircuitLib.mux: bad inputs";
 		T t = xor(x, y);
 		t = and(t, c);
@@ -179,7 +180,7 @@ public class CircuitLib<T> {
 		return ret;
 	}
 
-	public T[] mux(T[] x, T[] y, T c) throws Exception {
+	public T[] mux(T[] x, T[] y, T c) {
 		assert (x != null && y != null && x.length == y.length) : "CircuitLib.mux[]: bad inputs";
 
 		T[] ret = env.newTArray(x.length);

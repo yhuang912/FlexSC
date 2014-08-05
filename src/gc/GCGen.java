@@ -130,7 +130,7 @@ public class GCGen extends GCCompEnv {
 //		return  Utils.toFixPoint(res, res.length, offset);
 //	}
 
-	public boolean[] outputToAlice(GCSignal[] out) throws Exception {
+	public boolean[] outputToAlice(GCSignal[] out) throws IOException, BadLabelException {
 		boolean [] result = new boolean[out.length];
 		for(int i = 0; i < result.length; ++i) {
 			result[i] = outputToAlice(out[i]);

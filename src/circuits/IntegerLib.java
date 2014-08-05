@@ -12,7 +12,7 @@ public class IntegerLib<T> extends CircuitLib<T> {
 
 	static final int S = 0;
 	static final int COUT = 1;
-	protected T[] add(T x, T y, T cin) throws Exception {
+	protected T[] add(T x, T y, T cin) {
 		T[] res = env.newTArray(2);
 
 		T t1 = env.xor(x, cin);
@@ -24,7 +24,7 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		return res;
 	}
 
-	public T[] add(T[] x, T[] y, boolean cin) throws Exception {
+	public T[] add(T[] x, T[] y, boolean cin) {
 		assert(x != null && y != null && x.length == y.length) : "add: bad inputs.";
 		T[] res = env.newTArray(x.length);
 		T[] t = add(x[0], y[0], env.newT(cin));
@@ -53,7 +53,7 @@ public class IntegerLib<T> extends CircuitLib<T> {
 	}
 	
 	//tested
-	public T[] sub(T[] x, T[] y) throws Exception {
+	public T[] sub(T[] x, T[] y) {
 		assert(x != null && y != null && x.length == y.length) : "sub: bad inputs.";
 
 		return add(x, not(y), true);
@@ -88,7 +88,7 @@ public class IntegerLib<T> extends CircuitLib<T> {
 	}
 
 	//tested
-	public T geq(T[] x, T[] y) throws Exception {
+	public T geq(T[] x, T[] y) {
 		assert(x.length == y.length) : "bad input";
 
 		T[] result = sub(x, y);
@@ -96,7 +96,7 @@ public class IntegerLib<T> extends CircuitLib<T> {
 	}
 
 	//tested
-	public T leq(T[] x, T[] y) throws Exception {
+	public T leq(T[] x, T[] y) {
 		return geq(y, x);
 	}
 
