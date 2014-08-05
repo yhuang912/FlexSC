@@ -79,8 +79,8 @@ public abstract class Machine {
 				clientSock = serverSocket.accept();
 				InputStream is;
 				OutputStream os;
-				os = new BufferedOutputStream(clientSock.getOutputStream(), Master.BUFFER_SIZE);
-				is = new BufferedInputStream(clientSock.getInputStream(), Master.BUFFER_SIZE);
+				os = new BufferedOutputStream(clientSock.getOutputStream(), Constants.BUFFER_SIZE);
+				is = new BufferedInputStream(clientSock.getInputStream(), Constants.BUFFER_SIZE);
 				int id = NetworkUtil.readInt(is);
 				int index = log2(id - machineId);
 				debug("Accepted a connection from " + id + ". Stored at index " + index);
@@ -99,8 +99,8 @@ public abstract class Machine {
 			// System.out.println(machineId + ": I have " + (numberOfOutgoingConnections - i) + " remaining");
 			Socket peerSocket = connect(LOCALHOST, peerPort + machineId - (1 << i));
 			try {
-				peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Master.BUFFER_SIZE);
-				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Master.BUFFER_SIZE);
+				peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Constants.BUFFER_SIZE);
+				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Constants.BUFFER_SIZE);
 				NetworkUtil.writeInt(peerOsUp[i], machineId);
 				peerOsUp[i].flush();
 				debug((machineId - (1 << i)) + "peerOsUp " + peerOsUp[i].hashCode());
@@ -123,8 +123,8 @@ public abstract class Machine {
 		masterSocket = connect(server, port);
 
 		try {
-			masterOs = new BufferedOutputStream(masterSocket.getOutputStream(), Master.BUFFER_SIZE);
-			masterIs = new BufferedInputStream(masterSocket.getInputStream(), Master.BUFFER_SIZE);
+			masterOs = new BufferedOutputStream(masterSocket.getOutputStream(), Constants.BUFFER_SIZE);
+			masterIs = new BufferedInputStream(masterSocket.getInputStream(), Constants.BUFFER_SIZE);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  

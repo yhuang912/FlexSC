@@ -11,7 +11,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Master {
-	static int BUFFER_SIZE = 655360;
 	public static int MACHINES = 32;
 	public static int LOG_MACHINES = Machine.log2(MACHINES);
 	public static int START_PORT;
@@ -31,8 +30,8 @@ public class Master {
         serverSocket[index] = new ServerSocket(port);            // create socket and bind to port
         clientSock = serverSocket[index].accept();                   // wait for client to connect
         
-        os[index] = new BufferedOutputStream(clientSock.getOutputStream(), BUFFER_SIZE);  
-        is[index] = new BufferedInputStream(clientSock.getInputStream(), BUFFER_SIZE);
+        os[index] = new BufferedOutputStream(clientSock.getOutputStream(), Constants.BUFFER_SIZE);  
+        is[index] = new BufferedInputStream(clientSock.getInputStream(), Constants.BUFFER_SIZE);
 	}
 
 	public void disconnect() throws Exception {

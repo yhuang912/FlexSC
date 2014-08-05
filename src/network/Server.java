@@ -8,7 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-	static int bufferSize = 655360;
 	private ServerSocket sock;
 	
 	public InputStream is;
@@ -18,8 +17,8 @@ public class Server {
 		Socket clientSock;
         sock = new ServerSocket(port);            // create socket and bind to port
         clientSock = sock.accept();                   // wait for client to connect
-        os = new BufferedOutputStream(clientSock.getOutputStream(), bufferSize);  
-        is = new BufferedInputStream(clientSock.getInputStream(), bufferSize);
+        os = new BufferedOutputStream(clientSock.getOutputStream(), Constants.BUFFER_SIZE);  
+        is = new BufferedInputStream(clientSock.getInputStream(), Constants.BUFFER_SIZE);
 	}
 
 	public void disconnect() throws Exception { 
