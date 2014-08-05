@@ -3,6 +3,7 @@
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 import network.Master;
 import test.Utils;
@@ -57,10 +58,10 @@ public class Test_2Input1Output<T> {
 				
 				long t1 = System.nanoTime();
 
-				Object[] input = new Object[CompPool.MaxNumberTask];
+				Object[] input = new Object[Master.MACHINES];
 
-				for(int i = 0; i < CompPool.MaxNumberTask; ++i)
-					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
+				for(int i = 0; i < Master.MACHINES; ++i)
+					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/Master.MACHINES, (i+1)*Ta.length/Master.MACHINES)};
 
 
 				Object[] result = pool.runGadget( new AddGadget(), input);
@@ -101,10 +102,10 @@ public class Test_2Input1Output<T> {
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
 				CompPool<T> pool = new CompPool(eva, "localhost", PORT, MASTER_EVA_PORT);				
-				Object[] input = new Object[CompPool.MaxNumberTask];
+				Object[] input = new Object[Master.MACHINES];
 
-				for(int i = 0; i < CompPool.MaxNumberTask; ++i)
-					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/CompPool.MaxNumberTask, (i+1)*Ta.length/CompPool.MaxNumberTask)};
+				for(int i = 0; i < Master.MACHINES; ++i)
+					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/Master.MACHINES, (i+1)*Ta.length/Master.MACHINES)};
 				os.flush();
 				
 				Object[] result = pool.runGadget( new AddGadget(), input);
@@ -119,6 +120,9 @@ public class Test_2Input1Output<T> {
 
 				disconnect();
 
+			} catch(ExecutionException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+				System.out.println("Gadget probably does not exist. Reflection issue");
+				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);

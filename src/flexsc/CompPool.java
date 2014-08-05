@@ -11,11 +11,8 @@ import java.util.concurrent.Future;
 import network.Client;
 import network.Master;
 import network.Server;
-import test.parallel.AddGadget;
 
 public class CompPool<T> {
-	public final static int MaxNumberTask = Master.MACHINES;
-
 	CompEnv<T>[] envs;
 	Server[] servers;
 	Client[] clients;
@@ -24,13 +21,13 @@ public class CompPool<T> {
 
 	@SuppressWarnings("unchecked")
 	public CompPool(CompEnv<T> env, String host, int port, int masterPort) throws Exception{
-		envs = new CompEnv[MaxNumberTask];
-		servers = new Server[MaxNumberTask];
-		clients = new Client[MaxNumberTask];
+		envs = new CompEnv[Master.MACHINES];
+		servers = new Server[Master.MACHINES];
+		clients = new Client[Master.MACHINES];
 
-	     executorService = Executors.newFixedThreadPool(MaxNumberTask);
+	     executorService = Executors.newFixedThreadPool(Master.MACHINES);
 
-		for(int i = 0; i < MaxNumberTask; ++i) {
+		for(int i = 0; i < Master.MACHINES; ++i) {
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
 			if(env.getParty() == Party.Alice){
@@ -51,7 +48,7 @@ public class CompPool<T> {
 	}
 
 	public void finalize() throws Exception{
-		for(int i = 0; i < MaxNumberTask; ++i){
+		for(int i = 0; i < Master.MACHINES; ++i){
 			if(servers[i] != null)
 				servers[i].disconnect();
 			if(clients[i] != null)
@@ -60,10 +57,11 @@ public class CompPool<T> {
 		executorService.shutdown();
 	}
 
-	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputArray) throws InterruptedException, ExecutionException{
+	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputArray) throws InterruptedException, ExecutionException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
 		for(int i = 0; i < inputArray.length; ++i) {
-			Gadget<T> gadge = new AddGadget();
+			Class c = Class.forName("test.parallel.AddGadget");
+			Gadget<T> gadge = (Gadget<T>) c.newInstance();
 			gadge.env = envs[i];
 			gadge.inputs = (Object[]) inputArray[i];
 			gadge.port = masterPort + i;

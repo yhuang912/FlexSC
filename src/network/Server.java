@@ -2,12 +2,10 @@ package network;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 
 public class Server {
 	static int bufferSize = 655360;
@@ -20,18 +18,14 @@ public class Server {
 		Socket clientSock;
         sock = new ServerSocket(port);            // create socket and bind to port
         clientSock = sock.accept();                   // wait for client to connect
-        
         os = new BufferedOutputStream(clientSock.getOutputStream(), bufferSize);  
         is = new BufferedInputStream(clientSock.getInputStream(), bufferSize);
-
 	}
 
 	public void disconnect() throws Exception { 
 		is.read();
 		os.write(0);
-		os.flush(); // dummy I/O to prevent dropping connection earlier than
-					// protocol payloads are received.
-
+		os.flush();
 		sock.close(); 
 	}
 }
