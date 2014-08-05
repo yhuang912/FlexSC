@@ -47,9 +47,10 @@ public class OTExtSender extends OTSender {
     }
 
     int poolIndex = 0;
+
 	@Override
-	public void send(GCSignal[] m) throws Exception {
-		throw new Exception("It doesn't make sense to do single OT with OT extension!");
+	public void send(GCSignal[] m) throws IncorrectOtUsageException {
+		throw new IncorrectOtUsageException("It doesn't make sense to do single OT with OT extension!");
 	}
 	
 	/*

@@ -8,6 +8,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 
 import ot.FakeOTReceiver;
+import ot.IncorrectOtUsageException;
 import ot.OTExtReceiver;
 import ot.OTReceiver;
 import flexsc.CompEnv;
@@ -41,28 +42,28 @@ public class GCEva extends GCCompEnv {
 		gtt[0][0] = GCSignal.ZERO;
 	}
 
-	public GCSignal inputOfAlice(boolean in) throws Exception {
+	public GCSignal inputOfAlice(boolean in) {
 		Flag.sw.startOT();
 		GCSignal signal = GCSignal.receive(is);
 		Flag.sw.stopOT();
 		return signal;
 	}
 
-	public GCSignal inputOfBob(boolean in) throws Exception {
+	public GCSignal inputOfBob(boolean in) throws IOException, IncorrectOtUsageException {
 		Flag.sw.startOT();
 		GCSignal signal = rcv.receive(in);
 		Flag.sw.stopOT();
 		return signal; 
 	}
 
-	public GCSignal[] inputOfBob(boolean[] x) throws Exception {
+	public GCSignal[] inputOfBob(boolean[] x) throws IOException {
 		Flag.sw.startOT();
 		GCSignal[] signal = rcv.receive(x);
 		Flag.sw.stopOT();
 		return signal;
 	}
 
-	public GCSignal[] inputOfAlice(boolean[] x) throws Exception {
+	public GCSignal[] inputOfAlice(boolean[] x) {
 		Flag.sw.startOT();
 		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
@@ -72,13 +73,13 @@ public class GCEva extends GCCompEnv {
 	}
 
 
-	public boolean outputToAlice(GCSignal out) throws Exception {
+	public boolean outputToAlice(GCSignal out) {
 		if (!out.isPublic())
 			out.send(os);
 		return false;
 	}
 
-	public boolean[] outputToAlice(GCSignal[] out) throws Exception {
+	public boolean[] outputToAlice(GCSignal[] out) throws IOException {
 		boolean [] result = new boolean[out.length];
 		
 		for(int i = 0; i < result.length; ++i) {
@@ -115,7 +116,7 @@ public class GCEva extends GCCompEnv {
 		}
 	}
 
-	public GCSignal and(GCSignal a, GCSignal b) throws IllegalBlockSizeException, BadPaddingException {
+	public GCSignal and(GCSignal a, GCSignal b) {
 		Flag.sw.startGC();
 
 		GCSignal res;

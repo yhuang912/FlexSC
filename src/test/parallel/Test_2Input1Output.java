@@ -79,9 +79,14 @@ public class Test_2Input1Output<T> {
 				System.out.println("result:"+Utils.toInt(z));*/
 				// pool.finalize();
 				disconnect();
-			} catch (Exception e) {
+			} catch(ExecutionException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+				System.out.println("Gadget probably does not exist. Reflection issue");
 				e.printStackTrace();
-				System.exit(1);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
@@ -127,12 +132,6 @@ public class Test_2Input1Output<T> {
 			} catch(IOException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}/* catch (Exception e) {
-				e.printStackTrace();
-				System.exit(1);
-			} */ catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

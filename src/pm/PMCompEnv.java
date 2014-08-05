@@ -70,25 +70,25 @@ public class PMCompEnv extends BooleanCompEnv {
 	}
 	
 	@Override
-	public Boolean inputOfAlice(boolean in) throws Exception {
+	public Boolean inputOfAlice(boolean in) {
 		++statistic.OTs;
 		statistic.bandwidth+=10;
 		return f;
 	}
 
 	@Override
-	public Boolean inputOfBob(boolean in) throws Exception {
+	public Boolean inputOfBob(boolean in) {
 		return f;
 	}
 
 	@Override
-	public boolean outputToAlice(Boolean out) throws Exception {
+	public boolean outputToAlice(Boolean out) {
 		statistic.bandwidth+=10;
 		return false;
 	}
 
 	@Override
-	public Boolean and(Boolean a, Boolean b) throws Exception {
+	public Boolean and(Boolean a, Boolean b) {
 		++statistic.andGate;
 		statistic.bandwidth += 3*10;
 		return f;
@@ -117,20 +117,20 @@ public class PMCompEnv extends BooleanCompEnv {
 	}
 
 	@Override
-	public boolean[] outputToAlice(Boolean[] out) throws Exception {
-		statistic.bandwidth+=10*out.length;
+	public boolean[] outputToAlice(Boolean[] out) {
+		statistic.bandwidth += 10 * out.length;
 		return Utils.tobooleanArray(out);
 	}
 
 	@Override
-	public Boolean[] inputOfAlice(boolean[] in) throws Exception {
+	public Boolean[] inputOfAlice(boolean[] in) {
 		statistic.OTs += in.length;
 		statistic.bandwidth+=10*2*(80+in.length);
 		return Utils.toBooleanArray(in);	
 	}
 
 	@Override
-	public Boolean[] inputOfBob(boolean[] in) throws Exception {
+	public Boolean[] inputOfBob(boolean[] in) {
 		return Utils.toBooleanArray(in);
 	}
 

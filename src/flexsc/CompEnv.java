@@ -1,5 +1,6 @@
 package flexsc;
 
+import gc.BadLabelException;
 import gc.GCEva;
 import gc.GCGen;
 
@@ -8,6 +9,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+
+import ot.IncorrectOtUsageException;
 import objects.Float.Representation;
 import pm.PMCompEnv;
 import test.Utils;
@@ -39,15 +44,15 @@ public abstract class CompEnv<T> {
 		this.p = p;
 	}
 	
-	public abstract T inputOfAlice(boolean in) throws Exception;
-	public 	abstract T inputOfBob(boolean in) throws Exception;
-	public abstract boolean outputToAlice(T out) throws Exception;
+	public abstract T inputOfAlice(boolean in) throws IOException;
+	public 	abstract T inputOfBob(boolean in) throws IOException, IncorrectOtUsageException;
+	public abstract boolean outputToAlice(T out) throws IOException, BadLabelException;
 	
-	public abstract T[] inputOfAlice(boolean[] in) throws Exception;
-	public abstract T[] inputOfBob(boolean[] in) throws Exception;
+	public abstract T[] inputOfAlice(boolean[] in) throws IOException;
+	public abstract T[] inputOfBob(boolean[] in) throws IOException;
 	public abstract boolean[] outputToAlice(T[] out) throws Exception;
 	
-	public abstract T and(T a, T b) throws Exception;
+	public abstract T and(T a, T b);
 	public abstract T xor(T a, T b);
 	public abstract T not(T a);
 	
@@ -64,7 +69,7 @@ public abstract class CompEnv<T> {
 		return p;
 	}
 	
-	public void flush() throws Exception {
+	public void flush() throws IOException {
 		os.flush();
 	}
 	

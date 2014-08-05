@@ -16,6 +16,6 @@ public abstract class OTReceiver {
 		os = out;
 	}
 	
-	public abstract GCSignal receive(boolean c) throws Exception;
+	public abstract GCSignal receive(boolean c) throws IOException, IncorrectOtUsageException;
 	public abstract GCSignal[] receive(boolean[] c) throws IOException;
 }

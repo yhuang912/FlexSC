@@ -17,6 +17,6 @@ public abstract class OTSender {
 		msgBitLength = bitLen;
 	}
 	
-	public abstract void send(GCSignal[] m) throws Exception;
+	public abstract void send(GCSignal[] m) throws IncorrectOtUsageException, IOException;
 	public abstract void send(GCSignal[][] m) throws IOException;
 }

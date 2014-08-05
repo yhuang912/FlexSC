@@ -146,7 +146,7 @@ public class OTExtReceiver extends OTReceiver {
 	int poolIndex = 0;
 
 	@Override
-	public GCSignal receive(boolean c) throws Exception {
-		throw new Exception("It doesn't make sense to do single OT with OT extension!");
+	public GCSignal receive(boolean c) throws IncorrectOtUsageException {
+		throw new IncorrectOtUsageException("It doesn't make sense to do single OT with OT extension!");
 	}
 }

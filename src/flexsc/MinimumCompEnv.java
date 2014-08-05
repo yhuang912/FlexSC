@@ -15,22 +15,22 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 	
 	@Override
-	public Boolean inputOfAlice(boolean in) throws Exception {
+	public Boolean inputOfAlice(boolean in) {
 		return in;
 	}
 
 	@Override
-	public Boolean inputOfBob(boolean in) throws Exception {
+	public Boolean inputOfBob(boolean in) {
 		return in;
 	}
 
 	@Override
-	public boolean outputToAlice(Boolean out) throws Exception {
+	public boolean outputToAlice(Boolean out) {
 		return out;
 	}
 
 	@Override
-	public Boolean and(Boolean a, Boolean b) throws Exception {
+	public Boolean and(Boolean a, Boolean b) {
 		return a && b;
 	}
 
@@ -75,7 +75,7 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 		return new Boolean[d1][d2][d3];
 	}
 
-	public Boolean[] inputOfAlice(boolean[] in) throws Exception {
+	public Boolean[] inputOfAlice(boolean[] in) {
 		Boolean[] res = new Boolean[in.length];
 		for(int i = 0; i < res.length; ++i)
 			res[i] = inputOfAlice(in[i]);
@@ -83,7 +83,7 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 
 	@Override
-	public Boolean[] inputOfBob(boolean[] in) throws Exception {
+	public Boolean[] inputOfBob(boolean[] in) {
 		Boolean[] res = new Boolean[in.length];
 		for(int i = 0; i < res.length; ++i)
 			res[i] = inputOfBob(in[i]);
@@ -133,7 +133,7 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 
 	@Override
-	public boolean[] outputToAlice(Boolean[] out) throws Exception {
+	public boolean[] outputToAlice(Boolean[] out) {
 		return Utils.tobooleanArray(out);
 	}
 
@@ -149,5 +149,4 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	@Override
 	public void flush() throws IOException {		
 	}
-
 }

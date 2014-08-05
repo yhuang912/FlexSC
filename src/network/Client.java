@@ -43,7 +43,7 @@ public class Client {
 		} 
 	}
 
-	public void disconnect() throws Exception {
+	public void disconnect() throws IOException {
 		os.write(0);
 		os.flush();
 		is.read(); // dummy write to prevent dropping connection earlier than

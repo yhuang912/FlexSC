@@ -8,6 +8,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 
 import ot.FakeOTSender;
+import ot.IncorrectOtUsageException;
 import ot.OTExtSender;
 import ot.OTSender;
 import rand.ISAACProvider;
@@ -58,7 +59,7 @@ public class GCGen extends GCCompEnv {
 		return label;
 	}
 
-	public GCSignal inputOfAlice(boolean in) throws Exception {
+	public GCSignal inputOfAlice(boolean in) throws IOException {
 		Flag.sw.startOT();
 		GCSignal[] label = genPair();
 		label[in ? 1 : 0].send(os);
@@ -67,7 +68,7 @@ public class GCGen extends GCCompEnv {
 		return label[0];
 	}
 
-	public GCSignal inputOfBob(boolean in) throws Exception {
+	public GCSignal inputOfBob(boolean in) throws IncorrectOtUsageException, IOException {
 		Flag.sw.startOT();
 		GCSignal[] label = genPair();
 		snd.send(label);
@@ -75,7 +76,7 @@ public class GCGen extends GCCompEnv {
 		return label[0];
 	}
 
-	public GCSignal[] inputOfAlice(boolean[] x) throws Exception {
+	public GCSignal[] inputOfAlice(boolean[] x) throws IOException {
 		Flag.sw.startOT();
 		GCSignal[][] pairs = new GCSignal[x.length][2];
 		GCSignal[] result = new GCSignal[x.length];
@@ -90,7 +91,7 @@ public class GCGen extends GCCompEnv {
 		return result;
 	}
 
-	public GCSignal[] inputOfBob(boolean[] x) throws Exception {
+	public GCSignal[] inputOfBob(boolean[] x) throws IOException {
 		Flag.sw.startOT();
 		GCSignal[][] pair = new GCSignal[x.length][2];
 		for(int i = 0; i < x.length; ++i)
@@ -105,7 +106,7 @@ public class GCGen extends GCCompEnv {
 	}
 
 	boolean gatesRemain = false;
-	public boolean outputToAlice(GCSignal out) throws Exception {
+	public boolean outputToAlice(GCSignal out) throws IOException, BadLabelException {
 		if(gatesRemain){
 			gatesRemain = false;
 			os.flush();
@@ -121,7 +122,7 @@ public class GCGen extends GCCompEnv {
 		else if (lb.equals(R.xor(out)))
 			return true;
 //		return false;
-		throw new Exception("bad label at final output.");
+		throw new BadLabelException("bad label at final output.");
 	}
 
 //	public double outputToAliceFixedPoint(GCSignal[] f, int offset) throws Exception{
