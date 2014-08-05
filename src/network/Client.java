@@ -20,15 +20,7 @@ public class Client {
 	CountingInputStream cis;
 
 	public void connect(String server, int port) throws InterruptedException, IOException {
-		while(true){
-			try{
-				sock = new java.net.Socket(server, port);          // create socket and connect
-				if(sock != null)
-					break;
-			} catch(IOException e){
-				Thread.sleep(100);
-			}
-		}
+		sock = NetworkUtil.connect(server, port);
 
 		if(Flag.countIO) {
 			cos = new CountingOutputStream(sock.getOutputStream());

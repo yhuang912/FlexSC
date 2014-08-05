@@ -3,6 +3,7 @@ package network;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class NetworkUtil {
@@ -41,4 +42,17 @@ public class NetworkUtil {
 		os.write(data);
 	}
 
+	public static Socket connect(String server, int port) throws InterruptedException {
+		Socket sock;
+		while(true){
+			try{
+				sock = new Socket(server, port);          // create socket and connect
+				if(sock != null)
+					break;
+			} catch(IOException e){
+				Thread.sleep(100);
+			}
+		}
+		return sock;
+	}
 }

@@ -2,7 +2,6 @@ package test.fixedpoints;
 
 import java.util.Random;
 
-
 //import gc.Boolean;
 import org.junit.Test;
 

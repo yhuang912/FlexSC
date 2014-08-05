@@ -2,6 +2,7 @@ package gc;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 
 final class Garbler {
@@ -10,18 +11,14 @@ final class Garbler {
 	Garbler() {
 		try {
 			sha1 = MessageDigest.getInstance("SHA-1");
-		}
-		catch (Exception e) {
+		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
-			System.exit(1);
 		}
 	}
-
 
 	public GCSignal enc(GCSignal lb0, GCSignal lb1, long k, GCSignal m) {
 		return getPadding(lb0, lb1, k).xor(m);
 	}
-
 
 	public GCSignal dec(GCSignal lb0, GCSignal lb1, long k, GCSignal c) {
 		return getPadding(lb0, lb1, k).xor(c);

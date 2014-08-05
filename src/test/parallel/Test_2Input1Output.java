@@ -10,10 +10,8 @@ import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.CompPool;
-import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCSignal;
 
 
 public class Test_2Input1Output<T> {
@@ -72,8 +70,6 @@ public class Test_2Input1Output<T> {
 
 				long t2 = System.nanoTime();
 				System.out.println(Ta.length+"\t"+(t2-t1)/1000000000.0);
-
-
 
 				/*z = gen.outputToAlice((T[]) finalresult);
 				System.out.println("result:"+Utils.toInt(z));*/

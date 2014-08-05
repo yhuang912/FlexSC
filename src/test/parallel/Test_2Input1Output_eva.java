@@ -1,9 +1,9 @@
 package test.parallel;
 
-import network.Master;
 import flexsc.Flag;
 import flexsc.Mode;
 import gc.GCSignal;
+import network.Master;
 
 public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
 	static int ARRAY_LENGTH = 100000;

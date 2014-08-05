@@ -97,7 +97,7 @@ public abstract class Machine {
 		for (int i = 0; i < numberOfOutgoingConnections; i++) {
 			debug("I'm trying to connect to " + (machineId - (1 << i)) + " at " + (peerPort + machineId - (1 << i)) + ". Storing connection at " + i);
 			// System.out.println(machineId + ": I have " + (numberOfOutgoingConnections - i) + " remaining");
-			Socket peerSocket = connect(LOCALHOST, peerPort + machineId - (1 << i));
+			Socket peerSocket = NetworkUtil.connect(LOCALHOST, peerPort + machineId - (1 << i));
 			try {
 				peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Constants.BUFFER_SIZE);
 				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Constants.BUFFER_SIZE);
@@ -120,7 +120,7 @@ public abstract class Machine {
 	}
 
 	public void connectToMaster(String server, int port) throws InterruptedException {
-		masterSocket = connect(server, port);
+		masterSocket = NetworkUtil.connect(server, port);
 
 		try {
 			masterOs = new BufferedOutputStream(masterSocket.getOutputStream(), Constants.BUFFER_SIZE);
@@ -128,21 +128,6 @@ public abstract class Machine {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  
-	}
-
-	private Socket connect(String server, int port) throws InterruptedException {
-		Socket socket;
-		while(true){
-			try{
-				socket = new Socket(server, port);          // create socket and connect
-				if(socket != null)
-					break;
-			}
-			catch(IOException e){
-				Thread.sleep(100);
-			}
-		}
-		return socket;
 	}
 
 	public void disconnectFromMaster() throws IOException {
