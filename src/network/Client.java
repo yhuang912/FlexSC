@@ -38,8 +38,7 @@ public class Client {
 		}
 		else{
 			os = new BufferedOutputStream(sock.getOutputStream(), Constants.BUFFER_SIZE);  
-			is = new BufferedInputStream( sock.getInputStream(), Constants.BUFFER_SIZE);
-
+			is = new BufferedInputStream(sock.getInputStream(), Constants.BUFFER_SIZE);
 		} 
 	}
 

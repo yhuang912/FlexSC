@@ -85,7 +85,6 @@ public class Test_2Input1Output<T> {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -147,23 +146,4 @@ public class Test_2Input1Output<T> {
 		tGen.join();
 		tEva.join();	
 	}
-
-
-	public static void main(String args[])throws Exception {
-		// CompPool.MaxNumberTask = 2;//new Integer(args[0]);
-
-		Mode m = Mode.REAL;
-		Test_2Input1Output<GCSignal> tt = new Test_2Input1Output<GCSignal>();
-
-		for (int i = 100; i <= 100; i+=100) {
-			int a[] = new int[i];
-			a[0] = 1;
-			tt.runThreads(tt.new Helper(a, m));
-			Flag.sw.addCounter();
-			Flag.sw.print();
-			Flag.sw.flush();
-		}
-		
-	}	
-
 }
