@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public abstract class Machine {
-	public static String LOCALHOST = "localhost";
 	public static boolean DEBUG = true;
 	public InputStream masterIs;
 	public OutputStream masterOs;
@@ -33,7 +32,7 @@ public abstract class Machine {
 	}
 
 	protected void connect(int masterPort) throws InterruptedException, IOException, BadCommandException {
-		connectToMaster(LOCALHOST, masterPort);
+		connectToMaster(Constants.LOCALHOST, masterPort);
 		while(true) {
 			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
 			switch(command) {
@@ -97,7 +96,7 @@ public abstract class Machine {
 		for (int i = 0; i < numberOfOutgoingConnections; i++) {
 			debug("I'm trying to connect to " + (machineId - (1 << i)) + " at " + (peerPort + machineId - (1 << i)) + ". Storing connection at " + i);
 			// System.out.println(machineId + ": I have " + (numberOfOutgoingConnections - i) + " remaining");
-			Socket peerSocket = NetworkUtil.connect(LOCALHOST, peerPort + machineId - (1 << i));
+			Socket peerSocket = NetworkUtil.connect(Constants.LOCALHOST, peerPort + machineId - (1 << i));
 			try {
 				peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Constants.BUFFER_SIZE);
 				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Constants.BUFFER_SIZE);
