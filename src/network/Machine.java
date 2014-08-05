@@ -10,6 +10,7 @@ import java.net.Socket;
 
 public abstract class Machine {
 	public static String LOCALHOST = "localhost";
+	public static boolean DEBUG = false;
 	public InputStream masterIs;
 	public OutputStream masterOs;
 	private Socket masterSocket;
@@ -22,6 +23,7 @@ public abstract class Machine {
 	protected int numberOfIncomingConnections;
 	protected int numberOfOutgoingConnections;
 	int peerPort;
+	int totalMachines;
 
 	public Machine() {
 		peerIsUp = new BufferedInputStream[Master.LOG_MACHINES];
@@ -35,38 +37,35 @@ public abstract class Machine {
 		while(true) {
 			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
 			switch(command) {
-				case LISTEN: System.out.println(machineId + ": listen triggered");
+				case LISTEN: debug("listen triggered");
 					         listenFromPeer(peerPort + machineId);
 							 break;
 				case SET_MACHINE_ID: int id = NetworkUtil.readInt(masterIs);
 									 int peerPort = NetworkUtil.readInt(masterIs);
-									 setMachineId(id, peerPort);
+									 int machines = NetworkUtil.readInt(masterIs);
+									 setMachineId(id, peerPort, machines);
 									 break;
 				case CONNECT: connectToPeers();
 							  break;
 				case COMPUTE: return;
 				default:
-					System.out.println("Default switch case");
-					break;
-									 
+					throw new Exception("Unknown command. Default switch case");
 			}
 		}
 	}
 
-	public void setMachineId(int machineId, int peerPort) {
+	public void setMachineId(int machineId, int peerPort, int totalMachines) {
+		this.totalMachines = totalMachines;
 		this.machineId = machineId;
 		this.numberOfIncomingConnections = getNumberOfIncomingConnections(machineId);
-		this.numberOfOutgoingConnections = getNumberOfIncomingConnections(Master.MACHINES - machineId - 1);
-		if (machineId == Master.MACHINES - 1) {
-			System.out.println("out in " + numberOfOutgoingConnections + " " + numberOfIncomingConnections);
-		}
+		this.numberOfOutgoingConnections = getNumberOfIncomingConnections(totalMachines - machineId - 1);
 		this.peerPort = peerPort;
 	}
 
 	public void listenFromPeer(int port) {
 		Socket clientSock = null;
         try {
-        	System.out.println(machineId + ": Port listening from " + port);
+        	debug("Port listening from " + port);
 			serverSocket = new ServerSocket(port);
 			// Send Ack to Master before accept
 			NetworkUtil.writeInt(masterOs, 1);
@@ -84,10 +83,10 @@ public abstract class Machine {
 				is = new BufferedInputStream(clientSock.getInputStream(), Master.BUFFER_SIZE);
 				int id = NetworkUtil.readInt(is);
 				int index = log2(id - machineId);
-				System.out.println(machineId + ": Accepted a connection from " + id + ". Stored at index " + index);
+				debug("Accepted a connection from " + id + ". Stored at index " + index);
 				peerIsDown[index] = is;
 				peerOsDown[index] = os;
-				System.out.println(machineId + ": " + id + " peerIsDown " + peerIsDown[index].hashCode());
+				debug(id + " peerIsDown " + peerIsDown[index].hashCode());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}  
@@ -96,7 +95,7 @@ public abstract class Machine {
 
 	public void connectToPeers() throws InterruptedException {
 		for (int i = 0; i < numberOfOutgoingConnections; i++) {
-			System.out.println(machineId + ": I'm trying to connect to " + (machineId - (1 << i)) + " at " + (peerPort + machineId - (1 << i)) + ". Storing connection at " + i);
+			debug("I'm trying to connect to " + (machineId - (1 << i)) + " at " + (peerPort + machineId - (1 << i)) + ". Storing connection at " + i);
 			// System.out.println(machineId + ": I have " + (numberOfOutgoingConnections - i) + " remaining");
 			Socket peerSocket = connect(LOCALHOST, peerPort + machineId - (1 << i));
 			try {
@@ -104,15 +103,14 @@ public abstract class Machine {
 				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Master.BUFFER_SIZE);
 				NetworkUtil.writeInt(peerOsUp[i], machineId);
 				peerOsUp[i].flush();
-				System.out.println(machineId + ": " + (machineId - (1 << i)) + "peerOsUp " + peerOsUp[i].hashCode());
+				debug((machineId - (1 << i)) + "peerOsUp " + peerOsUp[i].hashCode());
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
-				System.out.println("out in " + numberOfOutgoingConnections + " " + numberOfIncomingConnections + " " + i);
 				e.printStackTrace();
 			}
 		}
-		System.out.println(machineId + ": I'm done connecting ");
+		debug("I'm done connecting ");
 		try {
 			NetworkUtil.writeInt(masterOs, Response.SUCCESS.getValue());
 			masterOs.flush();
@@ -157,7 +155,7 @@ public abstract class Machine {
 	private int getNumberOfIncomingConnections(int machineId) {
 		int k = 0;
 		while (true) {
-			if (machineId >= Master.MACHINES - (1 << k)) {
+			if (machineId >= totalMachines - (1 << k)) {
 				return k;
 			}
 			k++;
@@ -169,5 +167,11 @@ public abstract class Machine {
 	    	throw new IllegalArgumentException();
 	    }
 	    return 31 - Integer.numberOfLeadingZeros(n);
+	}
+
+	public void debug(String debug) {
+		if (DEBUG) {
+			System.out.println(machineId + ": " + debug);
+		}
 	}
 }

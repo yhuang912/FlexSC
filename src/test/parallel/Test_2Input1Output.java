@@ -19,8 +19,8 @@ import gc.GCSignal;
 public class Test_2Input1Output<T> {
 	
 	static int PORT = 51111;
-	static int MASTER_GEN_PORT = 30000;
-	static int MASTER_EVA_PORT = 40000;
+	static int MASTER_GEN_PORT;
+	static int MASTER_EVA_PORT;
 
 
 	public class AddGadget extends Gadget<T> {
@@ -35,8 +35,7 @@ public class Test_2Input1Output<T> {
 			T[] result = x[0];
 			for(int i = 1; i < x.length; ++i)
 				result = lib.add(result, x[i]);
-
-			System.out.println(machineId + ": Initial Sum = " + Utils.toInt(lib.getBooleans((T[]) result)));
+			System.out.println(machineId + " Initial Sum = " + Utils.toInt(lib.getBooleans((T[]) result)));
 			prefixSum(result, lib);
 			return null;
 		}
@@ -56,53 +55,19 @@ public class Test_2Input1Output<T> {
 						e.printStackTrace();
 					}
 					noOfOutgoingConnections--;
-					System.out.println(machineId + ": Sent " + Utils.toInt(lib.getBooleans((T[]) prefixSum)) + " Iteration " + k + ". peerOsUp " + peerOsUp[k].hashCode());
-					System.out.flush();
 				}
 				if (noOfIncomingConnections > 0) {
 					GCSignal[] read = new GCSignal[prefixSum.length];
 					for (int i = 0; i < prefixSum.length; i++) {
 						read[i] = GCSignal.receive(peerIsDown[k]);
 					}
-					try {
-						System.out.println(machineId + ": read " + Utils.toInt(lib.getBooleans((T[]) read)) + " Iteration " 
-					+ k + ". peerIsDown " + peerIsDown[k].hashCode());
-						System.out.flush();
-					} catch (Exception e) {
-						System.out.println(machineId + ": Failed at iteration " + k);
-						e.printStackTrace();
-						System.out.flush();
-					}
 					prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
 					noOfIncomingConnections--;
 				}
-				// masterOs.write(sum);
-				// System.out.println(machineId + " Iteration = " + k);
 			}
-			// System.out.println(machineId + " Iterations done");
 			System.out.println(machineId + " Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
-			// Thread.sleep(10000);
-			// System.out.println("Threads done " + machineId);
 			// disconnectFromPeers();
 		}
-
-		/* private void prefixSum(T[] sum, IntegerLib<T> lib) throws Exception {
-			GCSignal[] prefixSum = (GCSignal[]) sum;
-			for (int k = 0; k < Master.LOG_MACHINES; k++) {
-				for (int i = 0; i < prefixSum.length; i++) {
-					prefixSum[i].send(masterOs);
-				}
-				// masterOs.write(sum);
-				masterOs.flush();
-				GCSignal[] read = new GCSignal[prefixSum.length];
-				for (int i = 0; i < prefixSum.length; i++) {
-					read[i] = GCSignal.receive(masterIs);
-				}
-				prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
-			}
-			System.out.println("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
-			disconnectFromMaster();
-		} */
 	};
 
 	public class Helper {
@@ -147,10 +112,6 @@ public class Test_2Input1Output<T> {
 
 				Object[] result = pool.runGadget( new AddGadget(), input);
 				IntegerLib<T> lib = new IntegerLib<>(gen);
-				/*T[] finalresult = (T[]) result[0];
-				for(int i = 1; i < result.length; ++i){
-					finalresult = lib.add(finalresult, (T[])result[i]);
-				}*/
 
 				os.flush();
 
@@ -196,11 +157,6 @@ public class Test_2Input1Output<T> {
 				Object[] result = pool.runGadget( new AddGadget(), input);
 
 				IntegerLib<T> lib = new IntegerLib<>(eva);
-				/*T[] finalresult = (T[]) result[0];
-				for(int i = 1; i < result.length; ++i){
-					finalresult = lib.add(finalresult, 
-							(T[])result[i]);
-				}*/
 
 				os.flush();
 

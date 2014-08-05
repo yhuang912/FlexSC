@@ -14,7 +14,7 @@ public class Master {
 	static int BUFFER_SIZE = 655360;
 	public static int MACHINES = 32;
 	public static int LOG_MACHINES = Machine.log2(MACHINES);
-	static int START_PORT;
+	public static int START_PORT;
 
 	private ServerSocket[] serverSocket;
 	public InputStream[] is;
@@ -49,7 +49,6 @@ public class Master {
 		GCSignal[][] a = new GCSignal[MACHINES][length];
 		for (int k = 0; k < LOG_MACHINES; k++) {
 			for (int j = 0; j < MACHINES; j++) {
-				// TODO(kartiknayak): remove hardcoded length
 				for (int i = 0; i < length; i++) {
 					a[j][i] = GCSignal.receive(is[j]);
 				}
@@ -78,6 +77,7 @@ public class Master {
 			NetworkUtil.writeInt(os[i], Command.SET_MACHINE_ID.getValue());
 			NetworkUtil.writeInt(os[i], i);
 			NetworkUtil.writeInt(os[i], peerPort);
+			NetworkUtil.writeInt(os[i], MACHINES);
 			os[i].flush();
 		}
 
@@ -99,7 +99,6 @@ public class Master {
 			os[i].flush();
 
 			readResponse(i);
-			System.out.println("Reached " + i);
 		}
 
 		// let all machines start computing
@@ -126,8 +125,8 @@ public class Master {
 		for (int i = 0; i < MACHINES; i++) {
 			master.listen(Master.START_PORT + i, i);
 		}
-		System.out.println("connected master");
+		System.out.println("Connected to master");
 		master.connect(peerPort);
-		System.out.println("master says connections successful");
+		System.out.println("Connections successful");
 	}
 }
