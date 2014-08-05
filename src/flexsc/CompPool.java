@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 import network.Client;
 import network.Master;
 import network.Server;
-import test.parallel.Test_2Input1Output;
+import test.parallel.AddGadget;
 
 public class CompPool<T> {
 	public final static int MaxNumberTask = Master.MACHINES;
@@ -63,8 +63,8 @@ public class CompPool<T> {
 	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputArray) throws InterruptedException, ExecutionException{
 		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
 		for(int i = 0; i < inputArray.length; ++i) {
-			Test_2Input1Output a = new Test_2Input1Output();
-			Gadget<T> gadge = (Gadget<T>) a.new AddGadget();// g.clone();
+			// Test_2Input1Output a = new Test_2Input1Output();
+			Gadget<T> gadge = new AddGadget();// g.clone();
 			gadge.env = envs[i];
 			gadge.inputs = (Object[]) inputArray[i];
 			gadge.port = masterPort + i;
