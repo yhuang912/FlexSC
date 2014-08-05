@@ -87,8 +87,7 @@ public abstract class CompEnv<T> {
 				scData[data.length-1]);
 	}
 
-	public Representation<T> inputOfAliceFloatPoint(double d, int widthV, int widthP)
-			throws Exception {
+	public Representation<T> inputOfAliceFloatPoint(double d, int widthV, int widthP) throws IOException {
 		FloatFormat f = new FloatFormat(d, widthV, widthP);
 		boolean[] data = new boolean[2+f.v.length+f.p.length];
 		System.arraycopy(f.p, 0, data, 0, f.p.length);
@@ -123,12 +122,4 @@ public abstract class CompEnv<T> {
 		boolean[] res = outputToAlice(f);
 		return  Utils.toFixPoint(res, res.length, offset);
 	}
-//	abstract public Representation<T> inputOfBobFloatPoint(double d, int widthV, int widthP) throws Exception;
-//	abstract public Representation<T> inputOfAliceFloatPoint(double d, int widthV, int widthP) throws Exception;
-//	abstract public double outputToAliceFloatPoint(Representation<T> gcf) throws Exception;
-	
-//	abstract public T[] inputOfBobFixedPoint(double a, int width, int offset) throws Exception;
-//	abstract public T[] inputOfAliceFixedPoint(double d, int width, int offset) throws Exception;
-//	abstract public double outputToAliceFixedPoint(T[] f, int offset) throws Exception;
-
 }

@@ -48,7 +48,7 @@ public class CompPool<T> {
 		this.masterPort = masterPort;
 	}
 
-	public void finalize() throws Exception{
+	public void finalize() throws IOException {
 		for(int i = 0; i < Master.MACHINES; ++i){
 			if(servers[i] != null)
 				servers[i].disconnect();

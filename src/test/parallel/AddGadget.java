@@ -3,17 +3,19 @@ package test.parallel;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 
+import network.BadCommandException;
 import network.Master;
 import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Gadget;
+import gc.BadLabelException;
 import gc.GCSignal;
 
 public class AddGadget<T> extends Gadget<T> {
 
 	@Override
-	public Object secureCompute(CompEnv<T> e, Object[] o, int port) throws Exception {
+	public Object secureCompute(CompEnv<T> e, Object[] o, int port) throws InterruptedException, IOException, BadCommandException, BadLabelException {
 		connect(port);
 
 		T[][] x = (T[][]) o[0];
@@ -28,7 +30,7 @@ public class AddGadget<T> extends Gadget<T> {
 		return null;
 	}
 
-	private void prefixSum(T[] sum, IntegerLib<T> lib) throws Exception {
+	private void prefixSum(T[] sum, IntegerLib<T> lib) throws IOException, BadLabelException {
 		int noOfIncomingConnections = numberOfIncomingConnections;
 		int noOfOutgoingConnections = numberOfOutgoingConnections;
 		GCSignal[] prefixSum = (GCSignal[]) sum;

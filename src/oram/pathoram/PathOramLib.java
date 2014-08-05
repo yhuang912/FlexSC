@@ -19,7 +19,7 @@ public class PathOramLib<T> extends BucketLib<T> {
 		this.logN = logN;
 	}
 	
-	public T[] deepestLevel(T[] pos, T[] path) throws Exception {
+	public T[] deepestLevel(T[] pos, T[] path) {
 		T[] xored = xor(pos, path);
 		
 		return padSignal(
@@ -28,12 +28,12 @@ public class PathOramLib<T> extends BucketLib<T> {
 		
 	}
 		
-	public T[] deepestLevel(T[] pos, T[] path, T isDummy) throws Exception {
+	public T[] deepestLevel(T[] pos, T[] path, T isDummy) {
 		T[] depth = deepestLevel(pos, path);
 		return mux(depth, zeros(depth.length), isDummy);
 	}	
 	
-	public Block<T> readAndRemove(Block<T>[] path, T[] iden) throws Exception {
+	public Block<T> readAndRemove(Block<T>[] path, T[] iden) {
 		return super.readAndRemove(path, iden);
 	}
 	public Block<T> toBlock(T[] b){

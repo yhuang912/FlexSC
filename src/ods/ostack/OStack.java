@@ -16,7 +16,7 @@ public class OStack<T> extends ObliviousDataStructure<T> {
 	T[] top;
 	T[] counter;
 	public OStack(CompEnv<T> env, int N, int dataSize,
-			int sp) {
+			int sp) throws IOException {
 		super(env);
 		oram = new CircuitOram<T>(env, N, dataSize,capacity, sp);
 		oram = new CircuitOram<T>(env, N, dataSize+oram.lengthOfPos, capacity, sp);
