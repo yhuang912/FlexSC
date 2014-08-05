@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import network.Server;
+import network.Master;
 import flexsc.Signal;
 
 public class GCSignal extends Signal {
@@ -66,7 +66,7 @@ public class GCSignal extends Signal {
 	public static GCSignal receive(InputStream ois) {
 		byte[] b = null;
 		try {
-			b = Server.readBytes(ois, len);
+			b = Master.readBytes(ois, len);
 			//	ois.read(b);	
 		}
 		catch (Exception e) { e.printStackTrace(); }

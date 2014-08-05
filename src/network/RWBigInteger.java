@@ -10,7 +10,7 @@ public final class RWBigInteger {
 //			byte[] rep = bi.toByteArray();
 //			os.write(ByteBuffer.allocate(4).putInt(rep.length).array());
 //			os.write(rep);
-			Server.writeByte(os, bi.toByteArray());
+			Master.writeByte(os, bi.toByteArray());
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -23,7 +23,7 @@ public final class RWBigInteger {
 //			is.read(temp);
 //			rep = new byte[ByteBuffer.wrap(temp).getInt()];
 //			is.read(rep);
-			rep = Server.readBytes(is);
+			rep = Master.readBytes(is);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);

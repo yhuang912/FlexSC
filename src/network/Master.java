@@ -132,7 +132,7 @@ public class Master {
 		// master.disconnect();
 	}
 
-	private static byte[] readBytes(InputStream is, int len) throws IOException
+	public static byte[] readBytes(InputStream is, int len) throws IOException
 	{
 		byte[] temp = new byte[len];
 		int remain = len;
@@ -161,13 +161,23 @@ public class Master {
 		return temp;
 	}*/
 
-	public static int readInt(InputStream is) throws IOException
-	{
+	public static int readInt(InputStream is) throws IOException {
 		byte[] lenBytes = readBytes(is, 4);
 		return ByteBuffer.wrap(lenBytes).getInt();
 	}
 
 	public static void writeInt(OutputStream os, int data) throws IOException {
 		os.write(ByteBuffer.allocate(4).putInt(data).array());
+	}
+
+	public static byte[] readBytes(InputStream is) throws IOException {
+		byte[] lenBytes = readBytes(is, 4);
+		int len = ByteBuffer.wrap(lenBytes).getInt();
+		return readBytes(is, len);
+	}
+
+	public static void writeByte(OutputStream os, byte[] data) throws IOException {
+		os.write(ByteBuffer.allocate(4).putInt(data.length).array());
+		os.write(data);
 	}
 }
