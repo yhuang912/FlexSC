@@ -63,8 +63,7 @@ public class CompPool<T> {
 	public <G extends Gadget<T>> Object[] runGadget(G g, Object[] inputArray) throws InterruptedException, ExecutionException{
 		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
 		for(int i = 0; i < inputArray.length; ++i) {
-			// Test_2Input1Output a = new Test_2Input1Output();
-			Gadget<T> gadge = new AddGadget();// g.clone();
+			Gadget<T> gadge = new AddGadget();
 			gadge.env = envs[i];
 			gadge.inputs = (Object[]) inputArray[i];
 			gadge.port = masterPort + i;
