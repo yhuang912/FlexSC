@@ -17,15 +17,15 @@ public abstract class Gadget<T> extends Machine implements Callable<Object> {
 	protected CompEnv<T> env;
 	private int port;
 
-	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
+	abstract public void secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
 	@Override
 	public Object call() throws InterruptedException, IOException, BadCommandException, BadLabelException {
 		connect(port);
-		Object res = secureCompute();
+		secureCompute();
 		env.flush();
 		disconnect();
-		return res;
+		return null;
 	}
 
 	protected void send(OutputStream os, T[] data) throws IOException {

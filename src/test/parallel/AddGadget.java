@@ -2,23 +2,18 @@ package test.parallel;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import network.BadCommandException;
 import network.Master;
-import network.NetworkUtil;
 import test.Utils;
 import circuits.IntegerLib;
 import flexsc.Gadget;
-import flexsc.Mode;
 import gc.BadLabelException;
-import gc.GCSignal;
 
 public class AddGadget<T> extends Gadget<T> {
 
 	@Override
-	public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException {
+	public void secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException {
 
 		T[][] x = (T[][]) inputs[0];
 
@@ -29,7 +24,6 @@ public class AddGadget<T> extends Gadget<T> {
 			result = lib.add(result, x[i]);
 
 		prefixSum(result, lib);
-		return null;
 	}
 
 	private void prefixSum(T[] prefixSum, IntegerLib<T> lib) throws IOException, BadLabelException {

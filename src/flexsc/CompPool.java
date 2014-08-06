@@ -28,16 +28,16 @@ public class CompPool<T> {
 
 	     executorService = Executors.newFixedThreadPool(Master.MACHINES);
 
-		for(int i = 0; i < Master.MACHINES; ++i) {
+		for (int i = 0; i < Master.MACHINES; ++i) {
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
-			if(env.getParty() == Party.Alice){
+			if(env.getParty() == Party.Alice) {
 				servers[i] = new Server();
-				servers[i].listen(port+i);
+				servers[i].listen(port + i);
 				inputStream = servers[i].is;
 				outputStream = servers[i].os;
 			}
-			else{
+			else {
 				clients[i] = new Client();
 				clients[i].connect(host, port+i);
 				inputStream = clients[i].is;
@@ -49,7 +49,7 @@ public class CompPool<T> {
 	}
 
 	public void finalize() throws IOException {
-		for(int i = 0; i < Master.MACHINES; ++i){
+		for (int i = 0; i < Master.MACHINES; ++i){
 			if(servers[i] != null)
 				servers[i].disconnect();
 			if(clients[i] != null)
@@ -58,9 +58,9 @@ public class CompPool<T> {
 		executorService.shutdown();
 	}
 
-	public <G extends Gadget<T>> Object[] runGadget(String gadget, Object[] inputArray) throws InterruptedException, ExecutionException, ClassNotFoundException, InstantiationException, IllegalAccessException{
+	public <G extends Gadget<T>> void runGadget(String gadget, Object[] inputArray) throws InterruptedException, ExecutionException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
-		for(int i = 0; i < inputArray.length; ++i) {
+		for (int i = 0; i < inputArray.length; ++i) {
 			Class c = Class.forName(gadget);
 			Gadget<T> gadge = (Gadget<T>) c.newInstance();
 			gadge.setInputs((Object[]) inputArray[i], envs[i], masterPort + i);
@@ -68,12 +68,11 @@ public class CompPool<T> {
 			list.add(future);
 		}
 
-		Object[] result = new Object[inputArray.length];
-		int cnt = 0;
+		// TODO(kartiknayak): Verify that on multi machine model, removing this
+		// doesn't affect socket connections
 		for(Future<Object> future: list) {
-			result[cnt++] = future.get();
+			future.get();
 		}
-		return result;
 	}
 
 }	

@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutionException;
 import network.Constants;
 import network.Master;
 import test.Utils;
-import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.CompPool;
 import flexsc.Mode;
@@ -61,11 +60,7 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Master.MACHINES; ++i)
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/Master.MACHINES, (i+1)*Ta.length/Master.MACHINES)};
 
-
-				Object[] result = pool.runGadget("test.parallel.AddGadget", input);
-				IntegerLib<T> lib = new IntegerLib<>(gen);
-
-				os.flush();
+				pool.runGadget("test.parallel.AddGadget", input);
 
 				long t2 = System.nanoTime();
 				System.out.println(Ta.length+"\t"+(t2-t1)/1000000000.0);
@@ -108,16 +103,9 @@ public class Test_2Input1Output<T> {
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/Master.MACHINES, (i+1)*Ta.length/Master.MACHINES)};
 				os.flush();
 				
-				Object[] result = pool.runGadget("test.parallel.AddGadget", input);
+				pool.runGadget("test.parallel.AddGadget", input);
 
-				IntegerLib<T> lib = new IntegerLib<>(eva);
-
-				os.flush();
-
-				//eva.outputToAlice((T[]) finalresult);
-				//os.flush();
 				pool.finalize();
-
 				disconnect();
 
 			} catch(ExecutionException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {

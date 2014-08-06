@@ -7,7 +7,7 @@ import network.Master;
 
 public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
 	static int ARRAY_LENGTH = 100000;
-	static Mode MODE = Mode.VERIFY;
+	static Mode MODE = Mode.REAL;
 
 	public static void main(String args[]) throws Exception {
 		Test_2Input1Output.MASTER_EVA_PORT = new Integer(args[0]);
