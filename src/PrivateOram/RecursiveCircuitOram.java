@@ -26,7 +26,7 @@ public class RecursiveCircuitOram<T> {
 			int capacity,int sp) throws Exception {
 		this.is = env.is;
 		this.os = env.os;
-		this.p = env.p;
+		this.p = env.party;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
@@ -46,7 +46,7 @@ public class RecursiveCircuitOram<T> {
 
 	//with default params
 	public RecursiveCircuitOram(CompEnv<T> env, int N, int dataSize) throws Exception {
-		this.p = env.p;
+		this.p = env.party;
 		this.is = env.is;
 		this.os = env.os;
 		this.cutoff = 512;

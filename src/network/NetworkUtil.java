@@ -31,6 +31,16 @@ public class NetworkUtil {
 		os.write(ByteBuffer.allocate(4).putInt(data).array());
 	}
 
+	public static boolean readBoolean(InputStream is) throws IOException {
+		int read = readInt(is);
+		return read == 1;
+	}
+
+	public static void writeBoolean(OutputStream os, boolean data) throws IOException {
+		int sen = data ? 1 : 0;
+		writeInt(os, sen);
+	}
+
 	public static byte[] readBytes(InputStream is) throws IOException {
 		byte[] lenBytes = readBytes(is, 4);
 		int len = ByteBuffer.wrap(lenBytes).getInt();

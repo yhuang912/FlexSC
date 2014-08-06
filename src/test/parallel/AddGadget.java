@@ -2,24 +2,27 @@ package test.parallel;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import network.BadCommandException;
 import network.Master;
+import network.NetworkUtil;
 import test.Utils;
 import circuits.IntegerLib;
-import flexsc.CompEnv;
 import flexsc.Gadget;
+import flexsc.Mode;
 import gc.BadLabelException;
 import gc.GCSignal;
 
 public class AddGadget<T> extends Gadget<T> {
 
 	@Override
-	public Object secureCompute(CompEnv<T> e, Object[] o) throws InterruptedException, IOException, BadCommandException, BadLabelException {
+	public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException {
 
-		T[][] x = (T[][]) o[0];
+		T[][] x = (T[][]) inputs[0];
 
-		IntegerLib<T> lib =  new IntegerLib<T>(e);
+		IntegerLib<T> lib =  new IntegerLib<T>(env);
 
 		T[] result = x[0];
 		for(int i = 1; i < x.length; ++i)
@@ -29,15 +32,12 @@ public class AddGadget<T> extends Gadget<T> {
 		return null;
 	}
 
-	private void prefixSum(T[] sum, IntegerLib<T> lib) throws IOException, BadLabelException {
+	private void prefixSum(T[] prefixSum, IntegerLib<T> lib) throws IOException, BadLabelException {
 		int noOfIncomingConnections = numberOfIncomingConnections;
 		int noOfOutgoingConnections = numberOfOutgoingConnections;
-		GCSignal[] prefixSum = (GCSignal[]) sum;
 		for (int k = 0; k < Master.LOG_MACHINES; k++) {
 			if (noOfOutgoingConnections > 0) {
-				for (int i = 0; i < prefixSum.length; i++) {
-					prefixSum[i].send(peerOsUp[k]);
-				}
+				send(peerOsUp[k], prefixSum);
 				try {
 					((BufferedOutputStream) peerOsUp[k]).flush();
 				} catch (IOException e) {
@@ -46,15 +46,11 @@ public class AddGadget<T> extends Gadget<T> {
 				noOfOutgoingConnections--;
 			}
 			if (noOfIncomingConnections > 0) {
-				GCSignal[] read = new GCSignal[prefixSum.length];
-				for (int i = 0; i < prefixSum.length; i++) {
-					read[i] = GCSignal.receive(peerIsDown[k]);
-				}
-				prefixSum = (GCSignal[]) lib.add((T[]) prefixSum, (T[]) read);
+				T[] read = read(peerIsDown[k], prefixSum.length);
+				prefixSum = lib.add(prefixSum, read);
 				noOfIncomingConnections--;
 			}
 		}
-		debug("Sum = " + Utils.toInt(lib.getBooleans((T[]) prefixSum)));
-		// disconnectFromPeers();
+		debug("Sum = " + Utils.toInt(lib.getBooleans(prefixSum)));
 	}
 }

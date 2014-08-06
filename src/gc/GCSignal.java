@@ -58,8 +58,7 @@ public class GCSignal extends Signal {
 	public void send(OutputStream os) {
 		try {
 			os.write(bytes);
-		}
-		catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { e.printStackTrace(); }
 	}
 
 	// 'send' and 'receive' are supposed to be used only for secret signals
@@ -68,8 +67,7 @@ public class GCSignal extends Signal {
 		try {
 			b = NetworkUtil.readBytes(ois, len);
 			//	ois.read(b);	
-		}
-		catch (Exception e) { e.printStackTrace(); }
+		} catch (Exception e) { e.printStackTrace(); }
 		return new GCSignal(b);
 	}
 

@@ -63,8 +63,8 @@ public abstract class OramParty<T> {
 		lengthOfData = dataSize;
 		lengthOfIden = logN;
 		lengthOfPos = logN-1;
-		p = env.p;
-		mode = env.m;
+		p = env.party;
+		mode = env.mode;
 		init();
 
 	}
@@ -85,8 +85,8 @@ public abstract class OramParty<T> {
 		lengthOfData = dataSize;
 		lengthOfIden = logN;
 		this.lengthOfPos = lengthOfPos;
-		p = env.p;
-		mode = env.m;
+		p = env.party;
+		mode = env.mode;
 		init();
 
 	}

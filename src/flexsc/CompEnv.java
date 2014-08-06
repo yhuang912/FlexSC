@@ -32,17 +32,18 @@ public abstract class CompEnv<T> {
 	
 	public InputStream is;
 	public OutputStream os;
-	public Party p;
-	public Mode m;
+	public Party party;
+	public Mode mode;
+
 	public CompEnv(InputStream is, OutputStream os, Party p, Mode m) {
 		this.is = is;
 		this.os = os;
-		this.m = m;
-		this.p = p;
+		this.mode = m;
+		this.party = p;
 	}
 	
 	public abstract T inputOfAlice(boolean in) throws IOException;
-	public 	abstract T inputOfBob(boolean in) throws IOException, IncorrectOtUsageException;
+	public abstract T inputOfBob(boolean in) throws IOException, IncorrectOtUsageException;
 	public abstract boolean outputToAlice(T out) throws IOException, BadLabelException;
 	
 	public abstract T[] inputOfAlice(boolean[] in) throws IOException;
@@ -62,9 +63,6 @@ public abstract class CompEnv<T> {
 	public abstract T newT(boolean v);
 	
 	abstract public CompEnv<T> getNewInstance(InputStream in, OutputStream os);
-	public Party getParty(){
-		return p;
-	}
 	
 	public void flush() throws IOException {
 		os.flush();
@@ -118,5 +116,13 @@ public abstract class CompEnv<T> {
 	public double outputToAliceFixedPoint(T[] f, int offset) throws IOException, BadLabelException {
 		boolean[] res = outputToAlice(f);
 		return  Utils.toFixPoint(res, res.length, offset);
+	}
+
+	public Mode getMode() {
+		return mode;
+	}
+
+	public Party getParty() {
+		return party;
 	}
 }
