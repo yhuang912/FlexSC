@@ -15,8 +15,7 @@ import gc.GCSignal;
 public class AddGadget<T> extends Gadget<T> {
 
 	@Override
-	public Object secureCompute(CompEnv<T> e, Object[] o, int port) throws InterruptedException, IOException, BadCommandException, BadLabelException {
-		connect(port);
+	public Object secureCompute(CompEnv<T> e, Object[] o) throws InterruptedException, IOException, BadCommandException, BadLabelException {
 
 		T[][] x = (T[][]) o[0];
 

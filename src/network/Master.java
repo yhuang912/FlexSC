@@ -36,9 +36,6 @@ public class Master {
 
 	public void disconnect() throws IOException {
 		for (int i = 0; i < MACHINES; i++) {
-			NetworkUtil.writeInt(os[i], 0);
-			os[i].flush(); // dummy I/O to prevent dropping connection earlier than
-			// protocol payloads are received.
 			serverSocket[i].close();
 		}
 	}

@@ -23,7 +23,7 @@ public class TestCircuitOramRec {
 		System.out.print("\n");
 	}
 
-	final static int writeCount = 1<<4;
+	final static int writeCount = 1<<6;
 	final static int readCount = 1<<6;
 	public TestCircuitOramRec() {
 	}

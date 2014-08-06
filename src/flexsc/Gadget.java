@@ -13,18 +13,14 @@ public abstract class Gadget<T> extends Machine implements Callable<Object> {
 	CompEnv<T> env;
 	int port;
 
-	abstract public Object secureCompute(CompEnv<T> e, Object[] o, int port) throws InterruptedException, IOException, BadCommandException, BadLabelException;
+	abstract public Object secureCompute(CompEnv<T> e, Object[] o) throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
 	@Override
-	public Object call() {
-		Object res = null;
-		try {
-			res = secureCompute(env, inputs, port);
-			env.flush();
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
+	public Object call() throws InterruptedException, IOException, BadCommandException, BadLabelException {
+		connect(port);
+		Object res = secureCompute(env, inputs);
+		env.flush();
+		disconnect();
 		return res;
 	}
 }

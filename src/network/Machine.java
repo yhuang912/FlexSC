@@ -10,25 +10,31 @@ import java.net.Socket;
 
 public abstract class Machine {
 	public static boolean DEBUG = true;
-	public InputStream masterIs;
-	public OutputStream masterOs;
+
+	private InputStream masterIs;
+	private OutputStream masterOs;
 	private Socket masterSocket;
 	private ServerSocket serverSocket;
-	public InputStream[] peerIsUp;
-	public OutputStream[] peerOsUp;
-	public InputStream[] peerIsDown;
-	public OutputStream[] peerOsDown;
-	public int machineId;
-	protected int numberOfIncomingConnections;
-	protected int numberOfOutgoingConnections;
+	private Socket[] upSocket;
+	private Socket[] downSocket;
+	private int machineId;
 	int peerPort;
 	int totalMachines;
+
+	protected InputStream[] peerIsUp;
+	protected OutputStream[] peerOsUp;
+	protected InputStream[] peerIsDown;
+	protected OutputStream[] peerOsDown;
+	protected int numberOfIncomingConnections;
+	protected int numberOfOutgoingConnections;
 
 	public Machine() {
 		peerIsUp = new BufferedInputStream[Master.LOG_MACHINES];
 		peerOsUp = new BufferedOutputStream[Master.LOG_MACHINES];
 		peerIsDown = new BufferedInputStream[Master.LOG_MACHINES];
 		peerOsDown = new BufferedOutputStream[Master.LOG_MACHINES];
+		upSocket = new Socket[Master.LOG_MACHINES];
+		downSocket = new Socket[Master.LOG_MACHINES];
 	}
 
 	protected void connect(int masterPort) throws InterruptedException, IOException, BadCommandException {
@@ -83,6 +89,7 @@ public abstract class Machine {
 				int id = NetworkUtil.readInt(is);
 				int index = log2(id - machineId);
 				debug("Accepted a connection from " + id + ". Stored at index " + index);
+				downSocket[index] = clientSock;
 				peerIsDown[index] = is;
 				peerOsDown[index] = os;
 				debug(id + " peerIsDown " + peerIsDown[index].hashCode());
@@ -98,6 +105,7 @@ public abstract class Machine {
 			// System.out.println(machineId + ": I have " + (numberOfOutgoingConnections - i) + " remaining");
 			Socket peerSocket = NetworkUtil.connect(Constants.LOCALHOST, peerPort + machineId - (1 << i));
 			try {
+				upSocket[i] = peerSocket;
 				peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Constants.BUFFER_SIZE);
 				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Constants.BUFFER_SIZE);
 				NetworkUtil.writeInt(peerOsUp[i], machineId);
@@ -129,11 +137,22 @@ public abstract class Machine {
 		}  
 	}
 
-	public void disconnectFromMaster() throws IOException {
-		masterOs.write(0);
-		masterOs.flush(); // dummy I/O to prevent dropping connection earlier than
-		// protocol payloads are received.
+	public void disconnect() throws IOException {
+		disconnectFromMaster();
+		disconnectFromPeers();
+	}
+
+	private void disconnectFromMaster() throws IOException {
 		masterSocket.close();
+	}
+
+	private void disconnectFromPeers() throws IOException {
+		for (int i = 0; i < numberOfIncomingConnections; i++) {
+			downSocket[i].close();
+		}
+		for (int i = 0; i < numberOfOutgoingConnections; i++) {
+			upSocket[i].close();
+		}
 	}
 
 	private int getNumberOfIncomingConnections(int machineId) {
@@ -153,7 +172,7 @@ public abstract class Machine {
 	    return 31 - Integer.numberOfLeadingZeros(n);
 	}
 
-	public void debug(String debug) {
+	protected void debug(String debug) {
 		if (DEBUG) {
 			System.out.println(machineId + ": " + debug);
 		}

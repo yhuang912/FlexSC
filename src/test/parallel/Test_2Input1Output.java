@@ -15,12 +15,11 @@ import flexsc.Party;
 
 
 public class Test_2Input1Output<T> {
-	
-	static int PORT = 51111;
+
+	static int COMPPOOL_GEN_EVA_PORT = 51111;
 	static int MASTER_GEN_PORT;
 	static int MASTER_EVA_PORT;
 	static int THREAD_MASTER_SERVER_CLIENT_PORT = 15432;
-
 
 	public class Helper {
 		int[] intA;
@@ -53,7 +52,7 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = gen.inputOfBob(new boolean[32]);
 
-				CompPool<T> pool = new CompPool(gen, Constants.LOCALHOST, PORT, MASTER_GEN_PORT);
+				CompPool<T> pool = new CompPool(gen, Constants.LOCALHOST, COMPPOOL_GEN_EVA_PORT, MASTER_GEN_PORT);
 				
 				long t1 = System.nanoTime();
 
@@ -73,7 +72,7 @@ public class Test_2Input1Output<T> {
 
 				/*z = gen.outputToAlice((T[]) finalresult);
 				System.out.println("result:"+Utils.toInt(z));*/
-				// pool.finalize();
+				pool.finalize();
 				disconnect();
 			} catch(ExecutionException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 				System.out.println("Gadget probably does not exist. Reflection issue");
@@ -102,7 +101,7 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
-				CompPool<T> pool = new CompPool(eva, Constants.LOCALHOST, PORT, MASTER_EVA_PORT);				
+				CompPool<T> pool = new CompPool(eva, Constants.LOCALHOST, COMPPOOL_GEN_EVA_PORT, MASTER_EVA_PORT);				
 				Object[] input = new Object[Master.MACHINES];
 
 				for(int i = 0; i < Master.MACHINES; ++i)
@@ -116,8 +115,8 @@ public class Test_2Input1Output<T> {
 				os.flush();
 
 				//eva.outputToAlice((T[]) finalresult);
-				os.flush();
-				// pool.finalize();
+				//os.flush();
+				pool.finalize();
 
 				disconnect();
 

@@ -23,9 +23,6 @@ public class Server {
 	}
 
 	public void disconnect() throws IOException { 
-		is.read();
-		os.write(0);
-		os.flush();
 		sock.close(); 
 	}
 }
