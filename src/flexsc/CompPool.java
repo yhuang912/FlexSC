@@ -63,9 +63,7 @@ public class CompPool<T> {
 		for(int i = 0; i < inputArray.length; ++i) {
 			Class c = Class.forName(gadget);
 			Gadget<T> gadge = (Gadget<T>) c.newInstance();
-			gadge.env = envs[i];
-			gadge.inputs = (Object[]) inputArray[i];
-			gadge.port = masterPort + i;
+			gadge.setInputs((Object[]) inputArray[i], envs[i], masterPort + i);
 			Future<Object> future = executorService.submit(gadge);
 			list.add(future);
 		}

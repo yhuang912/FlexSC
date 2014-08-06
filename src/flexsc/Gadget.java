@@ -15,7 +15,7 @@ import network.NetworkUtil;
 public abstract class Gadget<T> extends Machine implements Callable<Object> {
 	protected Object[] inputs;
 	protected CompEnv<T> env;
-	int port;
+	private int port;
 
 	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
