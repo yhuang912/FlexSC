@@ -61,7 +61,7 @@ public class Test_2Input1Output<T> {
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i * Ta.length / Master.MACHINES, (i + 1) * Ta.length / Master.MACHINES)};
 
 				// pool.runGadget("test.parallel.AddGadget", input);
-				pool.runGadget("test.parallel.SortGadget", input);
+				pool.runGadget("test.parallel.AnotherSortGadget", input);
 
 				long t2 = System.nanoTime();
 				System.out.println(Ta.length+"\t"+(t2-t1)/1000000000.0);
@@ -105,7 +105,7 @@ public class Test_2Input1Output<T> {
 				os.flush();
 				
 				// pool.runGadget("test.parallel.AddGadget", input);
-				pool.runGadget("test.parallel.SortGadget", input);
+				pool.runGadget("test.parallel.AnotherSortGadget", input);
 
 				pool.finalize();
 				disconnect();

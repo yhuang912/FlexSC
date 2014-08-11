@@ -174,7 +174,11 @@ public abstract class Machine {
 
 	protected void debug(String debug) {
 		if (DEBUG) {
-			System.out.println(machineId + ": " + debug);
+			System.out.println(getMachineId() + ": " + debug);
 		}
+	}
+
+	private String getMachineId() {
+		return (machineId < 10) ? "0" + machineId : "" + machineId;
 	}
 }
