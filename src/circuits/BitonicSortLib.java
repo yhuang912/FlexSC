@@ -44,26 +44,25 @@ public class BitonicSortLib<T> extends IntegerLib<T>
     	data[i] = di;
     	data[j] = dj;
     }
- 
-    
+
     public void sort(T[][] a, T isAscending) {
         bitonicSort(a, 0, a.length, isAscending);
     }
 
     private void bitonicSort(T[][]key, int lo, int n, T dir) {
         if (n > 1) {
-            int m=n/2;
+            int m = n / 2;
             bitonicSort(key, lo, m, not(dir));
-            bitonicSort(key, lo+m, n-m, dir);
+            bitonicSort(key, lo + m, n - m, dir);
             bitonicMerge(key, lo, n, dir);
         }
     }
 
-    private void bitonicMerge(T[][] key, int lo, int n, T dir) {
+    public void bitonicMerge(T[][] key, int lo, int n, T dir) {
         if (n > 1) {
-            int m=greatestPowerOfTwoLessThan(n);
+            int m = greatestPowerOfTwoLessThan(n);
             for (int i = lo; i < lo + n - m; i++)
-                compare(key, i, i+m, dir);
+                compare(key, i, i + m, dir);
             bitonicMerge(key, lo, m, dir);
             bitonicMerge(key, lo + m, n - m, dir);
         }
@@ -79,9 +78,9 @@ public class BitonicSortLib<T> extends IntegerLib<T>
     }
     
     private int greatestPowerOfTwoLessThan(int n) {
-        int k=1;
-        while (k<n)
-            k=k<<1;
-        return k>>1;
+        int k = 1;
+        while (k < n)
+            k = k << 1;
+        return k >> 1;
     }
 }

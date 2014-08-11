@@ -22,7 +22,7 @@ public class Client {
 	public void connect(String server, int port) throws InterruptedException, IOException {
 		sock = NetworkUtil.connect(server, port);
 
-		if(Flag.countIO) {
+		if (Flag.countIO) {
 			cos = new CountingOutputStream(sock.getOutputStream());
 			cis = new CountingInputStream(sock.getInputStream());
 			os = new BufferedOutputStream(cos, Constants.BUFFER_SIZE);  

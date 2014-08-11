@@ -6,7 +6,7 @@ import gc.GCSignal;
 import network.Master;
 
 public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
-	static int ARRAY_LENGTH = 100000;
+	static int ARRAY_LENGTH = 40;
 	static Mode MODE = Mode.REAL;
 
 	public static void main(String args[]) throws Exception {
@@ -17,12 +17,12 @@ public class Test_2Input1Output_eva extends Test_2Input1Output<GCSignal>{
 
 		int a[] = new int[ARRAY_LENGTH];
 		for(int k = 0; k < Master.MACHINES; ++k){
-			for(int i = 0; i < a.length/Master.MACHINES; ++i)
-			{
-				if (i == 0)
+			for(int i = 0; i < a.length/Master.MACHINES; ++i) {
+				a[k*a.length/Master.MACHINES + i] = i;
+				/*if (i == 0)
 					a[k*a.length/Master.MACHINES + i] = ((Master.MACHINES - k) - 1);
 				else 
-					a[k*a.length/Master.MACHINES + i] = 0;
+					a[k*a.length/Master.MACHINES + i] = 0;*/
 			}
 		}
 		Helper h = tt.new Helper(a, m);

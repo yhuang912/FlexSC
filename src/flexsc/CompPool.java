@@ -26,7 +26,7 @@ public class CompPool<T> {
 		servers = new Server[Master.MACHINES];
 		clients = new Client[Master.MACHINES];
 
-	     executorService = Executors.newFixedThreadPool(Master.MACHINES);
+	    executorService = Executors.newFixedThreadPool(Master.MACHINES);
 
 		for (int i = 0; i < Master.MACHINES; ++i) {
 			InputStream inputStream = null;

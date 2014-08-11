@@ -11,7 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Master {
-	public static int MACHINES = 32;
+	public static int MACHINES = 4;
 	public static int LOG_MACHINES = Machine.log2(MACHINES);
 	public static int START_PORT;
 

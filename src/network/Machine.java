@@ -17,10 +17,10 @@ public abstract class Machine {
 	private ServerSocket serverSocket;
 	private Socket[] upSocket;
 	private Socket[] downSocket;
-	private int machineId;
 	int peerPort;
 	int totalMachines;
 
+	protected int machineId;
 	protected InputStream[] peerIsUp;
 	protected OutputStream[] peerOsUp;
 	protected InputStream[] peerIsDown;
