@@ -60,7 +60,7 @@ public class RecursiveCSCOramClient<T> {
 		CSCOramClient<T> currentOram = clients.get(0);
 		
 		sendBooleans(poses[0]);
-		System.out.println("write " + iden + " " + Utils.toInt(poses[0]) + " "+Utils.toInt(poses[1]));
+//		System.out.println("write " + iden + " " + Utils.toInt(poses[0]) + " "+Utils.toInt(poses[1]));
 		currentOram.write(iden, poses[0], poses[1], data);
 	}
 	

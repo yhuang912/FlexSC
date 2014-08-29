@@ -1,8 +1,6 @@
 package circuits;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Random;
 
 import flexsc.CompEnv;
 import flexsc.Party;
@@ -10,8 +8,6 @@ import gc.GCSignal;
 
 public class CircuitLib<T> {
 	protected CompEnv<T> env;
-//	public final static Signal SIGNAL_ZERO = new Signal(false);
-//	public final static Signal SIGNAL_ONE = new Signal(true);
 	public final T SIGNAL_ZERO;
 	public final T SIGNAL_ONE;
 
@@ -33,20 +29,24 @@ public class CircuitLib<T> {
 		return result;
 	}
 
-	public T[] randBools(Random rng, int length) throws Exception {
+	public T[] randBools(int length) throws Exception {
 		boolean[] res = new boolean[length];
 		for(int i = 0; i < length; ++i)
-			res[i] = rng.nextBoolean();
+			res[i] = env.rnd.nextBoolean();
 		T[] alice = env.inputOfAlice(res); 
 		T[] bob = env.inputOfBob(res);
 		return xor(alice, bob);
 	}
 
-	public boolean[] getBooleans(T[] x) throws Exception {
+	public boolean[] declassifyToAlice(T[] x) throws Exception{
 		return env.outputToAlice(x);
 	}
+	public boolean[] declassifyToBob(T[] x) throws Exception {
+		return env.outputToBob(x);
+	}
 	
-	public boolean[] syncBooleans(boolean[] pos) throws IOException {
+	public boolean[] declassifyToBoth(T[] x) throws Exception {
+		boolean[] pos = env.outputToAlice(x);
 		if(env.getParty() == Party.Alice){
 			//send pos to bob
 			env.os.write(new byte[]{(byte) pos.length});

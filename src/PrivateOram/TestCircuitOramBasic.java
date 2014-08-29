@@ -9,7 +9,7 @@ import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCSignal;
+//import gc.Boolean;
 
 
 public class TestCircuitOramBasic {
@@ -17,7 +17,7 @@ public class TestCircuitOramBasic {
 	final int capacity = 3;
 	int[] posMap = new int[N];
 	int writecount = N;
-	int readcount = N;
+	int readcount = N*10;
 	int dataSize = 32;
 	public TestCircuitOramBasic() {
 		SecureRandom rng = new SecureRandom();
@@ -41,8 +41,8 @@ public class TestCircuitOramBasic {
 				listen(port);
 
 				int data[] = new int[N+1];
-				CompEnv env = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
-				CircuitOram<GCSignal> client = new CircuitOram<GCSignal>(env, N, dataSize,capacity, 80);
+				CompEnv env = CompEnv.getEnv(Mode.VERIFY, Party.Alice, is, os);
+				CircuitOram<Boolean> client = new CircuitOram<Boolean>(env, N, dataSize,capacity, 80);
 				System.out.println("logN:"+client.logN+", N:"+client.N);
 				
 				
@@ -54,8 +54,8 @@ public class TestCircuitOramBasic {
 					System.out.println(element+" "+oldValue+" "+newValue);
 					data[element] = 2*element+1;
 //					long t1 = System.currentTimeMillis();
-					GCSignal[] scNewValue = client.env.inputOfAlice(Utils.fromInt(newValue, client.lengthOfPos));
-					GCSignal[] scData = client.env.inputOfAlice(Utils.fromInt(data[element], client.lengthOfData));
+					Boolean[] scNewValue = client.env.inputOfAlice(Utils.fromInt(newValue, client.lengthOfPos));
+					Boolean[] scData = client.env.inputOfAlice(Utils.fromInt(data[element], client.lengthOfData));
 					client.write(client.lib.toSignals(element), Utils.fromInt(oldValue, client.lengthOfPos), scNewValue, scData);
 
 					os.write(0);
@@ -78,8 +78,8 @@ public class TestCircuitOramBasic {
 					int newValue = rng.nextInt(1<<client.lengthOfPos);
 					System.out.println(element+" "+oldValue+" "+newValue);
 
-					GCSignal[] scNewValue = client.env.inputOfAlice(Utils.fromInt(newValue, client.lengthOfPos));
-					GCSignal[] scb = client.read(client.lib.toSignals(element), Utils.fromInt(oldValue, client.lengthOfPos), scNewValue);
+					Boolean[] scNewValue = client.env.inputOfAlice(Utils.fromInt(newValue, client.lengthOfPos));
+					Boolean[] scb = client.read(client.lib.toSignals(element), Utils.fromInt(oldValue, client.lengthOfPos), scNewValue);
 
 					boolean[] b = client.env.outputToAlice(scb);
 					os.write(0);
@@ -138,16 +138,16 @@ public class TestCircuitOramBasic {
 			try {
 				connect(host, port);
 				
-//				CircuitOramServer<GCSignal> server = new CircuitOramServer<GCSignal>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
-				CompEnv env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
-				CircuitOram<GCSignal> server = new CircuitOram<GCSignal>(env, N, dataSize,capacity, 80);
+//				CircuitOramServer<Boolean> server = new CircuitOramServer<Boolean>(is, os, N, dataSize, Party.Bob, capacity, Mode.REAL, 80);
+				CompEnv env = CompEnv.getEnv(Mode.VERIFY, Party.Bob, is, os);
+				CircuitOram<Boolean> server = new CircuitOram<Boolean>(env, N, dataSize,capacity, 80);
 
 
 				for(int i = 0; i < writecount; ++i) {
 					int element = i%N;
 					int oldValue = posMap[element];
-					GCSignal[] scNewValue = server.env.inputOfAlice(new boolean[server.lengthOfPos]);
-					GCSignal[] scData = server.env.inputOfAlice(new boolean[server.lengthOfData]);
+					Boolean[] scNewValue = server.env.inputOfAlice(new boolean[server.lengthOfPos]);
+					Boolean[] scData = server.env.inputOfAlice(new boolean[server.lengthOfData]);
 
 					server.write(server.lib.toSignals(element), Utils.fromInt(oldValue, server.lengthOfPos), scNewValue, scData);
 
@@ -158,8 +158,8 @@ public class TestCircuitOramBasic {
 				for(int i = 0; i < readcount; ++i){
 					int element = i%N;
 					int oldValue = posMap[element];
-					GCSignal[] scNewValue = server.env.inputOfAlice(new boolean[server.lengthOfPos]);
-					GCSignal[] scb = server.read(server.lib.toSignals(element), Utils.fromInt(oldValue, server.lengthOfPos), scNewValue);
+					Boolean[] scNewValue = server.env.inputOfAlice(new boolean[server.lengthOfPos]);
+					Boolean[] scb = server.read(server.lib.toSignals(element), Utils.fromInt(oldValue, server.lengthOfPos), scNewValue);
 
 					server.env.outputToAlice(scb);
 					is.read();

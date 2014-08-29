@@ -20,7 +20,7 @@ public class OStack<T> extends ObliviousDataStructure<T> {
 		oram = new CircuitOram<T>(env, N, dataSize,capacity, sp);
 		oram = new CircuitOram<T>(env, N, dataSize+oram.lengthOfPos, capacity, sp);
 		lib = oram.lib;
-		top = lib.randBools(rnd, oram.lengthOfPos);
+		top = lib.randBools(oram.lengthOfPos);
 		counter = env.inputOfAlice(Utils.fromInt(1, oram.lengthOfIden));
 	}
 
@@ -29,14 +29,14 @@ public class OStack<T> extends ObliviousDataStructure<T> {
 		oram = new CircuitOram<T>(env, N, dataSize, capacity, sp);
 		oram = new CircuitOram<T>(env, N, dataSize+oram.lengthOfPos, capacity, sp);
 		lib = oram.lib;
-		top = lib.randBools(rnd, oram.lengthOfPos);
+		top = lib.randBools(oram.lengthOfPos);
 		counter = env.inputOfAlice(Utils.fromInt(1, oram.lengthOfIden));
 	}
 	
 	public T[] access(T op, T[] data) throws Exception {
-		T[] newIter = lib.randBools(rnd, oram.lengthOfPos);
-		boolean[] pos = lib.syncBooleans(lib.getBooleans(top));
-		T[] block = oram.conditionalReadAndRemove(counter, pos, op);
+		T[] newIter = lib.randBools(oram.lengthOfPos);
+//		boolean[] pos = lib.declassifyToBoth(top);
+		T[] block = oram.conditionalReadAndRemove(counter, top, op);
 		T[] newBlock = oram.env.newTArray(data.length+oram.lengthOfPos);
 	    System.arraycopy(top, 0, newBlock, 0, top.length);
 	    System.arraycopy(data, 0, newBlock, top.length, data.length);
@@ -51,9 +51,10 @@ public class OStack<T> extends ObliviousDataStructure<T> {
 		return Arrays.copyOfRange(block, top.length, block.length);
 	}
 	
+	//(d1, p1) - > (d2, p2) -> (d3, p3)   
 	//op = 0
 	public void push(T[] data) throws Exception {
-		T[] newIter = lib.randBools(rnd, oram.lengthOfPos);
+		T[] newIter = lib.randBools(oram.lengthOfPos);
 		T[] block = oram.env.newTArray(data.length+oram.lengthOfPos);
 	    System.arraycopy(top, 0, block, 0, top.length);
 	    System.arraycopy(data, 0, block, top.length, data.length);
@@ -64,7 +65,7 @@ public class OStack<T> extends ObliviousDataStructure<T> {
 	
 	//op = 1
 	public T[] pop() throws IOException, Exception {
-		boolean[] pos = lib.syncBooleans(lib.getBooleans(top));
+		boolean[] pos = lib.declassifyToBoth(top);
 		T[] block = oram.readAndRemove(counter, pos, false);
 		counter = lib.sub(counter, lib.toSignals(1, oram.lengthOfIden));
 		top = Arrays.copyOf(block, top.length);

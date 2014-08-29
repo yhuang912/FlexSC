@@ -13,7 +13,7 @@ import ot.OTExtReceiver;
 import ot.OTExtSender;
 
 public class TestOTExtMany {
-	static final int n = 50000;
+	static final int n = 100000;
 	GCSignal[][] m;
 	boolean[] c;
 	GCSignal[] rcvd;
@@ -32,8 +32,11 @@ public class TestOTExtMany {
 					m[i][0] = GCSignal.freshLabel(rnd);
 					m[i][1] = GCSignal.freshLabel(rnd);
 				}
+				double t1 = System.nanoTime();
 				snd = new OTExtSender(80, is, os);
 				snd.send(m);
+				double t2 = System.nanoTime() -t1;
+				System.out.println(t2/1000000000);
 				
 				disconnect();
 			} catch (Exception e) {
@@ -51,13 +54,17 @@ public class TestOTExtMany {
 			try {
 				connect("localhost", 54321);
 				
-				rcv = new OTExtReceiver(is, os);
+
 				c = new boolean[n];
 				Random rnd = new Random();
 				for (int i = 0; i < n; i++)
 					c[i] = rnd.nextBoolean();
+				double t1 = System.nanoTime();
+				rcv = new OTExtReceiver(is, os);
 				rcvd = rcv.receive(c);
-				
+				double t2 = System.nanoTime() -t1;
+				System.out.println(t2/1000000000);
+
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -80,16 +87,16 @@ public class TestOTExtMany {
 //		System.out.println(m[c?1:0].toHexStr());
 //		System.out.println(rcvd.toHexStr());
 //			System.out.println(i);
-			try {
-				Assert.assertEquals(rcvd[i], m[i][c[i]?1:0]);
-			} catch (AssertionError e) {
-				System.out.println("rcvd[" + i + "]: " + rcvd[i].toHexStr());
-				System.out.println("m[" + i + "][c[" + i + "]]: " + m[i][c[i]?1:0].toHexStr());
-				
-				System.out.println("rcvd[" + i + "]: " + Arrays.toString(rcvd[i].bytes));
-				System.out.println("m[" + i + "][c[" + i + "]]: " + Arrays.toString(m[i][c[i]?1:0].bytes));
-				throw e;
-			}
+//			try {
+//				Assert.assertEquals(rcvd[i], m[i][c[i]?1:0]);
+//			} catch (AssertionError e) {
+//				System.out.println("rcvd[" + i + "]: " + rcvd[i].toHexStr());
+//				System.out.println("m[" + i + "][c[" + i + "]]: " + m[i][c[i]?1:0].toHexStr());
+//				
+//				System.out.println("rcvd[" + i + "]: " + Arrays.toString(rcvd[i].bytes));
+//				System.out.println("m[" + i + "][c[" + i + "]]: " + Arrays.toString(m[i][c[i]?1:0].bytes));
+//				throw e;
+//			}
 		}
 		
 	}

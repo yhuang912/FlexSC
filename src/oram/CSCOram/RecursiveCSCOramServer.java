@@ -25,7 +25,7 @@ public class RecursiveCSCOramServer<T> {
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		System.out.print(capacity);
+//		System.out.print(capacity);
 		CSCOramServer<T>  oram = new CSCOramServer<T>(is, os, N, dataSize, Party.Bob, capacity,  m, sp);
 		servers.add(oram);
 		int newDataSize = oram.lengthOfPos, newN = (1<<oram.lengthOfIden);

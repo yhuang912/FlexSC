@@ -23,8 +23,8 @@ public class TestCircuitOramRec {
 		System.out.print("\n");
 	}
 
-	final static int writeCount = 1<<4;
-	final static int readCount = 1<<6;
+	final static int writeCount = 1<<7;
+	final static int readCount = (1<<7);
 	public TestCircuitOramRec() {
 	}
 
@@ -138,13 +138,15 @@ public class TestCircuitOramRec {
 //					Flag.sw.stopTotal();
 //					Flag.sw.addCounter();
 					printStatistic();
-
 				}
 
-				for(int i = 0; i < readCount; ++i){
+				int cnt = 0;
+				for(int i = 0; i < readCount; ++i) {
 					int element = i%N;
 					GCSignal[] scb = server.read(server.baseOram.lib.toSignals(element));
 					server.baseOram.env.outputToAlice(scb);
+					if(i%N ==0)
+						System.out.println(cnt++);
 				}
 
 				disconnect();

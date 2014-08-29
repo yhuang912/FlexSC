@@ -1,5 +1,6 @@
 package test.oram.cscoram;
 
+import flexsc.Flag;
 import flexsc.Mode;
 import gc.GCSignal;
 import oram.CSCOram.RecursiveCSCOramClient;
@@ -10,12 +11,12 @@ import org.junit.Test;
 import test.Utils;
 
 public class TestNewOramRec {
-	
-	final static int writeCount = 100;
-	final static int readCount = 10;
+
+	final static int writeCount = 1;
+	final static int readCount = 0;
 	public TestNewOramRec() {
 	}
-	
+
 	class GenRunnable extends network.Server  implements Runnable{
 		int port;
 		int logN ;
@@ -38,35 +39,41 @@ public class TestNewOramRec {
 		}
 		public int[][] idens;
 		public boolean[][] du;
+		double tt=0;
 		public void run() {
 			try {
 				listen(port);
-				
+
 				os.write(logN);
 				os.write(recurFactor);
 				os.write(logCutoff);
 				os.write(capacity);
 				os.write(dataSize);
 				os.flush();
-				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
-				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
-				
-				System.out.println("connected");
-				double T = 0;
-				
+//				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
+//				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
+//
+//				System.out.println("connected");
+
 				RecursiveCSCOramClient<GCSignal> client = new RecursiveCSCOramClient<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
 
+				//				Flag.sw.flush();
 				for(int i = 0; i < writeCount; ++i) {
-					int element = i%N;
-					
-					client.write(element, Utils.fromInt(element, dataSize));
-					//System.gc();
-					Runtime rt = Runtime.getRuntime(); 
-				    double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
-				    System.out.println("mem: "+usedMB);	
-				}
-				System.out.println("avg time : "+T/10.0);
+					double t1 = System.nanoTime();
 
+					int element = i%N;
+
+					client.write(element, Utils.fromInt(element, dataSize));
+					double t2 = System.nanoTime();
+					tt = (t2-t1);
+					//					System.out.println(tt/1000000000.0);
+
+					//					Flag.sw.addCounter();
+					//System.gc();
+					//					Runtime rt = Runtime.getRuntime(); 
+					//				    double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
+					//				    System.out.println("mem: "+usedMB);	
+				}
 				for(int i = 0; i < readCount; ++i){
 					int element = i%N;
 					boolean[] b = client.read(element);
@@ -74,7 +81,7 @@ public class TestNewOramRec {
 					if(Utils.toInt(b) != element)
 						System.out.println("inconsistent: "+element+" "+Utils.toInt(b));
 				}
-				
+
 				os.flush();
 
 				idens = new int[client.clients.get(0).tree.length][];
@@ -84,7 +91,7 @@ public class TestNewOramRec {
 					idens[j] = new int[client.clients.get(0).tree[j].length];
 					for(int i = 0; i < client.clients.get(0).tree[j].length; ++i)
 						idens[j][i]=Utils.toInt(client.clients.get(0).tree[j][i].iden);
-					}
+				}
 
 				for(int j = 1; j < client.clients.get(0).tree.length; ++j){
 					du[j] = new boolean[client.clients.get(0).tree[j].length];
@@ -112,37 +119,41 @@ public class TestNewOramRec {
 		public void run() {
 			try {
 				connect(host, port);
-				
+
 				int logN = is.read();
 				int recurFactor = is.read();
 				int logCutoff = is.read();
 				int cutoff = 1<<logCutoff;
 				int capacity = is.read();
 				int dataSize = is.read();
-				
+
 				int N = 1<<logN;
-				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
-				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
-				System.out.println("connected");
+//				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
+//				System.out.println(logN+" "+recurFactor +" "+cutoff+" "+capacity+" "+dataSize);
+//				System.out.println("connected");
 				RecursiveCSCOramServer<GCSignal> server = new RecursiveCSCOramServer<GCSignal>(is, os, N, dataSize, cutoff, recurFactor, capacity, Mode.REAL, 80);
+				//				Flag.sw.flush();
+				//				Flag.sw.startTotal();
 				for(int i = 0; i < writeCount; ++i) {
 					server.access();
+
+					//					Flag.sw.addCounter();
 				}
 
 				for(int i = 0; i < readCount; ++i){
 					server.access();
 				}
-				
+				//				Flag.sw.stopTotal();
 
 				os.flush();
-				
+
 				idens = new int[server.servers.get(0).tree.length][];
 				du = new boolean[server.servers.get(0).tree.length][];
 				for(int j = 1; j < server.servers.get(0).tree.length; ++j){
 					idens[j] = new int[server.servers.get(0).tree[j].length];
 					for(int i = 0; i < server.servers.get(0).tree[j].length; ++i)
 						idens[j][i]=Utils.toInt(server.servers.get(0).tree[j][i].iden);
-					}
+				}
 
 				for(int j = 1; j < server.servers.get(0).tree.length; ++j){
 					du[j] = new boolean[server.servers.get(0).tree[j].length];
@@ -172,7 +183,7 @@ public class TestNewOramRec {
 		return res;
 
 	}
-	
+
 	public void printTree(GenRunnable gen, EvaRunnable eva) {
 		int k = 1;
 		int i = 1;
@@ -195,19 +206,30 @@ public class TestNewOramRec {
 		}
 		System.out.print("\n");
 	}
-	
+
+	public static void main(String[] args) throws Exception {
+		TestNewOramRec t = new TestNewOramRec();
+		t.runThreads();
+	}
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345, 20, 6, 32,  4, 10);
-		EvaRunnable eva = new EvaRunnable("localhost", 12345);
-		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start(); Thread.sleep(10);
-		tEva.start();
-		tGen.join();
-//		printTree(gen,eva);
-		System.out.print("\n");
+		for(int datasize = 10; datasize <= 1000; datasize*=10){
+			System.out.println("datasize:"+datasize);
+			for(int log = 10; log <= 16; log+=2){
+				GenRunnable gen = new GenRunnable(12345, log, 6, datasize,  4, 10);
+				EvaRunnable eva = new EvaRunnable("localhost", 12345);
+				Thread tGen = new Thread(gen);
+				Thread tEva = new Thread(eva);
+				tGen.start(); Thread.sleep(10);
+				tEva.start();
+				tGen.join();
+				System.gc();
 
-		System.out.println();
+				System.out.print(gen.tt/1000000000.0+" ");
+			}
+			System.out.println(" ");
+		}
+
+
 	}
 }

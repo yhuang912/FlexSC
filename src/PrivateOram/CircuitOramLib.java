@@ -2,12 +2,12 @@ package PrivateOram;
 
 
 import oram.Block;
-import oram.TreeBasedOramLib;
+import oram.BucketLib;
 import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Party;
 
-public class CircuitOramLib<T> extends TreeBasedOramLib<T> {
+public class CircuitOramLib<T> extends BucketLib<T>{//TreeBasedOramLib<T> {
 	int logN;
 	int loglogN;
 	int capacity;

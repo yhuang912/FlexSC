@@ -88,6 +88,13 @@ public class PMCompEnv extends BooleanCompEnv {
 	}
 
 	@Override
+	public boolean outputToBob(Boolean out) throws Exception {
+		statistic.bandwidth+=10;
+		return false;
+	}
+
+	
+	@Override
 	public Boolean and(Boolean a, Boolean b) throws Exception {
 		++statistic.andGate;
 		statistic.bandwidth += 3*10;
@@ -122,6 +129,13 @@ public class PMCompEnv extends BooleanCompEnv {
 		return Utils.tobooleanArray(out);
 	}
 
+	@Override
+	public boolean[] outputToBob(Boolean[] out) throws Exception {
+		statistic.bandwidth+=10*out.length;
+		return Utils.tobooleanArray(out);
+	}
+
+	
 	@Override
 	public Boolean[] inputOfAlice(boolean[] in) throws Exception {
 		statistic.OTs += in.length;

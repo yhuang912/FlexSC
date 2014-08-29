@@ -1,78 +1,82 @@
 package test;
 
-import flexsc.Flag;
-
 public class StopWatch {
     public long ands = 0;
     double startTimeOT = 0;
     double stopTimeOT = 0;
-    double elapsedTimeOT = 0;
+    public double elapsedTimeOT = 0;
 
     double startTimeGC = 0;
     double stopTimeGC = 0;
-    double elapsedTimeGC = 0;
+    public double elapsedTimeGC = 0;
 
     double startTimeTotal = 0;
     double stopTimeTotal = 0;
-    double elapsedTimeTotal = 0;
+    public double elapsedTimeTotal = 0;
 
     double startTimeOTIO = 0;
     double stopTimeOTIO = 0;
-    double elapsedTimeOTIO = 0;
+    public double elapsedTimeOTIO = 0;
 
     double startTimeGCIO = 0;
     double stopTimeGCIO = 0;
-    double elapsedTimeGCIO = 0;
-    boolean countTime = Flag.CountTime;
+    public double elapsedTimeGCIO = 0;
+    boolean countTime;
 long counter = 0;
+	public StopWatch(boolean countTime) {
+		this.countTime = countTime;
+	}
     public void startOT() {
     	if(countTime)
-        startTimeOT = System.nanoTime();
+    		startTimeOT = System.nanoTime();
     }
     
     public void stopOT() {
-    	if(countTime)
-         stopTimeOT = System.nanoTime();
-         elapsedTimeOT += stopTimeOT - startTimeOT;
+    	if(countTime) {
+    		stopTimeOT = System.nanoTime();
+    		elapsedTimeOT += stopTimeOT - startTimeOT;
+         }
    }
     public void startOTIO() {
     	if(countTime)
-        startTimeOTIO = System.nanoTime();
+    		startTimeOTIO = System.nanoTime();
     }
     
     public void stopOTIO() {
-    	if(countTime)
-         stopTimeOTIO = System.nanoTime();
-         elapsedTimeOTIO += stopTimeOTIO - startTimeOTIO;
+    	if(countTime) { 
+    		stopTimeOTIO = System.nanoTime();
+    		elapsedTimeOTIO += stopTimeOTIO - startTimeOTIO;
+         }
    }
     public void startGC() {
     	if(countTime)
-        startTimeGC = System.nanoTime();
+    		startTimeGC = System.nanoTime();
     }
     
     public void stopGC() {
-    	if(countTime)
-         stopTimeGC = System.nanoTime();
-         elapsedTimeGC += stopTimeGC - startTimeGC;
+    	if(countTime) {
+    		stopTimeGC = System.nanoTime();
+    		elapsedTimeGC += stopTimeGC - startTimeGC;
+         }
    }
 
     public void startGCIO() {
     	if(countTime)
-        startTimeGCIO = System.nanoTime();
+    		startTimeGCIO = System.nanoTime();
     }
     
     public void stopGCIO() {
-    	if(countTime)
-         stopTimeGCIO = System.nanoTime();
-         elapsedTimeGCIO += stopTimeGCIO - startTimeGCIO;
+    	if(countTime) {
+    		stopTimeGCIO = System.nanoTime();
+    		elapsedTimeGCIO += stopTimeGCIO - startTimeGCIO;
+         }
    }
     public void startTotal() {
-
         startTimeTotal = System.nanoTime();
     }
     
     public double stopTotal() {
-    	stopTimeTotal = System.nanoTime();
+    	 stopTimeTotal = System.nanoTime();
          elapsedTimeTotal += stopTimeTotal - startTimeTotal;
          return stopTimeTotal - startTimeTotal;
    }

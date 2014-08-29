@@ -5,15 +5,22 @@ import gc.GCGen;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Arrays;
 
 import objects.Float.Representation;
 import pm.PMCompEnv;
+import rand.ISAACProvider;
 import test.Utils;
 import circuits.FloatFormat;
 import cv.CVCompEnv;
 
 public abstract class CompEnv<T> {
+	
+	public SecureRandom rnd;
+	
 	@SuppressWarnings("rawtypes")
 	public static CompEnv getEnv(Mode mode, Party p, InputStream is, OutputStream os) throws Exception{
 		if(mode == Mode.REAL)
@@ -37,15 +44,25 @@ public abstract class CompEnv<T> {
 		this.os = os;
 		this.m = m;
 		this.p = p;
+		Security.addProvider(new ISAACProvider ());
+		try {
+			rnd = SecureRandom.getInstance ("ISAACRandom");
+
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public abstract T inputOfAlice(boolean in) throws Exception;
 	public 	abstract T inputOfBob(boolean in) throws Exception;
 	public abstract boolean outputToAlice(T out) throws Exception;
+	public abstract boolean outputToBob(T out) throws Exception;
 	
 	public abstract T[] inputOfAlice(boolean[] in) throws Exception;
 	public abstract T[] inputOfBob(boolean[] in) throws Exception;
 	public abstract boolean[] outputToAlice(T[] out) throws Exception;
+	public abstract boolean[] outputToBob(T[] out) throws Exception;
 	
 	public abstract T and(T a, T b) throws Exception;
 	public abstract T xor(T a, T b);
@@ -121,12 +138,4 @@ public abstract class CompEnv<T> {
 		boolean[] res = outputToAlice(f);
 		return  Utils.toFixPoint(res, res.length, offset);
 	}
-//	abstract public Representation<T> inputOfBobFloatPoint(double d, int widthV, int widthP) throws Exception;
-//	abstract public Representation<T> inputOfAliceFloatPoint(double d, int widthV, int widthP) throws Exception;
-//	abstract public double outputToAliceFloatPoint(Representation<T> gcf) throws Exception;
-	
-//	abstract public T[] inputOfBobFixedPoint(double a, int width, int offset) throws Exception;
-//	abstract public T[] inputOfAliceFixedPoint(double d, int width, int offset) throws Exception;
-//	abstract public double outputToAliceFixedPoint(T[] f, int offset) throws Exception;
-
 }

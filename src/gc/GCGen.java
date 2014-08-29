@@ -2,14 +2,11 @@ package gc;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.Security;
 
 import ot.FakeOTSender;
 import ot.OTExtSender;
 import ot.OTSender;
-import rand.ISAACProvider;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
@@ -17,18 +14,9 @@ import flexsc.Party;
 public class GCGen extends GCCompEnv {
 
 	static public GCSignal R = null;
-	static SecureRandom rnd;
-
 	static{
-		Security.addProvider(new ISAACProvider ());
-		try {
-			rnd = SecureRandom.getInstance ("ISAACRandom");
-			R = GCSignal.freshLabel(rnd);
-			R.setLSB();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		R = GCSignal.freshLabel(new SecureRandom());
+		R.setLSB();
 	}
 
 	OTSender snd;
@@ -119,14 +107,30 @@ public class GCGen extends GCCompEnv {
 			return false;
 		else if (lb.equals(R.xor(out)))
 			return true;
-//		return false;
+		
 		throw new Exception("bad label at final output.");
 	}
+	
+	public boolean outputToBob(GCSignal out) throws Exception {
+		if (!out.isPublic())
+			out.send(os);
+		return false;
+	}
+	
+	public boolean[] outputToBob(GCSignal[] out) throws Exception {
+		boolean [] result = new boolean[out.length];
+		
+		for(int i = 0; i < result.length; ++i) {
+			if (!out[i].isPublic())
+				out[i].send(os);
+		}
+		os.flush();
+		
+		for(int i = 0; i < result.length; ++i)
+			result[i] = false;
+		return result;
+	}
 
-//	public double outputToAliceFixedPoint(GCSignal[] f, int offset) throws Exception{
-//		boolean[] res = outputToAlice(f);
-//		return  Utils.toFixPoint(res, res.length, offset);
-//	}
 
 	public boolean[] outputToAlice(GCSignal[] out) throws Exception {
 		boolean [] result = new boolean[out.length];
@@ -135,15 +139,6 @@ public class GCGen extends GCCompEnv {
 		}
 		return result;
 	}
-
-//	public double outputToAliceFloatPoint(Representation<GCSignal> gcf) throws Exception {
-//		boolean s = outputToAlice(gcf.s);
-//		boolean z = outputToAlice(gcf.z);
-//		boolean[] v = outputToAlice(gcf.v);
-//		boolean[] p = outputToAlice(gcf.p);
-//		return new FloatFormat(v, p, s, z).toDouble();
-//	}
-
 
 	private GCSignal[][] gtt = new GCSignal[2][2];
 	private GCSignal labelL[] = new GCSignal[2];
@@ -241,45 +236,6 @@ public class GCGen extends GCCompEnv {
 		else 
 			return R.xor(a);
 	}
-
-//	public Representation<GCSignal> inputOfAliceFloatPoint(double d, int widthV, int widthP) throws Exception {
-//		FloatFormat f = new FloatFormat(d, widthV, widthP);
-//		GCSignal signalS = inputOfAlice(f.s);
-//		GCSignal signalZ = inputOfAlice(f.z);
-//		GCSignal[] v = inputOfAlice(f.v);
-//		GCSignal[] p = inputOfAlice(f.p);
-//
-//		return new Representation<GCSignal>(signalS, p, v, signalZ);
-//	}
-//
-//	public Representation<GCSignal> inputOfGen(FloatFormat f, int widthV, int widthP) throws Exception {
-//		GCSignal signalS = inputOfAlice(f.s);
-//		GCSignal signalZ = inputOfAlice(f.z);
-//		GCSignal[] v = inputOfAlice(f.v);
-//		GCSignal[] p = inputOfAlice(f.p);
-//
-//		return new Representation<GCSignal>(signalS, p, v, signalZ);
-//	}	
-//
-//
-//	public Representation<GCSignal> inputOfBobFloatPoint(double d, int widthV, int widthP) throws Exception {
-//		FloatFormat f = new FloatFormat(0, widthV, widthP);
-//		GCSignal signalS = inputOfBob(false);
-//		GCSignal signalZ = inputOfBob(false);
-//		GCSignal[] v = inputOfBob(f.v);
-//		GCSignal[] p = inputOfBob(f.p);
-//
-//		return new Representation<GCSignal>(signalS, p, v, signalZ);
-//	}
-//
-//	public GCSignal[] inputOfAliceFixedPoint(double a, int width, int offset) throws Exception {
-//		GCSignal[] result = inputOfAlice(Utils.fromFixPoint(a,width,offset));
-//		return result;
-//	}
-//
-//	public GCSignal[] inputOfBobFixedPoint(double a, int width, int offset) throws Exception {
-//		return inputOfBob(new boolean[width]);
-//	}
 
 	@Override
 	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {

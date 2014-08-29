@@ -37,12 +37,15 @@ public class Server {
 	
 	static public byte[] readBytes(InputStream is, int len) throws IOException
 	{
+
 		byte[] temp = new byte[len];
 		int remain = len;
-		remain -= is.read(temp);
-		while(0 != remain)
+		while(0 < remain)
 		{
-			remain -= is.read(temp, len-remain, remain);
+			int readBytes = is.read(temp, len-remain, remain);
+			if (readBytes != -1) {
+				remain -= readBytes;
+			}
 		}
 		return temp;
 	}

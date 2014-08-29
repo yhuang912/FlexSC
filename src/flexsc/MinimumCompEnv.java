@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import objects.Float.Representation;
 import test.Utils;
-import circuits.FloatFormat;
 
 public class MinimumCompEnv extends CompEnv<Boolean> {
 	
@@ -91,48 +89,6 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 
 	@Override
-	public Representation<Boolean> inputOfBobFloatPoint(double d, int widthV, int widthP)
-			throws Exception {
-		FloatFormat f = new FloatFormat(d, 23, 9);
-		Representation<Boolean> result = 
-				new Representation<Boolean>(f.s, Utils.toBooleanArray(f.p), Utils.toBooleanArray(f.v), f.z);
-		return result;
-	}
-
-	@Override
-	public Representation<Boolean> inputOfAliceFloatPoint(double d, int widthV, int widthP)
-			throws Exception {
-		FloatFormat f = new FloatFormat(d, 23, 9);
-		Representation<Boolean> result = 
-				new Representation<Boolean>(f.s, Utils.toBooleanArray(f.p), Utils.toBooleanArray(f.v), f.z);
-		return result;
-	}
-
-	@Override
-	public double outputToAliceFloatPoint(Representation<Boolean> f) throws Exception {
-		FloatFormat d = new FloatFormat(Utils.tobooleanArray(f.v), Utils.tobooleanArray(f.p), f.s, f.z);
-		return d.toDouble();
-	}
-
-	@Override
-	public Boolean[] inputOfBobFixedPoint(double d, int width, int offset)
-			throws Exception {
-		return inputOfBob(Utils.fromFixPoint(d,width,offset));
-	}
-
-	@Override
-	public Boolean[] inputOfAliceFixedPoint(double d, int width, int offset)
-			throws Exception {
-		return inputOfBob(Utils.fromFixPoint(d,width,offset));
-	}
-
-	@Override
-	public double outputToAliceFixedPoint(Boolean[] f, int offset) throws Exception {
-		boolean[] res = outputToAlice(f);
-		return  Utils.toFixPoint(res, res.length, offset);
-	}
-
-	@Override
 	public boolean[] outputToAlice(Boolean[] out) throws Exception {
 		return Utils.tobooleanArray(out);
 	}
@@ -149,6 +105,17 @@ public class MinimumCompEnv extends CompEnv<Boolean> {
 	}
 	@Override
 	public void flush() throws IOException {		
+	}
+
+	@Override
+	public boolean outputToBob(Boolean out) throws Exception {
+		return out;
+		
+	}
+
+	@Override
+	public boolean[] outputToBob(Boolean[] out) throws Exception {
+		return Utils.tobooleanArray(out);
 	}
 
 }

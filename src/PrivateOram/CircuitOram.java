@@ -121,8 +121,10 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		putBack(scIden, scNewPos, scData);
 	}
 	
-	public T[] conditionalReadAndRemove(T[] scIden, boolean[] pos, T condition) throws Exception {
-		PlainBlock[][] blocks = getPath(pos);
+	public T[] conditionalReadAndRemove(T[] scIden, T[] pos, T condition) throws Exception {
+		T[] posToUse = lib.mux(lib.randBools(pos.length), pos, condition);
+		boolean[] path = lib.declassifyToBoth(posToUse);
+		PlainBlock[][] blocks = getPath(path);
 		Block<T>[][] scPath = preparePath(blocks, blocks);
 
 		Block<T> res = lib.conditionalReadAndRemove(scPath, scIden, condition);
@@ -130,7 +132,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		res = lib.mux(res, res2, res.isDummy);
 		
 		blocks = preparePlainPath(scPath);
-		putPath(blocks, pos);
+		putPath(blocks, path);
 
 		return res.data;
 	}

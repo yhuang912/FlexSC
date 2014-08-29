@@ -81,10 +81,10 @@ public class RecursiveCircuitOram<T> {
 		T[][] poses = travelToDeep(iden, 1);
 		CircuitOram<T> currentOram = clients.get(0);
 
-//		boolean[] oldPos = clients.get(clients.size()-1).env.outputToAlice(poses[0]);
-		boolean[] oldPos = baseOram.env.outputToAlice(poses[0]);
-		oldPos = baseOram.lib.syncBooleans(oldPos);
-//		System.out.println("read " + Utils.toInt(oldPos));// + " "+Utils.toInt(poses[1]));
+//		boolean[] oldPos = baseOram.env.outputToAlice(poses[0]);
+//		oldPos = baseOram.lib.syncBooleans(oldPos);
+		boolean[] oldPos = baseOram.lib.declassifyToBoth(poses[0]);
+		
 		T[] res = currentOram.read(iden, oldPos, poses[1]);
 		return res;
 	}
@@ -93,10 +93,10 @@ public class RecursiveCircuitOram<T> {
 		T[][] poses = travelToDeep(iden, 1);
 		CircuitOram<T> currentOram = clients.get(0);
 
-//		boolean[] oldPos = clients.get(clients.size()-1).env.outputToAlice(poses[0]);
-		boolean[] oldPos = baseOram.env.outputToAlice(poses[0]);
-		oldPos = baseOram.lib.syncBooleans(oldPos);
-//		System.out.println("write " + Utils.toInt(oldPos));// + " "+Utils.toInt(poses[1]));
+
+//		boolean[] oldPos = baseOram.env.outputToAlice(poses[0]);
+//		oldPos = baseOram.lib.syncBooleans(oldPos);
+		boolean[] oldPos = baseOram.lib.declassifyToBoth(poses[0]);
 		currentOram.write(iden, oldPos, poses[1], data);
 	}
 	
@@ -107,7 +107,7 @@ public class RecursiveCircuitOram<T> {
 			
 			T[] pos = extract(baseMap, ithPos, clients.get(level-1).lengthOfPos);
 			
-			T[] newPos = baseOram.lib.randBools(rng, clients.get(level-1).lengthOfPos);
+			T[] newPos = baseOram.lib.randBools(clients.get(level-1).lengthOfPos);
 			put(baseMap, ithPos, newPos);
 			baseOram.putBack(subIdentifier(iden, baseOram), baseMap);
 			os.flush();
@@ -120,16 +120,16 @@ public class RecursiveCircuitOram<T> {
 			CircuitOram<T> currentOram = clients.get(level);
 
 			T[][] poses = travelToDeep(subIdentifier(iden, currentOram), level+1);
-			//System.out.println(" tr "+level+" "+iden+" "+Utils.toInt(poses[0]) + " "+Utils.toInt(poses[1]));
-			//			sendBooleans(poses[0]);
-			boolean[] oldPos = clients.get(clients.size()-1).env.outputToAlice(poses[0]);
-			oldPos = baseOram.lib.syncBooleans(oldPos);
+
+//			boolean[] oldPos = clients.get(clients.size()-1).env.outputToAlice(poses[0]);
+//			oldPos = baseOram.lib.syncBooleans(oldPos);
+			boolean[] oldPos = baseOram.lib.declassifyToBoth(poses[0]);
 
 			T[] data = currentOram.readAndRemove(subIdentifier(iden, currentOram), oldPos, true);
 			T[] ithPos = currentOram.lib.rightPublicShift(iden, currentOram.lengthOfIden);//iden>>currentOram.lengthOfIden;//iden/(1<<currentOram.lengthOfIden);
 
 			T[] pos = extract(data, ithPos, clients.get(level-1).lengthOfPos);
-			T[] tmpNewPos = baseOram.lib.randBools(rng, clients.get(level-1).lengthOfPos);
+			T[] tmpNewPos = baseOram.lib.randBools(clients.get(level-1).lengthOfPos);
 			put(data, ithPos, tmpNewPos);
 			currentOram.putBack(subIdentifier(iden, currentOram), poses[1], data);
 			T[][] result = currentOram.env.newTArray(2, 0);

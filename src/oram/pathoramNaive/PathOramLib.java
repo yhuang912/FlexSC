@@ -118,59 +118,60 @@ public class PathOramLib<T> extends BucketLib<T> {
 
 	}
 
-}
-
-
-//public void pushDown(Block<T>[][] path, Block<T>[] stash, boolean[] pos) throws Exception {
-//
-//	Block<T>[][] newPath = newBlockMatrix(path.length,0);
-//	for(int i = 0; i < path.length; ++i) {
-//		newPath[i] = newBlockArray(path[i].length);
-//	}
-//
-//	T[] posInSignal = env.newTArray(lengthOfPos);//new Signal[lengthOfPos];
-//	for(int i = 0; i < pos.length; ++i)
-//		posInSignal[i] = pos[i] ? SIGNAL_ONE : SIGNAL_ZERO;
-//
-//	for(int i = 0; i < path.length; ++i) {
-//		for(int j = 0; j < path[i].length; ++j) {
-//			newPath[i][j] = dummyBlock;
-//		}			
-//	}
-//
-//	for(int i = newPath.length-1; i >= 0; --i)
-//		for(int j = 0; j < newPath[i].length; ++j) {
-//			T pushed = SIGNAL_ZERO;
-//			for(int k = 0; k < path.length; ++k) {
-//				for(int l = 0; l < path[k].length; ++l){
-//					T[] depth = deepestLevel2(path[i][j].pos, posInSignal, path[i][j].isDummy);
-//					T canPush = geq(depth, toSignals(i-1, depth.length));
-//					canPush = and(canPush, not(path[k][l].isDummy ));
-//					T toPush = and(canPush, not(pushed));
-//
-//					newPath[i][j] = mux(newPath[i][j], path[k][l], toPush);
-//					path[k][l].isDummy = mux(path[k][l].isDummy, SIGNAL_ONE, toPush);
-//					pushed  = or(pushed, canPush);	
-//				}
-//			}
-//
-//			for(int k = 0; k < stash.length; ++k)
-//			{
-//				T[] depth = deepestLevel2(stash[i].pos, posInSignal, stash[i].isDummy);
-//				T canPush = geq(depth, toSignals(i-1, depth.length));
-//				canPush = and(canPush, not(stash[k].isDummy ));
-//				T toPush = and(canPush, not(pushed));
-//
-//				newPath[i][j] = mux(newPath[i][j], stash[k], toPush);
-//				stash[k].isDummy = mux(stash[k].isDummy, SIGNAL_ONE, toPush);
-//				pushed  = or(pushed, canPush);	
-//
-//			}
-//		}
-//
-//	//dissemble(blockInSignal, path, stash);
-//	for(int i = 0; i < path.length; ++i)
-//		for(int j = 0; j < path[i].length; ++j)
-//			path[i][j] = newPath[i][j];
-//
 //}
+
+
+public void pushDown(Block<T>[][] path, Block<T>[] stash, boolean[] pos) throws Exception {
+
+	Block<T>[][] newPath = newBlockMatrix(path.length,0);
+	for(int i = 0; i < path.length; ++i) {
+		newPath[i] = newBlockArray(path[i].length);
+	}
+
+	T[] posInSignal = env.newTArray(lengthOfPos);//new Signal[lengthOfPos];
+	for(int i = 0; i < pos.length; ++i)
+		posInSignal[i] = pos[i] ? SIGNAL_ONE : SIGNAL_ZERO;
+
+	for(int i = 0; i < path.length; ++i) {
+		for(int j = 0; j < path[i].length; ++j) {
+			newPath[i][j] = dummyBlock;
+		}			
+	}
+
+	for(int i = newPath.length-1; i >= 0; --i)
+		for(int j = 0; j < newPath[i].length; ++j) {
+			T pushed = SIGNAL_ZERO;
+			for(int k = 0; k < path.length; ++k) {
+				for(int l = 0; l < path[k].length; ++l){
+					T[] depth = deepestLevel2(path[i][j].pos, posInSignal, path[i][j].isDummy);
+					T canPush = geq(depth, toSignals(i-1, depth.length));
+					canPush = and(canPush, not(path[k][l].isDummy ));
+					T toPush = and(canPush, not(pushed));
+
+					newPath[i][j] = mux(newPath[i][j], path[k][l], toPush);
+					path[k][l].isDummy = mux(path[k][l].isDummy, SIGNAL_ONE, toPush);
+					pushed  = or(pushed, canPush);	
+				}
+			}
+
+			for(int k = 0; k < stash.length; ++k)
+			{
+				T[] depth = deepestLevel2(stash[i].pos, posInSignal, stash[i].isDummy);
+				T canPush = geq(depth, toSignals(i-1, depth.length));
+				canPush = and(canPush, not(stash[k].isDummy ));
+				T toPush = and(canPush, not(pushed));
+
+				newPath[i][j] = mux(newPath[i][j], stash[k], toPush);
+				stash[k].isDummy = mux(stash[k].isDummy, SIGNAL_ONE, toPush);
+				pushed  = or(pushed, canPush);	
+
+			}
+		}
+
+	//dissemble(blockInSignal, path, stash);
+	for(int i = 0; i < path.length; ++i)
+		for(int j = 0; j < path[i].length; ++j)
+			path[i][j] = newPath[i][j];
+
+}
+}
