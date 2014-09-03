@@ -1,5 +1,8 @@
 package network;
 
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
 import gc.GCSignal;
 
 import java.io.BufferedInputStream;
@@ -9,6 +12,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.Random;
+
+import test.Utils;
 
 public class Master {
 	public static int MACHINES = 32;
@@ -114,15 +121,60 @@ public class Master {
 		}
 	}
 
-	public static void main(String args[]) throws IOException, BadResponseException {
+	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException {
 		Master master = new Master();
 		Master.START_PORT = Integer.parseInt(args[0]);
 		int peerPort = Integer.parseInt(args[1]);
+		int masterMasterConnectionPort = Integer.parseInt(args[2]);
+		boolean isGen = Boolean.parseBoolean(args[3]);
+		Party party = isGen ? Party.Alice : Party.Bob;
+		Mode mode = Mode.REAL;
+		InputStream is;
+		OutputStream os;
+		if (isGen) {
+			Server server = new Server();
+			server.listen(masterMasterConnectionPort);
+			is = server.is;
+			os = server.os;
+		} else {
+			Client client = new Client();
+			client.connect(Constants.LOCALHOST, masterMasterConnectionPort);
+			is = client.is;
+			os = client.os;
+		}
+		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
+		GCSignal[][] Ta = env.newTArray(64 /* number of entries in the input */, 0);
+		if (isGen) {
+			for(int i = 0; i < Ta.length; ++i)
+				Ta[i] = env.inputOfBob(new boolean[32]);
+		} else {
+			boolean[][] a = getInput();
+			for(int i = 0; i < Ta.length; ++i)
+				Ta[i] = env.inputOfBob(a[i]);
+		}
+		Object[] input = new Object[Master.MACHINES];
+
+		for(int i = 0; i < Master.MACHINES; ++i)
+			input[i] = new Object[]{Arrays.copyOfRange(Ta, i * Ta.length / Master.MACHINES, (i + 1) * Ta.length / Master.MACHINES)};
+
 		for (int i = 0; i < MACHINES; i++) {
 			master.listen(Master.START_PORT + i, i);
 		}
 		System.out.println("Connected to master");
+		// master tells the machines what their ports are for peer connections
 		master.setUp(peerPort);
 		System.out.println("Connections successful");
+	}
+
+	private static boolean[][] getInput() {
+		int[] aa = new int[64];
+		boolean[][] a = new boolean[aa.length][];
+		Random rn = new Random();
+		for(int i = 0; i < a.length; ++i) {
+			aa[i] = rn.nextInt(64);
+		}
+		for(int i = 0; i < aa.length; ++i)
+			a[i] = Utils.fromInt(aa[i], 32);
+		return a;
 	}
 }

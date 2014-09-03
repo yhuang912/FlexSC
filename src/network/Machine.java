@@ -8,7 +8,12 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public abstract class Machine {
+import flexsc.CompEnv;
+import flexsc.Gadget;
+import flexsc.Mode;
+import flexsc.Party;
+
+public class Machine {
 	public static boolean DEBUG = true;
 
 	private InputStream masterIs;
@@ -19,6 +24,7 @@ public abstract class Machine {
 	private Socket[] downSocket;
 	int peerPort;
 	int totalMachines;
+	int masterPort;
 
 	protected int machineId;
 	protected InputStream[] peerIsUp;
@@ -28,16 +34,17 @@ public abstract class Machine {
 	protected int numberOfIncomingConnections;
 	protected int numberOfOutgoingConnections;
 
-	public Machine() {
+	public Machine(int masterPort) {
 		peerIsUp = new BufferedInputStream[Master.LOG_MACHINES];
 		peerOsUp = new BufferedOutputStream[Master.LOG_MACHINES];
 		peerIsDown = new BufferedInputStream[Master.LOG_MACHINES];
 		peerOsDown = new BufferedOutputStream[Master.LOG_MACHINES];
 		upSocket = new Socket[Master.LOG_MACHINES];
 		downSocket = new Socket[Master.LOG_MACHINES];
+		this.masterPort = masterPort;
 	}
 
-	protected void connect(int masterPort) throws InterruptedException, IOException, BadCommandException {
+	protected void connect() throws InterruptedException, IOException, BadCommandException {
 		connectToMaster(Constants.LOCALHOST, masterPort);
 		while(true) {
 			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
@@ -180,5 +187,46 @@ public abstract class Machine {
 
 	private String getMachineId() {
 		return (machineId < 10) ? "0" + machineId : "" + machineId;
+	}
+
+	public static void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+		int masterPort = Integer.parseInt(args[0]);
+		int machineId = Integer.parseInt(args[1]);
+		int compPoolGenEvaPort = Integer.parseInt(args[2]);
+		boolean isGen = Boolean.parseBoolean(args[1]);
+		Mode mode = Mode.REAL;
+		Machine machine = new Machine(masterPort);
+		// TODO(OT)
+		// Connect to the other party
+		CompEnv env = machine.connectToOtherParty(isGen, mode, compPoolGenEvaPort);
+		// Connect to master and then to peers
+		machine.connect();
+		// listen
+		Class c = Class.forName("test.parallel.AnotherSortGadget");
+		Gadget gadge = (Gadget) c.newInstance();
+		gadge.setInputs(/* (Object[]) inputArray[i], */env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown);
+		machine.disconnect();
+	}
+
+	CompEnv connectToOtherParty(boolean isGen, Mode mode, int compPoolGenEvaPort) throws InterruptedException, IOException, ClassNotFoundException {
+		Party party = isGen ? Party.Alice : Party.Bob;
+		InputStream is = null;
+		OutputStream os = null;
+		if (isGen) {
+			Server server = new Server();
+			server.listen(compPoolGenEvaPort);
+			is = server.is;
+			os = server.os;
+		} else {
+			Client client = new Client();
+			client.connect(Constants.LOCALHOST, compPoolGenEvaPort);
+			is = client.is;
+			os = client.os;
+		}
+		return CompEnv.getEnv(mode, party, is, os);
 	}
 }

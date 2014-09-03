@@ -58,12 +58,12 @@ public class CompPool<T> {
 		executorService.shutdown();
 	}
 
-	public <G extends Gadget<T>> void runGadget(String gadget, Object[] inputArray) throws InterruptedException, ExecutionException, ClassNotFoundException, InstantiationException, IllegalAccessException{
+	/*public <G extends Gadget<T>> void runGadget(String gadget, Object[] inputArray) throws InterruptedException, ExecutionException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 		ArrayList<Future<Object> > list = new ArrayList<Future<Object>>();
 		for (int i = 0; i < inputArray.length; ++i) {
 			Class c = Class.forName(gadget);
 			Gadget<T> gadge = (Gadget<T>) c.newInstance();
-			gadge.setInputs((Object[]) inputArray[i], envs[i], masterPort + i);
+			gadge.setInputs((Object[]) inputArray[i], envs[i], machineId);
 			Future<Object> future = executorService.submit(gadge);
 			list.add(future);
 		}
@@ -73,6 +73,6 @@ public class CompPool<T> {
 		for(Future<Object> future: list) {
 			future.get();
 		}
-	}
+	}*/
 
 }	

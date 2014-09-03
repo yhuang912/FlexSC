@@ -9,22 +9,25 @@ import java.io.OutputStream;
 import java.util.concurrent.Callable;
 
 import network.BadCommandException;
-import network.Machine;
 import network.NetworkUtil;
 
-public abstract class Gadget<T> extends Machine implements Callable<Object> {
+public abstract class Gadget<T> implements Callable<Object> {
 	protected Object[] inputs;
 	protected CompEnv<T> env;
-	private int port;
+	protected int machineId;
+	protected InputStream[] peerIsUp;
+	protected OutputStream[] peerOsUp;
+	protected InputStream[] peerIsDown;
+	protected OutputStream[] peerOsDown;
 
 	abstract public void secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
 	@Override
 	public Object call() throws InterruptedException, IOException, BadCommandException, BadLabelException {
-		connect(port);
+		// connect(port);
 		secureCompute();
 		env.flush();
-		disconnect();
+		// disconnect();
 		return null;
 	}
 
@@ -62,8 +65,13 @@ public abstract class Gadget<T> extends Machine implements Callable<Object> {
 		return null;
 	}
 
-	void setInputs(Object[] inputs, CompEnv<T> env, int port) {
-		this.port = port;
+	public void setInputs(//Object[] inputs, 
+			CompEnv<T> env,
+			int machineId, 
+			InputStream[] peerIsUp,
+			OutputStream[] peerOsUp,
+			InputStream[] peerIsDown,
+			OutputStream[] peerOsDown) {
 		this.inputs = inputs;
 		this.env = env;
 	}

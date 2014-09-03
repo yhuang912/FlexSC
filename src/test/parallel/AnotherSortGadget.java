@@ -6,8 +6,8 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 
 import network.BadCommandException;
+import network.Machine;
 import network.Master;
-import test.Utils;
 import circuits.AnotherBitonicSortLib;
 import flexsc.Gadget;
 import gc.BadLabelException;
@@ -17,6 +17,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 	@Override
 	public void secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
+		System.out.println("Secure compute starting");
 		T[][] x = (T[][]) inputs[0];
 		AnotherBitonicSortLib<T> lib =  new AnotherBitonicSortLib<T>(env);
 		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
@@ -29,7 +30,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 				boolean up = (machineId / diff) % 2 == 1 ? true : false;
 				InputStream is;
 				OutputStream os;
-				int commMachine = log2(diff);
+				int commMachine = Machine.log2(diff);
 				if (up) {
 					is = peerIsUp[commMachine];
 					os = peerOsUp[commMachine];
@@ -59,9 +60,9 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		}
 
 		// if (machineId == 2 || machineId == 3) {
-			for (int i = 0; i < x.length; i++) {
+			/*for (int i = 0; i < x.length; i++) {
 				debug(" " + Utils.toInt(lib.getBooleans(x[i])));
-			}
+			}*/
 		// }
 		// debug("Length of input: " + x.length);
 	}
@@ -81,7 +82,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		return y;
 	}
 
-	public <T> T[] concatenate (T[] A, T[] B) {
+	public <T> T[] concatenate(T[] A, T[] B) {
 	    int aLen = A.length;
 	    int bLen = B.length;
 
