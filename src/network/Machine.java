@@ -1,5 +1,13 @@
 package network;
 
+import flexsc.CompEnv;
+import flexsc.Gadget;
+import flexsc.Mode;
+import flexsc.Party;
+import gc.BadLabelException;
+import gc.GCGen;
+import gc.GCSignal;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -7,11 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import flexsc.CompEnv;
-import flexsc.Gadget;
-import flexsc.Mode;
-import flexsc.Party;
 
 public class Machine {
 	public static boolean DEBUG = true;
@@ -25,6 +28,8 @@ public class Machine {
 	int peerPort;
 	int totalMachines;
 	int masterPort;
+	private Object input;
+	boolean isGen;
 
 	protected int machineId;
 	protected InputStream[] peerIsUp;
@@ -44,8 +49,9 @@ public class Machine {
 		this.masterPort = masterPort;
 	}
 
-	protected void connect() throws InterruptedException, IOException, BadCommandException {
+	protected void connect() throws InterruptedException, IOException, BadCommandException, ClassNotFoundException {
 		connectToMaster(Constants.LOCALHOST, masterPort);
+		System.out.println("Connected to master");
 		while(true) {
 			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
 			switch(command) {
@@ -56,6 +62,19 @@ public class Machine {
 									 int peerPort = NetworkUtil.readInt(masterIs);
 									 int machines = NetworkUtil.readInt(masterIs);
 									 setMachineId(id, peerPort, machines);
+									 if (isGen) {
+										 GCGen.R = GCSignal.receive(masterIs);
+									 }
+									 int inputLength = NetworkUtil.readInt(masterIs);
+									 int inputSize = NetworkUtil.readInt(masterIs);
+									 GCSignal[][] gcInput = new GCSignal[inputLength][inputSize];
+									 for (int j = 0; j < inputLength; j++)
+											for (int k = 0; k < inputSize; k++)
+												gcInput[j][k] = GCSignal.receive(masterIs);
+									 input = gcInput;
+									 /*ObjectInputStream ois = new ObjectInputStream(masterIs);
+									 GCSignal[][] input = (GCSignal[][])ois.readObject();
+									 System.out.println("first " + input[0][0].toHexStr());*/
 									 break;
 				case CONNECT: connectToPeers();
 							  break;
@@ -189,26 +208,31 @@ public class Machine {
 		return (machineId < 10) ? "0" + machineId : "" + machineId;
 	}
 
-	public static void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public static void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException {
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
 		int compPoolGenEvaPort = Integer.parseInt(args[2]);
-		boolean isGen = Boolean.parseBoolean(args[1]);
 		Mode mode = Mode.REAL;
 		Machine machine = new Machine(masterPort);
+		machine.isGen = Boolean.parseBoolean(args[3]);
 		// TODO(OT)
 		// Connect to the other party
-		CompEnv env = machine.connectToOtherParty(isGen, mode, compPoolGenEvaPort);
+		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort);
+
+		System.out.println("Connected to other party");
 		// Connect to master and then to peers
 		machine.connect();
 		// listen
 		Class c = Class.forName("test.parallel.AnotherSortGadget");
 		Gadget gadge = (Gadget) c.newInstance();
-		gadge.setInputs(/* (Object[]) inputArray[i], */env, machineId,
+		Object[] inputs = new Object[1];
+		inputs[0] = machine.input;
+		gadge.setInputs(inputs, env, machineId,
 				machine.peerIsUp,
 				machine.peerOsUp,
 				machine.peerIsDown,
 				machine.peerOsDown);
+		gadge.secureCompute();
 		machine.disconnect();
 	}
 
@@ -221,11 +245,18 @@ public class Machine {
 			server.listen(compPoolGenEvaPort);
 			is = server.is;
 			os = server.os;
+			/*os.write(10);
+			os.flush();*/
 		} else {
 			Client client = new Client();
 			client.connect(Constants.LOCALHOST, compPoolGenEvaPort);
 			is = client.is;
 			os = client.os;
+			/*int inte = is.read();
+			while(inte == -1) {
+			  inte = is.read();
+			}
+			System.out.println(inte);*/
 		}
 		return CompEnv.getEnv(mode, party, is, os);
 	}

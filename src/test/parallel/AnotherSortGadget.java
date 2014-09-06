@@ -8,6 +8,7 @@ import java.lang.reflect.Array;
 import network.BadCommandException;
 import network.Machine;
 import network.Master;
+import test.Utils;
 import circuits.AnotherBitonicSortLib;
 import flexsc.Gadget;
 import gc.BadLabelException;
@@ -59,12 +60,11 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 			lib.bitonicMerge(x, 0, x.length, mergeDir);
 		}
 
-		// if (machineId == 2 || machineId == 3) {
-			/*for (int i = 0; i < x.length; i++) {
-				debug(" " + Utils.toInt(lib.getBooleans(x[i])));
-			}*/
-		// }
-		// debug("Length of input: " + x.length);
+		System.out.println("Sorting done");
+		for (int i = 0; i < x.length; i++) {
+			System.out.println(" " + Utils.toInt(lib.getBooleans(x[i])));
+		}
+		env.os.flush();
 	}
 
 	private void send(OutputStream os, T[][] x) throws IOException {

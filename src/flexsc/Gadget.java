@@ -65,7 +65,7 @@ public abstract class Gadget<T> implements Callable<Object> {
 		return null;
 	}
 
-	public void setInputs(//Object[] inputs, 
+	public void setInputs(Object[] inputs, 
 			CompEnv<T> env,
 			int machineId, 
 			InputStream[] peerIsUp,
@@ -74,5 +74,10 @@ public abstract class Gadget<T> implements Callable<Object> {
 			OutputStream[] peerOsDown) {
 		this.inputs = inputs;
 		this.env = env;
+		this.peerIsUp = peerIsUp;
+		this.peerOsUp = peerOsUp;
+		this.peerIsDown = peerIsDown;
+		this.peerOsDown = peerOsDown;
+		this.machineId = machineId;
 	}
 }

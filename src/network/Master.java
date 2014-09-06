@@ -3,6 +3,7 @@ package network;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
+import gc.GCGen;
 import gc.GCSignal;
 
 import java.io.BufferedInputStream;
@@ -18,13 +19,14 @@ import java.util.Random;
 import test.Utils;
 
 public class Master {
-	public static int MACHINES = 32;
+	public static int MACHINES = 4;
 	public static int LOG_MACHINES = Machine.log2(MACHINES);
 	public static int START_PORT;
 
 	private ServerSocket[] serverSocket;
 	public InputStream[] is;
 	public OutputStream[] os;
+	private boolean isGen;
 
 	public Master() {
 		serverSocket = new ServerSocket[MACHINES];
@@ -74,14 +76,30 @@ public class Master {
 		}
 	}
 
-	public void setUp(int peerPort) throws IOException, BadResponseException {
+	public void setUp(int peerPort, Object[] input) throws IOException, BadResponseException {
 		// set machineId for each of the machines
+		//GCSignal[][][] gcInput1 = (GCSignal[][][]) input;
 		for (int i = 0; i < MACHINES; i++) {
 			NetworkUtil.writeInt(os[i], Command.SET_MACHINE_ID.getValue());
 			NetworkUtil.writeInt(os[i], i);
 			NetworkUtil.writeInt(os[i], peerPort);
 			NetworkUtil.writeInt(os[i], MACHINES);
+			if (isGen) {
+				GCGen.R.send(os[i]);
+			}
+			GCSignal[][] gcInput = (GCSignal[][]) input[i];
+			// GCSignal[][] gcInput = gcInput1[i];
+			NetworkUtil.writeInt(os[i], gcInput.length);
+			NetworkUtil.writeInt(os[i], gcInput[0].length);
+			for (int j = 0; j < gcInput.length; j++)
+				for (int k = 0; k < gcInput[j].length; k++)
+					gcInput[j][k].send(os[i]);
+		    /*ObjectOutputStream oos = new ObjectOutputStream(os[i]);
+		    oos.writeObject(input[i]);
+		    GCSignal[][] signal = (GCSignal[][]) input[i];
+		    System.out.println("first " + signal[0][0].toHexStr());*/
 			os[i].flush();
+			// oos.flush();
 		}
 
 		// Ask all machines except for the last to listen
@@ -126,12 +144,12 @@ public class Master {
 		Master.START_PORT = Integer.parseInt(args[0]);
 		int peerPort = Integer.parseInt(args[1]);
 		int masterMasterConnectionPort = Integer.parseInt(args[2]);
-		boolean isGen = Boolean.parseBoolean(args[3]);
-		Party party = isGen ? Party.Alice : Party.Bob;
+		master.isGen = Boolean.parseBoolean(args[3]);
+		Party party = master.isGen ? Party.Alice : Party.Bob;
 		Mode mode = Mode.REAL;
 		InputStream is;
 		OutputStream os;
-		if (isGen) {
+		if (master.isGen) {
 			Server server = new Server();
 			server.listen(masterMasterConnectionPort);
 			is = server.is;
@@ -142,9 +160,10 @@ public class Master {
 			is = client.is;
 			os = client.os;
 		}
+		System.out.println("connected to other master");
 		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
-		GCSignal[][] Ta = env.newTArray(64 /* number of entries in the input */, 0);
-		if (isGen) {
+		GCSignal[][] Ta = env.newTArray(16384 /* number of entries in the input */, 0);
+		if (master.isGen) {
 			for(int i = 0; i < Ta.length; ++i)
 				Ta[i] = env.inputOfBob(new boolean[32]);
 		} else {
@@ -155,23 +174,25 @@ public class Master {
 		Object[] input = new Object[Master.MACHINES];
 
 		for(int i = 0; i < Master.MACHINES; ++i)
-			input[i] = new Object[]{Arrays.copyOfRange(Ta, i * Ta.length / Master.MACHINES, (i + 1) * Ta.length / Master.MACHINES)};
+			input[i] = Arrays.copyOfRange(Ta, i * Ta.length / Master.MACHINES, (i + 1) * Ta.length / Master.MACHINES);
+
+		System.out.println("OT done");
 
 		for (int i = 0; i < MACHINES; i++) {
 			master.listen(Master.START_PORT + i, i);
 		}
 		System.out.println("Connected to master");
 		// master tells the machines what their ports are for peer connections
-		master.setUp(peerPort);
+		master.setUp(peerPort, input);
 		System.out.println("Connections successful");
 	}
 
 	private static boolean[][] getInput() {
-		int[] aa = new int[64];
+		int[] aa = new int[16384];
 		boolean[][] a = new boolean[aa.length][];
 		Random rn = new Random();
 		for(int i = 0; i < a.length; ++i) {
-			aa[i] = rn.nextInt(64);
+			aa[i] = rn.nextInt(16384);
 		}
 		for(int i = 0; i < aa.length; ++i)
 			a[i] = Utils.fromInt(aa[i], 32);
