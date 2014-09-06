@@ -61,7 +61,7 @@ public class Test_2Input1Output<T> {
 					input[i] = new Object[]{Arrays.copyOfRange(Ta, i * Ta.length / Master.MACHINES, (i + 1) * Ta.length / Master.MACHINES)};
 
 				// pool.runGadget("test.parallel.AddGadget", input);
-				pool.runGadget("test.parallel.AnotherSortGadget", input);
+				// pool.runGadget("test.parallel.AnotherSortGadget", input);
 
 				long t2 = System.nanoTime();
 				System.out.println(Ta.length+"\t"+(t2-t1)/1000000000.0);
@@ -70,7 +70,7 @@ public class Test_2Input1Output<T> {
 				System.out.println("result:"+Utils.toInt(z));*/
 				pool.finalize();
 				disconnect();
-			} catch(ExecutionException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			} catch(/*ExecutionException |*/ ClassNotFoundException /*| InstantiationException | IllegalAccessException*/ e) {
 				System.out.println("Gadget probably does not exist. Reflection issue");
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -105,12 +105,12 @@ public class Test_2Input1Output<T> {
 				os.flush();
 				
 				// pool.runGadget("test.parallel.AddGadget", input);
-				pool.runGadget("test.parallel.AnotherSortGadget", input);
+				// pool.runGadget("test.parallel.AnotherSortGadget", input);
 
 				pool.finalize();
 				disconnect();
 
-			} catch(ExecutionException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+			} catch(/*ExecutionException |*/ ClassNotFoundException /*| InstantiationException | IllegalAccessException */e) {
 				System.out.println("Gadget probably does not exist. Reflection issue");
 				e.printStackTrace();
 			} catch(IOException e) {

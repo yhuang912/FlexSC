@@ -27,8 +27,8 @@ public class AddGadget<T> extends Gadget<T> {
 	}
 
 	private void prefixSum(T[] prefixSum, IntegerLib<T> lib) throws IOException, BadLabelException {
-		int noOfIncomingConnections = numberOfIncomingConnections;
-		int noOfOutgoingConnections = numberOfOutgoingConnections;
+		int noOfIncomingConnections = 2;
+		int noOfOutgoingConnections = 2;
 		for (int k = 0; k < Master.LOG_MACHINES; k++) {
 			if (noOfOutgoingConnections > 0) {
 				send(peerOsUp[k], prefixSum);
@@ -45,6 +45,6 @@ public class AddGadget<T> extends Gadget<T> {
 				noOfIncomingConnections--;
 			}
 		}
-		debug("Sum = " + Utils.toInt(lib.getBooleans(prefixSum)));
+		// debug("Sum = " + Utils.toInt(lib.getBooleans(prefixSum)));
 	}
 }
