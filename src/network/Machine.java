@@ -16,7 +16,11 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Machine {
+import test.parallel.MarkerWithLastValueGadget;
+import test.parallel.PrefixSumGadget;
+import test.parallel.SubtractGadget;
+
+public class Machine<T> {
 	public static boolean DEBUG = true;
 
 	private InputStream masterIs;
@@ -222,17 +226,72 @@ public class Machine {
 		System.out.println("Connected to other party");
 		// Connect to master and then to peers
 		machine.connect();
+
+		Class c = Class.forName("test.parallel.HistogramMapper");
+		Gadget histogramMapper = (Gadget) c.newInstance();
+		Object[] histogramInputs = new Object[1];
+		histogramInputs[0] = machine.input;
+		histogramMapper.setInputs(histogramInputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown);
+		Object[] output = (Object[]) histogramMapper.secureCompute();
 		// listen
-		Class c = Class.forName("test.parallel.AnotherSortGadget");
+		c = Class.forName("test.parallel.AnotherSortGadget");
 		Gadget gadge = (Gadget) c.newInstance();
-		Object[] inputs = new Object[1];
-		inputs[0] = machine.input;
+		Object[] inputs = new Object[2];
+		inputs[0] = output[0];
+		inputs[1] = output[1];
 		gadge.setInputs(inputs, env, machineId,
 				machine.peerIsUp,
 				machine.peerOsUp,
 				machine.peerIsDown,
 				machine.peerOsDown);
-		gadge.secureCompute();
+		output = (Object[]) gadge.secureCompute();
+
+		c = Class.forName("test.parallel.PrefixSumGadget");
+		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
+		Object[] prefixSumInputs = new Object[1];
+		prefixSumInputs[0] = output[1];
+		prefixSumGadget.setInputs(prefixSumInputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.numberOfIncomingConnections,
+				machine.numberOfOutgoingConnections);
+		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.secureCompute();
+
+		c = Class.forName("test.parallel.MarkerWithLastValueGadget");
+		MarkerWithLastValueGadget markerGadget = (MarkerWithLastValueGadget) c.newInstance();
+		Object[] markerInputs = new Object[1];
+		markerInputs[0] = output[0];
+		markerGadget.setInputs(markerInputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.numberOfIncomingConnections,
+				machine.numberOfOutgoingConnections,
+				machine.totalMachines);
+		Object marker = markerGadget.secureCompute();
+
+		c = Class.forName("test.parallel.SubtractGadget");
+		SubtractGadget subtractGadget = (SubtractGadget) c.newInstance();
+		inputs = new Object[3];
+		inputs[0] = marker; // sort by flag
+		inputs[1] = markerInputs[0]; // actual value
+		inputs[2] = prefixSumDataResult[0]; // frequency
+		subtractGadget.setInputs(inputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.numberOfIncomingConnections,
+				machine.numberOfOutgoingConnections);
+		output = (Object[]) subtractGadget.secureCompute();
+
 		machine.disconnect();
 	}
 

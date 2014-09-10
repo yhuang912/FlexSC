@@ -190,12 +190,20 @@ public class Master {
 	private static boolean[][] getInput() {
 		int[] aa = new int[64];
 		boolean[][] a = new boolean[aa.length][];
+		int limit = 20;
 		Random rn = new Random();
-		for(int i = 0; i < a.length; ++i) {
-			aa[i] = rn.nextInt(16384);
+		int[] freq = new int[limit + 1];
+		for (int i = 0; i < limit + 1; i++)
+			freq[i] = 0;
+		for (int i = 0; i < a.length; ++i) {
+			aa[i] = rn.nextInt(limit);
+			freq[aa[i]]++;
 		}
 		for(int i = 0; i < aa.length; ++i)
 			a[i] = Utils.fromInt(aa[i], 32);
+		System.out.println("Frequencies");
+		for (int i = 0; i < limit + 1; i++)
+			System.out.println(i + ": " + freq[i]);
 		return a;
 	}
 }

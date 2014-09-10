@@ -16,13 +16,16 @@ import gc.BadLabelException;
 public class AnotherSortGadget<T>  extends Gadget<T> {
 
 	@Override
-	public void secureCompute() throws InterruptedException, IOException,
+	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
-		System.out.println("Secure compute starting");
+		// System.out.println("Secure compute starting");
 		T[][] x = (T[][]) inputs[0];
+		T[][] data = (T[][]) inputs[1];
 		AnotherBitonicSortLib<T> lib =  new AnotherBitonicSortLib<T>(env);
 		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
-		lib.sort(x, dir);
+		// System.out.println("hello");
+		lib.sortWithPayload(x, data, dir);
+		// System.out.println("hello2");
 
 		for (int k = 0; k < Master.LOG_MACHINES; k++) {
 			int diff = (1 << k);
@@ -41,30 +44,40 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 				}
 
 				send(os, x);
-				T[][] receive = receive(is, x.length, x[0].length);
-				T[][] array;
+				send(os, data);
+				T[][] receiveKey = receive(is, x.length, x[0].length);
+				T[][] receiveData = receive(is, data.length, data[0].length);
+				T[][] arrayKey, arrayData;
 				if (up) {
-					array = concatenate(receive, x);
+					arrayKey = concatenate(receiveKey, x);
+					arrayData = concatenate(receiveData, data);
 				} else {
-					array = concatenate(x, receive);
+					arrayKey = concatenate(x, receiveKey);
+					arrayData = concatenate(data, receiveData);
 				}
 
-				lib.compareAndSwapFirst(array, 0, array.length, mergeDir);
+				lib.compareAndSwapFirstWithPayload(arrayKey, arrayData, 0, arrayKey.length, mergeDir);
 				if (up) {
-					System.arraycopy(array, array.length / 2, x, 0, array.length / 2);
+					System.arraycopy(arrayKey, arrayKey.length / 2, x, 0, arrayKey.length / 2);
+					System.arraycopy(arrayData, arrayData.length / 2, data, 0, arrayData.length / 2);
 				} else {
-					System.arraycopy(array, 0, x, 0, array.length / 2);
+					System.arraycopy(arrayKey, 0, x, 0, arrayKey.length / 2);
+					System.arraycopy(arrayData, 0, data, 0, arrayData.length / 2);
 				}
 				diff /= 2;
 			}
-			lib.bitonicMerge(x, 0, x.length, mergeDir);
+			lib.bitonicMergeWithPayload(x, data, 0, x.length, mergeDir);
 		}
 
-		System.out.println("Sorting done");
-		for (int i = 0; i < x.length; i++) {
-			System.out.println(" " + Utils.toInt(lib.getBooleans(x[i])));
-		}
+		// System.out.println("Sorting done");
+		/* for (int i = 0; i < x.length; i++) {
+			System.out.println(machineId + ": " + Utils.toInt(lib.getBooleans(x[i])) + ", " + Utils.toInt(lib.getBooleans(data[i])));
+		} */
 		env.os.flush();
+		T[][][] output = env.newTArray(2, x.length, x[0].length);
+		output[0] = x;
+		output[1] = data;
+		return output;
 	}
 
 	private void send(OutputStream os, T[][] x) throws IOException {

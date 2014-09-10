@@ -20,15 +20,15 @@ public abstract class Gadget<T> implements Callable<Object> {
 	protected InputStream[] peerIsDown;
 	protected OutputStream[] peerOsDown;
 
-	abstract public void secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
+	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
 	@Override
 	public Object call() throws InterruptedException, IOException, BadCommandException, BadLabelException {
 		// connect(port);
-		secureCompute();
+		Object ret = secureCompute();
 		env.flush();
 		// disconnect();
-		return null;
+		return ret;
 	}
 
 	protected void send(OutputStream os, T[] data) throws IOException {
