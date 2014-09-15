@@ -19,9 +19,10 @@ import java.util.Random;
 import test.Utils;
 
 public class Master {
-	public static int MACHINES = 4;
+	public static int MACHINES = 2;
 	public static int LOG_MACHINES = Machine.log2(MACHINES);
 	public static int START_PORT;
+	public static int INPUT_LENGTH = 8192;
 
 	private ServerSocket[] serverSocket;
 	public InputStream[] is;
@@ -162,7 +163,7 @@ public class Master {
 		}
 		System.out.println("connected to other master");
 		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
-		GCSignal[][] Ta = env.newTArray(64 /* number of entries in the input */, 0);
+		GCSignal[][] Ta = env.newTArray(INPUT_LENGTH /* number of entries in the input */, 0);
 		if (master.isGen) {
 			for(int i = 0; i < Ta.length; ++i)
 				Ta[i] = env.inputOfBob(new boolean[32]);
@@ -188,7 +189,7 @@ public class Master {
 	}
 
 	private static boolean[][] getInput() {
-		int[] aa = new int[64];
+		int[] aa = new int[INPUT_LENGTH];
 		boolean[][] a = new boolean[aa.length][];
 		int limit = 20;
 		Random rn = new Random();

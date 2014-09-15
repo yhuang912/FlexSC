@@ -227,6 +227,7 @@ public class Machine<T> {
 		// Connect to master and then to peers
 		machine.connect();
 
+		long startTime = System.nanoTime();
 		Class c = Class.forName("test.parallel.HistogramMapper");
 		Gadget histogramMapper = (Gadget) c.newInstance();
 		Object[] histogramInputs = new Object[1];
@@ -237,6 +238,8 @@ public class Machine<T> {
 				machine.peerIsDown,
 				machine.peerOsDown);
 		Object[] output = (Object[]) histogramMapper.secureCompute();
+
+		System.out.println("hello");
 		// listen
 		c = Class.forName("test.parallel.AnotherSortGadget");
 		Gadget gadge = (Gadget) c.newInstance();
@@ -250,6 +253,7 @@ public class Machine<T> {
 				machine.peerOsDown);
 		output = (Object[]) gadge.secureCompute();
 
+		System.out.println("hello1");
 		c = Class.forName("test.parallel.PrefixSumGadget");
 		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
 		Object[] prefixSumInputs = new Object[1];
@@ -262,6 +266,8 @@ public class Machine<T> {
 				machine.numberOfIncomingConnections,
 				machine.numberOfOutgoingConnections);
 		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.secureCompute();
+
+		System.out.println("hello2");
 
 		c = Class.forName("test.parallel.MarkerWithLastValueGadget");
 		MarkerWithLastValueGadget markerGadget = (MarkerWithLastValueGadget) c.newInstance();
@@ -292,6 +298,8 @@ public class Machine<T> {
 				machine.numberOfOutgoingConnections);
 		output = (Object[]) subtractGadget.secureCompute();
 
+		long endTime = System.nanoTime();
+		System.out.println(machineId + ": " + env.party + " " + (endTime - startTime)/1000000.0);
 		machine.disconnect();
 	}
 

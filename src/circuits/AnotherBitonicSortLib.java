@@ -1,5 +1,7 @@
 package circuits;
 
+import java.io.IOException;
+
 import flexsc.CompEnv;
 
 public class AnotherBitonicSortLib<T> extends IntegerLib<T> {
@@ -64,6 +66,9 @@ public class AnotherBitonicSortLib<T> extends IntegerLib<T> {
 
 	public void bitonicMergeWithPayload(T[][] a, T[][] data, int start, int n, T dir) {
 		if (n > 1) {
+			if (n == 2048) {
+				System.out.println("merging");
+			}
 			int m = compareAndSwapFirstWithPayload(a, data, start, n, dir);
 			bitonicMergeWithPayload(a, data, start, m, dir);
 			bitonicMergeWithPayload(a, data, start + m, n - m, dir);
@@ -74,6 +79,12 @@ public class AnotherBitonicSortLib<T> extends IntegerLib<T> {
 		int m = n / 2;
 		for (int i = start; i < start + m; i++) {
 			compareAndSwapWithPayload(a, data, i, i + m, dir);
+		}
+		try {
+			env.os.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return m;
 	}

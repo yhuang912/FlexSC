@@ -23,9 +23,10 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		T[][] data = (T[][]) inputs[1];
 		AnotherBitonicSortLib<T> lib =  new AnotherBitonicSortLib<T>(env);
 		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
-		// System.out.println("hello");
+		System.out.println("sort hello");
 		lib.sortWithPayload(x, data, dir);
-		// System.out.println("hello2");
+		System.out.println("sort hello1");
+		// env.os.flush();
 
 		for (int k = 0; k < Master.LOG_MACHINES; k++) {
 			int diff = (1 << k);
@@ -43,10 +44,13 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					os = peerOsDown[commMachine];
 				}
 
+				System.out.println("sort hello10");
 				send(os, x);
 				send(os, data);
+				System.out.println("sort hello11");
 				T[][] receiveKey = receive(is, x.length, x[0].length);
 				T[][] receiveData = receive(is, data.length, data[0].length);
+				System.out.println("sort hello12");
 				T[][] arrayKey, arrayData;
 				if (up) {
 					arrayKey = concatenate(receiveKey, x);
@@ -56,7 +60,9 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					arrayData = concatenate(data, receiveData);
 				}
 
+				System.out.println("sort hello13");
 				lib.compareAndSwapFirstWithPayload(arrayKey, arrayData, 0, arrayKey.length, mergeDir);
+				System.out.println("sort hello14");
 				if (up) {
 					System.arraycopy(arrayKey, arrayKey.length / 2, x, 0, arrayKey.length / 2);
 					System.arraycopy(arrayData, arrayData.length / 2, data, 0, arrayData.length / 2);
@@ -66,6 +72,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 				}
 				diff /= 2;
 			}
+			System.out.println("sort hello2");
 			lib.bitonicMergeWithPayload(x, data, 0, x.length, mergeDir);
 		}
 
@@ -83,6 +90,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 	private void send(OutputStream os, T[][] x) throws IOException {
 		for (int i = 0; i < x.length; i++) {
 			send(os, x[i]);
+			// os.flush();
 		}
 		os.flush();
 	}

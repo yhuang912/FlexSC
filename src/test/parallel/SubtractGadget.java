@@ -80,14 +80,14 @@ public class SubtractGadget<T> extends Gadget<T> {
 			if (numberOfOutgoingConnections > 0) {
 				prefixSum[0] = lib.sub(prefixSum[0], last);
 			}
-			for (int i = 0; i < x.length; i++) {
+			/*for (int i = 0; i < x.length; i++) {
 				int int1 = Utils.toInt(lib.getBooleans(flag[i]));
 				int int2 = Utils.toInt(lib.getBooleans(x[i]));
 				int int3 = Utils.toInt(lib.getBooleans(prefixSum[i]));
 				if (Party.Alice.equals(env.party)) {
 					System.out.println(machineId + ": " + int2 + ", " + int3);
 				}
-			}
+			}*/
 			env.os.flush();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
