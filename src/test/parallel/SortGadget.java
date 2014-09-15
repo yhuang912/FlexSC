@@ -5,9 +5,6 @@ import java.lang.reflect.Array;
 
 import network.BadCommandException;
 import network.Master;
-
-import org.apache.commons.lang.ArrayUtils;
-
 import test.Utils;
 import circuits.BitonicSortLib;
 import flexsc.Gadget;
