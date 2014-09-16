@@ -41,9 +41,12 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 		}
 		T[][][] output = env.newTArray(1, x.length, x[0].length);
 		output[0] = x;
-		/* for (int i = 0; i < x.length; i++) {
-    		System.out.println(machineId + ", " + Utils.toInt(lib.getBooleans(x[i])));
-		} */
+		/*for (int i = 0; i < x.length; i++) {
+			int int1 = Utils.toInt(lib.getBooleans(x[i]));
+			if (machineId == 3 && Party.Alice.equals(env.party)) {
+				System.out.println(machineId + ", " + int1);
+			}
+		}*/	
 		return output;
 	}
 

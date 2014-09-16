@@ -31,17 +31,17 @@ public class SubtractGadget<T> extends Gadget<T> {
 			System.arraycopy(x[i], 0, data[i], 0, x[i].length);
 			System.arraycopy(prefixSum[i], 0, data[i], x[i].length, prefixSum[i].length);
 		}
-		/* for (int i = 0; i < x.length; i++) {
+		/*for (int i = 0; i < x.length; i++) {
 			int int1 = Utils.toInt(lib.getBooleans(flag[i]));
 			int int2 = Utils.toInt(lib.getBooleans(x[i]));
 			int int3 = Utils.toInt(lib.getBooleans(prefixSum[i]));
 			if (Party.Alice.equals(env.party)) {
-				System.out.println(machineId + ": " + int1 + ", " + int2 + ", " + int3);
+				System.out.println(machineId + ": "+ int1 + ", " + int2 + ", " + int3);
 			}
 		}
-		System.out.println("**");
+		//System.out.println("**");
 		Thread.sleep(10000);
-		System.out.println("-------------"); */
+		System.out.println("-------------");*/
 		Class c;
 		Gadget gadge;
 		try {
@@ -63,8 +63,15 @@ public class SubtractGadget<T> extends Gadget<T> {
 				System.arraycopy(data[i], 0, x[i], 0, x[i].length);
 				System.arraycopy(data[i], x[i].length, prefixSum[i], 0, prefixSum[i].length);
 			}
-			
 
+			/*for (int i = 0; i < x.length; i++) {
+				int int1 = Utils.toInt(lib.getBooleans(flag[i]));
+				int int2 = Utils.toInt(lib.getBooleans(x[i]));
+				int int3 = Utils.toInt(lib.getBooleans(prefixSum[i]));
+				if (Party.Alice.equals(env.party)) {
+					System.out.println(machineId + ": "+ int1 + ", " + int2 + ", " + int3);
+				}
+			}*/
 			// send and receive values
 			if (numberOfIncomingConnections > 0) {
 				send(peerOsDown[0], prefixSum[prefixSum.length - 1]);
@@ -80,12 +87,14 @@ public class SubtractGadget<T> extends Gadget<T> {
 			if (numberOfOutgoingConnections > 0) {
 				prefixSum[0] = lib.sub(prefixSum[0], last);
 			}
-			/*for (int i = 0; i < x.length; i++) {
-				int int1 = Utils.toInt(lib.getBooleans(flag[i]));
-				int int2 = Utils.toInt(lib.getBooleans(x[i]));
-				int int3 = Utils.toInt(lib.getBooleans(prefixSum[i]));
-				if (Party.Alice.equals(env.party)) {
-					System.out.println(machineId + ": " + int2 + ", " + int3);
+			/*if (machineId == 0) {
+				for (int i = 0; i < 4; i++) {
+					int int1 = Utils.toInt(lib.getBooleans(flag[i]));
+					int int2 = Utils.toInt(lib.getBooleans(x[i]));
+					int int3 = Utils.toInt(lib.getBooleans(prefixSum[i]));
+					if (Party.Alice.equals(env.party)) {
+						System.out.println(machineId + ": " + int2 + ", " + int3);
+					}
 				}
 			}*/
 			env.os.flush();

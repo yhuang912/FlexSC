@@ -75,6 +75,8 @@ public class Machine<T> {
 									 System.out.println("first " + input[0][0].toHexStr());*/
 									
 									 int logMachines = Machine.log2(machines);
+									 Master.LOG_MACHINES = logMachines;
+									 Master.MACHINES = machines;
 									peerIsUp = new BufferedInputStream[logMachines];
 									peerOsUp = new BufferedOutputStream[logMachines];
 									peerIsDown = new BufferedInputStream[logMachines];
