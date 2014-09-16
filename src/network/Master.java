@@ -19,10 +19,10 @@ import java.util.Random;
 import test.Utils;
 
 public class Master {
-	public static int MACHINES = 2;
-	public static int LOG_MACHINES = Machine.log2(MACHINES);
+	public static int MACHINES;// = 4;
+	public static int LOG_MACHINES;// = Machine.log2(MACHINES);
 	public static int START_PORT;
-	public static int INPUT_LENGTH = 16384;
+	public static int INPUT_LENGTH = 2048;
 
 	private ServerSocket[] serverSocket;
 	public InputStream[] is;
@@ -141,6 +141,10 @@ public class Master {
 	}
 
 	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException {
+		Master.MACHINES = Integer.parseInt(args[4]);
+		Master.LOG_MACHINES = Machine.log2(Master.MACHINES);
+		// System.out.println("Machines " + Master.MACHINES);
+		// System.out.println("Log Machines " + Master.LOG_MACHINES);
 		Master master = new Master();
 		Master.START_PORT = Integer.parseInt(args[0]);
 		int peerPort = Integer.parseInt(args[1]);

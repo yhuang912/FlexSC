@@ -44,12 +44,6 @@ public class Machine<T> {
 	protected int numberOfOutgoingConnections;
 
 	public Machine(int masterPort) {
-		peerIsUp = new BufferedInputStream[Master.LOG_MACHINES];
-		peerOsUp = new BufferedOutputStream[Master.LOG_MACHINES];
-		peerIsDown = new BufferedInputStream[Master.LOG_MACHINES];
-		peerOsDown = new BufferedOutputStream[Master.LOG_MACHINES];
-		upSocket = new Socket[Master.LOG_MACHINES];
-		downSocket = new Socket[Master.LOG_MACHINES];
 		this.masterPort = masterPort;
 	}
 
@@ -79,6 +73,14 @@ public class Machine<T> {
 									 /*ObjectInputStream ois = new ObjectInputStream(masterIs);
 									 GCSignal[][] input = (GCSignal[][])ois.readObject();
 									 System.out.println("first " + input[0][0].toHexStr());*/
+									
+									 int logMachines = Machine.log2(machines);
+									peerIsUp = new BufferedInputStream[logMachines];
+									peerOsUp = new BufferedOutputStream[logMachines];
+									peerIsDown = new BufferedInputStream[logMachines];
+									peerOsDown = new BufferedOutputStream[logMachines];
+									upSocket = new Socket[logMachines];
+									downSocket = new Socket[logMachines];
 									 break;
 				case CONNECT: connectToPeers();
 							  break;
@@ -299,7 +301,7 @@ public class Machine<T> {
 		output = (Object[]) subtractGadget.secureCompute();
 
 		long endTime = System.nanoTime();
-		System.out.println(machineId + ": " + env.party + " " + (endTime - startTime)/1000000.0);
+		System.out.println(machineId + ": " + env.party + " " + (endTime - startTime)/1000000000.0);
 		machine.disconnect();
 	}
 
