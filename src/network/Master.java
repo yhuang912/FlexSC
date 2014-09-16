@@ -22,7 +22,7 @@ public class Master {
 	public static int MACHINES = 2;
 	public static int LOG_MACHINES = Machine.log2(MACHINES);
 	public static int START_PORT;
-	public static int INPUT_LENGTH = 8192;
+	public static int INPUT_LENGTH = 16384;
 
 	private ServerSocket[] serverSocket;
 	public InputStream[] is;

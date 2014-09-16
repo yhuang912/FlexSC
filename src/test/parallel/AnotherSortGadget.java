@@ -26,7 +26,6 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		System.out.println("sort hello");
 		lib.sortWithPayload(x, data, dir);
 		System.out.println("sort hello1");
-		// env.os.flush();
 
 		for (int k = 0; k < Master.LOG_MACHINES; k++) {
 			int diff = (1 << k);
@@ -45,11 +44,14 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 				}
 
 				System.out.println("sort hello10");
+				/*T[][] receiveKey = env.newTArray(x.length, x[0].length);
+				T[][] receiveData = env.newTArray(data.length, data[0].length);
+				// receive(is, x.length, x[0].length);
 				send(os, x);
-				send(os, data);
-				System.out.println("sort hello11");
-				T[][] receiveKey = receive(is, x.length, x[0].length);
-				T[][] receiveData = receive(is, data.length, data[0].length);
+				send(os, data);*/
+				// T[][] receiveData = receive(is, data.length, data[0].length);
+				T[][] receiveKey = sendReceive(os, is, x, x.length, x[0].length);
+				T[][] receiveData = sendReceive(os, is, data, data.length, data[0].length);
 				System.out.println("sort hello12");
 				T[][] arrayKey, arrayData;
 				if (up) {
@@ -85,6 +87,24 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		output[0] = x;
 		output[1] = data;
 		return output;
+	}
+
+	private T[][] sendReceive(OutputStream os, InputStream is, T[][] x, int arrayLength, int intLength) throws IOException {
+		T[][] y = env.newTArray(arrayLength, intLength);
+		int toTransfer = x.length;
+		int i = 0, j = 0;
+		while (toTransfer > 0) {
+			int curTransfer = Math.min(toTransfer, 1024);
+			toTransfer -= curTransfer;
+			for (int k = 0; k < curTransfer; k++, i++) {
+				send(os, x[i]);
+			}
+			os.flush();
+			for (int k = 0; k < curTransfer; k++, j++) {
+				y[j] = (T[]) read(is, intLength);
+			}
+		}
+		return y;
 	}
 
 	private void send(OutputStream os, T[][] x) throws IOException {

@@ -2,9 +2,8 @@ package test.parallel;
 
 import java.io.IOException;
 
-import test.Utils;
-import circuits.IntegerLib;
 import network.BadCommandException;
+import test.Utils;
 import flexsc.Gadget;
 import gc.BadLabelException;
 
