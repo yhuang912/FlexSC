@@ -23,9 +23,9 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		T[][] data = (T[][]) inputs[1];
 		AnotherBitonicSortLib<T> lib =  new AnotherBitonicSortLib<T>(env);
 		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
-		System.out.println("sort hello");
+		// System.out.println("sort hello");
 		lib.sortWithPayload(x, data, dir);
-		System.out.println("sort hello1");
+		// System.out.println("sort hello1");
 
 		for (int k = 0; k < Master.LOG_MACHINES; k++) {
 			int diff = (1 << k);
@@ -43,7 +43,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					os = peerOsDown[commMachine];
 				}
 
-				System.out.println("sort hello10");
+				// System.out.println("sort hello10");
 				/*T[][] receiveKey = env.newTArray(x.length, x[0].length);
 				T[][] receiveData = env.newTArray(data.length, data[0].length);
 				// receive(is, x.length, x[0].length);
@@ -52,7 +52,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 				// T[][] receiveData = receive(is, data.length, data[0].length);
 				T[][] receiveKey = sendReceive(os, is, x, x.length, x[0].length);
 				T[][] receiveData = sendReceive(os, is, data, data.length, data[0].length);
-				System.out.println("sort hello12");
+				// System.out.println("sort hello12");
 				T[][] arrayKey, arrayData;
 				if (up) {
 					arrayKey = concatenate(receiveKey, x);
@@ -62,9 +62,9 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					arrayData = concatenate(data, receiveData);
 				}
 
-				System.out.println("sort hello13");
+				// System.out.println("sort hello13");
 				lib.compareAndSwapFirstWithPayload(arrayKey, arrayData, 0, arrayKey.length, mergeDir);
-				System.out.println("sort hello14");
+				// System.out.println("sort hello14");
 				if (up) {
 					System.arraycopy(arrayKey, arrayKey.length / 2, x, 0, arrayKey.length / 2);
 					System.arraycopy(arrayData, arrayData.length / 2, data, 0, arrayData.length / 2);
@@ -74,7 +74,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 				}
 				diff /= 2;
 			}
-			System.out.println("sort hello2");
+			// System.out.println("sort hello2");
 			lib.bitonicMergeWithPayload(x, data, 0, x.length, mergeDir);
 		}
 

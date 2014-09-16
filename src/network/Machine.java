@@ -239,7 +239,7 @@ public class Machine<T> {
 				machine.peerOsDown);
 		Object[] output = (Object[]) histogramMapper.secureCompute();
 
-		System.out.println("hello");
+		// System.out.println("hello");
 		// listen
 		c = Class.forName("test.parallel.AnotherSortGadget");
 		Gadget gadge = (Gadget) c.newInstance();
@@ -253,7 +253,7 @@ public class Machine<T> {
 				machine.peerOsDown);
 		output = (Object[]) gadge.secureCompute();
 
-		System.out.println("hello1");
+		// System.out.println("hello1");
 		c = Class.forName("test.parallel.PrefixSumGadget");
 		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
 		Object[] prefixSumInputs = new Object[1];
@@ -267,7 +267,7 @@ public class Machine<T> {
 				machine.numberOfOutgoingConnections);
 		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.secureCompute();
 
-		System.out.println("hello2");
+		// System.out.println("hello2");
 
 		c = Class.forName("test.parallel.MarkerWithLastValueGadget");
 		MarkerWithLastValueGadget markerGadget = (MarkerWithLastValueGadget) c.newInstance();

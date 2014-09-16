@@ -66,9 +66,9 @@ public class AnotherBitonicSortLib<T> extends IntegerLib<T> {
 
 	public void bitonicMergeWithPayload(T[][] a, T[][] data, int start, int n, T dir) {
 		if (n > 1) {
-			if (n == 2048) {
+			/* if (n == 2048) {
 				System.out.println("merging");
-			}
+			} */
 			int m = compareAndSwapFirstWithPayload(a, data, start, n, dir);
 			bitonicMergeWithPayload(a, data, start, m, dir);
 			bitonicMergeWithPayload(a, data, start + m, n - m, dir);
