@@ -4,8 +4,6 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-
 final class Garbler {
 	private MessageDigest sha1 = null;
 	Garbler() {
@@ -28,7 +26,6 @@ final class Garbler {
 	}
 	
 	private GCSignal getPadding(GCSignal lb0, GCSignal lb1, long k) {
-		
 //        sha1.update(lb0.bytes);
 //        sha1.update(lb1.bytes);
 //        sha1.update(ByteBuffer.allocate(8).putLong(k).array());

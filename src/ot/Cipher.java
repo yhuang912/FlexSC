@@ -36,17 +36,17 @@ public final class Cipher {
 	}
 
 	private BigInteger getPaddingOfLength(byte[] key, int padLength) {
-		sha1.update(key);
+		
 		byte[] pad = new byte[(padLength-1)/8+1];
 		byte[] tmp;
-		tmp = sha1.digest();
 		int i;
 		for (i = 0; i < (pad.length-1)/bytesPerUnit; i++) {
-			System.arraycopy(tmp, 0, pad, i*bytesPerUnit, bytesPerUnit);
-			sha1.update(tmp);
+			assert (i < 128) : "Padding is unexpectedly long.";
+			sha1.update(key);
+			sha1.update((byte)i);
 			tmp = sha1.digest();
+			System.arraycopy(tmp, 0, pad, i*bytesPerUnit, bytesPerUnit);
 		}
-		System.arraycopy(tmp, 0, pad, i*bytesPerUnit, pad.length-i*bytesPerUnit);
 		
 		return new BigInteger(1, pad);
 	}

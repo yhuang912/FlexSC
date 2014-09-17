@@ -12,7 +12,7 @@ import ot.NPOTReceiver;
 import ot.NPOTSender;
 
 public class TestNPOTMany {
-	static int n = 50000;
+	static int n = 10000;
 	GCSignal[][] m;
 	boolean[] c;
 	GCSignal[] rcvd;
