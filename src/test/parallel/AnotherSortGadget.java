@@ -8,7 +8,6 @@ import java.lang.reflect.Array;
 import network.BadCommandException;
 import network.Machine;
 import network.Master;
-import test.Utils;
 import circuits.AnotherBitonicSortLib;
 import flexsc.Gadget;
 import gc.BadLabelException;
