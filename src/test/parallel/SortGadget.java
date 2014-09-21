@@ -23,7 +23,7 @@ public class SortGadget<T> extends Gadget<T> {
 		lib.sort(x, dir);
 
 		int id = machineId;
-		for (int k = 0; k < Master.LOG_MACHINES; k++) {
+		for (int k = 0; k < logMachines; k++) {
 			if (id % 2 == 1) {
 				send(k, x);
 				break;

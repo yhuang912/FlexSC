@@ -31,6 +31,7 @@ public class Machine<T> {
 	private Socket[] downSocket;
 	int peerPort;
 	int totalMachines;
+	int logMachines;
 	int masterPort;
 	private Object input;
 	boolean isGen;
@@ -75,14 +76,12 @@ public class Machine<T> {
 									 System.out.println("first " + input[0][0].toHexStr());*/
 									
 									 int logMachines = Machine.log2(machines);
-									 Master.LOG_MACHINES = logMachines;
-									 Master.MACHINES = machines;
-									peerIsUp = new BufferedInputStream[logMachines];
-									peerOsUp = new BufferedOutputStream[logMachines];
-									peerIsDown = new BufferedInputStream[logMachines];
-									peerOsDown = new BufferedOutputStream[logMachines];
-									upSocket = new Socket[logMachines];
-									downSocket = new Socket[logMachines];
+									 peerIsUp = new BufferedInputStream[logMachines];
+									 peerOsUp = new BufferedOutputStream[logMachines];
+									 peerIsDown = new BufferedInputStream[logMachines];
+									 peerOsDown = new BufferedOutputStream[logMachines];
+									 upSocket = new Socket[logMachines];
+									 downSocket = new Socket[logMachines];
 									 break;
 				case CONNECT: connectToPeers();
 							  break;
@@ -95,6 +94,7 @@ public class Machine<T> {
 
 	public void setMachineId(int machineId, int peerPort, int totalMachines) {
 		this.totalMachines = totalMachines;
+		this.logMachines = Machine.log2(totalMachines);
 		this.machineId = machineId;
 		this.numberOfIncomingConnections = getNumberOfIncomingConnections(machineId);
 		this.numberOfOutgoingConnections = getNumberOfIncomingConnections(totalMachines - machineId - 1);
@@ -240,7 +240,8 @@ public class Machine<T> {
 				machine.peerIsUp,
 				machine.peerOsUp,
 				machine.peerIsDown,
-				machine.peerOsDown);
+				machine.peerOsDown,
+				machine.logMachines);
 		Object[] output = (Object[]) histogramMapper.secureCompute();
 
 		// System.out.println("hello");
@@ -254,7 +255,8 @@ public class Machine<T> {
 				machine.peerIsUp,
 				machine.peerOsUp,
 				machine.peerIsDown,
-				machine.peerOsDown);
+				machine.peerOsDown,
+				machine.logMachines);
 		output = (Object[]) gadge.secureCompute();
 
 		// System.out.println("hello1");
@@ -267,6 +269,7 @@ public class Machine<T> {
 				machine.peerOsUp,
 				machine.peerIsDown,
 				machine.peerOsDown,
+				machine.logMachines,
 				machine.numberOfIncomingConnections,
 				machine.numberOfOutgoingConnections);
 		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.secureCompute();
@@ -282,6 +285,7 @@ public class Machine<T> {
 				machine.peerOsUp,
 				machine.peerIsDown,
 				machine.peerOsDown,
+				machine.logMachines,
 				machine.numberOfIncomingConnections,
 				machine.numberOfOutgoingConnections,
 				machine.totalMachines);
@@ -298,6 +302,7 @@ public class Machine<T> {
 				machine.peerOsUp,
 				machine.peerIsDown,
 				machine.peerOsDown,
+				machine.logMachines,
 				machine.numberOfIncomingConnections,
 				machine.numberOfOutgoingConnections);
 		output = (Object[]) subtractGadget.secureCompute();

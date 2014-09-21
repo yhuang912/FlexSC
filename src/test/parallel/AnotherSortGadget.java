@@ -26,7 +26,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		lib.sortWithPayload(x, data, dir);
 		// System.out.println("sort hello1");
 
-		for (int k = 0; k < Master.LOG_MACHINES; k++) {
+		for (int k = 0; k < logMachines; k++) {
 			int diff = (1 << k);
 			T mergeDir = ((machineId / (2 * (1 << k))) % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 			while (diff != 0) {

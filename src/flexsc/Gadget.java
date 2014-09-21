@@ -19,6 +19,7 @@ public abstract class Gadget<T> implements Callable<Object> {
 	protected OutputStream[] peerOsUp;
 	protected InputStream[] peerIsDown;
 	protected OutputStream[] peerOsDown;
+	protected int logMachines;
 
 	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
@@ -71,7 +72,8 @@ public abstract class Gadget<T> implements Callable<Object> {
 			InputStream[] peerIsUp,
 			OutputStream[] peerOsUp,
 			InputStream[] peerIsDown,
-			OutputStream[] peerOsDown) {
+			OutputStream[] peerOsDown,
+			int logMachines) {
 		this.inputs = inputs;
 		this.env = env;
 		this.peerIsUp = peerIsUp;
@@ -79,5 +81,6 @@ public abstract class Gadget<T> implements Callable<Object> {
 		this.peerIsDown = peerIsDown;
 		this.peerOsDown = peerOsDown;
 		this.machineId = machineId;
+		this.logMachines = logMachines;
 	}
 }

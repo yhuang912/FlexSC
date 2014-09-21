@@ -53,7 +53,7 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 	private T[] prefixSum(T[] prefixSum, IntegerLib<T> lib) throws IOException, BadLabelException {
 		int noOfIncomingConnections = this.numberOfIncomingConnections;
 		int noOfOutgoingConnections = this.numberOfOutgoingConnections;
-		for (int k = 0; k < Master.LOG_MACHINES; k++) {
+		for (int k = 0; k < logMachines; k++) {
 			/* if (noOfOutgoingConnections > 0) {
 				send(peerOsUp[k], prefixSum);
 				((BufferedOutputStream) peerOsUp[k]).flush();
@@ -86,9 +86,10 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 			OutputStream[] peerOsUp,
 			InputStream[] peerIsDown,
 			OutputStream[] peerOsDown,
+			int logMachines,
 			int numberOfIncomingConnections,
 			int numberOfOutgoingConnections) {
-		setInputs(inputs, env, machineId, peerIsUp, peerOsUp, peerIsDown, peerOsDown);
+		setInputs(inputs, env, machineId, peerIsUp, peerOsUp, peerIsDown, peerOsDown, logMachines);
 		this.numberOfIncomingConnections = numberOfIncomingConnections;
 		this.numberOfOutgoingConnections = numberOfOutgoingConnections;
 	}

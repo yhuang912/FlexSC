@@ -24,6 +24,7 @@ public class Test_2Input1Output<T> {
 		int[] intA;
 		boolean[][] a;
 		Mode m;
+		int machines;
 
 		public Helper(int[] aa, Mode m) {
 			this.m = m;
@@ -31,6 +32,7 @@ public class Test_2Input1Output<T> {
 			a = new boolean[aa.length][];
 			for(int i = 0; i < aa.length; ++i)
 				a[i] = Utils.fromInt(aa[i], 32);
+			machines = 4;
 		}
 	}
 
@@ -51,14 +53,14 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = gen.inputOfBob(new boolean[32]);
 
-				CompPool<T> pool = new CompPool(gen, Constants.LOCALHOST, COMPPOOL_GEN_EVA_PORT, MASTER_GEN_PORT);
+				CompPool<T> pool = new CompPool(gen, Constants.LOCALHOST, COMPPOOL_GEN_EVA_PORT, MASTER_GEN_PORT, h.machines);
 				
 				long t1 = System.nanoTime();
 
-				Object[] input = new Object[Master.MACHINES];
+				Object[] input = new Object[h.machines];
 
-				for(int i = 0; i < Master.MACHINES; ++i)
-					input[i] = new Object[]{Arrays.copyOfRange(Ta, i * Ta.length / Master.MACHINES, (i + 1) * Ta.length / Master.MACHINES)};
+				for(int i = 0; i < h.machines; ++i)
+					input[i] = new Object[]{Arrays.copyOfRange(Ta, i * Ta.length / h.machines, (i + 1) * Ta.length / h.machines)};
 
 				// pool.runGadget("test.parallel.AddGadget", input);
 				// pool.runGadget("test.parallel.AnotherSortGadget", input);
@@ -68,7 +70,7 @@ public class Test_2Input1Output<T> {
 
 				/*z = gen.outputToAlice((T[]) finalresult);
 				System.out.println("result:"+Utils.toInt(z));*/
-				pool.finalize();
+				pool.finalize(h.machines);
 				disconnect();
 			} catch(/*ExecutionException |*/ ClassNotFoundException /*| InstantiationException | IllegalAccessException*/ e) {
 				System.out.println("Gadget probably does not exist. Reflection issue");
@@ -97,17 +99,17 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
-				CompPool<T> pool = new CompPool(eva, Constants.LOCALHOST, COMPPOOL_GEN_EVA_PORT, MASTER_EVA_PORT);				
-				Object[] input = new Object[Master.MACHINES];
+				CompPool<T> pool = new CompPool(eva, Constants.LOCALHOST, COMPPOOL_GEN_EVA_PORT, MASTER_EVA_PORT, h.machines);				
+				Object[] input = new Object[h.machines];
 
-				for(int i = 0; i < Master.MACHINES; ++i)
-					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/Master.MACHINES, (i+1)*Ta.length/Master.MACHINES)};
+				for(int i = 0; i < h.machines; ++i)
+					input[i] = new Object[]{Arrays.copyOfRange(Ta, i*Ta.length/h.machines, (i+1)*Ta.length/h.machines)};
 				os.flush();
 				
 				// pool.runGadget("test.parallel.AddGadget", input);
 				// pool.runGadget("test.parallel.AnotherSortGadget", input);
 
-				pool.finalize();
+				pool.finalize(h.machines);
 				disconnect();
 
 			} catch(/*ExecutionException |*/ ClassNotFoundException /*| InstantiationException | IllegalAccessException */e) {

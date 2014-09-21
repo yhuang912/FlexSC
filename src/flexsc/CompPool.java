@@ -21,14 +21,14 @@ public class CompPool<T> {
 	int masterPort;
 
 	@SuppressWarnings("unchecked")
-	public CompPool(CompEnv<T> env, String host, int port, int masterPort) throws IOException, InterruptedException {
-		envs = new CompEnv[Master.MACHINES];
-		servers = new Server[Master.MACHINES];
-		clients = new Client[Master.MACHINES];
+	public CompPool(CompEnv<T> env, String host, int port, int masterPort, int machines) throws IOException, InterruptedException {
+		envs = new CompEnv[machines];
+		servers = new Server[machines];
+		clients = new Client[machines];
 
-	    executorService = Executors.newFixedThreadPool(Master.MACHINES);
+	    executorService = Executors.newFixedThreadPool(machines);
 
-		for (int i = 0; i < Master.MACHINES; ++i) {
+		for (int i = 0; i < machines; ++i) {
 			InputStream inputStream = null;
 			OutputStream outputStream = null;
 			if(env.getParty() == Party.Alice) {
@@ -48,8 +48,8 @@ public class CompPool<T> {
 		this.masterPort = masterPort;
 	}
 
-	public void finalize() throws IOException {
-		for (int i = 0; i < Master.MACHINES; ++i){
+	public void finalize(int machines) throws IOException {
+		for (int i = 0; i < machines; ++i){
 			if(servers[i] != null)
 				servers[i].disconnect();
 			if(clients[i] != null)
