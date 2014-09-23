@@ -145,9 +145,7 @@ public class Master {
 	}
 
 	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException {
-		// IPManager ipManager = IPManager.loadIPs();
-		// for (int i = 0; i < args.length; i++)
-			// System.out.println(args[i]);
+		IPManager ipManager = IPManager.loadIPs();
 		int inputLength = Integer.parseInt(args[5]);
 		int machines = Integer.parseInt(args[4]);
 		Master master = new Master(machines);
@@ -166,7 +164,7 @@ public class Master {
 			os = server.os;
 		} else {
 			Client client = new Client();
-			client.connect(Constants.LOCALHOST, masterMasterConnectionPort);
+			client.connect(ipManager.masterGarblerIp, masterMasterConnectionPort);
 			is = client.is;
 			os = client.os;
 		}
