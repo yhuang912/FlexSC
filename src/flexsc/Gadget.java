@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 import network.BadCommandException;
 import network.NetworkUtil;
 
-public abstract class Gadget<T> implements Callable<Object> {
+public abstract class Gadget<T> {
 	protected Object[] inputs;
 	protected CompEnv<T> env;
 	protected int machineId;
@@ -20,14 +20,20 @@ public abstract class Gadget<T> implements Callable<Object> {
 	protected InputStream[] peerIsDown;
 	protected OutputStream[] peerOsDown;
 	protected int logMachines;
+	protected int inputLength;
 
 	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
-	@Override
-	public Object call() throws InterruptedException, IOException, BadCommandException, BadLabelException {
+	public Object compute() throws InterruptedException, IOException, BadCommandException, BadLabelException {
 		// connect(port);
+		long startTime = System.nanoTime();
 		Object ret = secureCompute();
 		env.flush();
+		long endTime = System.nanoTime();
+		if (machineId == 0 && env.party.equals(Party.Alice)) {
+			String[] gadge = this.getClass().getName().split("\\.");
+			System.out.println((1 << logMachines) + "," + inputLength + "," + (endTime - startTime)/1000000000.0 + "," + gadge[gadge.length - 1]);
+		}
 		// disconnect();
 		return ret;
 	}
@@ -73,7 +79,8 @@ public abstract class Gadget<T> implements Callable<Object> {
 			OutputStream[] peerOsUp,
 			InputStream[] peerIsDown,
 			OutputStream[] peerOsDown,
-			int logMachines) {
+			int logMachines,
+			int inputLength) {
 		this.inputs = inputs;
 		this.env = env;
 		this.peerIsUp = peerIsUp;
@@ -82,5 +89,6 @@ public abstract class Gadget<T> implements Callable<Object> {
 		this.peerOsDown = peerOsDown;
 		this.machineId = machineId;
 		this.logMachines = logMachines;
+		this.inputLength = inputLength;
 	}
 }

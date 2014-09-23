@@ -55,7 +55,8 @@ public class SubtractGadget<T> extends Gadget<T> {
 					peerOsUp,
 					peerIsDown,
 					peerOsDown,
-					logMachines);
+					logMachines,
+					inputLength);
 			Object[] sortOutput = (Object[]) gadge.secureCompute();
 			
 			flag = (T[][]) sortOutput[0];
@@ -88,7 +89,7 @@ public class SubtractGadget<T> extends Gadget<T> {
 			if (numberOfOutgoingConnections > 0) {
 				prefixSum[0] = lib.sub(prefixSum[0], last);
 			}
-			if (machineId == 0) {
+			/*if (machineId == 0) {
 				for (int i = 0; i < 4; i++) {
 					int int1 = Utils.toInt(lib.getBooleans(flag[i]));
 					int int2 = Utils.toInt(lib.getBooleans(x[i]));
@@ -97,7 +98,7 @@ public class SubtractGadget<T> extends Gadget<T> {
 						System.out.println(machineId + ": " + int2 + ", " + int3);
 					}
 				}
-			}
+			}*/
 			env.os.flush();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -117,9 +118,10 @@ public class SubtractGadget<T> extends Gadget<T> {
 			InputStream[] peerIsDown,
 			OutputStream[] peerOsDown,
 			int logMachines,
+			int inputLength,
 			int numberOfIncomingConnections,
 			int numberOfOutgoingConnections) {
-		setInputs(inputs, env, machineId, peerIsUp, peerOsUp, peerIsDown, peerOsDown, logMachines);
+		setInputs(inputs, env, machineId, peerIsUp, peerOsUp, peerIsDown, peerOsDown, logMachines, inputLength);
 		this.numberOfIncomingConnections = numberOfIncomingConnections;
 		this.numberOfOutgoingConnections = numberOfOutgoingConnections;
 	}

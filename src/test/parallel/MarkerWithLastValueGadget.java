@@ -65,10 +65,11 @@ public class MarkerWithLastValueGadget<T> extends Gadget<T> {
 			InputStream[] peerIsDown,
 			OutputStream[] peerOsDown,
 			int logMachines,
+			int inputLength,
 			int numberOfIncomingConnections,
 			int numberOfOutgoingConnections,
 			int totalMachines) {
-		setInputs(inputs, env, machineId, peerIsUp, peerOsUp, peerIsDown, peerOsDown, logMachines);
+		setInputs(inputs, env, machineId, peerIsUp, peerOsUp, peerIsDown, peerOsDown, logMachines, inputLength);
 		this.numberOfIncomingConnections = numberOfIncomingConnections;
 		this.numberOfOutgoingConnections = numberOfOutgoingConnections;
 		this.totalMachines = totalMachines;

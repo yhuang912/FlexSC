@@ -13,6 +13,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -21,7 +22,7 @@ import test.parallel.PrefixSumGadget;
 import test.parallel.SubtractGadget;
 
 public class Machine<T> {
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	private InputStream masterIs;
 	private OutputStream masterOs;
@@ -35,6 +36,7 @@ public class Machine<T> {
 	int masterPort;
 	private Object input;
 	boolean isGen;
+	int inputLength;
 
 	protected int machineId;
 	protected InputStream[] peerIsUp;
@@ -50,7 +52,7 @@ public class Machine<T> {
 
 	protected void connect() throws InterruptedException, IOException, BadCommandException, ClassNotFoundException {
 		connectToMaster(Constants.LOCALHOST, masterPort);
-		System.out.println("Connected to master");
+		debug("Connected to master");
 		while(true) {
 			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
 			switch(command) {
@@ -168,7 +170,7 @@ public class Machine<T> {
 			masterIs = new BufferedInputStream(masterSocket.getInputStream(), Constants.BUFFER_SIZE);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}  
+		}
 	}
 
 	public void disconnect() throws IOException {
@@ -223,11 +225,12 @@ public class Machine<T> {
 		Mode mode = Mode.REAL;
 		Machine machine = new Machine(masterPort);
 		machine.isGen = Boolean.parseBoolean(args[3]);
+		machine.inputLength = Integer.parseInt(args[4]);
 		// TODO(OT)
 		// Connect to the other party
 		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort);
 
-		System.out.println("Connected to other party");
+		// System.out.println("Connected to other party");
 		// Connect to master and then to peers
 		machine.connect();
 
@@ -241,8 +244,9 @@ public class Machine<T> {
 				machine.peerOsUp,
 				machine.peerIsDown,
 				machine.peerOsDown,
-				machine.logMachines);
-		Object[] output = (Object[]) histogramMapper.secureCompute();
+				machine.logMachines,
+				machine.inputLength);
+		Object[] output = (Object[]) histogramMapper.compute();
 
 		// System.out.println("hello");
 		// listen
@@ -256,8 +260,9 @@ public class Machine<T> {
 				machine.peerOsUp,
 				machine.peerIsDown,
 				machine.peerOsDown,
-				machine.logMachines);
-		output = (Object[]) gadge.secureCompute();
+				machine.logMachines,
+				machine.inputLength);
+		output = (Object[]) gadge.compute();
 
 		// System.out.println("hello1");
 		c = Class.forName("test.parallel.PrefixSumGadget");
@@ -270,9 +275,10 @@ public class Machine<T> {
 				machine.peerIsDown,
 				machine.peerOsDown,
 				machine.logMachines,
+				machine.inputLength,
 				machine.numberOfIncomingConnections,
 				machine.numberOfOutgoingConnections);
-		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.secureCompute();
+		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
 
 		// System.out.println("hello2");
 
@@ -286,10 +292,11 @@ public class Machine<T> {
 				machine.peerIsDown,
 				machine.peerOsDown,
 				machine.logMachines,
+				machine.inputLength,
 				machine.numberOfIncomingConnections,
 				machine.numberOfOutgoingConnections,
 				machine.totalMachines);
-		Object marker = markerGadget.secureCompute();
+		Object marker = markerGadget.compute();
 
 		c = Class.forName("test.parallel.SubtractGadget");
 		SubtractGadget subtractGadget = (SubtractGadget) c.newInstance();
@@ -303,13 +310,19 @@ public class Machine<T> {
 				machine.peerIsDown,
 				machine.peerOsDown,
 				machine.logMachines,
+				machine.inputLength,
 				machine.numberOfIncomingConnections,
 				machine.numberOfOutgoingConnections);
-		output = (Object[]) subtractGadget.secureCompute();
+		output = (Object[]) subtractGadget.compute();
 
 		long endTime = System.nanoTime();
-		System.out.println(machineId + ": " + env.party + " " + (endTime - startTime)/1000000000.0);
+		// System.out.println(machineId + ": " + env.party + " " + (endTime - startTime)/1000000000.0);
 		machine.disconnect();
+
+		if (machine.machineId == 0) {
+			PrintWriter writer = new PrintWriter("mutex.txt");
+			writer.close();
+		}
 	}
 
 	CompEnv connectToOtherParty(boolean isGen, Mode mode, int compPoolGenEvaPort) throws InterruptedException, IOException, ClassNotFoundException {

@@ -119,7 +119,7 @@ public class Master {
 		}
 
 		// Ask all machines to connect, one at a time
-		System.out.println("Everyone started listening!");
+		// System.out.println("Everyone started listening!");
 		for (int i = machines - 1; i > 0; i--) {
 			NetworkUtil.writeInt(os[i], Command.CONNECT.getValue());
 			os[i].flush();
@@ -145,6 +145,9 @@ public class Master {
 	}
 
 	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException {
+		// IPManager ipManager = IPManager.loadIPs();
+		// for (int i = 0; i < args.length; i++)
+			// System.out.println(args[i]);
 		int inputLength = Integer.parseInt(args[5]);
 		int machines = Integer.parseInt(args[4]);
 		Master master = new Master(machines);
@@ -167,7 +170,7 @@ public class Master {
 			is = client.is;
 			os = client.os;
 		}
-		System.out.println("connected to other master");
+		// System.out.println("connected to other master");
 		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
 		GCSignal[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
 		if (master.isGen) {
@@ -183,15 +186,15 @@ public class Master {
 		for(int i = 0; i < machines; ++i)
 			input[i] = Arrays.copyOfRange(Ta, i * Ta.length / machines, (i + 1) * Ta.length / machines);
 
-		System.out.println("OT done");
+		// System.out.println("OT done");
 
 		for (int i = 0; i < machines; i++) {
 			master.listen(Master.START_PORT + i, i);
 		}
-		System.out.println("Connected to master");
+		// System.out.println("Connected to master");
 		// master tells the machines what their ports are for peer connections
 		master.setUp(peerPort, input);
-		System.out.println("Connections successful");
+		// System.out.println("Connections successful");
 	}
 
 	private static boolean[][] getInput(int inputLength) {
@@ -208,9 +211,9 @@ public class Master {
 		}
 		for(int i = 0; i < aa.length; ++i)
 			a[i] = Utils.fromInt(aa[i], 32);
-		System.out.println("Frequencies");
+		/* System.out.println("Frequencies");
 		for (int i = 0; i < limit + 1; i++)
-			System.out.println(i + ": " + freq[i]);
+			System.out.println(i + ": " + freq[i]);*/
 		return a;
 	}
 }
