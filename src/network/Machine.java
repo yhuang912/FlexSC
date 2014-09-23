@@ -50,8 +50,9 @@ public class Machine<T> {
 		this.masterPort = masterPort;
 	}
 
-	protected void connect() throws InterruptedException, IOException, BadCommandException, ClassNotFoundException {
-		connectToMaster(Constants.LOCALHOST, masterPort);
+	protected void connect(IPManager ipManager) throws InterruptedException, IOException, BadCommandException, ClassNotFoundException {
+		String otherMasterIp = isGen ? ipManager.masterEvaluatorIp : ipManager.masterGarblerIp;
+		connectToMaster(otherMasterIp, masterPort);
 		debug("Connected to master");
 		while(true) {
 			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
@@ -85,7 +86,7 @@ public class Machine<T> {
 									 upSocket = new Socket[logMachines];
 									 downSocket = new Socket[logMachines];
 									 break;
-				case CONNECT: connectToPeers();
+				case CONNECT: connectToPeers(ipManager);
 							  break;
 				case COMPUTE: return;
 				default:
@@ -135,11 +136,17 @@ public class Machine<T> {
         }
 	}
 
-	public void connectToPeers() throws InterruptedException {
+	public void connectToPeers(IPManager ipManager) throws InterruptedException {
 		for (int i = 0; i < numberOfOutgoingConnections; i++) {
 			debug("I'm trying to connect to " + (machineId - (1 << i)) + " at " + (peerPort + machineId - (1 << i)) + ". Storing connection at " + i);
 			// System.out.println(machineId + ": I have " + (numberOfOutgoingConnections - i) + " remaining");
-			Socket peerSocket = NetworkUtil.connect(Constants.LOCALHOST, peerPort + machineId - (1 << i));
+			String peerIp = null;
+			if (isGen) {
+				peerIp = ipManager.gIp[(machineId - (1 << i))];
+			} else {
+				peerIp = ipManager.eIp[(machineId - (1 << i))];
+			}
+			Socket peerSocket = NetworkUtil.connect(peerIp, peerPort + machineId - (1 << i));
 			try {
 				upSocket[i] = peerSocket;
 				peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Constants.BUFFER_SIZE);
@@ -219,6 +226,7 @@ public class Machine<T> {
 	}
 
 	public static void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException {
+		IPManager ipManager = IPManager.loadIPs();
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
 		int compPoolGenEvaPort = Integer.parseInt(args[2]);
@@ -228,11 +236,11 @@ public class Machine<T> {
 		machine.inputLength = Integer.parseInt(args[4]);
 		// TODO(OT)
 		// Connect to the other party
-		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort);
+		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);
 
 		// System.out.println("Connected to other party");
 		// Connect to master and then to peers
-		machine.connect();
+		machine.connect(ipManager);
 
 		long startTime = System.nanoTime();
 		Class c = Class.forName("test.parallel.HistogramMapper");
@@ -325,7 +333,7 @@ public class Machine<T> {
 		}
 	}
 
-	CompEnv connectToOtherParty(boolean isGen, Mode mode, int compPoolGenEvaPort) throws InterruptedException, IOException, ClassNotFoundException {
+	CompEnv connectToOtherParty(boolean isGen, Mode mode, int compPoolGenEvaPort, IPManager ipManager) throws InterruptedException, IOException, ClassNotFoundException {
 		Party party = isGen ? Party.Alice : Party.Bob;
 		InputStream is = null;
 		OutputStream os = null;
@@ -334,18 +342,12 @@ public class Machine<T> {
 			server.listen(compPoolGenEvaPort);
 			is = server.is;
 			os = server.os;
-			/*os.write(10);
-			os.flush();*/
 		} else {
 			Client client = new Client();
-			client.connect(Constants.LOCALHOST, compPoolGenEvaPort);
+			// my evaluator's machine id is going to be the same as mine
+			client.connect(ipManager.gIp[machineId], compPoolGenEvaPort);
 			is = client.is;
 			os = client.os;
-			/*int inte = is.read();
-			while(inte == -1) {
-			  inte = is.read();
-			}
-			System.out.println(inte);*/
 		}
 		return CompEnv.getEnv(mode, party, is, os);
 	}

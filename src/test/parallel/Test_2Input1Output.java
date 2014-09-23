@@ -53,7 +53,7 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = gen.inputOfBob(new boolean[32]);
 
-				CompPool<T> pool = new CompPool(gen, Constants.LOCALHOST, COMPPOOL_GEN_EVA_PORT, MASTER_GEN_PORT, h.machines);
+				CompPool<T> pool = new CompPool(gen, "localhost", COMPPOOL_GEN_EVA_PORT, MASTER_GEN_PORT, h.machines);
 				
 				long t1 = System.nanoTime();
 
@@ -91,7 +91,7 @@ public class Test_2Input1Output<T> {
 
 		public void run() {
 			try {
-				connect(Constants.LOCALHOST, THREAD_MASTER_SERVER_CLIENT_PORT);				
+				connect("localhost", THREAD_MASTER_SERVER_CLIENT_PORT);				
 
 				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
 
@@ -99,7 +99,7 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
-				CompPool<T> pool = new CompPool(eva, Constants.LOCALHOST, COMPPOOL_GEN_EVA_PORT, MASTER_EVA_PORT, h.machines);				
+				CompPool<T> pool = new CompPool(eva, "localhost", COMPPOOL_GEN_EVA_PORT, MASTER_EVA_PORT, h.machines);				
 				Object[] input = new Object[h.machines];
 
 				for(int i = 0; i < h.machines; ++i)
