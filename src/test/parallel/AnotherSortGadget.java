@@ -7,7 +7,6 @@ import java.lang.reflect.Array;
 
 import network.BadCommandException;
 import network.Machine;
-import network.Master;
 import circuits.AnotherBitonicSortLib;
 import flexsc.Gadget;
 import gc.BadLabelException;
@@ -18,6 +17,10 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
 		// System.out.println("Secure compute starting");
+		long communicate = 0;
+		long compute = 0;
+		long concatenate = 0;
+		long initTimer = System.nanoTime();
 		T[][] x = (T[][]) inputs[0];
 		T[][] data = (T[][]) inputs[1];
 		AnotherBitonicSortLib<T> lib =  new AnotherBitonicSortLib<T>(env);
@@ -30,6 +33,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 			int diff = (1 << k);
 			T mergeDir = ((machineId / (2 * (1 << k))) % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 			while (diff != 0) {
+				long startCommunicate = System.nanoTime();
 				boolean up = (machineId / diff) % 2 == 1 ? true : false;
 				InputStream is;
 				OutputStream os;
@@ -42,16 +46,10 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					os = peerOsDown[commMachine];
 				}
 
-				// System.out.println("sort hello10");
-				/*T[][] receiveKey = env.newTArray(x.length, x[0].length);
-				T[][] receiveData = env.newTArray(data.length, data[0].length);
-				// receive(is, x.length, x[0].length);
-				send(os, x);
-				send(os, data);*/
-				// T[][] receiveData = receive(is, data.length, data[0].length);
 				T[][] receiveKey = sendReceive(os, is, x, x.length, x[0].length);
 				T[][] receiveData = sendReceive(os, is, data, data.length, data[0].length);
-				// System.out.println("sort hello12");
+				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
+
 				T[][] arrayKey, arrayData;
 				if (up) {
 					arrayKey = concatenate(receiveKey, x);
@@ -60,10 +58,10 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					arrayKey = concatenate(x, receiveKey);
 					arrayData = concatenate(data, receiveData);
 				}
-
-				// System.out.println("sort hello13");
+				long endConcatenate = System.nanoTime();
 				lib.compareAndSwapFirstWithPayload(arrayKey, arrayData, 0, arrayKey.length, mergeDir);
-				// System.out.println("sort hello14");
+
+				long startConcatenate2 = System.nanoTime();
 				if (up) {
 					System.arraycopy(arrayKey, arrayKey.length / 2, x, 0, arrayKey.length / 2);
 					System.arraycopy(arrayData, arrayData.length / 2, data, 0, arrayData.length / 2);
@@ -71,20 +69,23 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					System.arraycopy(arrayKey, 0, x, 0, arrayKey.length / 2);
 					System.arraycopy(arrayData, 0, data, 0, arrayData.length / 2);
 				}
+				long endConcatenate2 = System.nanoTime();
+				communicate += (endCommunicate - startCommunicate);
+				concatenate += (endConcatenate2 - startConcatenate2) + (endConcatenate - startConcatenate);
 				diff /= 2;
 			}
-			// System.out.println("sort hello2");
 			lib.bitonicMergeWithPayload(x, data, 0, x.length, mergeDir);
 		}
 
-		// System.out.println("Sorting done");
-		/* for (int i = 0; i < x.length; i++) {
-			System.out.println(machineId + ": " + Utils.toInt(lib.getBooleans(x[i])) + ", " + Utils.toInt(lib.getBooleans(data[i])));
-		} */
 		env.os.flush();
 		T[][][] output = env.newTArray(2, x.length, x[0].length);
 		output[0] = x;
 		output[1] = data;
+		long finalTimer = System.nanoTime();
+		compute = finalTimer - initTimer - (communicate + concatenate);
+		System.out.println((1 << logMachines) + "," + inputLength + "," + compute/1000000000.0 + ",Compute");
+		System.out.println((1 << logMachines) + "," + inputLength + "," + concatenate/1000000000.0 + ",Concatenate");
+		System.out.println((1 << logMachines) + "," + inputLength + "," + communicate/1000000000.0 + ",Communicate");
 		return output;
 	}
 
