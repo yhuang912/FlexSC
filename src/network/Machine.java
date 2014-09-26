@@ -230,7 +230,7 @@ public class Machine<T> {
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
 		int compPoolGenEvaPort = Integer.parseInt(args[2]);
-		Mode mode = Mode.COUNT;
+		Mode mode = Mode.REAL;
 		Machine machine = new Machine(masterPort);
 		machine.isGen = Boolean.parseBoolean(args[3]);
 		machine.inputLength = Integer.parseInt(args[4]);
