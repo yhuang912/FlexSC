@@ -19,10 +19,7 @@ import java.util.Random;
 import test.Utils;
 
 public class Master {
-	// public static int MACHINES;// = 4;
-	// public static int LOG_MACHINES;// = Machine.log2(MACHINES);
 	public static int START_PORT;
-	// public static int INPUT_LENGTH = 1024;
 
 	private ServerSocket[] serverSocket;
 	public InputStream[] is;
@@ -99,10 +96,6 @@ public class Master {
 			for (int j = 0; j < gcInput.length; j++)
 				for (int k = 0; k < gcInput[j].length; k++)
 					gcInput[j][k].send(os[i]);
-		    /*ObjectOutputStream oos = new ObjectOutputStream(os[i]);
-		    oos.writeObject(input[i]);
-		    GCSignal[][] signal = (GCSignal[][]) input[i];
-		    System.out.println("first " + signal[0][0].toHexStr());*/
 			os[i].flush();
 			// oos.flush();
 		}

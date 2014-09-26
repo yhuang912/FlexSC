@@ -238,7 +238,6 @@ public class Machine<T> {
 		// Connect to the other party
 		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);
 
-		// System.out.println("Connected to other party");
 		// Connect to master and then to peers
 		machine.connect(ipManager);
 
@@ -256,7 +255,6 @@ public class Machine<T> {
 				machine.inputLength);
 		Object[] output = (Object[]) histogramMapper.compute();
 
-		// System.out.println("hello");
 		// listen
 		c = Class.forName("test.parallel.AnotherSortGadget");
 		Gadget gadge = (Gadget) c.newInstance();
@@ -287,18 +285,18 @@ public class Machine<T> {
 				machine.numberOfOutgoingConnections);
 		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
 
-		long totalMemory = Runtime.getRuntime().totalMemory();
+		/*long totalMemory = Runtime.getRuntime().totalMemory();
 		long freeMemory = Runtime.getRuntime().freeMemory();
-		/*if (machineId == 0 && env.party.equals(Party.Alice)) {
+		if (machineId == 0 && env.party.equals(Party.Alice)) {
 			System.out.println(machineId + ": " + (totalMemory - freeMemory));
 		}
 		prefixSumGadget = null;
 		System.gc();
 		totalMemory = Runtime.getRuntime().totalMemory();
-		freeMemory = Runtime.getRuntime().freeMemory();*/
+		freeMemory = Runtime.getRuntime().freeMemory();
 		if (machineId == 0 && env.party.equals(Party.Alice)) {
 			System.out.println(machineId + ": " + (totalMemory - freeMemory));
-		}
+		}*/
 
 		c = Class.forName("test.parallel.MarkerWithLastValueGadget");
 		MarkerWithLastValueGadget markerGadget = (MarkerWithLastValueGadget) c.newInstance();
@@ -337,7 +335,6 @@ public class Machine<T> {
 		/*Statistics a = ((PMCompEnv) env).statistic;
 		a.finalize();
 		System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);*/
-		// System.out.println(machineId + ": " + env.party + " " + (endTime - startTime)/1000000000.0);
 		machine.disconnect();
 
 		if (machine.machineId == 0) {
