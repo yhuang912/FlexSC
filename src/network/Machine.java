@@ -230,7 +230,7 @@ public class Machine<T> {
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
 		int compPoolGenEvaPort = Integer.parseInt(args[2]);
-		Mode mode = Mode.REAL;
+		Mode mode = Mode.COUNT;
 		Machine machine = new Machine(masterPort);
 		machine.isGen = Boolean.parseBoolean(args[3]);
 		machine.inputLength = Integer.parseInt(args[4]);
@@ -289,13 +289,13 @@ public class Machine<T> {
 
 		long totalMemory = Runtime.getRuntime().totalMemory();
 		long freeMemory = Runtime.getRuntime().freeMemory();
-		if (machineId == 0 && env.party.equals(Party.Alice)) {
+		/*if (machineId == 0 && env.party.equals(Party.Alice)) {
 			System.out.println(machineId + ": " + (totalMemory - freeMemory));
 		}
 		prefixSumGadget = null;
 		System.gc();
 		totalMemory = Runtime.getRuntime().totalMemory();
-		freeMemory = Runtime.getRuntime().freeMemory();
+		freeMemory = Runtime.getRuntime().freeMemory();*/
 		if (machineId == 0 && env.party.equals(Party.Alice)) {
 			System.out.println(machineId + ": " + (totalMemory - freeMemory));
 		}
@@ -334,6 +334,9 @@ public class Machine<T> {
 		output = (Object[]) subtractGadget.compute();
 
 		long endTime = System.nanoTime();
+		/*Statistics a = ((PMCompEnv) env).statistic;
+		a.finalize();
+		System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);*/
 		// System.out.println(machineId + ": " + env.party + " " + (endTime - startTime)/1000000000.0);
 		machine.disconnect();
 

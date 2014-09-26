@@ -50,7 +50,9 @@ public abstract class Gadget<T> {
 			for (int i = 0; i < vData.length; i++) {
 				NetworkUtil.writeBoolean(os, (Boolean) data[i]);
 			}
-		} /* handle PM */
+		} else if (mode == Mode.COUNT) {
+			
+		}
 	}
 
 	protected T[] read(InputStream is, int length) throws IOException {
@@ -67,7 +69,9 @@ public abstract class Gadget<T> {
 				vData[i] = NetworkUtil.readBoolean(is);
 			}
 			return (T[]) vData;
-		} /* handle PM */
+		} else if (mode == Mode.COUNT) {
+			
+		}
 		// shouldn't happen;
 		return null;
 	}
