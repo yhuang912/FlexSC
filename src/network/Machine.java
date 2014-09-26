@@ -272,7 +272,6 @@ public class Machine<T> {
 				machine.inputLength);
 		output = (Object[]) gadge.compute();
 
-		// System.out.println("hello1");
 		c = Class.forName("test.parallel.PrefixSumGadget");
 		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
 		Object[] prefixSumInputs = new Object[1];
@@ -288,7 +287,18 @@ public class Machine<T> {
 				machine.numberOfOutgoingConnections);
 		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
 
-		// System.out.println("hello2");
+		long totalMemory = Runtime.getRuntime().totalMemory();
+		long freeMemory = Runtime.getRuntime().freeMemory();
+		if (machineId == 0 && env.party.equals(Party.Alice)) {
+			System.out.println(machineId + ": " + (totalMemory - freeMemory));
+		}
+		prefixSumGadget = null;
+		System.gc();
+		totalMemory = Runtime.getRuntime().totalMemory();
+		freeMemory = Runtime.getRuntime().freeMemory();
+		if (machineId == 0 && env.party.equals(Party.Alice)) {
+			System.out.println(machineId + ": " + (totalMemory - freeMemory));
+		}
 
 		c = Class.forName("test.parallel.MarkerWithLastValueGadget");
 		MarkerWithLastValueGadget markerGadget = (MarkerWithLastValueGadget) c.newInstance();

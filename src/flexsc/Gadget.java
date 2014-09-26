@@ -32,7 +32,7 @@ public abstract class Gadget<T> {
 		long endTime = System.nanoTime();
 		if (machineId == 0 && env.party.equals(Party.Alice)) {
 			String[] gadge = this.getClass().getName().split("\\.");
-			System.out.println((1 << logMachines) + "," + inputLength + "," + (endTime - startTime)/1000000000.0 + "," + gadge[gadge.length - 1]);
+			// System.out.println((1 << logMachines) + "," + inputLength + "," + (endTime - startTime)/1000000000.0 + "," + gadge[gadge.length - 1]);
 		}
 		// disconnect();
 		return ret;
