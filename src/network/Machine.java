@@ -51,8 +51,8 @@ public class Machine<T> {
 	}
 
 	protected void connect(IPManager ipManager) throws InterruptedException, IOException, BadCommandException, ClassNotFoundException {
-		String otherMasterIp = isGen ? ipManager.masterEvaluatorIp : ipManager.masterGarblerIp;
-		connectToMaster(otherMasterIp, masterPort);
+		String masterIp = isGen ? ipManager.masterGarblerIp : ipManager.masterEvaluatorIp;
+		connectToMaster(masterIp, masterPort);
 		debug("Connected to master");
 		while(true) {
 			Command command = Command.valueOf(NetworkUtil.readInt(masterIs));
