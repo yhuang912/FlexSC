@@ -22,7 +22,7 @@ import test.parallel.PrefixSumGadget;
 import test.parallel.SubtractGadget;
 
 public class Machine<T> {
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	private InputStream masterIs;
 	private OutputStream masterOs;
