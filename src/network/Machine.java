@@ -234,6 +234,7 @@ public class Machine<T> {
 		Machine machine = new Machine(masterPort);
 		machine.isGen = Boolean.parseBoolean(args[3]);
 		machine.inputLength = Integer.parseInt(args[4]);
+		machine.machineId = machineId;
 		// TODO(OT)
 		// Connect to the other party
 		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);
