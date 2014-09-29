@@ -99,7 +99,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		int toTransfer = x.length;
 		int i = 0, j = 0;
 		while (toTransfer > 0) {
-			int curTransfer = Math.min(toTransfer, 1024);
+			int curTransfer = Math.min(toTransfer, 64);
 			toTransfer -= curTransfer;
 			for (int k = 0; k < curTransfer; k++, i++) {
 				send(os, x[i]);
