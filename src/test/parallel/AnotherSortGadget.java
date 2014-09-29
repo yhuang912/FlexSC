@@ -28,7 +28,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 		// System.out.println("sort hello");
 		lib.sortWithPayload(x, data, dir);
-		// System.out.println("sort hello1");
+		System.out.println(machineId + ": first local sort done");
 
 		for (int k = 0; k < logMachines; k++) {
 			int diff = (1 << k);
