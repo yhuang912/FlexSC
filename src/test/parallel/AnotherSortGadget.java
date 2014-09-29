@@ -46,13 +46,13 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					os = peerOsDown[commMachine];
 				}
 
-				System.out.println(machineId + ": before " + k + " " + diff);
+				// System.out.println(machineId + ": before " + k + " " + diff);
 				T[][] receiveKey = sendReceive(os, is, x, x.length, x[0].length);
-				System.out.println(machineId + ": between " + k + " " + diff);
+				// System.out.println(machineId + ": between " + k + " " + diff);
 				T[][] receiveData = sendReceive(os, is, data, data.length, data[0].length);
 				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
 
-				System.out.println(machineId + ": after " + k + " " + diff);
+				// System.out.println(machineId + ": after " + k + " " + diff);
 				T[][] arrayKey, arrayData;
 				if (up) {
 					arrayKey = concatenate(receiveKey, x);
@@ -99,7 +99,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		int toTransfer = x.length;
 		int i = 0, j = 0;
 		while (toTransfer > 0) {
-			int curTransfer = Math.min(toTransfer, 64);
+			int curTransfer = Math.min(toTransfer, 256);
 			toTransfer -= curTransfer;
 			for (int k = 0; k < curTransfer; k++, i++) {
 				send(os, x[i]);

@@ -257,7 +257,7 @@ public class Machine<T> {
 				machine.inputLength);
 		Object[] output = (Object[]) histogramMapper.compute();
 
-		System.out.println(machineId + ": histogram mappper done");
+		// System.out.println(machineId + ": histogram mappper done");
 		// listen
 		c = Class.forName("test.parallel.AnotherSortGadget");
 		Gadget gadge = (Gadget) c.newInstance();
@@ -273,7 +273,7 @@ public class Machine<T> {
 				machine.inputLength);
 		output = (Object[]) gadge.compute();
 
-		System.out.println(machineId + ": sorting done");
+		// System.out.println(machineId + ": sorting done");
 
 		c = Class.forName("test.parallel.PrefixSumGadget");
 		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
