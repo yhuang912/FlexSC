@@ -161,7 +161,7 @@ public class Master {
 			is = client.is;
 			os = client.os;
 		}
-		// System.out.println("connected to other master");
+		System.out.println("connected to other master");
 		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
 		GCSignal[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
 		if (master.isGen) {
@@ -177,15 +177,15 @@ public class Master {
 		for(int i = 0; i < machines; ++i)
 			input[i] = Arrays.copyOfRange(Ta, i * Ta.length / machines, (i + 1) * Ta.length / machines);
 
-		// System.out.println("OT done");
+		System.out.println("OT done");
 
 		for (int i = 0; i < machines; i++) {
 			master.listen(Master.START_PORT + i, i);
 		}
-		// System.out.println("Connected to master");
+		System.out.println("Connected to master");
 		// master tells the machines what their ports are for peer connections
 		master.setUp(peerPort, input);
-		// System.out.println("Connections successful");
+		System.out.println("Connections successful");
 	}
 
 	private static boolean[][] getInput(int inputLength) {
