@@ -46,12 +46,12 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					os = peerOsDown[commMachine];
 				}
 
-				System.out.println(machineId + ": before send recv");
+				System.out.println(machineId + ": before " + k + " " + diff);
 				T[][] receiveKey = sendReceive(os, is, x, x.length, x[0].length);
 				T[][] receiveData = sendReceive(os, is, data, data.length, data[0].length);
 				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
 
-				System.out.println(machineId + ": after send recv");
+				System.out.println(machineId + ": after " + k + " " + diff);
 				T[][] arrayKey, arrayData;
 				if (up) {
 					arrayKey = concatenate(receiveKey, x);
