@@ -48,6 +48,7 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 
 				System.out.println(machineId + ": before " + k + " " + diff);
 				T[][] receiveKey = sendReceive(os, is, x, x.length, x[0].length);
+				System.out.println(machineId + ": between " + k + " " + diff);
 				T[][] receiveData = sendReceive(os, is, data, data.length, data[0].length);
 				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
 
