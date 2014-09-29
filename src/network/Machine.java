@@ -234,6 +234,7 @@ public class Machine<T> {
 		Machine machine = new Machine(masterPort);
 		machine.isGen = Boolean.parseBoolean(args[3]);
 		machine.inputLength = Integer.parseInt(args[4]);
+		int firstPhysicalMachineId = Integer.parseInt(args[5]);
 		machine.machineId = machineId;
 		// TODO(OT)
 		// Connect to the other party
@@ -338,7 +339,7 @@ public class Machine<T> {
 		System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);*/
 		machine.disconnect();
 
-		if (machine.machineId == 0) {
+		if (machine.machineId == firstPhysicalMachineId) {
 			PrintWriter writer = new PrintWriter("mutex.txt");
 			writer.close();
 		}
