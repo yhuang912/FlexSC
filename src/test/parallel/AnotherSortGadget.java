@@ -28,7 +28,6 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 		// System.out.println("sort hello");
 		lib.sortWithPayload(x, data, dir);
-		System.out.println(machineId + ": first local sort done");
 
 		for (int k = 0; k < logMachines; k++) {
 			int diff = (1 << k);
@@ -47,10 +46,12 @@ public class AnotherSortGadget<T>  extends Gadget<T> {
 					os = peerOsDown[commMachine];
 				}
 
+				System.out.println(machineId + ": before send recv");
 				T[][] receiveKey = sendReceive(os, is, x, x.length, x[0].length);
 				T[][] receiveData = sendReceive(os, is, data, data.length, data[0].length);
 				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
 
+				System.out.println(machineId + ": after send recv");
 				T[][] arrayKey, arrayData;
 				if (up) {
 					arrayKey = concatenate(receiveKey, x);
