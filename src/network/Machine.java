@@ -1,7 +1,6 @@
 package network;
 
 import flexsc.CompEnv;
-import flexsc.Gadget;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.BadLabelException;
@@ -17,9 +16,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import test.parallel.MarkerWithLastValueGadget;
-import test.parallel.PrefixSumGadget;
-import test.parallel.SubtractGadget;
+import test.parallel.Histogram;
 
 public class Machine<T> {
 	public static boolean DEBUG = false;
@@ -31,20 +28,20 @@ public class Machine<T> {
 	private Socket[] upSocket;
 	private Socket[] downSocket;
 	int peerPort;
-	int totalMachines;
-	int logMachines;
+	public int totalMachines;
+	public int logMachines;
 	int masterPort;
-	private Object input;
+	public Object input;
 	boolean isGen;
-	int inputLength;
+	public int inputLength;
 
-	protected int machineId;
-	protected InputStream[] peerIsUp;
-	protected OutputStream[] peerOsUp;
-	protected InputStream[] peerIsDown;
-	protected OutputStream[] peerOsDown;
-	protected int numberOfIncomingConnections;
-	protected int numberOfOutgoingConnections;
+	public int machineId;
+	public InputStream[] peerIsUp;
+	public OutputStream[] peerOsUp;
+	public InputStream[] peerIsDown;
+	public OutputStream[] peerOsDown;
+	public int numberOfIncomingConnections;
+	public int numberOfOutgoingConnections;
 
 	public Machine(int masterPort) {
 		this.masterPort = masterPort;
@@ -244,97 +241,7 @@ public class Machine<T> {
 		machine.connect(ipManager);
 
 		long startTime = System.nanoTime();
-		Class c = Class.forName("test.parallel.HistogramMapper");
-		Gadget histogramMapper = (Gadget) c.newInstance();
-		Object[] histogramInputs = new Object[1];
-		histogramInputs[0] = machine.input;
-		histogramMapper.setInputs(histogramInputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength);
-		Object[] output = (Object[]) histogramMapper.compute();
-
-		// System.out.println(machineId + ": histogram mappper done");
-		// listen
-		c = Class.forName("test.parallel.AnotherSortGadget");
-		Gadget gadge = (Gadget) c.newInstance();
-		Object[] inputs = new Object[2];
-		inputs[0] = output[0];
-		inputs[1] = output[1];
-		gadge.setInputs(inputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength);
-		output = (Object[]) gadge.compute();
-
-		// System.out.println(machineId + ": sorting done");
-
-		c = Class.forName("test.parallel.PrefixSumGadget");
-		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
-		Object[] prefixSumInputs = new Object[1];
-		prefixSumInputs[0] = output[1];
-		prefixSumGadget.setInputs(prefixSumInputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength,
-				machine.numberOfIncomingConnections,
-				machine.numberOfOutgoingConnections);
-		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
-
-		/*long totalMemory = Runtime.getRuntime().totalMemory();
-		long freeMemory = Runtime.getRuntime().freeMemory();
-		if (machineId == 0 && env.party.equals(Party.Alice)) {
-			System.out.println(machineId + ": " + (totalMemory - freeMemory));
-		}
-		prefixSumGadget = null;
-		System.gc();
-		totalMemory = Runtime.getRuntime().totalMemory();
-		freeMemory = Runtime.getRuntime().freeMemory();
-		if (machineId == 0 && env.party.equals(Party.Alice)) {
-			System.out.println(machineId + ": " + (totalMemory - freeMemory));
-		}*/
-
-		c = Class.forName("test.parallel.MarkerWithLastValueGadget");
-		MarkerWithLastValueGadget markerGadget = (MarkerWithLastValueGadget) c.newInstance();
-		Object[] markerInputs = new Object[1];
-		markerInputs[0] = output[0];
-		markerGadget.setInputs(markerInputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength,
-				machine.numberOfIncomingConnections,
-				machine.numberOfOutgoingConnections,
-				machine.totalMachines);
-		Object marker = markerGadget.compute();
-
-		c = Class.forName("test.parallel.SubtractGadget");
-		SubtractGadget subtractGadget = (SubtractGadget) c.newInstance();
-		inputs = new Object[3];
-		inputs[0] = marker; // sort by flag
-		inputs[1] = markerInputs[0]; // actual value
-		inputs[2] = prefixSumDataResult[0]; // frequency
-		subtractGadget.setInputs(inputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength,
-				machine.numberOfIncomingConnections,
-				machine.numberOfOutgoingConnections);
-		output = (Object[]) subtractGadget.compute();
+		Histogram.getHistogram(machineId, machine, env);
 
 		long endTime = System.nanoTime();
 		/*Statistics a = ((PMCompEnv) env).statistic;
