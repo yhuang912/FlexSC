@@ -19,7 +19,7 @@ import java.net.Socket;
 import test.parallel.Histogram;
 import test.parallel.ParallelGadget;
 
-public class Machine<T> {
+public class Machine {
 	public static boolean DEBUG = false;
 
 	private InputStream masterIs;

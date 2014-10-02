@@ -25,12 +25,10 @@ public class Master {
 	public OutputStream[] os;
 	public boolean isGen;
 	private int machines;
-	private int logMachines;
 	ParallelGadget parallelGadget;
 
 	public Master(int machines) {
 		this.machines = machines;
-		this.logMachines = Machine.log2(machines);
 		serverSocket = new ServerSocket[machines];
 		is = new InputStream[machines];
 		os = new OutputStream[machines];
@@ -51,7 +49,7 @@ public class Master {
 		}
 	}
 
-	public void func() throws IOException {
+	/*public void func() throws IOException {
 		int length = 32;
 		GCSignal[][] a = new GCSignal[machines][length];
 		for (int k = 0; k < logMachines; k++) {
@@ -76,11 +74,10 @@ public class Master {
 				os[to].flush();
 			}
 		}
-	}
+	}*/
 
 	public void setUp(int peerPort, Object[] input) throws IOException, BadResponseException {
 		// set machineId for each of the machines
-		//GCSignal[][][] gcInput1 = (GCSignal[][][]) input;
 		for (int i = 0; i < machines; i++) {
 			NetworkUtil.writeInt(os[i], Command.SET_MACHINE_ID.getValue());
 			NetworkUtil.writeInt(os[i], i);

@@ -33,10 +33,38 @@ public class Histogram implements ParallelGadget {
 		}
 		for(int i = 0; i < aa.length; ++i)
 			a[i] = Utils.fromInt(aa[i], 32);
-		/* System.out.println("Frequencies");
+		/*System.out.println("Frequencies");
 		for (int i = 0; i < limit + 1; i++)
 			System.out.println(i + ": " + freq[i]);*/
 		return a;
+	}
+
+	public Object[] performOTAndReturnMachineInputs(int inputLength,
+			int machines, Master master, CompEnv<GCSignal> env)
+			throws IOException {
+		GCSignal[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
+		if (master.isGen) {
+			for(int i = 0; i < Ta.length; ++i)
+				Ta[i] = env.inputOfBob(new boolean[32]);
+		} else {
+			boolean[][] a = getInput(inputLength);
+			for(int i = 0; i < Ta.length; ++i)
+				Ta[i] = env.inputOfBob(a[i]);
+		}
+		Object[] input = new Object[machines];
+	
+		for(int i = 0; i < machines; ++i)
+			input[i] = Arrays.copyOfRange(Ta, i * Ta.length / machines, (i + 1) * Ta.length / machines);
+		return input;
+	}
+
+	public void sendInputToMachines(Object[] input, int i, OutputStream[] os) throws IOException {
+		GCSignal[][] gcInput = (GCSignal[][]) input[i];
+		NetworkUtil.writeInt(os[i], gcInput.length);
+		NetworkUtil.writeInt(os[i], gcInput[0].length);
+		for (int j = 0; j < gcInput.length; j++)
+			for (int k = 0; k < gcInput[j].length; k++)
+				gcInput[j][k].send(os[i]);
 	}
 
 	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs) {
@@ -142,34 +170,6 @@ public class Histogram implements ParallelGadget {
 				machine.numberOfIncomingConnections,
 				machine.numberOfOutgoingConnections);
 		output = (Object[]) subtractGadget.compute();
-	}
-
-	public Object[] performOTAndReturnMachineInputs(int inputLength,
-			int machines, Master master, CompEnv<GCSignal> env)
-			throws IOException {
-		GCSignal[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
-		if (master.isGen) {
-			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(new boolean[32]);
-		} else {
-			boolean[][] a = getInput(inputLength);
-			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(a[i]);
-		}
-		Object[] input = new Object[machines];
-	
-		for(int i = 0; i < machines; ++i)
-			input[i] = Arrays.copyOfRange(Ta, i * Ta.length / machines, (i + 1) * Ta.length / machines);
-		return input;
-	}
-
-	public void sendInputToMachines(Object[] input, int i, OutputStream[] os) throws IOException {
-		GCSignal[][] gcInput = (GCSignal[][]) input[i];
-		NetworkUtil.writeInt(os[i], gcInput.length);
-		NetworkUtil.writeInt(os[i], gcInput[0].length);
-		for (int j = 0; j < gcInput.length; j++)
-			for (int k = 0; k < gcInput[j].length; k++)
-				gcInput[j][k].send(os[i]);
 	}
 
 }

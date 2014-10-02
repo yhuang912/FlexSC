@@ -10,6 +10,7 @@ import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Gadget;
+import flexsc.Party;
 import gc.BadLabelException;
 
 public class SubtractGadget<T> extends Gadget<T> {
@@ -88,7 +89,7 @@ public class SubtractGadget<T> extends Gadget<T> {
 			if (numberOfOutgoingConnections > 0) {
 				prefixSum[0] = lib.sub(prefixSum[0], last);
 			}
-			/*if (machineId == 0) {
+		/*if (machineId == 0) {
 				for (int i = 0; i < 4; i++) {
 					int int1 = Utils.toInt(lib.getBooleans(flag[i]));
 					int int2 = Utils.toInt(lib.getBooleans(x[i]));
