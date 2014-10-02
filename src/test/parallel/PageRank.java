@@ -15,4 +15,5 @@ public class PageRank {
 			BadCommandException, BadLabelException {
 		
 	}
+	
 }

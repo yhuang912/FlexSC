@@ -13,10 +13,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Random;
 
-import test.Utils;
+import test.parallel.Histogram;
+import test.parallel.ParallelGadget;
 
 public class Master {
 	public static int START_PORT;
@@ -24,9 +23,10 @@ public class Master {
 	private ServerSocket[] serverSocket;
 	public InputStream[] is;
 	public OutputStream[] os;
-	private boolean isGen;
+	public boolean isGen;
 	private int machines;
 	private int logMachines;
+	ParallelGadget parallelGadget;
 
 	public Master(int machines) {
 		this.machines = machines;
@@ -89,13 +89,7 @@ public class Master {
 			if (isGen) {
 				GCGen.R.send(os[i]);
 			}
-			GCSignal[][] gcInput = (GCSignal[][]) input[i];
-			// GCSignal[][] gcInput = gcInput1[i];
-			NetworkUtil.writeInt(os[i], gcInput.length);
-			NetworkUtil.writeInt(os[i], gcInput[0].length);
-			for (int j = 0; j < gcInput.length; j++)
-				for (int k = 0; k < gcInput[j].length; k++)
-					gcInput[j][k].send(os[i]);
+			parallelGadget.sendInputToMachines(input, i, os);
 			os[i].flush();
 			// oos.flush();
 		}
@@ -139,13 +133,13 @@ public class Master {
 
 	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException {
 		IPManager ipManager = IPManager.loadIPs();
-		int inputLength = Integer.parseInt(args[5]);
 		int machines = Integer.parseInt(args[4]);
 		Master master = new Master(machines);
 		Master.START_PORT = Integer.parseInt(args[0]);
 		int peerPort = Integer.parseInt(args[1]);
 		int masterMasterConnectionPort = Integer.parseInt(args[2]);
 		master.isGen = Boolean.parseBoolean(args[3]);
+		int inputLength = Integer.parseInt(args[5]);
 		Party party = master.isGen ? Party.Alice : Party.Bob;
 		Mode mode = Mode.REAL;
 		InputStream is;
@@ -163,19 +157,9 @@ public class Master {
 		}
 		// System.out.println("connected to other master");
 		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
-		GCSignal[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
-		if (master.isGen) {
-			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(new boolean[32]);
-		} else {
-			boolean[][] a = getInput(inputLength);
-			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(a[i]);
-		}
-		Object[] input = new Object[machines];
-
-		for(int i = 0; i < machines; ++i)
-			input[i] = Arrays.copyOfRange(Ta, i * Ta.length / machines, (i + 1) * Ta.length / machines);
+		master.parallelGadget = new Histogram();
+		Object[] input = master.parallelGadget.performOTAndReturnMachineInputs(inputLength, machines,
+				master, env);
 
 		// System.out.println("OT done");
 
@@ -186,25 +170,5 @@ public class Master {
 		// master tells the machines what their ports are for peer connections
 		master.setUp(peerPort, input);
 		// System.out.println("Connections successful");
-	}
-
-	private static boolean[][] getInput(int inputLength) {
-		int[] aa = new int[inputLength];
-		boolean[][] a = new boolean[aa.length][];
-		int limit = 20;
-		Random rn = new Random();
-		int[] freq = new int[limit + 1];
-		for (int i = 0; i < limit + 1; i++)
-			freq[i] = 0;
-		for (int i = 0; i < a.length; ++i) {
-			aa[i] = rn.nextInt(limit);
-			freq[aa[i]]++;
-		}
-		for(int i = 0; i < aa.length; ++i)
-			a[i] = Utils.fromInt(aa[i], 32);
-		/* System.out.println("Frequencies");
-		for (int i = 0; i < limit + 1; i++)
-			System.out.println(i + ": " + freq[i]);*/
-		return a;
 	}
 }

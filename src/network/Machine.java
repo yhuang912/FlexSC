@@ -17,6 +17,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import test.parallel.Histogram;
+import test.parallel.ParallelGadget;
 
 public class Machine<T> {
 	public static boolean DEBUG = false;
@@ -42,6 +43,7 @@ public class Machine<T> {
 	public OutputStream[] peerOsDown;
 	public int numberOfIncomingConnections;
 	public int numberOfOutgoingConnections;
+	ParallelGadget parallelGadget;
 
 	public Machine(int masterPort) {
 		this.masterPort = masterPort;
@@ -66,15 +68,7 @@ public class Machine<T> {
 									 }
 									 int inputLength = NetworkUtil.readInt(masterIs);
 									 int inputSize = NetworkUtil.readInt(masterIs);
-									 GCSignal[][] gcInput = new GCSignal[inputLength][inputSize];
-									 for (int j = 0; j < inputLength; j++)
-											for (int k = 0; k < inputSize; k++)
-												gcInput[j][k] = GCSignal.receive(masterIs);
-									 input = gcInput;
-									 /*ObjectInputStream ois = new ObjectInputStream(masterIs);
-									 GCSignal[][] input = (GCSignal[][])ois.readObject();
-									 System.out.println("first " + input[0][0].toHexStr());*/
-									
+				                     input = parallelGadget.readInputFromMaster(inputLength, inputSize, masterIs);
 									 int logMachines = Machine.log2(machines);
 									 peerIsUp = new BufferedInputStream[logMachines];
 									 peerOsUp = new BufferedOutputStream[logMachines];
@@ -222,39 +216,6 @@ public class Machine<T> {
 		return (machineId < 10) ? "0" + machineId : "" + machineId;
 	}
 
-	public static void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException {
-		IPManager ipManager = IPManager.loadIPs();
-		int masterPort = Integer.parseInt(args[0]);
-		int machineId = Integer.parseInt(args[1]);
-		int compPoolGenEvaPort = Integer.parseInt(args[2]);
-		Mode mode = Mode.REAL;
-		Machine machine = new Machine(masterPort);
-		machine.isGen = Boolean.parseBoolean(args[3]);
-		machine.inputLength = Integer.parseInt(args[4]);
-		int firstPhysicalMachineId = Integer.parseInt(args[5]);
-		machine.machineId = machineId;
-		// TODO(OT)
-		// Connect to the other party
-		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);
-
-		// Connect to master and then to peers
-		machine.connect(ipManager);
-
-		long startTime = System.nanoTime();
-		Histogram.getHistogram(machineId, machine, env);
-
-		long endTime = System.nanoTime();
-		/*Statistics a = ((PMCompEnv) env).statistic;
-		a.finalize();
-		System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);*/
-		machine.disconnect();
-
-		if (machine.machineId == firstPhysicalMachineId) {
-			PrintWriter writer = new PrintWriter("mutex.txt");
-			writer.close();
-		}
-	}
-
 	CompEnv connectToOtherParty(boolean isGen, Mode mode, int compPoolGenEvaPort, IPManager ipManager) throws InterruptedException, IOException, ClassNotFoundException {
 		Party party = isGen ? Party.Alice : Party.Bob;
 		InputStream is = null;
@@ -272,5 +233,39 @@ public class Machine<T> {
 			os = client.os;
 		}
 		return CompEnv.getEnv(mode, party, is, os);
+	}
+
+	public static void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException {
+		IPManager ipManager = IPManager.loadIPs();
+		int masterPort = Integer.parseInt(args[0]);
+		int machineId = Integer.parseInt(args[1]);
+		int compPoolGenEvaPort = Integer.parseInt(args[2]);
+		Mode mode = Mode.REAL;
+		Machine machine = new Machine(masterPort);
+		machine.isGen = Boolean.parseBoolean(args[3]);
+		machine.inputLength = Integer.parseInt(args[4]);
+		int firstPhysicalMachineId = Integer.parseInt(args[5]);
+		machine.machineId = machineId;
+		machine.parallelGadget = new Histogram();
+		// TODO(OT)
+		// Connect to the other party
+		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);
+
+		// Connect to master and then to peers
+		machine.connect(ipManager);
+
+		long startTime = System.nanoTime();
+		machine.parallelGadget.compute(machineId, machine, env);
+
+		long endTime = System.nanoTime();
+		/*Statistics a = ((PMCompEnv) env).statistic;
+		a.finalize();
+		System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);*/
+		machine.disconnect();
+
+		if (machine.machineId == firstPhysicalMachineId) {
+			PrintWriter writer = new PrintWriter("mutex.txt");
+			writer.close();
+		}
 	}
 }
