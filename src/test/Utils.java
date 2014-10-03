@@ -1,8 +1,39 @@
 package test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+
+import flexsc.CompEnv;
+import flexsc.Party;
 
 public class Utils {
+	public static <T>void print(CompEnv<T> env, String name, T[] data, T[] data2, T con) throws Exception {
+		int a = toInt(env.outputToAlice(data));
+		int ab = toInt(env.outputToAlice(data2));
+		boolean cc = env.outputToAlice(con);
+		
+		if(cc)
+		if(env.getParty() == Party.Alice && a != 0)
+			System.out.println(name +" "+ a+" "+ab);
+				
+	}
+	
+	public static <T>void print(CompEnv<T> env, String name, T[] data) throws Exception {
+		long a =  toSignedInt(env.outputToAlice(data));
+
+		if(env.getParty() == Party.Alice && a != 0)
+			System.out.println(name +" "+ a);
+	}
+	
+	
+	public static <T>void print(CompEnv<T> env, String name, T data) throws Exception {
+		boolean a  = env.outputToAlice(data);
+
+		if(env.getParty() == Party.Alice)
+			System.out.println(name +" "+ a);
+	}
+	
 	public static Boolean[] toBooleanArray(boolean[] a) {
 		Boolean[] res = new Boolean[a.length];
 		for (int i = 0; i < a.length; i++)
@@ -74,13 +105,61 @@ public class Utils {
 		return res;
 	}
 
-	public static float toFloat(boolean[] value) {
-		return Float.intBitsToFloat(toInt(value));
+	public static double toFloat(boolean[] value, int widthV, int widthP) {
+		boolean[]v = Arrays.copyOfRange(value, 1, 1+widthV);
+		boolean[]p = Arrays.copyOfRange(value, 1+widthV, value.length);
+
+		double result = value[0] ? -1 : 1;
+		long value_v = Utils.toUnSignedInt(v);
+		long value_p = Utils.toSignedInt(p);
+		result = result * value_v;
+		result = result * Math.pow(2, value_p);
+//		System.out.println("utils:"+result +" "+toUnSignedInt(v) +" "+toSignedInt(p));
+		BigDecimal b = new BigDecimal(result);
+//		return b.setScale(v.length/10*3, BigDecimal.ROUND_HALF_UP).doubleValue(); // 6 is should not be fixed.
+		return b.setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue(); // 6 is should not be fixed.
 	}
 	
-	public static boolean[] fromFloat(float value) {
-		return fromInt(Float.floatToIntBits(value), 32);
-	}
+	public static boolean[] fromFloat(double d, int widthV, int widthP) {
+			boolean s;
+			boolean[] v,p;			
+			v = new boolean[widthV];
+			p = new boolean[widthP];
+			s = d < 0;
+			if ( Math.abs(d - 0) < 0.00001 ) {
+			//	   d = 0.000001;
+				for(int i  = 0; i < widthV; ++i)
+					v[i] = false;
+				v[widthV-1]=true;
+				for(int i  = 0; i < widthP; ++i)
+					p[i] = false;
+				p[widthP-1]=true;
+			} else {
+			d = s ? -1*d:d;
+			int pInt = 0;
+			
+			double lower_bound = Math.pow(2, widthV-1);
+			double upper_bound = Math.pow(2, widthV);
+			while(d < lower_bound) {
+				d*=2;
+				pInt--;
+			}
+			
+			while(d >= upper_bound) {
+				d/=2;
+				pInt++;
+			}
+			
+			p = Utils.fromInt(pInt, widthP);
+			long tmp = (long) (d+0.000001);//a hack...
+			v = Utils.fromLong(tmp, widthV);
+			}
+			boolean[] result = new boolean[1+widthV+widthP];
+			result[0] = s;
+			System.arraycopy(v, 0, result, 1, v.length);
+			System.arraycopy(p, 0, result, 1+v.length, p.length);
+			return result;
+		}
 	
 	final static int[] mask = { 0b00000001, 0b00000010, 0b00000100, 0b00001000,
 			0b00010000, 0b00100000, 0b01000000, 0b10000000 };
@@ -111,7 +190,7 @@ public class Utils {
 		return Utils.fromLong( (long) a, width);
 	}
 	
-	public static double toFixPoint(boolean[] b, int width, int offset) {
+	public static double toFixPoint(boolean[] b, int offset) {
 		double a = toSignedInt(b);
 		a /= Math.pow(2, offset);
 		return a;

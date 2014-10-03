@@ -1,27 +1,27 @@
 package test.harness;
 
-import objects.Float.Representation;
-
 import org.junit.Assert;
 
+import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Mode;
+import flexsc.PMCompEnv;
 import flexsc.Party;
 
 
-public class TestFloat<T> {
+public class TestFloat<T> extends TestHarness<T>{
+	public static int widthV = 23, widthP = 7;
 	public abstract class Helper {
 		double a,b;
-		Mode m;
-		public Helper(double a, double b, Mode m) {
-			this.m = m;
+
+		public Helper(double a, double b) {
 			this.b = b;
 			this.a = a;
 		}
-		public abstract Representation<T> secureCompute(Representation<T> a, Representation<T> b, CompEnv<T> env) throws Exception;
+		public abstract T[] secureCompute(T[] a, T[] b, CompEnv<T> env) throws Exception;
 		public abstract double plainCompute(double a, double b);
 	}
-	
+
 	class GenRunnable extends network.Server implements Runnable {
 		Helper h;
 		double z;
@@ -34,13 +34,13 @@ public class TestFloat<T> {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(h.m, Party.Alice, is, os);
-				
-				Representation<T> fgc1 = (Representation<T>) gen.inputOfAliceFloatPoint(h.a, 23, 9);
-				Representation<T> fgc2 = (Representation<T>) gen.inputOfBobFloatPoint(0, 23, 9);
-				Representation<T> re = h.secureCompute(fgc1, fgc2, gen);
-									
-				z = gen.outputToAliceFloatPoint(re);
+				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+
+				T[] f1 = gen.inputOfAlice(Utils.fromFloat(h.a, widthV, widthP));
+				T[] f2 = gen.inputOfBob(Utils.fromFloat(0, widthV, widthP));
+				T[] re = h.secureCompute(f1, f2, gen);
+				Assert.assertTrue(re.length == widthP+widthV+1);
+				z = Utils.toFloat(gen.outputToAlice(re), widthV, widthP);
 
 				disconnect();
 			} catch (Exception e) {
@@ -52,6 +52,8 @@ public class TestFloat<T> {
 
 	class EvaRunnable extends network.Client implements Runnable {
 		Helper h;
+		public double andgates;
+		public double encs;
 
 		EvaRunnable (Helper h) {
 			this.h = h;
@@ -61,13 +63,23 @@ public class TestFloat<T> {
 			try {
 				connect("localhost", 54321);	
 				@SuppressWarnings("unchecked")
-				CompEnv<T> eva = CompEnv.getEnv(h.m, Party.Bob, is, os);
-				
-				Representation<T> fgc1 = eva.inputOfAliceFloatPoint(0, 23, 9);
-				Representation<T> fgc2 = eva.inputOfBobFloatPoint(h.b, 23, 9);
-				Representation<T> re = h.secureCompute(fgc1, fgc2, eva);
-									
-				eva.outputToAliceFloatPoint(re);
+				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+
+				T[] f1 = env.inputOfAlice(Utils.fromFloat(0, widthV, widthP));
+				T[] f2 = env.inputOfBob(Utils.fromFloat(h.b, widthV, widthP));
+				if(m == Mode.COUNT) {
+					((PMCompEnv)env).statistic.flush();;
+				}
+
+				T[] re = h.secureCompute(f1, f2, env);
+
+				if(m == Mode.COUNT) {
+					((PMCompEnv)env).statistic.finalize();
+					andgates = ((PMCompEnv)env).statistic.andGate;
+					encs = ((PMCompEnv)env).statistic.NumEncAlice;
+				}					
+
+				env.outputToAlice(re);
 				
 				disconnect();
 			} catch (Exception e) {
@@ -77,18 +89,27 @@ public class TestFloat<T> {
 		}
 	}
 
-	public void runThreads(Helper h) throws InterruptedException {
+	public void runThreads(Helper h) throws Exception {
 		GenRunnable gen = new GenRunnable(h);
-		EvaRunnable eva = new EvaRunnable(h);
+		EvaRunnable env = new EvaRunnable(h);
 
 		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
+		Thread tEva = new Thread(env);
 		tGen.start(); Thread.sleep(1);
 		tEva.start();
 		tGen.join();
-
-		if(Math.abs(h.plainCompute(h.a, h.b)-gen.z)>3E-6)
-			System.out.print(gen.z+" "+h.plainCompute(h.a, h.b)+" "+h.a+" "+h.b+"\n");
-		Assert.assertTrue(Math.abs(h.plainCompute(h.a, h.b)-gen.z)<=3E-6);
+		if(m == Mode.COUNT) {
+			System.out.println(env.andgates+" "+env.encs);
+		} 
+		else {
+			double error = 0;
+			if(gen.z != 0)
+				error = Math.abs((h.plainCompute(h.a, h.b)-gen.z)/gen.z);
+			else error = Math.abs((h.plainCompute(h.a, h.b)-gen.z));
+			
+			if(Math.abs((h.plainCompute(h.a, h.b)-gen.z)/gen.z)>1E-3)
+				System.out.print(error+" "+gen.z+" "+h.plainCompute(h.a, h.b)+" "+h.a+" "+h.b+"\n");
+			Assert.assertTrue(error<=1E-3);
+		}
 	}
 }

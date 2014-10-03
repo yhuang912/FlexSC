@@ -53,7 +53,7 @@ public class SortGadget<T> extends Gadget<T> {
 				synchronized(this) {
 					for (int i = 0; i < x.length; i++) {
 						// debug(" " + Utils.toInt(lib.getBooleans(x[i])));
-						System.out.println(" " + Utils.toInt(lib.getBooleans(x[i])));
+						// System.out.println(" " + Utils.toInt(lib.getBooleans(x[i])));
 					}
 					//debug("Length of input: " + x.length);
 					//debug("Iteration " + k + " done");

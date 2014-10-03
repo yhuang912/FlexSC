@@ -22,7 +22,7 @@ public class TestIntegerSqrt extends Test_1Input1Output<GCSignal> {
 			runThreads(
 					new Helper(rnd.nextInt(1 << 10), Mode.REAL) {
 						public  GCSignal[] secureCompute(GCSignal[] Signala, CompEnv<GCSignal> e) throws Exception {
-							return new IntegerLib<GCSignal>(e).integerSqrt(Signala);
+							return new IntegerLib<GCSignal>(e).sqrt(Signala);
 						}
 
 						public int plainCompute(int x) {

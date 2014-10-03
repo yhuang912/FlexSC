@@ -3,15 +3,12 @@ package gc;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.Security;
 
 import ot.FakeOTSender;
 import ot.IncorrectOtUsageException;
 import ot.OTExtSender;
 import ot.OTSender;
-import rand.ISAACProvider;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
@@ -19,18 +16,9 @@ import flexsc.Party;
 public class GCGen extends GCCompEnv {
 
 	static public GCSignal R = null;
-	static SecureRandom rnd;
-
 	static{
-		Security.addProvider(new ISAACProvider ());
-		try {
-			rnd = SecureRandom.getInstance ("ISAACRandom");
-			R = GCSignal.freshLabel(rnd);
-			R.setLSB();
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		R = GCSignal.freshLabel(new SecureRandom());
+		R.setLSB();
 	}
 
 	OTSender snd;
@@ -68,7 +56,7 @@ public class GCGen extends GCCompEnv {
 		return label[0];
 	}
 
-	public GCSignal inputOfBob(boolean in) throws IncorrectOtUsageException, IOException {
+	public GCSignal inputOfBob(boolean in) throws IOException, IncorrectOtUsageException {
 		Flag.sw.startOT();
 		GCSignal[] label = genPair();
 		snd.send(label);
@@ -121,9 +109,30 @@ public class GCGen extends GCCompEnv {
 			return false;
 		else if (lb.equals(R.xor(out)))
 			return true;
-//		return false;
+		
 		throw new BadLabelException("bad label at final output.");
 	}
+	
+	public boolean outputToBob(GCSignal out) throws IOException, BadLabelException {
+		if (!out.isPublic())
+			out.send(os);
+		return false;
+	}
+	
+	public boolean[] outputToBob(GCSignal[] out) throws IOException, BadLabelException {
+		boolean [] result = new boolean[out.length];
+		
+		for(int i = 0; i < result.length; ++i) {
+			if (!out[i].isPublic())
+				out[i].send(os);
+		}
+		os.flush();
+		
+		for(int i = 0; i < result.length; ++i)
+			result[i] = false;
+		return result;
+	}
+
 
 	public boolean[] outputToAlice(GCSignal[] out) throws IOException, BadLabelException {
 		boolean [] result = new boolean[out.length];
@@ -132,7 +141,6 @@ public class GCGen extends GCCompEnv {
 		}
 		return result;
 	}
-
 
 	private GCSignal[][] gtt = new GCSignal[2][2];
 	private GCSignal labelL[] = new GCSignal[2];
@@ -232,7 +240,7 @@ public class GCGen extends GCCompEnv {
 	}
 
 	@Override
-	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) {
+	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {
 		return new GCGen(in, os, true);
 	}
 }

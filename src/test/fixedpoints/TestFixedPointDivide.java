@@ -1,39 +1,38 @@
 package test.fixedpoints;
 
 import flexsc.CompEnv;
-import flexsc.Mode;
-import gc.GCSignal;
+//import gc.Boolean;
+
 
 import java.util.Random;
 
 import org.junit.Test;
 
 import test.harness.TestFixedPoint;
-import circuits.FixedPointLib;
+import circuits.arithmetic.FixedPointLib;
 
 
-public class TestFixedPointDivide extends TestFixedPoint<GCSignal> {
+public class TestFixedPointDivide extends TestFixedPoint<Boolean> {
 
 	@Test
-	public void testAllCases() throws InterruptedException {
+	public void testAllCases() throws Exception {
 		Random rng = new Random();
-		int testCases = 10;
 
 		for (int i = 0; i < testCases; i++) {
-			double d1 = rng.nextInt(1<<30)%1000000.0/1000000.0;
-			double d2 = rng.nextInt(1<<30)%1000000.0/1000000.0;
-			runThreads(new Helper(d1, d2, Mode.REAL) {
+			double d1 = rng.nextDouble()*100;
+			double d2 = rng.nextDouble()*100;
+			runThreads(new Helper(d1, d2) {
 				
 				@Override
-				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b, int offset, CompEnv<GCSignal> env) throws Exception {
-					return new FixedPointLib<GCSignal>(env).divide(a, b, offset);
+				public Boolean[] secureCompute(Boolean[] a, Boolean[] b, int offset, CompEnv<Boolean> env) throws Exception {
+					return new FixedPointLib<Boolean>(env, width, offset).div(a, b);
 				}
 				
 				@Override
 				public double plainCompute(double a, double b) {
 					return a/b;
 				}
-			});
+			}, 0.01);
 		}
 	}
 }

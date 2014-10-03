@@ -1,32 +1,30 @@
 package test.floats;
 
-import flexsc.CompEnv;
-import flexsc.Mode;
-import gc.GCSignal;
-
 import java.util.Random;
-
-import objects.Float.Representation;
 
 import org.junit.Test;
 
 import test.harness.TestFloat;
-import circuits.FloatLib;
+import circuits.arithmetic.FloatLib;
+import flexsc.CompEnv;
+//import gc.Boolean;
 
 
-public class TestFloatAdd extends TestFloat<GCSignal> {
+public class TestFloatAdd extends TestFloat<Boolean> {
 
 	@Test
-	public void testAllCases() throws InterruptedException {
+	public void testAllCases() throws Exception {
 		Random rng = new Random();
-		int testCases = 100;
-
+		
+		
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rng.nextDouble(), rng.nextDouble(), Mode.REAL) {
+			double a = rng. nextDouble()*(1<<30)-(1<<29);
+			double b = rng.nextDouble()*(1<<30)-(1<<29);
+			runThreads(new Helper(a,b) {
 				
 				@Override
-				public Representation<GCSignal> secureCompute(Representation<GCSignal> a, Representation<GCSignal> b, CompEnv<GCSignal> env) throws Exception {
-					return new FloatLib<GCSignal>(env).add(a, b);
+				public Boolean[] secureCompute(Boolean[] a, Boolean[] b, CompEnv<Boolean> env) throws Exception {
+					return new FloatLib<Boolean>(env, widthV, widthP).add(a, b);
 				}
 				
 				@Override
@@ -35,5 +33,19 @@ public class TestFloatAdd extends TestFloat<GCSignal> {
 				}
 			});
 		}
+		
+		double a = rng.nextDouble()*1000;
+		runThreads(new Helper(a, -a) {
+			
+			@Override
+			public Boolean[] secureCompute(Boolean[] a, Boolean[] b, CompEnv<Boolean> env) throws Exception {
+				return new FloatLib<Boolean>(env, widthV, widthP).add(a, b);
+			}
+			
+			@Override
+			public double plainCompute(double a, double b) {
+				return a+b;
+			}
+		});
 	}
 }

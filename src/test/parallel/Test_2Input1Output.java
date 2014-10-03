@@ -2,13 +2,9 @@ package test.parallel;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
 
-import network.Constants;
-import network.Master;
 import test.Utils;
 import flexsc.CompEnv;
-import flexsc.CompPool;
 import flexsc.Mode;
 import flexsc.Party;
 
@@ -53,7 +49,8 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = gen.inputOfBob(new boolean[32]);
 
-				CompPool<T> pool = new CompPool(gen, "localhost", COMPPOOL_GEN_EVA_PORT, MASTER_GEN_PORT, h.machines);
+				// CompPool<T> pool = new CompPool(gen, "localhost", COMPPOOL_GEN_EVA_PORT, MASTER_GEN_PORT, h.machines);
+				Object pool;
 				
 				long t1 = System.nanoTime();
 
@@ -70,14 +67,12 @@ public class Test_2Input1Output<T> {
 
 				/*z = gen.outputToAlice((T[]) finalresult);
 				System.out.println("result:"+Utils.toInt(z));*/
-				pool.finalize(h.machines);
+				// pool.finalize(h.machines);
 				disconnect();
 			} catch(/*ExecutionException |*/ ClassNotFoundException /*| InstantiationException | IllegalAccessException*/ e) {
 				System.out.println("Gadget probably does not exist. Reflection issue");
 				e.printStackTrace();
 			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
@@ -99,7 +94,7 @@ public class Test_2Input1Output<T> {
 				for(int i = 0; i < Ta.length; ++i)
 					Ta[i] = eva.inputOfBob(h.a[i]);
 
-				CompPool<T> pool = new CompPool(eva, "localhost", COMPPOOL_GEN_EVA_PORT, MASTER_EVA_PORT, h.machines);				
+				// CompPool<T> pool = new CompPool(eva, "localhost", COMPPOOL_GEN_EVA_PORT, MASTER_EVA_PORT, h.machines);				
 				Object[] input = new Object[h.machines];
 
 				for(int i = 0; i < h.machines; ++i)
@@ -109,7 +104,7 @@ public class Test_2Input1Output<T> {
 				// pool.runGadget("test.parallel.AddGadget", input);
 				// pool.runGadget("test.parallel.AnotherSortGadget", input);
 
-				pool.finalize(h.machines);
+				// pool.finalize(h.machines);
 				disconnect();
 
 			} catch(/*ExecutionException |*/ ClassNotFoundException /*| InstantiationException | IllegalAccessException */e) {

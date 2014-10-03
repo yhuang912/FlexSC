@@ -1,8 +1,8 @@
+// Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package circuits;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Random;
 
 import flexsc.CompEnv;
 import flexsc.Party;
@@ -10,9 +10,7 @@ import gc.BadLabelException;
 import gc.GCSignal;
 
 public class CircuitLib<T> {
-	protected CompEnv<T> env;
-//	public final static Signal SIGNAL_ZERO = new Signal(false);
-//	public final static Signal SIGNAL_ONE = new Signal(true);
+	public CompEnv<T> env;
 	public final T SIGNAL_ZERO;
 	public final T SIGNAL_ONE;
 
@@ -34,20 +32,26 @@ public class CircuitLib<T> {
 		return result;
 	}
 
-	public T[] randBools(Random rng, int length) throws IOException {
+	public T[] randBools(int length) throws Exception {
 		boolean[] res = new boolean[length];
 		for(int i = 0; i < length; ++i)
-			res[i] = rng.nextBoolean();
-		T[] alice = env.inputOfAlice(res); 
+			res[i] = env.rnd.nextBoolean();
+		T[] alice = env.inputOfAlice(res);
 		T[] bob = env.inputOfBob(res);
-		return xor(alice, bob);
+		T[] resSC = xor(alice, bob);
+		
+		return resSC;
 	}
 
-	public boolean[] getBooleans(T[] x) throws IOException, BadLabelException {
+	public boolean[] declassifyToAlice(T[] x) throws Exception{
 		return env.outputToAlice(x);
 	}
+	public boolean[] declassifyToBob(T[] x) throws Exception {
+		return env.outputToBob(x);
+	}
 	
-	public boolean[] syncBooleans(boolean[] pos) throws IOException {
+	public boolean[] declassifyToBoth(T[] x) throws IOException, BadLabelException {
+		boolean[] pos = env.outputToAlice(x);
 		if(env.getParty() == Party.Alice){
 			//send pos to bob
 			env.os.write(new byte[]{(byte) pos.length});
@@ -56,8 +60,7 @@ public class CircuitLib<T> {
 				tmp[i] = (byte) (pos[i] ? 1 : 0);
 			env.os.write(tmp);
 			env.os.flush();
-		}
-		else {
+		} else {
 			byte[] l = new byte[1];
 			env.is.read(l);
 			byte tmp[] = new byte[l[0]];
@@ -75,12 +78,6 @@ public class CircuitLib<T> {
 		return toSignals(value, 32);
 	}
 
-	/*
-	 * If GCSignal is being passed to toSignals (happens because of subtle issues 
-	 * in the RAMSCCompiler), then don't do anything just return that value. 
-	 * I know this is super hacky, so I'll try to fix the internal issues with the 
-	 * compiler itself, but this is probably a quick fix for now.
-	*/
 	public GCSignal[] toSignals(GCSignal[] value) {
 		return value;
 	}
@@ -196,6 +193,16 @@ public class CircuitLib<T> {
 			res[i] = a[i];
 		return res;
 	}
+
+	public T[] padSignedSignal(T[] a, int length) {
+		T[] res = env.newTArray(length);
+		for(int i = 0; i < a.length && i < length; ++i)
+			res[i] = a[i];
+		for(int i = a.length; i < length; ++i)
+			res[i] = a[a.length-1];
+		return res;
+	}
+
 	
 	public T[] copy(T[] x) {
 		return Arrays.copyOf(x, x.length);

@@ -31,7 +31,7 @@ public class GCEva extends GCCompEnv {
 		gtt[0][0] = GCSignal.ZERO;
 	}
 	
-	public GCEva(InputStream is, OutputStream os, boolean NoOT) {
+	public GCEva(InputStream is, OutputStream os, boolean NoOT) throws Exception {
 		super(is, os, Party.Bob);
 
 		rcv = null;
@@ -39,7 +39,7 @@ public class GCEva extends GCCompEnv {
 		gtt[0][0] = GCSignal.ZERO;
 	}
 
-	public GCSignal inputOfAlice(boolean in) {
+	public GCSignal inputOfAlice(boolean in) throws IOException {
 		Flag.sw.startOT();
 		GCSignal signal = GCSignal.receive(is);
 		Flag.sw.stopOT();
@@ -60,7 +60,7 @@ public class GCEva extends GCCompEnv {
 		return signal;
 	}
 
-	public GCSignal[] inputOfAlice(boolean[] x) {
+	public GCSignal[] inputOfAlice(boolean[] x) throws IOException {
 		Flag.sw.startOT();
 		GCSignal[] result = new GCSignal[x.length];
 		for(int i = 0; i < x.length; ++i)
@@ -70,13 +70,25 @@ public class GCEva extends GCCompEnv {
 	}
 
 
-	public boolean outputToAlice(GCSignal out) {
+	public boolean outputToAlice(GCSignal out) throws IOException, BadLabelException{
 		if (!out.isPublic())
 			out.send(os);
 		return false;
 	}
 
-	public boolean[] outputToAlice(GCSignal[] out) throws IOException {
+	public boolean outputToBob(GCSignal out) throws IOException, BadLabelException {
+		if (out.isPublic())
+			return out.v;
+
+		GCSignal lb = GCSignal.receive(is);
+		if (lb.equals(out))
+			return false;
+//		else if (lb.equals(R.xor(out)))
+		else
+			return true;
+	}
+	
+	public boolean[] outputToAlice(GCSignal[] out) throws IOException, BadLabelException {
 		boolean [] result = new boolean[out.length];
 		
 		for(int i = 0; i < result.length; ++i) {
@@ -87,6 +99,14 @@ public class GCEva extends GCCompEnv {
 		
 		for(int i = 0; i < result.length; ++i)
 			result[i] = false;
+		return result;
+	}
+	
+	public boolean[] outputToBob(GCSignal[] out) throws IOException, BadLabelException {
+		boolean [] result = new boolean[out.length];
+		for(int i = 0; i < result.length; ++i) {
+			result[i] = outputToBob(out[i]);
+		}
 		return result;
 	}
 
@@ -149,7 +169,7 @@ public class GCEva extends GCCompEnv {
 	}
 
 	@Override
-	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) {
+	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) throws Exception {
 		return new GCEva(in, os, true);
 	}
 }
