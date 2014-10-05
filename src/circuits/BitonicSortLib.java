@@ -1,86 +1,105 @@
 package circuits;
 
+import java.io.IOException;
+
 import flexsc.CompEnv;
 
-public class BitonicSortLib<T> extends IntegerLib<T>
-{
-    public BitonicSortLib(CompEnv<T> e) {
+public class BitonicSortLib<T> extends IntegerLib<T> {
+	T isAscending;
+
+	public BitonicSortLib(CompEnv<T> e) {
 		super(e);
 	}
 
-    public void sortWithPayload(T[][] a, T[][] data, T isAscending) {
-        bitonicSortWithPayload(a, data, 0, a.length, isAscending);
-    }
+	public void sort(T[][] a, T isAscending) {
+		this.isAscending = isAscending;
+		bitonicSort(a, 0, a.length, isAscending);
+	}
 
-    private void bitonicSortWithPayload(T[][]key, T[][] data, int lo, int n, T dir) {
-        if (n > 1) {
-            int m=n/2;
-            bitonicSortWithPayload(key, data, lo, m, not(dir));
-            bitonicSortWithPayload(key, data, lo+m, n-m, dir);
-            bitonicMergeWithPayload(key, data, lo, n, dir);
-        }
-    }
+	private void bitonicSort(T[][] a, int start, int n, T dir) {
+		if (n > 1) {
+			int m = n / 2;
+			bitonicSort(a, start, m, isAscending);
+			bitonicSort(a, start + m, n - m, not(isAscending));
+			bitonicMerge(a, start, n, dir);
+		}
+	}
 
-    private void bitonicMergeWithPayload(T[][] key, T[][] data, int lo, int n, T dir) {
-        if (n > 1) {
-            int m=greatestPowerOfTwoLessThan(n);
-            for (int i = lo; i < lo + n - m; i++)
-                compareWithPayload(key, data, i, i+m, dir);
-            bitonicMergeWithPayload(key, data, lo, m, dir);
-            bitonicMergeWithPayload(key, data, lo + m, n - m, dir);
-        }
-    }
+	public void bitonicMerge(T[][] a, int start, int n, T dir) {
+		if (n > 1) {
+			int m = compareAndSwapFirst(a, start, n, dir);
+			bitonicMerge(a, start, m, dir);
+			bitonicMerge(a, start + m, n - m, dir);
+		}
+	}
 
-    private void compareWithPayload(T[][] key, T[][] data, int i, int j, T dir) {
-    	T greater = not(leq(key[i], key[j]));
+	public int compareAndSwapFirst(T[][] a, int start, int n, T dir) {
+		int m = n / 2;
+		for (int i = start; i < start + m; i++) {
+			compareAndSwap(a, i, i + m, dir);
+		}
+		return m;
+	}
+
+	private void compareAndSwap(T[][] a, int i, int j, T dir) {
+    	T greater = not(leq(a[i], a[j]));
     	T swap = eq(greater, dir);
-    	T[] ki = mux(key[i], key[j], swap);
-    	T[] kj = mux(key[j], key[i], swap);
-    	key[i] = ki;
-    	key[j] = kj;
-    	
+    	T[] ki = mux(a[i], a[j], swap);
+    	T[] kj = mux(a[j], a[i], swap);
+    	a[i] = ki;
+    	a[j] = kj;
+    }
+
+	public void sortWithPayload(T[][] a, T[][] data, T isAscending) {
+		this.isAscending = isAscending;
+		bitonicSortWithPayload(a, data, 0, a.length, isAscending);
+	}
+
+	private void bitonicSortWithPayload(T[][] a, T[][] data, int start, int n, T dir) {
+		if (n > 1) {
+			int m = n / 2;
+			bitonicSortWithPayload(a, data, start, m, isAscending);
+			bitonicSortWithPayload(a, data, start + m, n - m, not(isAscending));
+			bitonicMergeWithPayload(a, data, start, n, dir);
+		}
+	}
+
+	public void bitonicMergeWithPayload(T[][] a, T[][] data, int start, int n, T dir) {
+		if (n > 1) {
+			/* if (n == 2048) {
+				System.out.println("merging");
+			} */
+			int m = compareAndSwapFirstWithPayload(a, data, start, n, dir);
+			bitonicMergeWithPayload(a, data, start, m, dir);
+			bitonicMergeWithPayload(a, data, start + m, n - m, dir);
+		}
+	}
+
+	public int compareAndSwapFirstWithPayload(T[][] a, T[][] data, int start, int n, T dir) {
+		int m = n / 2;
+		for (int i = start; i < start + m; i++) {
+			compareAndSwapWithPayload(a, data, i, i + m, dir);
+		}
+		try {
+			env.os.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return m;
+	}
+
+	private void compareAndSwapWithPayload(T[][] a, T[][] data, int i, int j, T dir) {
+    	T greater = not(leq(a[i], a[j]));
+    	T swap = eq(greater, dir);
+    	T[] ki = mux(a[i], a[j], swap);
+    	T[] kj = mux(a[j], a[i], swap);
+    	a[i] = ki;
+    	a[j] = kj;
+
     	T[] di = mux(data[i], data[j], swap);
     	T[] dj = mux(data[j], data[i], swap);
     	data[i] = di;
     	data[j] = dj;
-    }
-
-    public void sort(T[][] a, T isAscending) {
-        bitonicSort(a, 0, a.length, isAscending);
-    }
-
-    private void bitonicSort(T[][]key, int lo, int n, T dir) {
-        if (n > 1) {
-            int m = n / 2;
-            bitonicSort(key, lo, m, not(dir));
-            bitonicSort(key, lo + m, n - m, dir);
-            bitonicMerge(key, lo, n, dir);
-        }
-    }
-
-    public void bitonicMerge(T[][] key, int lo, int n, T dir) {
-        if (n > 1) {
-            int m = greatestPowerOfTwoLessThan(n);
-            for (int i = lo; i < lo + n - m; i++)
-                compare(key, i, i + m, dir);
-            bitonicMerge(key, lo, m, dir);
-            bitonicMerge(key, lo + m, n - m, dir);
-        }
-    }
-
-    private void compare(T[][] key, int i, int j, T dir) {
-    	T greater = not(leq(key[i], key[j]));
-    	T swap = eq(greater, dir);
-    	T[] ki = mux(key[i], key[j], swap);
-    	T[] kj = mux(key[j], key[i], swap);
-    	key[i] = ki;
-    	key[j] = kj;
-    }
-    
-    private int greatestPowerOfTwoLessThan(int n) {
-        int k = 1;
-        while (k < n)
-            k = k << 1;
-        return k >> 1;
     }
 }

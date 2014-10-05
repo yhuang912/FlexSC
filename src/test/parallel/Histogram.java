@@ -102,7 +102,7 @@ public class Histogram implements ParallelGadget {
 
 		// System.out.println(machineId + ": histogram mappper done");
 		// listen
-		c = Class.forName("test.parallel.AnotherSortGadget");
+		c = Class.forName("test.parallel.SortGadget");
 		Gadget gadge = (Gadget) c.newInstance();
 		Object[] inputs = new Object[2];
 		inputs[0] = output[0];

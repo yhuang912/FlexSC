@@ -12,14 +12,14 @@ import org.junit.Test;
 import test.harness.TestSortHarness;
 import circuits.BitonicSortLib;
 
-public class TestSort  extends TestSortHarness<GCSignal>{
+public class TestSort extends TestSortHarness<GCSignal>{
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();
 		int testCases = 1;
 
 		for (int i = 0; i < testCases; i++) {
-			int [] a = new int[900];
+			int [] a = new int[512];
 			for(int j = 0; j < a.length; ++j)
 				a[j] = rnd.nextInt()%(1<<30);
 			

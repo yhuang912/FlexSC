@@ -45,7 +45,7 @@ public class SubtractGadget<T> extends Gadget<T> {
 		Class c;
 		Gadget gadge;
 		try {
-			c = Class.forName("test.parallel.AnotherSortGadget");
+			c = Class.forName("test.parallel.SortGadget");
 			gadge = (Gadget) c.newInstance();
 			Object[] inputs = new Object[2];
 			inputs[0] = flag;
