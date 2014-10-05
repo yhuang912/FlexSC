@@ -8,6 +8,7 @@ import java.lang.reflect.Array;
 import network.BadCommandException;
 import network.Machine;
 import circuits.BitonicSortLib;
+import circuits.SimpleComparator;
 import flexsc.Gadget;
 import flexsc.Party;
 import gc.BadLabelException;
@@ -24,10 +25,10 @@ public class SortGadget<T>  extends Gadget<T> {
 		long initTimer = System.nanoTime();
 		T[][] x = (T[][]) inputs[0];
 		T[][] data = (T[][]) inputs[1];
-		BitonicSortLib<T> lib =  new BitonicSortLib<T>(env);
+		BitonicSortLib<T> lib =  new BitonicSortLib<T>(env, new SimpleComparator<T>(env));
 		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 		// System.out.println("sort hello");
-		lib.sortWithPayload(x, data, dir);
+		lib.sort(x, data, dir);
 
 		for (int k = 0; k < logMachines; k++) {
 			int diff = (1 << k);
@@ -62,7 +63,7 @@ public class SortGadget<T>  extends Gadget<T> {
 					arrayData = concatenate(data, receiveData);
 				}
 				long endConcatenate = System.nanoTime();
-				lib.compareAndSwapFirstWithPayload(arrayKey, arrayData, 0, arrayKey.length, mergeDir);
+				lib.compareAndSwapFirst(arrayKey, arrayData, 0, arrayKey.length, mergeDir);
 
 				long startConcatenate2 = System.nanoTime();
 				if (up) {
@@ -77,7 +78,7 @@ public class SortGadget<T>  extends Gadget<T> {
 				concatenate += (endConcatenate2 - startConcatenate2) + (endConcatenate - startConcatenate);
 				diff /= 2;
 			}
-			lib.bitonicMergeWithPayload(x, data, 0, x.length, mergeDir);
+			lib.bitonicMerge(x, data, 0, x.length, mergeDir);
 		}
 
 		env.os.flush();

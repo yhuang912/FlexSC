@@ -10,7 +10,6 @@ import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Gadget;
-import flexsc.Party;
 import gc.BadLabelException;
 
 public class SubtractGadget<T> extends Gadget<T> {

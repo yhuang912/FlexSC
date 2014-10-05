@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import test.harness.TestSortHarness;
 import circuits.BitonicSortLib;
+import circuits.SimpleComparator;
 
 public class TestSort extends TestSortHarness<GCSignal>{
 	@Test
@@ -24,9 +25,9 @@ public class TestSort extends TestSortHarness<GCSignal>{
 				a[j] = rnd.nextInt()%(1<<30);
 			
 			Helper helper = new Helper(a, Mode.REAL) {
-				public GCSignal[][] secureCompute(GCSignal[][] Signala, CompEnv<GCSignal> e) throws Exception {
-					BitonicSortLib<GCSignal> lib =  new BitonicSortLib<GCSignal>(e);
-					lib.sort(Signala, lib.SIGNAL_ONE);
+				public GCSignal[][] secureCompute(GCSignal[][] Signala, final CompEnv<GCSignal> e) throws Exception {
+					BitonicSortLib<GCSignal> lib =  new BitonicSortLib<GCSignal>(e, new SimpleComparator<>(e));
+					lib.sort(Signala, null /* data */, lib.SIGNAL_ONE);
 					return Signala;
 				}
 				
