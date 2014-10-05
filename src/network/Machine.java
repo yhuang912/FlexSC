@@ -1,6 +1,7 @@
 package network;
 
 import flexsc.CompEnv;
+import flexsc.Gadget;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.BadLabelException;
@@ -245,9 +246,11 @@ public class Machine {
 		machine.isGen = Boolean.parseBoolean(args[3]);
 		machine.inputLength = Integer.parseInt(args[4]);
 		int firstPhysicalMachineId = Integer.parseInt(args[5]);
+		String experiment = args[6];
 		machine.machineId = machineId;
+		Class c = Class.forName("test.parallel." + experiment);
 		// machine.parallelGadget = new Histogram();
-		machine.parallelGadget = new PageRank();
+		machine.parallelGadget = (ParallelGadget) c.newInstance();
 		// TODO(OT)
 		// Connect to the other party
 		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);

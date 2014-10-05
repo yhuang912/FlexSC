@@ -44,8 +44,13 @@ public class BitonicSortLib<T> extends IntegerLib<T> {
 	private void compareAndSwap(T[][] a, int i, int j, T dir) {
     	T greater = not(leq(a[i], a[j]));
     	T swap = eq(greater, dir);
-    	T[] ki = mux(a[i], a[j], swap);
-    	T[] kj = mux(a[j], a[i], swap);
+    	// T[] ki = mux(a[i], a[j], swap);
+    	// T[] kj = mux(a[j], a[i], swap);
+    	T[] s = mux(a[j], a[i], swap);
+    	s = xor(s, a[i]);
+    	T[] ki = xor(a[j], s);
+    	T[] kj = xor(a[i], s);
+
     	a[i] = ki;
     	a[j] = kj;
     }
@@ -92,13 +97,17 @@ public class BitonicSortLib<T> extends IntegerLib<T> {
 	private void compareAndSwapWithPayload(T[][] a, T[][] data, int i, int j, T dir) {
     	T greater = not(leq(a[i], a[j]));
     	T swap = eq(greater, dir);
-    	T[] ki = mux(a[i], a[j], swap);
-    	T[] kj = mux(a[j], a[i], swap);
+    	T[] s = mux(a[j], a[i], swap);
+    	s = xor(s, a[i]);
+    	T[] ki = xor(a[j], s);
+    	T[] kj = xor(a[i], s);
     	a[i] = ki;
     	a[j] = kj;
 
-    	T[] di = mux(data[i], data[j], swap);
-    	T[] dj = mux(data[j], data[i], swap);
+    	T[] s2 = mux(data[j], data[i], swap);
+    	s2 = xor(s2, data[i]);
+    	T[] di = xor(data[j], s2);
+    	T[] dj = xor(data[i], s2);
     	data[i] = di;
     	data[j] = dj;
     }

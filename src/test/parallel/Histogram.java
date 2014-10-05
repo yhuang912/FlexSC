@@ -1,10 +1,5 @@
 package test.parallel;
 
-import flexsc.CompEnv;
-import flexsc.Gadget;
-import gc.BadLabelException;
-import gc.GCSignal;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,9 +8,12 @@ import java.util.Random;
 
 import network.BadCommandException;
 import network.Machine;
-import network.Master;
 import network.NetworkUtil;
 import test.Utils;
+import flexsc.CompEnv;
+import flexsc.Gadget;
+import gc.BadLabelException;
+import gc.GCSignal;
 
 public class Histogram implements ParallelGadget {
 

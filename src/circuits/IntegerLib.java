@@ -17,7 +17,7 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T>{
 		super(e);
 		this.width = width;
 	}
-	
+
 	static final int S = 0;
 	static final int COUT = 1;
 	

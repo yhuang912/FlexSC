@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import test.parallel.PageRank;
 import test.parallel.ParallelGadget;
 import flexsc.CompEnv;
 import flexsc.Mode;
@@ -128,7 +127,7 @@ public class Master {
 		}
 	}
 
-	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException {
+	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		IPManager ipManager = IPManager.loadIPs();
 		int machines = Integer.parseInt(args[4]);
 		Master master = new Master(machines);
@@ -154,8 +153,10 @@ public class Master {
 		}
 		System.out.println("connected to other master");
 		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
-		// master.parallelGadget = new Histogram();
-		master.parallelGadget = new PageRank();
+		String experiment = args[6];
+		Class c = Class.forName("test.parallel." + experiment);
+		// machine.parallelGadget = new Histogram();
+		master.parallelGadget = (ParallelGadget) c.newInstance();
 
 		for (int i = 0; i < machines; i++) {
 			master.listen(Master.START_PORT + i, i);

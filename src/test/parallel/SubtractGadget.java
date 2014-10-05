@@ -91,9 +91,9 @@ public class SubtractGadget<T> extends Gadget<T> {
 			}
 		/*if (machineId == 0) {
 				for (int i = 0; i < 4; i++) {
-					int int1 = Utils.toInt(lib.getBooleans(flag[i]));
-					int int2 = Utils.toInt(lib.getBooleans(x[i]));
-					int int3 = Utils.toInt(lib.getBooleans(prefixSum[i]));
+					int int1 = Utils.toInt(env.outputToAlice(flag[i]));
+					int int2 = Utils.toInt(env.outputToAlice(x[i]));
+					int int3 = Utils.toInt(env.outputToAlice(prefixSum[i]));
 					if (Party.Alice.equals(env.party)) {
 						System.out.println(machineId + ": " + int2 + ", " + int3);
 					}
