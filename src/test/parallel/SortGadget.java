@@ -87,11 +87,11 @@ public class SortGadget<T>  extends Gadget<T> {
 		output[1] = data;
 		long finalTimer = System.nanoTime();
 		compute = finalTimer - initTimer - (communicate + concatenate);
-		if (machineId == 0 && env.party.equals(Party.Alice)) {
+		/* if (machineId == 0 && env.party.equals(Party.Alice)) {
 			System.out.println((1 << logMachines) + "," + inputLength + "," + compute/1000000000.0 + ",Compute");
 			System.out.println((1 << logMachines) + "," + inputLength + "," + concatenate/1000000000.0 + ",Concatenate");
 			System.out.println((1 << logMachines) + "," + inputLength + "," + communicate/1000000000.0 + ",Communicate");
-		}
+		}*/
 		return output;
 	}
 

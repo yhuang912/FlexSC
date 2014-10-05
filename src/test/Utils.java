@@ -221,4 +221,12 @@ public class Utils {
 			pos += x[i][0].length;
 		}
 	}
+
+	public static <T> void unflatten(T[] flat, T[] ... x) {
+		int pos = 0;
+		for (int i = 0; i < x.length; i++) {
+			System.arraycopy(flat, pos, x[i], 0, x[i].length);
+			pos += x[i].length;
+		}
+	}
 }

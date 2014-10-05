@@ -10,7 +10,7 @@ import flexsc.CompEnv;
 import gc.BadLabelException;
 import gc.GCSignal;
 
-public interface ParallelGadget {
+public interface ParallelGadget<T> {
 
 	/*public Object[] performOTAndReturnMachineInputs(int inputLength,
 			int machines, boolean isGen, CompEnv<GCSignal> env)
@@ -24,7 +24,7 @@ public interface ParallelGadget {
 
 	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs);
 
-	public void compute(int machineId, Machine machine, CompEnv env)
+	public <T> void compute(int machineId, Machine machine, CompEnv env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException;

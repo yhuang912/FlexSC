@@ -19,6 +19,7 @@ public class SubtractGadget<T> extends Gadget<T> {
 	private int numberOfIncomingConnections;
 	private int numberOfOutgoingConnections;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {

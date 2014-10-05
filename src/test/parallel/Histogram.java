@@ -16,7 +16,7 @@ import flexsc.Gadget;
 import gc.BadLabelException;
 import gc.GCSignal;
 
-public class Histogram implements ParallelGadget {
+public class Histogram<T> implements ParallelGadget<T> {
 
 	private boolean[][] getInput(int inputLength) {
 		int[] aa = new int[inputLength];
@@ -82,6 +82,7 @@ public class Histogram implements ParallelGadget {
 		 return gcInput;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void compute(int machineId, Machine machine, CompEnv env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,

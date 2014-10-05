@@ -88,7 +88,7 @@ public class Master {
 			// oos.flush();
 		}
 		parallelGadget.sendInputToMachines(inputLength, machines, isGen, env, os);
-		System.out.println("OT done");
+		// System.out.println("OT done");
 
 		// Ask all machines except for the last to listen
 		for (int i = 0; i < machines - 1; i++) {
@@ -151,7 +151,7 @@ public class Master {
 			is = client.is;
 			os = client.os;
 		}
-		System.out.println("connected to other master");
+		// System.out.println("connected to other master");
 		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
 		String experiment = args[6];
 		Class c = Class.forName("test.parallel." + experiment);
@@ -161,9 +161,9 @@ public class Master {
 		for (int i = 0; i < machines; i++) {
 			master.listen(Master.START_PORT + i, i);
 		}
-		System.out.println("Connected to master");
+		// System.out.println("Connected to master");
 		// master tells the machines what their ports are for peer connections
 		master.setUp(peerPort, inputLength, env);
-		System.out.println("Connections successful");
+		// System.out.println("Connections successful");
 	}
 }

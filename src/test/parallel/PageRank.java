@@ -7,16 +7,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import circuits.Comparator;
+import circuits.IntegerLib;
 import network.BadCommandException;
 import network.Machine;
 import network.NetworkUtil;
 import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Gadget;
+import flexsc.Party;
 import gc.BadLabelException;
 import gc.GCSignal;
 
-public class PageRank implements ParallelGadget {
+public class PageRank<T> implements ParallelGadget<T> {
 
 	private boolean[][][] getInput(int inputLength) throws IOException {
 		int[] u = new int[inputLength];
@@ -79,7 +82,6 @@ public class PageRank implements ParallelGadget {
 		Object[] input = performOTAndReturnMachineInputs(inputLength, machines, isGen, env);
 		Object[] inputU = (Object[]) input[0];
 		Object[] inputV = (Object[]) input[1];
-		System.out.println(inputLength + " " + " ...");
 		for (int i = 0; i < machines; i++) {
 			GCSignal[][] gcInputU = (GCSignal[][]) inputU[i];
 			GCSignal[][] gcInputV = (GCSignal[][]) inputV[i];
@@ -113,8 +115,9 @@ public class PageRank implements ParallelGadget {
 	    return ret;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void compute(int machineId, Machine machine, CompEnv env)
+	public <T> void compute(int machineId, Machine machine, final CompEnv env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
@@ -128,9 +131,17 @@ public class PageRank implements ParallelGadget {
 				machine.logMachines,
 				machine.inputLength);
 		Object[] output = (Object[]) initialPageRank.compute();
+		T[][] u = (T[][]) output[0];
+		T[][] v = (T[][]) output[1];
+		T[][] pr = (T[][]) output[2];
+		T[][] l = (T[][]) output[3];
 
+		T[][] data = (T[][]) Utils.flatten(env, v, pr, l);
 		c = Class.forName("test.parallel.SortGadget");
 		SortGadget sortGadget = (SortGadget) c.newInstance();
+		Object[] inputs = new Object[2];
+		inputs[0] = output[0];
+		inputs[1] = data;
 		sortGadget.setInputs(inputs, env, machineId,
 				machine.peerIsUp,
 				machine.peerOsUp,
@@ -138,6 +149,52 @@ public class PageRank implements ParallelGadget {
 				machine.peerOsDown,
 				machine.logMachines,
 				machine.inputLength);
+		sortGadget.setComparator(new Comparator<T>() {
+
+			@Override
+			public T leq(T[] ui, T[] uj, T[] datai, T[] dataj) {
+				T[] vi = (T[]) env.newTArray(32);
+				T[] pri = (T[]) env.newTArray(32);
+				T[] vj = (T[]) env.newTArray(32);
+				T[] prj = (T[]) env.newTArray(32);
+				Utils.unflatten(datai, vi, pri);
+				Utils.unflatten(dataj, vj, prj);
+				IntegerLib<T> lib = new IntegerLib<>(env);
+				T v = lib.geq(vi, vj);
+				T eq = lib.eq(ui, uj);
+				T u = lib.leq(ui, uj);
+				return lib.mux(u, v, eq);
+			}
+		});
+		Object[] output2 = (Object[]) sortGadget.compute();
+
+		u = (T[][]) output2[0];
+		Utils.unflatten((T[][]) output2[1], v, pr, l);
+
+		c = Class.forName("test.parallel.PrefixSumGadget");
+		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
+		Object[] prefixSumInputs = new Object[1];
+		prefixSumInputs[0] = l;
+		prefixSumGadget.setInputs(prefixSumInputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.logMachines,
+				machine.inputLength,
+				machine.numberOfIncomingConnections,
+				machine.numberOfOutgoingConnections);
+		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
+
+//		for (int i = 0; i < pr.length; i++) {
+//		int a = Utils.toInt(env.outputToAlice(u[i]));
+//		int b = Utils.toInt(env.outputToAlice(v[i]));
+//		double c2 = Utils.toFloat(env.outputToAlice(pr[i]), 20, 12);
+//		int d = Utils.toInt(env.outputToAlice(l[i]));
+//		if (Party.Alice.equals(env.party)) {
+//			System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);
+//		}
+//    }
 	}
 
 }
