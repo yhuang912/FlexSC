@@ -16,7 +16,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import test.parallel.Histogram;
+import test.parallel.PageRank;
 import test.parallel.ParallelGadget;
 
 public class Machine {
@@ -246,7 +246,8 @@ public class Machine {
 		machine.inputLength = Integer.parseInt(args[4]);
 		int firstPhysicalMachineId = Integer.parseInt(args[5]);
 		machine.machineId = machineId;
-		machine.parallelGadget = new Histogram();
+		// machine.parallelGadget = new Histogram();
+		machine.parallelGadget = new PageRank();
 		// TODO(OT)
 		// Connect to the other party
 		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);
@@ -255,6 +256,7 @@ public class Machine {
 		machine.connect(ipManager);
 
 		long startTime = System.nanoTime();
+		machine.debug("Calling compute");
 		machine.parallelGadget.compute(machineId, machine, env);
 
 		long endTime = System.nanoTime();

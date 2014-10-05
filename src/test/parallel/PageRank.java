@@ -1,74 +1,116 @@
 package test.parallel;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Random;
 
-import test.Utils;
 import network.BadCommandException;
 import network.Machine;
-import network.Master;
+import network.NetworkUtil;
+import test.Utils;
 import flexsc.CompEnv;
+import flexsc.Gadget;
 import gc.BadLabelException;
 import gc.GCSignal;
 
 public class PageRank implements ParallelGadget {
 
-	private boolean[][] getInput(int inputLength) {
-		int[] aa = new int[inputLength];
-		boolean[][] a = new boolean[aa.length][];
-		int limit = 20;
-		Random rn = new Random();
-		int[] freq = new int[limit + 1];
-		for (int i = 0; i < limit + 1; i++)
-			freq[i] = 0;
-		for (int i = 0; i < a.length; ++i) {
-			aa[i] = rn.nextInt(limit);
-			freq[aa[i]]++;
+	private boolean[][][] getInput(int inputLength) throws IOException {
+		int[] u = new int[inputLength];
+		int[] v = new int[inputLength];
+		BufferedReader br = new BufferedReader(new FileReader("PageRank.in"));
+		for (int i = 0; i < inputLength; i++) {
+			String readLine = br.readLine();
+			String[] split = readLine.split(" ");
+			u[i] = Integer.parseInt(split[0]);
+			v[i] = Integer.parseInt(split[1]);
 		}
-		for(int i = 0; i < aa.length; ++i)
-			a[i] = Utils.fromInt(aa[i], 32);
-		/*System.out.println("Frequencies");
-		for (int i = 0; i < limit + 1; i++)
-			System.out.println(i + ": " + freq[i]);*/
-		return a;
+		boolean[][] a = new boolean[u.length][];
+		boolean[][] b = new boolean[v.length][];
+		for(int i = 0; i < u.length; ++i) {
+			a[i] = Utils.fromInt(u[i], 32);
+			b[i] = Utils.fromInt(v[i], 32);
+		}
+		boolean[][][] ret = new boolean[2][][];
+		ret[0] = a;
+		ret[1] = b;
+		return ret;
 	}
 
-	@Override
-	public Object[] performOTAndReturnMachineInputs(int inputLength,
-			int machines, Master master, CompEnv<GCSignal> env)
+	private Object[] performOTAndReturnMachineInputs(int inputLength,
+			int machines, boolean isGen, CompEnv<GCSignal> env)
 			throws IOException {
-		GCSignal[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
-		GCSignal[][] Tb = env.newTArray(inputLength /* number of entries in the input */, 0);
-		if (master.isGen) {
-			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(new boolean[32]);
+		GCSignal[][] tu = env.newTArray(inputLength /* number of entries in the input */, 0);
+		GCSignal[][] tv = env.newTArray(inputLength /* number of entries in the input */, 0);
+		if (isGen) {
+			for(int i = 0; i < tu.length; ++i)
+				tu[i] = env.inputOfBob(new boolean[32]);
+			for(int i = 0; i < tv.length; ++i)
+				tv[i] = env.inputOfBob(new boolean[32]);
 		} else {
-			boolean[][] a = getInput(inputLength);
-			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(a[i]);
+			boolean[][][] input = getInput(inputLength);
+			for(int i = 0; i < tu.length; ++i)
+				tu[i] = env.inputOfBob(input[0][i]);
+			for(int i = 0; i < tv.length; ++i)
+				tv[i] = env.inputOfBob(input[1][i]);
 		}
-		Object[] input = new Object[machines];
+		Object[] inputU = new Object[machines];
+		Object[] inputV = new Object[machines];
 	
-		for(int i = 0; i < machines; ++i)
-			input[i] = Arrays.copyOfRange(Ta, i * Ta.length / machines, (i + 1) * Ta.length / machines);
+		for(int i = 0; i < machines; ++i) {
+			inputU[i] = Arrays.copyOfRange(tu, i * tu.length / machines, (i + 1) * tu.length / machines);
+			inputV[i] = Arrays.copyOfRange(tv, i * tv.length / machines, (i + 1) * tv.length / machines);
+		}
+		Object[] input = new Object[2][];
+		input[0] = inputU;
+		input[1] = inputV;
 		return input;
 	}
 
 	@Override
-	public void sendInputToMachines(Object[] input, int i, OutputStream[] os)
-			throws IOException {
-		// TODO Auto-generated method stub
-		
+	public void sendInputToMachines(int inputLength,
+			int machines,
+			boolean isGen, 
+			CompEnv<GCSignal> env,
+			OutputStream[] os) throws IOException {
+		Object[] input = performOTAndReturnMachineInputs(inputLength, machines, isGen, env);
+		Object[] inputU = (Object[]) input[0];
+		Object[] inputV = (Object[]) input[1];
+		System.out.println(inputLength + " " + " ...");
+		for (int i = 0; i < machines; i++) {
+			GCSignal[][] gcInputU = (GCSignal[][]) inputU[i];
+			GCSignal[][] gcInputV = (GCSignal[][]) inputV[i];
+			NetworkUtil.writeInt(os[i], gcInputU.length);
+			NetworkUtil.writeInt(os[i], gcInputU[0].length);
+			for (int j = 0; j < gcInputU.length; j++)
+				for (int k = 0; k < gcInputU[j].length; k++)
+					gcInputU[j][k].send(os[i]);
+	
+			for (int j = 0; j < gcInputV.length; j++)
+				for (int k = 0; k < gcInputV[j].length; k++)
+					gcInputV[j][k].send(os[i]);
+			os[i].flush();
+		}
 	}
 
 	@Override
 	public Object readInputFromMaster(int inputLength, int inputSize,
 			InputStream masterIs) {
-		// TODO Auto-generated method stub
-		return null;
+		GCSignal[][] gcInputU = new GCSignal[inputLength][inputSize];
+		GCSignal[][] gcInputV = new GCSignal[inputLength][inputSize];
+		for (int j = 0; j < inputLength; j++)
+			for (int k = 0; k < inputSize; k++)
+				gcInputU[j][k] = GCSignal.receive(masterIs);
+		for (int j = 0; j < inputLength; j++)
+			for (int k = 0; k < inputSize; k++)
+				gcInputV[j][k] = GCSignal.receive(masterIs);
+		Object[] ret = new Object[2];
+		ret[0] = gcInputU;
+		ret[1] = gcInputV;
+	    return ret;
 	}
 
 	@Override
@@ -76,8 +118,17 @@ public class PageRank implements ParallelGadget {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
-		// TODO Auto-generated method stub
+		Class c = Class.forName("test.parallel.SetInitialPageRankGadget");
 		
+		Gadget initialPageRank = (Gadget) c.newInstance();
+		initialPageRank.setInputs((Object[]) machine.input, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.logMachines,
+				machine.inputLength);
+		Object[] output = (Object[]) initialPageRank.compute();
 	}
 
 }

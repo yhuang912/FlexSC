@@ -1,11 +1,5 @@
 package network;
 
-import flexsc.CompEnv;
-import flexsc.Mode;
-import flexsc.Party;
-import gc.GCGen;
-import gc.GCSignal;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -14,8 +8,13 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import test.parallel.Histogram;
+import test.parallel.PageRank;
 import test.parallel.ParallelGadget;
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
+import gc.GCGen;
+import gc.GCSignal;
 
 public class Master {
 	public static int START_PORT;
@@ -76,7 +75,7 @@ public class Master {
 		}
 	}*/
 
-	public void setUp(int peerPort, Object[] input) throws IOException, BadResponseException {
+	public void setUp(int peerPort, int inputLength, CompEnv env) throws IOException, BadResponseException {
 		// set machineId for each of the machines
 		for (int i = 0; i < machines; i++) {
 			NetworkUtil.writeInt(os[i], Command.SET_MACHINE_ID.getValue());
@@ -86,10 +85,11 @@ public class Master {
 			if (isGen) {
 				GCGen.R.send(os[i]);
 			}
-			parallelGadget.sendInputToMachines(input, i, os);
 			os[i].flush();
 			// oos.flush();
 		}
+		parallelGadget.sendInputToMachines(inputLength, machines, isGen, env, os);
+		System.out.println("OT done");
 
 		// Ask all machines except for the last to listen
 		for (int i = 0; i < machines - 1; i++) {
@@ -152,20 +152,17 @@ public class Master {
 			is = client.is;
 			os = client.os;
 		}
-		// System.out.println("connected to other master");
+		System.out.println("connected to other master");
 		CompEnv<GCSignal> env = CompEnv.getEnv(mode, party, is, os);
-		master.parallelGadget = new Histogram();
-		Object[] input = master.parallelGadget.performOTAndReturnMachineInputs(inputLength, machines,
-				master, env);
-
-		// System.out.println("OT done");
+		// master.parallelGadget = new Histogram();
+		master.parallelGadget = new PageRank();
 
 		for (int i = 0; i < machines; i++) {
 			master.listen(Master.START_PORT + i, i);
 		}
-		// System.out.println("Connected to master");
+		System.out.println("Connected to master");
 		// master tells the machines what their ports are for peer connections
-		master.setUp(peerPort, input);
-		// System.out.println("Connections successful");
+		master.setUp(peerPort, inputLength, env);
+		System.out.println("Connections successful");
 	}
 }

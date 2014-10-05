@@ -6,18 +6,21 @@ import java.io.OutputStream;
 
 import network.BadCommandException;
 import network.Machine;
-import network.Master;
 import flexsc.CompEnv;
 import gc.BadLabelException;
 import gc.GCSignal;
 
 public interface ParallelGadget {
 
-	public Object[] performOTAndReturnMachineInputs(int inputLength,
-			int machines, Master master, CompEnv<GCSignal> env)
-			throws IOException;
+	/*public Object[] performOTAndReturnMachineInputs(int inputLength,
+			int machines, boolean isGen, CompEnv<GCSignal> env)
+			throws IOException;*/
 
-	public void sendInputToMachines(Object[] input, int i, OutputStream[] os) throws IOException;
+	public void sendInputToMachines(int inputLength,
+			int machines,
+			boolean isGen, 
+			CompEnv<GCSignal> env,
+			OutputStream[] os) throws IOException;
 
 	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs);
 

@@ -39,11 +39,11 @@ public class Histogram implements ParallelGadget {
 		return a;
 	}
 
-	public Object[] performOTAndReturnMachineInputs(int inputLength,
-			int machines, Master master, CompEnv<GCSignal> env)
+	private Object[] performOTAndReturnMachineInputs(int inputLength,
+			int machines, boolean isGen, CompEnv<GCSignal> env)
 			throws IOException {
 		GCSignal[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
-		if (master.isGen) {
+		if (isGen) {
 			for(int i = 0; i < Ta.length; ++i)
 				Ta[i] = env.inputOfBob(new boolean[32]);
 		} else {
@@ -58,13 +58,21 @@ public class Histogram implements ParallelGadget {
 		return input;
 	}
 
-	public void sendInputToMachines(Object[] input, int i, OutputStream[] os) throws IOException {
-		GCSignal[][] gcInput = (GCSignal[][]) input[i];
-		NetworkUtil.writeInt(os[i], gcInput.length);
-		NetworkUtil.writeInt(os[i], gcInput[0].length);
-		for (int j = 0; j < gcInput.length; j++)
-			for (int k = 0; k < gcInput[j].length; k++)
-				gcInput[j][k].send(os[i]);
+	public void sendInputToMachines(int inputLength,
+			int machines,
+			boolean isGen, 
+			CompEnv<GCSignal> env,
+			OutputStream[] os) throws IOException {
+		Object[] input = performOTAndReturnMachineInputs(inputLength, machines, isGen, env);
+		for (int i = 0; i < machines; i++) {
+			GCSignal[][] gcInput = (GCSignal[][]) input[i];
+			NetworkUtil.writeInt(os[i], gcInput.length);
+			NetworkUtil.writeInt(os[i], gcInput[0].length);
+			for (int j = 0; j < gcInput.length; j++)
+				for (int k = 0; k < gcInput[j].length; k++)
+					gcInput[j][k].send(os[i]);
+			os[i].flush();
+		}
 	}
 
 	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs) {
