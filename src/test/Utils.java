@@ -196,4 +196,29 @@ public class Utils {
 		return a;
 	}
 
+	public static <T> T[][] flatten(CompEnv<T> env, T[][] ... data) {
+		int length = 0;
+		for (int i = 0; i < data.length; i++) {
+			length += data[i][0].length;
+		}
+		T[][] ret = env.newTArray(data[0].length, length);
+		int pos = 0;
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				System.arraycopy(data[i][j], 0, ret[j], pos, data[i][j].length);
+			}
+			pos += data[i][0].length;
+		}
+		return ret;
+	}
+
+	public static <T> void unflatten(T[][] flat, T[][] ... x) {
+		int pos = 0;
+		for (int i = 0; i < x.length; i++) {
+			for (int j = 0; j < x[i].length; j++) {
+				System.arraycopy(flat[j], pos, x[i][j], 0, x[i][j].length);
+			}
+			pos += x[i][0].length;
+		}
+	}
 }

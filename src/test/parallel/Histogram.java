@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
+import circuits.SimpleComparator;
 import network.BadCommandException;
 import network.Machine;
 import network.NetworkUtil;
@@ -31,9 +32,9 @@ public class Histogram implements ParallelGadget {
 		}
 		for(int i = 0; i < aa.length; ++i)
 			a[i] = Utils.fromInt(aa[i], 32);
-		/*System.out.println("Frequencies");
+		System.out.println("Frequencies");
 		for (int i = 0; i < limit + 1; i++)
-			System.out.println(i + ": " + freq[i]);*/
+			System.out.println(i + ": " + freq[i]);
 		return a;
 	}
 
@@ -101,7 +102,8 @@ public class Histogram implements ParallelGadget {
 		// System.out.println(machineId + ": histogram mappper done");
 		// listen
 		c = Class.forName("test.parallel.SortGadget");
-		Gadget gadge = (Gadget) c.newInstance();
+		SortGadget gadge = (SortGadget) c.newInstance();
+		gadge.comp = new SimpleComparator<>(env);
 		Object[] inputs = new Object[2];
 		inputs[0] = output[0];
 		inputs[1] = output[1];

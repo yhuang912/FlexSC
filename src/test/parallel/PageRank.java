@@ -119,7 +119,6 @@ public class PageRank implements ParallelGadget {
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
 		Class c = Class.forName("test.parallel.SetInitialPageRankGadget");
-		
 		Gadget initialPageRank = (Gadget) c.newInstance();
 		initialPageRank.setInputs((Object[]) machine.input, env, machineId,
 				machine.peerIsUp,
@@ -129,6 +128,16 @@ public class PageRank implements ParallelGadget {
 				machine.logMachines,
 				machine.inputLength);
 		Object[] output = (Object[]) initialPageRank.compute();
+
+		c = Class.forName("test.parallel.SortGadget");
+		SortGadget sortGadget = (SortGadget) c.newInstance();
+		sortGadget.setInputs(inputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.logMachines,
+				machine.inputLength);
 	}
 
 }

@@ -8,26 +8,26 @@ import java.lang.reflect.Array;
 import network.BadCommandException;
 import network.Machine;
 import circuits.BitonicSortLib;
-import circuits.SimpleComparator;
+import circuits.Comparator;
 import flexsc.Gadget;
 import flexsc.Party;
 import gc.BadLabelException;
 
 public class SortGadget<T>  extends Gadget<T> {
 
+	Comparator<T> comp = null;
+
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
-		// System.out.println("Secure compute starting");
 		long communicate = 0;
 		long compute = 0;
 		long concatenate = 0;
 		long initTimer = System.nanoTime();
 		T[][] x = (T[][]) inputs[0];
 		T[][] data = (T[][]) inputs[1];
-		BitonicSortLib<T> lib =  new BitonicSortLib<T>(env, new SimpleComparator<T>(env));
+		BitonicSortLib<T> lib =  new BitonicSortLib<T>(env, comp);
 		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
-		// System.out.println("sort hello");
 		lib.sort(x, data, dir);
 
 		for (int k = 0; k < logMachines; k++) {
@@ -113,22 +113,6 @@ public class SortGadget<T>  extends Gadget<T> {
 		return y;
 	}
 
-	private void send(OutputStream os, T[][] x) throws IOException {
-		for (int i = 0; i < x.length; i++) {
-			send(os, x[i]);
-			// os.flush();
-		}
-		os.flush();
-	}
-
-	private T[][] receive(InputStream is, int arrayLength, int intLength) throws IOException {
-		T[][] y = env.newTArray(arrayLength, intLength);
-		for (int i = 0; i < arrayLength; i++) {
-			y[i] = (T[]) read(is, intLength);
-		}
-		return y;
-	}
-
 	public <T> T[] concatenate(T[] A, T[] B) {
 	    int aLen = A.length;
 	    int bLen = B.length;
@@ -139,5 +123,9 @@ public class SortGadget<T>  extends Gadget<T> {
 	    System.arraycopy(B, 0, C, aLen, bLen);
 
 	    return C;
+	}
+
+	public void setComparator(Comparator<T> comp) {
+		this.comp = comp;
 	}
 }
