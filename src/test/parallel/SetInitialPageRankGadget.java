@@ -3,12 +3,19 @@ package test.parallel;
 import java.io.IOException;
 
 import network.BadCommandException;
+import network.Machine;
 import test.Utils;
 import circuits.IntegerLib;
+import flexsc.CompEnv;
 import flexsc.Gadget;
 import gc.BadLabelException;
 
 public class SetInitialPageRankGadget<T> extends Gadget<T> {
+
+	public SetInitialPageRankGadget(Object[] inputs, CompEnv<T> env,
+			Machine machine) {
+		super(inputs, env, machine);
+	}
 
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,

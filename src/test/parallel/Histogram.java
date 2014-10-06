@@ -87,97 +87,33 @@ public class Histogram<T> implements ParallelGadget<T> {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
-		Class c = Class.forName("test.parallel.HistogramMapper");
-		Gadget histogramMapper = (Gadget) c.newInstance();
 		Object[] histogramInputs = new Object[1];
 		histogramInputs[0] = machine.input;
-		histogramMapper.setInputs(histogramInputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength);
+		HistogramMapper<T> histogramMapper = new HistogramMapper<>(histogramInputs, env, machine);
 		Object[] output = (Object[]) histogramMapper.compute();
 
-		// System.out.println(machineId + ": histogram mappper done");
-		// listen
-		c = Class.forName("test.parallel.SortGadget");
-		SortGadget gadge = (SortGadget) c.newInstance();
-		gadge.comp = new SimpleComparator<>(env);
 		Object[] inputs = new Object[2];
 		inputs[0] = output[0];
 		inputs[1] = output[1];
-		gadge.setInputs(inputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength);
+		SortGadget gadge = new SortGadget<>(inputs, env, machine);
+		gadge.comp = new SimpleComparator<>(env);
 		output = (Object[]) gadge.compute();
 
-		// System.out.println(machineId + ": sorting done");
-
-		c = Class.forName("test.parallel.PrefixSumGadget");
-		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
 		Object[] prefixSumInputs = new Object[1];
 		prefixSumInputs[0] = output[1];
-		prefixSumGadget.setInputs(prefixSumInputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength,
-				machine.numberOfIncomingConnections,
-				machine.numberOfOutgoingConnections);
+		PrefixSumGadget prefixSumGadget = new PrefixSumGadget<>(prefixSumInputs, env, machine);
 		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
 
-		/*long totalMemory = Runtime.getRuntime().totalMemory();
-		long freeMemory = Runtime.getRuntime().freeMemory();
-		if (machineId == 0 && env.party.equals(Party.Alice)) {
-			System.out.println(machineId + ": " + (totalMemory - freeMemory));
-		}
-		prefixSumGadget = null;
-		System.gc();
-		totalMemory = Runtime.getRuntime().totalMemory();
-		freeMemory = Runtime.getRuntime().freeMemory();
-		if (machineId == 0 && env.party.equals(Party.Alice)) {
-			System.out.println(machineId + ": " + (totalMemory - freeMemory));
-		}*/
-
-		c = Class.forName("test.parallel.MarkerWithLastValueGadget");
-		MarkerWithLastValueGadget markerGadget = (MarkerWithLastValueGadget) c.newInstance();
 		Object[] markerInputs = new Object[1];
 		markerInputs[0] = output[0];
-		markerGadget.setInputs(markerInputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength,
-				machine.numberOfIncomingConnections,
-				machine.numberOfOutgoingConnections,
-				machine.totalMachines);
+		MarkerWithLastValueGadget<T> markerGadget = new MarkerWithLastValueGadget<>(markerInputs, env, machine);
 		Object marker = markerGadget.compute();
 
-		c = Class.forName("test.parallel.SubtractGadgetForHistogram");
-		SubtractGadgetForHistogram subtractGadget = (SubtractGadgetForHistogram) c.newInstance();
 		inputs = new Object[3];
 		inputs[0] = marker; // sort by flag
 		inputs[1] = markerInputs[0]; // actual value
 		inputs[2] = prefixSumDataResult[0]; // frequency
-		subtractGadget.setInputs(inputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength,
-				machine.numberOfIncomingConnections,
-				machine.numberOfOutgoingConnections);
+		SubtractGadgetForHistogram<T> subtractGadget = new SubtractGadgetForHistogram<>(inputs, env, machine);
 		output = (Object[]) subtractGadget.compute();
 	}
 

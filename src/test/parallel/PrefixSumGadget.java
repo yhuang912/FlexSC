@@ -2,22 +2,19 @@ package test.parallel;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import network.BadCommandException;
-import network.Master;
-import test.Utils;
+import network.Machine;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Gadget;
-import flexsc.Party;
 import gc.BadLabelException;
 
 public class PrefixSumGadget<T> extends Gadget<T> {
 
-	private int numberOfIncomingConnections;
-	private int numberOfOutgoingConnections;
+	public PrefixSumGadget(Object[] inputs, CompEnv<T> env, Machine machine) {
+		super(inputs, env, machine);
+	}
 
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException {
@@ -40,57 +37,25 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 		}
 		T[][][] output = env.newTArray(1, x.length, x[0].length);
 		output[0] = x;
-		/*for (int i = 0; i < x.length; i++) {
-			int int1 = Utils.toInt(lib.getBooleans(x[i]));
-			if (machineId == 3 && Party.Alice.equals(env.party)) {
-				System.out.println(machineId + ", " + int1);
-			}
-		}*/	
 		return output;
 	}
 
 	private T[] prefixSum(T[] prefixSum, IntegerLib<T> lib) throws IOException, BadLabelException {
-		int noOfIncomingConnections = this.numberOfIncomingConnections;
-		int noOfOutgoingConnections = this.numberOfOutgoingConnections;
-		for (int k = 0; k < logMachines; k++) {
-			/* if (noOfOutgoingConnections > 0) {
-				send(peerOsUp[k], prefixSum);
-				((BufferedOutputStream) peerOsUp[k]).flush();
-				noOfOutgoingConnections--;
-			}
+		int noOfIncomingConnections = machine.numberOfIncomingConnections;
+		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
+		for (int k = 0; k < machine.logMachines; k++) {
 			if (noOfIncomingConnections > 0) {
-				T[] read = read(peerIsDown[k], prefixSum.length);
-				prefixSum = lib.add(prefixSum, read);
-				noOfIncomingConnections--;
-			} */
-			if (noOfIncomingConnections > 0) {
-				send(peerOsDown[k], prefixSum);
-				((BufferedOutputStream) peerOsDown[k]).flush();
+				send(machine.peerOsDown[k], prefixSum);
+				((BufferedOutputStream) machine.peerOsDown[k]).flush();
 				noOfIncomingConnections--;
 			}
 			if (noOfOutgoingConnections > 0) {
-				T[] read = read(peerIsUp[k], prefixSum.length);
+				T[] read = read(machine.peerIsUp[k], prefixSum.length);
 				prefixSum = lib.add(prefixSum, read);
 				noOfOutgoingConnections--;
 			}
 		}
 		// System.out.println(machineId + ": Sum = " + Utils.toInt(lib.getBooleans(prefixSum)));
 		return prefixSum;
-	}
-
-	public void setInputs(Object[] inputs, 
-			CompEnv<T> env,
-			int machineId, 
-			InputStream[] peerIsUp,
-			OutputStream[] peerOsUp,
-			InputStream[] peerIsDown,
-			OutputStream[] peerOsDown,
-			int logMachines,
-			int inputLength,
-			int numberOfIncomingConnections,
-			int numberOfOutgoingConnections) {
-		setInputs(inputs, env, machineId, peerIsUp, peerOsUp, peerIsDown, peerOsDown, logMachines, inputLength);
-		this.numberOfIncomingConnections = numberOfIncomingConnections;
-		this.numberOfOutgoingConnections = numberOfOutgoingConnections;
 	}
 }

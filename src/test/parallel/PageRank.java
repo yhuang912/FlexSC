@@ -122,33 +122,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
-		Class c = Class.forName("test.parallel.SetInitialPageRankGadget");
-		Gadget initialPageRank = (Gadget) c.newInstance();
-		initialPageRank.setInputs((Object[]) machine.input, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength);
-		Object[] output = (Object[]) initialPageRank.compute();
-		T[][] u = (T[][]) output[0];
-		T[][] v = (T[][]) output[1];
-		T[][] pr = (T[][]) output[2];
-		T[][] l = (T[][]) output[3];
 
-		T[][] data = (T[][]) Utils.flatten(env, v, pr, l);
-		SortGadget sortGadget = new SortGadget<>();
-		Object[] inputs = new Object[2];
-		inputs[0] = output[0];
-		inputs[1] = data;
-		sortGadget.setInputs(inputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength);
 		Comparator<T> firstSortComparator = new Comparator<T>() {
 
 			@Override
@@ -199,12 +173,62 @@ public class PageRank<T> implements ParallelGadget<T> {
 			}
 		};
 
+
+		SetInitialPageRankGadget<T> initialPageRank = new SetInitialPageRankGadget<>((Object []) machine.input, env, machine);
+		Object[] output = (Object[]) initialPageRank.compute();
+		T[][] u = (T[][]) output[0];
+		T[][] v = (T[][]) output[1];
+		T[][] pr = (T[][]) output[2];
+		T[][] l = (T[][]) output[3];
+
+		T[][] data = (T[][]) Utils.flatten(env, v, pr, l);
+		Object[] inputs = new Object[2];
+		inputs[0] = output[0];
+		inputs[1] = data;
+		SortGadget sortGadget = new SortGadget<>(inputs, env, machine);
 		sortGadget.setComparator(firstSortComparator);
 		Object[] output2 = (Object[]) sortGadget.compute();
 
 		u = (T[][]) output2[0];
 		Utils.unflatten((T[][]) output2[1], v, pr, l);
 
+		Object[] prefixSumInputs = new Object[1];
+		prefixSumInputs[0] = l;
+		PrefixSumGadget<T> prefixSumGadget = new PrefixSumGadget<>(prefixSumInputs, env, machine);
+		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
+
+		// key is v
+		data = (T[][]) Utils.flatten(env, u, pr, l);
+		inputs = new Object[2];
+		inputs[0] = v;
+		inputs[1] = data;
+		sortGadget = new SortGadget<>(inputs, env, machine);
+		sortGadget.setComparator(firstSortComparator);
+		Object[] output3 = (Object[]) sortGadget.compute();
+
+		v = (T[][]) output3[0];
+		Utils.unflatten((T[][]) output3[1], u, pr, l);
+
+		inputs = new Object[1];
+		inputs[0] = l;
+		SubtractGadgetForPageRank subtractGadget = new SubtractGadgetForPageRank<>(inputs, env, machine);
+		l = (T[][]) subtractGadget.compute();
+
+		data = (T[][]) Utils.flatten(env, v, pr, l);
+		inputs = new Object[2];
+		inputs[0] = u;
+		inputs[1] = data;
+		sortGadget = new SortGadget<>(inputs, env, machine);
+		sortGadget.setComparator(secondSortComparator);
+		Object[] output4 = (Object[]) sortGadget.compute();
+		u = (T[][]) output4[0];
+		Utils.unflatten((T[][]) output4[1], v, pr, l);
+
+		print(machineId, env, u, v, pr, l);
+	}
+
+	private <T> void print(int machineId, final CompEnv env, T[][] u, T[][] v,
+			T[][] pr, T[][] l) throws IOException, BadLabelException {
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(u[i]));
 			int b = Utils.toInt(env.outputToAlice(v[i]));
@@ -214,73 +238,6 @@ public class PageRank<T> implements ParallelGadget<T> {
 				System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);
 			}
 	    }
-
-		c = Class.forName("test.parallel.PrefixSumGadget");
-		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
-		Object[] prefixSumInputs = new Object[1];
-		prefixSumInputs[0] = l;
-		prefixSumGadget.setInputs(prefixSumInputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength,
-				machine.numberOfIncomingConnections,
-				machine.numberOfOutgoingConnections);
-		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
-
-		// key is v
-		data = (T[][]) Utils.flatten(env, u, pr, l);
-		sortGadget = new SortGadget<>();
-		inputs = new Object[2];
-		inputs[0] = v;
-		inputs[1] = data;
-		sortGadget.setInputs(inputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength);
-		sortGadget.setComparator(firstSortComparator);
-		Object[] output3 = (Object[]) sortGadget.compute();
-
-		v = (T[][]) output3[0];
-		Utils.unflatten((T[][]) output3[1], u, pr, l);
-
-		c = Class.forName("test.parallel.SubtractGadgetForPageRank");
-		SubtractGadgetForPageRank subtractGadget = (SubtractGadgetForPageRank) c.newInstance();
-		inputs = new Object[1];
-		inputs[0] = l;
-		subtractGadget.setInputs(inputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength,
-				machine.numberOfIncomingConnections,
-				machine.numberOfOutgoingConnections);
-		l = (T[][]) subtractGadget.compute();
-
-		sortGadget = new SortGadget<>();
-		data = (T[][]) Utils.flatten(env, v, pr, l);
-		inputs = new Object[2];
-		inputs[0] = u;
-		inputs[1] = data;
-		sortGadget.setInputs(inputs, env, machineId,
-				machine.peerIsUp,
-				machine.peerOsUp,
-				machine.peerIsDown,
-				machine.peerOsDown,
-				machine.logMachines,
-				machine.inputLength);
-		sortGadget.setComparator(secondSortComparator);
-		Object[] output4 = (Object[]) sortGadget.compute();
-		u = (T[][]) output4[0];
-		Utils.unflatten((T[][]) output4[1], v, pr, l);
-		
 	}
 
 }

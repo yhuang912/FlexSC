@@ -6,21 +6,22 @@ import gc.GCSignal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.Callable;
 
 import network.BadCommandException;
+import network.Machine;
 import network.NetworkUtil;
 
 public abstract class Gadget<T> {
 	protected Object[] inputs;
 	protected CompEnv<T> env;
-	protected int machineId;
+	protected Machine machine;
+	/*protected int machineId;
 	protected InputStream[] peerIsUp;
 	protected OutputStream[] peerOsUp;
 	protected InputStream[] peerIsDown;
 	protected OutputStream[] peerOsDown;
 	protected int logMachines;
-	protected int inputLength;
+	protected int inputLength;*/
 
 	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
@@ -30,7 +31,7 @@ public abstract class Gadget<T> {
 		Object ret = secureCompute();
 		env.flush();
 		long endTime = System.nanoTime();
-		if (machineId == 0 && env.party.equals(Party.Alice)) {
+		if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
 			String[] gadge = this.getClass().getName().split("\\.");
 			// System.out.println((1 << logMachines) + "," + inputLength + "," + (endTime - startTime)/1000000000.0 + "," + gadge[gadge.length - 1]);
 		}
@@ -76,23 +77,11 @@ public abstract class Gadget<T> {
 		return null;
 	}
 
-	public void setInputs(Object[] inputs, 
+	public Gadget(Object[] inputs, 
 			CompEnv<T> env,
-			int machineId, 
-			InputStream[] peerIsUp,
-			OutputStream[] peerOsUp,
-			InputStream[] peerIsDown,
-			OutputStream[] peerOsDown,
-			int logMachines,
-			int inputLength) {
+			Machine machine) {
 		this.inputs = inputs;
 		this.env = env;
-		this.peerIsUp = peerIsUp;
-		this.peerOsUp = peerOsUp;
-		this.peerIsDown = peerIsDown;
-		this.peerOsDown = peerOsDown;
-		this.machineId = machineId;
-		this.logMachines = logMachines;
-		this.inputLength = inputLength;
+		this.machine = machine;
 	}
 }

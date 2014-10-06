@@ -9,11 +9,16 @@ import network.BadCommandException;
 import network.Machine;
 import circuits.BitonicSortLib;
 import circuits.Comparator;
+import flexsc.CompEnv;
 import flexsc.Gadget;
 import flexsc.Party;
 import gc.BadLabelException;
 
 public class SortGadget<T>  extends Gadget<T> {
+
+	public SortGadget(Object[] inputs, CompEnv<T> env, Machine machine) {
+		super(inputs, env, machine);
+	}
 
 	Comparator<T> comp = null;
 
@@ -27,24 +32,24 @@ public class SortGadget<T>  extends Gadget<T> {
 		T[][] x = (T[][]) inputs[0];
 		T[][] data = (T[][]) inputs[1];
 		BitonicSortLib<T> lib =  new BitonicSortLib<T>(env, comp);
-		T dir = (machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
+		T dir = (machine.machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 		lib.sort(x, data, dir);
 
-		for (int k = 0; k < logMachines; k++) {
+		for (int k = 0; k < machine.logMachines; k++) {
 			int diff = (1 << k);
-			T mergeDir = ((machineId / (2 * (1 << k))) % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
+			T mergeDir = ((machine.machineId / (2 * (1 << k))) % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 			while (diff != 0) {
 				long startCommunicate = System.nanoTime();
-				boolean up = (machineId / diff) % 2 == 1 ? true : false;
+				boolean up = (machine.machineId / diff) % 2 == 1 ? true : false;
 				InputStream is;
 				OutputStream os;
 				int commMachine = Machine.log2(diff);
 				if (up) {
-					is = peerIsUp[commMachine];
-					os = peerOsUp[commMachine];
+					is = machine.peerIsUp[commMachine];
+					os = machine.peerOsUp[commMachine];
 				} else {
-					is = peerIsDown[commMachine];
-					os = peerOsDown[commMachine];
+					is = machine.peerIsDown[commMachine];
+					os = machine.peerOsDown[commMachine];
 				}
 
 				// System.out.println(machineId + ": before " + k + " " + diff);
