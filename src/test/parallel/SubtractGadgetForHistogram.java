@@ -14,7 +14,7 @@ import flexsc.Gadget;
 import flexsc.Party;
 import gc.BadLabelException;
 
-public class SubtractGadget<T> extends Gadget<T> {
+public class SubtractGadgetForHistogram<T> extends Gadget<T> {
 
 	private int numberOfIncomingConnections;
 	private int numberOfOutgoingConnections;
@@ -28,11 +28,7 @@ public class SubtractGadget<T> extends Gadget<T> {
 		T[][] flag = (T[][]) inputs[0];
 		T[][] x = (T[][]) inputs[1];
 		T[][] prefixSum = (T[][]) inputs[2];
-		/*T[][] data = env.newTArray(x.length, x[0].length + prefixSum[0].length);
-		for (int i = 0; i < data.length; i++) {
-			System.arraycopy(x[i], 0, data[i], 0, x[i].length);
-			System.arraycopy(prefixSum[i], 0, data[i], x[i].length, prefixSum[i].length);
-		}*/
+
 		T[][] data = Utils.flatten(env, x, prefixSum);
 		Class c;
 		SortGadget gadge;
@@ -54,20 +50,8 @@ public class SubtractGadget<T> extends Gadget<T> {
 			
 			flag = (T[][]) sortOutput[0];
 			data = (T[][]) sortOutput[1];
-			/*for (int i = 0; i < data.length; i++) {
-				System.arraycopy(data[i], 0, x[i], 0, x[i].length);
-				System.arraycopy(data[i], x[i].length, prefixSum[i], 0, prefixSum[i].length);
-			}*/
 			Utils.unflatten(data, x, prefixSum);
 
-			/*for (int i = 0; i < x.length; i++) {
-				int int1 = Utils.toInt(lib.getBooleans(flag[i]));
-				int int2 = Utils.toInt(lib.getBooleans(x[i]));
-				int int3 = Utils.toInt(lib.getBooleans(prefixSum[i]));
-				if (Party.Alice.equals(env.party)) {
-					System.out.println(machineId + ": "+ int1 + ", " + int2 + ", " + int3);
-				}
-			}*/
 			// send and receive values
 			if (numberOfIncomingConnections > 0) {
 				send(peerOsDown[0], prefixSum[prefixSum.length - 1]);

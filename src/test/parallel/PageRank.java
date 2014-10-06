@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import circuits.Comparator;
 import circuits.IntegerLib;
+import circuits.SimpleComparator;
 import network.BadCommandException;
 import network.Machine;
 import network.NetworkUtil;
@@ -137,8 +138,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 		T[][] l = (T[][]) output[3];
 
 		T[][] data = (T[][]) Utils.flatten(env, v, pr, l);
-		c = Class.forName("test.parallel.SortGadget");
-		SortGadget sortGadget = (SortGadget) c.newInstance();
+		SortGadget sortGadget = new SortGadget<>();
 		Object[] inputs = new Object[2];
 		inputs[0] = output[0];
 		inputs[1] = data;
@@ -149,7 +149,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 				machine.peerOsDown,
 				machine.logMachines,
 				machine.inputLength);
-		sortGadget.setComparator(new Comparator<T>() {
+		Comparator<T> firstSortComparator = new Comparator<T>() {
 
 			@Override
 			public T leq(T[] ui, T[] uj, T[] datai, T[] dataj) {
@@ -160,16 +160,60 @@ public class PageRank<T> implements ParallelGadget<T> {
 				Utils.unflatten(datai, vi, pri);
 				Utils.unflatten(dataj, vj, prj);
 				IntegerLib<T> lib = new IntegerLib<>(env);
-				T v = lib.geq(vi, vj);
-				T eq = lib.eq(ui, uj);
-				T u = lib.leq(ui, uj);
-				return lib.mux(u, v, eq);
+//				T v = lib.geq(vi, vj);
+//				T eq = lib.eq(ui, uj);
+//				T u = lib.leq(ui, uj);
+//				return lib.mux(u, v, eq);
+
+				T[] ai = (T[]) env.newTArray(64);
+				T[] aj = (T[]) env.newTArray(64);
+				ai = (T[]) Utils.flatten(env, lib.not(vi), ui);
+				aj = (T[]) Utils.flatten(env, lib.not(vj), uj);
+				return lib.leq(ai, aj);
 			}
-		});
+		};
+		Comparator<T> secondSortComparator = new Comparator<T>() {
+
+			@Override
+			public T leq(T[] ui, T[] uj, T[] datai, T[] dataj) {
+				IntegerLib<T> lib = new IntegerLib<>(env);
+				T[] pri = (T[]) env.newTArray(32);
+				T[] prj = (T[]) env.newTArray(32);
+				T[] li = (T[]) env.newTArray(32);
+				T[] lj = (T[]) env.newTArray(32);
+
+				T[] vi = (T[]) env.newTArray(32);
+				T[] vj = (T[]) env.newTArray(32);
+				Utils.unflatten(datai, vi, pri, li);
+				Utils.unflatten(dataj, vj, prj, lj);
+//				T v = lib.leq(vi, vj);
+//				T eq = lib.eq(ui, uj);
+//				T u = lib.leq(ui, uj);
+//				return lib.mux(u, v, eq);
+
+				T[] ai = (T[]) env.newTArray(64);
+				T[] aj = (T[]) env.newTArray(64);
+				ai = (T[]) Utils.flatten(env, vi, ui);
+				aj = (T[]) Utils.flatten(env, vj, uj);
+				return lib.leq(ai, aj);
+			}
+		};
+
+		sortGadget.setComparator(firstSortComparator);
 		Object[] output2 = (Object[]) sortGadget.compute();
 
 		u = (T[][]) output2[0];
 		Utils.unflatten((T[][]) output2[1], v, pr, l);
+
+		for (int i = 0; i < pr.length; i++) {
+			int a = Utils.toInt(env.outputToAlice(u[i]));
+			int b = Utils.toInt(env.outputToAlice(v[i]));
+			double c2 = Utils.toFloat(env.outputToAlice(pr[i]), 20, 12);
+			int d = Utils.toInt(env.outputToAlice(l[i]));
+			if (Party.Alice.equals(env.party)) {
+				System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);
+			}
+	    }
 
 		c = Class.forName("test.parallel.PrefixSumGadget");
 		PrefixSumGadget prefixSumGadget = (PrefixSumGadget) c.newInstance();
@@ -186,15 +230,57 @@ public class PageRank<T> implements ParallelGadget<T> {
 				machine.numberOfOutgoingConnections);
 		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
 
-//		for (int i = 0; i < pr.length; i++) {
-//		int a = Utils.toInt(env.outputToAlice(u[i]));
-//		int b = Utils.toInt(env.outputToAlice(v[i]));
-//		double c2 = Utils.toFloat(env.outputToAlice(pr[i]), 20, 12);
-//		int d = Utils.toInt(env.outputToAlice(l[i]));
-//		if (Party.Alice.equals(env.party)) {
-//			System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);
-//		}
-//    }
+		// key is v
+		data = (T[][]) Utils.flatten(env, u, pr, l);
+		sortGadget = new SortGadget<>();
+		inputs = new Object[2];
+		inputs[0] = v;
+		inputs[1] = data;
+		sortGadget.setInputs(inputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.logMachines,
+				machine.inputLength);
+		sortGadget.setComparator(firstSortComparator);
+		Object[] output3 = (Object[]) sortGadget.compute();
+
+		v = (T[][]) output3[0];
+		Utils.unflatten((T[][]) output3[1], u, pr, l);
+
+		c = Class.forName("test.parallel.SubtractGadgetForPageRank");
+		SubtractGadgetForPageRank subtractGadget = (SubtractGadgetForPageRank) c.newInstance();
+		inputs = new Object[1];
+		inputs[0] = l;
+		subtractGadget.setInputs(inputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.logMachines,
+				machine.inputLength,
+				machine.numberOfIncomingConnections,
+				machine.numberOfOutgoingConnections);
+		l = (T[][]) subtractGadget.compute();
+
+		sortGadget = new SortGadget<>();
+		data = (T[][]) Utils.flatten(env, v, pr, l);
+		inputs = new Object[2];
+		inputs[0] = u;
+		inputs[1] = data;
+		sortGadget.setInputs(inputs, env, machineId,
+				machine.peerIsUp,
+				machine.peerOsUp,
+				machine.peerIsDown,
+				machine.peerOsDown,
+				machine.logMachines,
+				machine.inputLength);
+		sortGadget.setComparator(secondSortComparator);
+		Object[] output4 = (Object[]) sortGadget.compute();
+		u = (T[][]) output4[0];
+		Utils.unflatten((T[][]) output4[1], v, pr, l);
+		
 	}
 
 }

@@ -163,8 +163,8 @@ public class Histogram<T> implements ParallelGadget<T> {
 				machine.totalMachines);
 		Object marker = markerGadget.compute();
 
-		c = Class.forName("test.parallel.SubtractGadget");
-		SubtractGadget subtractGadget = (SubtractGadget) c.newInstance();
+		c = Class.forName("test.parallel.SubtractGadgetForHistogram");
+		SubtractGadgetForHistogram subtractGadget = (SubtractGadgetForHistogram) c.newInstance();
 		inputs = new Object[3];
 		inputs[0] = marker; // sort by flag
 		inputs[1] = markerInputs[0]; // actual value

@@ -212,6 +212,20 @@ public class Utils {
 		return ret;
 	}
 
+	public static <T> T[] flatten(CompEnv<T> env, T[] ... data) {
+		int length = 0;
+		for (int i = 0; i < data.length; i++) {
+			length += data[i].length;
+		}
+		T[] ret = env.newTArray(length);
+		int pos = 0;
+		for (int i = 0; i < data.length; i++) {
+			System.arraycopy(data[i], 0, ret, pos, data[i].length);
+			pos += data[i].length;
+		}
+		return ret;
+	}
+
 	public static <T> void unflatten(T[][] flat, T[][] ... x) {
 		int pos = 0;
 		for (int i = 0; i < x.length; i++) {

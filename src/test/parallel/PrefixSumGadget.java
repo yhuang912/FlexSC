@@ -31,7 +31,6 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 			x[i] = lib.add(result, x[i]);
 			result = x[i];
 		}
-		// System.out.println(machineId + ": Sum = " + Utils.toInt(lib.getBooleans(result)));
 		T[] localSum = result;
 
 		T[] prefixSum = prefixSum(result, lib);
