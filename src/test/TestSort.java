@@ -13,7 +13,7 @@ import test.harness.TestSortHarness;
 import circuits.BitonicSortLib;
 import circuits.SimpleComparator;
 
-public class TestSort extends TestSortHarness<GCSignal>{
+public class TestSort extends TestSortHarness<GCSignal> {
 	@Test
 	public void testAllCases() throws Exception {
 		Random rnd = new Random();

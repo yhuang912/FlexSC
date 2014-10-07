@@ -187,12 +187,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.compute();
 
 		// Sort to get edges followed by the vertex
-		T[][] data = (T[][]) Utils.flatten(env, v, pr, l);
-		SortGadget sortGadget = new SortGadget<T>(env, machine)
-				.setInputs(u, data, firstSortComparator);
-		Object[] output2 = (Object[]) sortGadget.compute();
-		u = (T[][]) output2[0];
-		Utils.unflatten((T[][]) output2[1], v, pr, l);
+		T[][] data = (T[][]) new SortGadget<T>(env, machine)
+				.setInputs(u, firstSortComparator, v, pr, l)
+				.compute();
+		Utils.unflatten(data, v, pr, l);
 
 		// Compute prefixSum for L
 		new PrefixSumGadget<T>(env, machine)
@@ -201,12 +199,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 
 		// Weird sort
 		// key is v
-		data = (T[][]) Utils.flatten(env, u, pr, l);
-		sortGadget = new SortGadget<T>(env, machine)
-				.setInputs(v, data, firstSortComparator);
-		Object[] output3 = (Object[]) sortGadget.compute();
-		v = (T[][]) output3[0];
-		Utils.unflatten((T[][]) output3[1], u, pr, l);
+		data = (T[][]) new SortGadget<T>(env, machine)
+				.setInputs(v, firstSortComparator, u, pr, l)
+				.compute();
+		Utils.unflatten(data, u, pr, l);
 
 		// Subtract to obtain l
 		new SubtractGadgetForPageRank<>(env, machine)
@@ -215,12 +211,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 
 		for (int i = 0; i < ITERATIONS; i++) {
 			// Sort so that all vertices are followed by edges
-			data = (T[][]) Utils.flatten(env, v, pr, l);
-			sortGadget = new SortGadget<T>(env, machine)
-					.setInputs(u, data, secondSortComparator);
-			Object[] output4 = (Object[]) sortGadget.compute();
-			u = (T[][]) output4[0];
-			Utils.unflatten((T[][]) output4[1], v, pr, l);
+			data = (T[][]) new SortGadget<T>(env, machine)
+					.setInputs(u, secondSortComparator, v, pr, l)
+					.compute();
+			Utils.unflatten(data, v, pr, l);
 	
 			// Write PR to edge
 			new WritePrPartToEdge<>(env, machine)
@@ -231,9 +225,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 					.setInputs(u, v, pr, true /* setVertexPrToZero */)
 					.compute();
 	
-			data = (T[][]) Utils.flatten(env, v, pr, l);
-			new SortGadget<T>(env, machine)
-				.setInputs(u, data, firstSortComparator)
+			data = (T[][]) new SortGadget<T>(env, machine)
+				.setInputs(u, firstSortComparator, v, pr, l)
 				.compute();
 			Utils.unflatten(data, v, pr, l);
 	
@@ -241,14 +234,12 @@ public class PageRank<T> implements ParallelGadget<T> {
 			new PrefixSumGadget<T>(env, machine)
 				.setInputs(pr, new FloatLib<T>(env, FLOAT_V, FLOAT_P))
 				.compute();
-	
+
 			// get all vertices together to subtract
-			data = (T[][]) Utils.flatten(env, u, pr, l);
-			sortGadget = new SortGadget<T>(env, machine)
-					.setInputs(v, data, secondSortComparator);
-			Object[] output8 = (Object[]) sortGadget.compute();
-			v = (T[][]) output8[0];
-			Utils.unflatten((T[][]) output8[1], u, pr, l);
+			data = (T[][]) new SortGadget<T>(env, machine)
+					.setInputs(v, secondSortComparator, u, pr, l)
+					.compute();
+			Utils.unflatten(data, u, pr, l);
 	
 			new SubtractGadgetForHistogram<T>(env, machine)
 				.setInputs(pr, new FloatLib<T>(env, FLOAT_V, FLOAT_P))
