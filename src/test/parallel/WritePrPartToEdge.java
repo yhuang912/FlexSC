@@ -3,11 +3,10 @@ package test.parallel;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 
-import test.Utils;
-import circuits.IntegerLib;
-import circuits.arithmetic.FloatLib;
 import network.BadCommandException;
 import network.Machine;
+import test.Utils;
+import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Gadget;
 import gc.BadLabelException;
@@ -35,16 +34,14 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
 		IntegerLib<T> lib = new IntegerLib<>(env);
-		FloatLib<T> floatLib = new FloatLib<>(env, 20, 12);
-		T[] floatZero = env.inputOfAlice(Utils.fromFloat(0, 20, 12));
-		T[] intZero = env.inputOfAlice(Utils.fromInt(0, 32));
+		T[] intZero = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 		T isVertex;
-		T[] val = lib.zeros(32);
+		T[] val = lib.zeros(PageRank.INT_LEN);
 		T _true = env.newT(true);
 
 		T foundToSend = env.newT(false);
-		T[] lastPrToSend = lib.zeros(32);
-		T[] lastLToSend = lib.zeros(32);
+		T[] lastPrToSend = lib.zeros(PageRank.INT_LEN);
+		T[] lastLToSend = lib.zeros(PageRank.INT_LEN);
 		for (int i = 0; i < u.length; i++) {
 			isVertex = lib.eq(v[i], intZero);
 			foundToSend = lib.mux(foundToSend, _true, isVertex);

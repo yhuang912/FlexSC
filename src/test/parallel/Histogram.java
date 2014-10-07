@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
+import circuits.IntegerLib;
 import circuits.SimpleComparator;
 import network.BadCommandException;
 import network.Machine;
@@ -98,7 +99,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 				.compute();
 
 		new PrefixSumGadget<T>(env, machine)
-				.setInputs(freq)
+				.setInputs(freq, new IntegerLib<T>(env))
 				.compute();
 
 		T[][] marker = (T[][]) env.newTArray(input.length, input[0].length);

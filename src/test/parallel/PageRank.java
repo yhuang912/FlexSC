@@ -7,15 +7,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-import circuits.Comparator;
-import circuits.IntegerLib;
-import circuits.SimpleComparator;
 import network.BadCommandException;
 import network.Machine;
 import network.NetworkUtil;
 import test.Utils;
+import circuits.Comparator;
+import circuits.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
-import flexsc.Gadget;
 import flexsc.Party;
 import gc.BadLabelException;
 import gc.GCSignal;
@@ -196,7 +195,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 
 		// Compute prefixSum for L
 		new PrefixSumGadget<T>(env, machine)
-				.setInputs(l)
+				.setInputs(l, new IntegerLib<T>(env))
 				.compute();
 
 		// Weird sort
@@ -227,8 +226,27 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.compute();
 
 		new SwapNonVertexEdges<T>(env, machine)
-				.setInputs(u, v)
+				.setInputs(u, v, pr)
 				.compute();
+
+		data = (T[][]) Utils.flatten(env, v, pr, l);
+		new SortGadget<T>(env, machine)
+			.setInputs(u, data, firstSortComparator)
+			.compute();
+		Utils.unflatten(data, v, pr, l);
+
+		// Compute prefixSum for pr
+		new PrefixSumGadget<T>(env, machine)
+			.setInputs(pr, new FloatLib<T>(env, FLOAT_V, FLOAT_P))
+			.compute();
+
+		// get all vertices together to subtract
+		data = (T[][]) Utils.flatten(env, u, pr, l);
+		sortGadget = new SortGadget<T>(env, machine)
+				.setInputs(v, data, secondSortComparator);
+		Object[] output8 = (Object[]) sortGadget.compute();
+		v = (T[][]) output8[0];
+		Utils.unflatten((T[][]) output8[1], u, pr, l);
 
 		print(machineId, env, u, v, pr, l);
 	}
@@ -238,7 +256,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(u[i]));
 			int b = Utils.toInt(env.outputToAlice(v[i]));
-			double c2 = Utils.toFloat(env.outputToAlice(pr[i]), FLOAT_P, PageRank.FLOAT_V);
+			double c2 = Utils.toFloat(env.outputToAlice(pr[i]), FLOAT_V, PageRank.FLOAT_P);
 			int d = Utils.toInt(env.outputToAlice(l[i]));
 			if (Party.Alice.equals(env.party)) {
 				System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);

@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import network.BadCommandException;
 import network.Machine;
-import circuits.IntegerLib;
+import circuits.ArithmeticLib;
 import flexsc.CompEnv;
 import flexsc.Gadget;
 import gc.BadLabelException;
@@ -13,20 +13,20 @@ import gc.BadLabelException;
 public class PrefixSumGadget<T> extends Gadget<T> {
 
 	private T[][] x;
+	private ArithmeticLib<T> lib;
 
 	public PrefixSumGadget(CompEnv<T> env, Machine machine) {
 		super(env, machine);
 	}
 
-	public PrefixSumGadget<T> setInputs(T[][] x) {
+	public PrefixSumGadget<T> setInputs(T[][] x, ArithmeticLib<T> lib) {
 		this.x = x;
+		this.lib = lib;
 		return this;
 	}
 
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException {
-
-		IntegerLib<T> lib =  new IntegerLib<T>(env);
 
 		T[] result = x[0];
 		for(int i = 1; i < x.length; ++i) {
@@ -43,7 +43,7 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 		return null;
 	}
 
-	private T[] prefixSum(T[] prefixSum, IntegerLib<T> lib) throws IOException, BadLabelException {
+	private T[] prefixSum(T[] prefixSum, ArithmeticLib<T> lib) throws IOException, BadLabelException {
 		int noOfIncomingConnections = machine.numberOfIncomingConnections;
 		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
 		for (int k = 0; k < machine.logMachines; k++) {
