@@ -19,9 +19,9 @@ public class MarkerWithLastValueGadget<T> extends Gadget<T> {
 	private T[][] x;
 	private T[][] marker;
 
-	public MarkerWithLastValueGadget(Object[] inputs, CompEnv<T> env,
+	public MarkerWithLastValueGadget(CompEnv<T> env,
 			Machine machine) {
-		super(inputs, env, machine);
+		super(env, machine);
 	}
 
 	public MarkerWithLastValueGadget<T> setInputs(T[][] x, T[][] marker) {

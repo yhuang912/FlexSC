@@ -11,15 +11,13 @@ import gc.BadLabelException;
 
 public class HistogramMapper<T> extends Gadget<T> {
 
-	private T[][] input;
 	private T[][] freq;
 
-	public HistogramMapper(Object[] inputs, CompEnv<T> env, Machine machine) {
-		super(inputs, env, machine);
+	public HistogramMapper(CompEnv<T> env, Machine machine) {
+		super(env, machine);
 	}
 
-	public HistogramMapper<T> setInputs(T[][] input, T[][] freq) {
-		this.input = input;
+	public HistogramMapper<T> setInputs(T[][] freq) {
 		this.freq = freq;
 		return this;
 	}

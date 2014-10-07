@@ -89,24 +89,24 @@ public class Histogram<T> implements ParallelGadget<T> {
 			BadCommandException, BadLabelException {
 		T[][] input = (T[][]) machine.input;
 		T[][] freq = (T[][]) env.newTArray(input.length, input[0].length);
-		new HistogramMapper<>(null /* input */, env, machine)
-				.setInputs(input, freq)
+		new HistogramMapper<T>(env, machine)
+				.setInputs(freq)
 				.compute();
 
-		new SortGadget<T>(null /* inputs */, env, machine)
+		new SortGadget<T>(env, machine)
 				.setInputs(input, freq, new SimpleComparator<T>(env))
 				.compute();
 
-		new PrefixSumGadget<T>(null /* input */, env, machine)
+		new PrefixSumGadget<T>(env, machine)
 				.setInputs(freq)
 				.compute();
 
 		T[][] marker = (T[][]) env.newTArray(input.length, input[0].length);
-		new MarkerWithLastValueGadget<T>(null /* markerInputs */, env, machine)
+		new MarkerWithLastValueGadget<T>(env, machine)
 				.setInputs(input, marker)
 				.compute();
 
-		new SubtractGadgetForHistogram<T>(null /* inputs */, env, machine)
+		new SubtractGadgetForHistogram<T>(env, machine)
 				.setInputs(marker, input, freq)
 				.compute();
 	}

@@ -14,8 +14,8 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 
 	private T[][] x;
 
-	public PrefixSumGadget(Object[] inputs, CompEnv<T> env, Machine machine) {
-		super(inputs, env, machine);
+	public PrefixSumGadget(CompEnv<T> env, Machine machine) {
+		super(env, machine);
 	}
 
 	public PrefixSumGadget<T> setInputs(T[][] x) {

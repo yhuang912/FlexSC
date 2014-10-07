@@ -19,9 +19,9 @@ public class SubtractGadgetForHistogram<T> extends Gadget<T> {
 	private T[][] x;
 	private T[][] prefixSum;
 
-	public SubtractGadgetForHistogram(Object[] inputs, CompEnv<T> env,
+	public SubtractGadgetForHistogram(CompEnv<T> env,
 			Machine machine) {
-		super(inputs, env, machine);
+		super(env, machine);
 	}
 
 	public SubtractGadgetForHistogram<T> setInputs(T[][] flag, T[][] x, T[][] prefixSum) {
@@ -38,7 +38,7 @@ public class SubtractGadgetForHistogram<T> extends Gadget<T> {
 		IntegerLib<T> lib = new IntegerLib<>(env);
 
 		T[][] data = Utils.flatten(env, x, prefixSum);
-		SortGadget<T> gadge = new SortGadget<T>(inputs, env, machine)
+		SortGadget<T> gadge = new SortGadget<T>(env, machine)
 				.setInputs(flag, data, new SimpleComparator<T>(env));
 		Object[] sortOutput = (Object[]) gadge.secureCompute();
 

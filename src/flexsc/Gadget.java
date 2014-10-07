@@ -12,16 +12,8 @@ import network.Machine;
 import network.NetworkUtil;
 
 public abstract class Gadget<T> {
-	protected Object[] inputs;
 	protected CompEnv<T> env;
 	protected Machine machine;
-	/*protected int machineId;
-	protected InputStream[] peerIsUp;
-	protected OutputStream[] peerOsUp;
-	protected InputStream[] peerIsDown;
-	protected OutputStream[] peerOsDown;
-	protected int logMachines;
-	protected int inputLength;*/
 
 	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
 
@@ -105,10 +97,8 @@ public abstract class Gadget<T> {
 		return null;
 	}
 
-	public Gadget(Object[] inputs, 
-			CompEnv<T> env,
+	public Gadget(CompEnv<T> env, 
 			Machine machine) {
-		this.inputs = inputs;
 		this.env = env;
 		this.machine = machine;
 	}

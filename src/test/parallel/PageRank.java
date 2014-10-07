@@ -182,51 +182,51 @@ public class PageRank<T> implements ParallelGadget<T> {
 		T[][] l = (T[][]) env.newTArray(u.length, u[0].length);
 		
 		// set initial pagerank
-		new SetInitialPageRankGadget<T>(null /* input */, env, machine)
+		new SetInitialPageRankGadget<T>(env, machine)
 				.setInputs(u, v, pr, l)
 				.compute();
 
 		// Sort to get edges followed by the vertex
 		T[][] data = (T[][]) Utils.flatten(env, v, pr, l);
-		SortGadget sortGadget = new SortGadget<T>(null /* inputs */, env, machine)
+		SortGadget sortGadget = new SortGadget<T>(env, machine)
 				.setInputs(u, data, firstSortComparator);
 		Object[] output2 = (Object[]) sortGadget.compute();
 		u = (T[][]) output2[0];
 		Utils.unflatten((T[][]) output2[1], v, pr, l);
 
 		// Compute prefixSum for L
-		new PrefixSumGadget<T>(null /* input */, env, machine)
+		new PrefixSumGadget<T>(env, machine)
 				.setInputs(l)
 				.compute();
 
 		// Weird sort
 		// key is v
 		data = (T[][]) Utils.flatten(env, u, pr, l);
-		sortGadget = new SortGadget<T>(null /* inputs */, env, machine)
+		sortGadget = new SortGadget<T>(env, machine)
 				.setInputs(v, data, firstSortComparator);
 		Object[] output3 = (Object[]) sortGadget.compute();
 		v = (T[][]) output3[0];
 		Utils.unflatten((T[][]) output3[1], u, pr, l);
 
 		// Subtract to obtain l
-		new SubtractGadgetForPageRank<>(null /* inputs */, env, machine)
+		new SubtractGadgetForPageRank<>(env, machine)
 				.setInputs(l)
 				.compute();
 
 		// Sort so that all vertices are followed by edges
 		data = (T[][]) Utils.flatten(env, v, pr, l);
-		sortGadget = new SortGadget<T>(null /* inputs */, env, machine)
+		sortGadget = new SortGadget<T>(env, machine)
 				.setInputs(u, data, secondSortComparator);
 		Object[] output4 = (Object[]) sortGadget.compute();
 		u = (T[][]) output4[0];
 		Utils.unflatten((T[][]) output4[1], v, pr, l);
 
 		// Write PR to edge
-		new WritePrPartToEdge<>(null /* inputs */, env, machine)
+		new WritePrPartToEdge<>(env, machine)
 				.setInputs(u, v, pr, l)
 				.compute();
 
-		new SwapNonVertexEdges<T>(null /* inputs */, env, machine)
+		new SwapNonVertexEdges<T>(env, machine)
 				.setInputs(u, v)
 				.compute();
 

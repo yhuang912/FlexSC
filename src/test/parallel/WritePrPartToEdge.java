@@ -19,8 +19,8 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 	private T[][] pr;
 	private T[][] l;
 
-	public WritePrPartToEdge(Object[] inputs, CompEnv<T> env, Machine machine) {
-		super(inputs, env, machine);
+	public WritePrPartToEdge(CompEnv<T> env, Machine machine) {
+		super(env, machine);
 	}
 
 	public WritePrPartToEdge<T> setInputs(T[][] u, T[][] v, T[][] pr, T[][] l) {

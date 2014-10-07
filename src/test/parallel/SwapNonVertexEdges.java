@@ -15,8 +15,8 @@ public class SwapNonVertexEdges<T> extends Gadget<T> {
 	T[][] u;
 	T[][] v;
 
-	public SwapNonVertexEdges(Object[] inputs, CompEnv<T> env, Machine machine) {
-		super(inputs, env, machine);
+	public SwapNonVertexEdges(CompEnv<T> env, Machine machine) {
+		super(env, machine);
 	}
 
 	public SwapNonVertexEdges<T> setInputs(T[][] u, T[][] v) {

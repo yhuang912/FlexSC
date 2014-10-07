@@ -19,8 +19,8 @@ public class SortGadget<T>  extends Gadget<T> {
 	private T[][] data;
 	private Comparator<T> comp;
 
-	public SortGadget(Object[] inputs, CompEnv<T> env, Machine machine) {
-		super(inputs, env, machine);
+	public SortGadget(CompEnv<T> env, Machine machine) {
+		super(env, machine);
 	}
 
 	public SortGadget<T> setInputs(T[][] x, T[][] data, Comparator<T> comp) {

@@ -15,9 +15,9 @@ public class SubtractGadgetForPageRank<T> extends Gadget<T> {
 
 	private T[][] l;
 
-	public SubtractGadgetForPageRank(Object[] inputs, CompEnv<T> env,
+	public SubtractGadgetForPageRank(CompEnv<T> env,
 			Machine machine) {
-		super(inputs, env, machine);
+		super(env, machine);
 	}
 
 	public SubtractGadgetForPageRank<T> setInputs(T[][] l) {
