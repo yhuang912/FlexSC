@@ -14,6 +14,7 @@ import network.NetworkUtil;
 import test.Utils;
 import flexsc.CompEnv;
 import flexsc.Gadget;
+import flexsc.Party;
 import gc.BadLabelException;
 import gc.GCSignal;
 
@@ -116,8 +117,19 @@ public class Histogram<T> implements ParallelGadget<T> {
 		Utils.unflatten(data, input, freq);
 
 		new SubtractGadgetForHistogram<T>(env, machine)
-				.setInputs(flag, input, freq)
+				.setInputs(freq, new IntegerLib<T>(env))
 				.compute();
+
+		if (machine.machineId == 0) {
+			for (int i = 0; i < 4; i++) {
+				int int1 = Utils.toInt(env.outputToAlice(flag[i]));
+				int int2 = Utils.toInt(env.outputToAlice(input[i]));
+				int int3 = Utils.toInt(env.outputToAlice(freq[i]));
+				if (Party.Alice.equals(env.party)) {
+					System.out.println(machine.machineId + ": " + int2 + ", " + int3);
+				}
+			}
+		}
 	}
 
 }

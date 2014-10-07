@@ -12,18 +12,20 @@ import gc.BadLabelException;
 
 public class SwapNonVertexEdges<T> extends Gadget<T> {
 
-	T[][] u;
-	T[][] v;
-	T[][] pr;
+	private T[][] u;
+	private T[][] v;
+	private T[][] pr;
+	private boolean setVertexPrToZero;
 
 	public SwapNonVertexEdges(CompEnv<T> env, Machine machine) {
 		super(env, machine);
 	}
 
-	public SwapNonVertexEdges<T> setInputs(T[][] u, T[][] v, T[][] pr) {
+	public SwapNonVertexEdges<T> setInputs(T[][] u, T[][] v, T[][] pr, boolean setVertexPrToZero) {
 		this.u = u;
 		this.v = v;
 		this.pr = pr;
+		this.setVertexPrToZero = setVertexPrToZero;
 		return this;
 	}
 
@@ -41,7 +43,9 @@ public class SwapNonVertexEdges<T> extends Gadget<T> {
 			s = lib.xor(s, u1);
 			u[i] = lib.xor(v1, s);
 			v[i] = lib.xor(u1, s);
-			pr[i] = lib.mux(floatZero, pr[i], swap); // if is vertex, change pr[i] to 0
+			if (setVertexPrToZero) {
+				pr[i] = lib.mux(floatZero, pr[i], swap); // if is vertex, change pr[i] to 0
+			}
 		}
 		return null;
 	}

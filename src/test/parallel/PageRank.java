@@ -23,6 +23,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 	static int FLOAT_V = 20;
 	static int FLOAT_P = 11;
 	static int INT_LEN = 32;
+	static int ITERATIONS = 3;
 
 	private boolean[][][] getInput(int inputLength) throws IOException {
 		int[] u = new int[inputLength];
@@ -212,41 +213,51 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.setInputs(l)
 				.compute();
 
-		// Sort so that all vertices are followed by edges
-		data = (T[][]) Utils.flatten(env, v, pr, l);
-		sortGadget = new SortGadget<T>(env, machine)
-				.setInputs(u, data, secondSortComparator);
-		Object[] output4 = (Object[]) sortGadget.compute();
-		u = (T[][]) output4[0];
-		Utils.unflatten((T[][]) output4[1], v, pr, l);
-
-		// Write PR to edge
-		new WritePrPartToEdge<>(env, machine)
-				.setInputs(u, v, pr, l)
+		for (int i = 0; i < ITERATIONS; i++) {
+			// Sort so that all vertices are followed by edges
+			data = (T[][]) Utils.flatten(env, v, pr, l);
+			sortGadget = new SortGadget<T>(env, machine)
+					.setInputs(u, data, secondSortComparator);
+			Object[] output4 = (Object[]) sortGadget.compute();
+			u = (T[][]) output4[0];
+			Utils.unflatten((T[][]) output4[1], v, pr, l);
+	
+			// Write PR to edge
+			new WritePrPartToEdge<>(env, machine)
+					.setInputs(u, v, pr, l)
+					.compute();
+	
+			new SwapNonVertexEdges<T>(env, machine)
+					.setInputs(u, v, pr, true /* setVertexPrToZero */)
+					.compute();
+	
+			data = (T[][]) Utils.flatten(env, v, pr, l);
+			new SortGadget<T>(env, machine)
+				.setInputs(u, data, firstSortComparator)
 				.compute();
-
-		new SwapNonVertexEdges<T>(env, machine)
-				.setInputs(u, v, pr)
+			Utils.unflatten(data, v, pr, l);
+	
+			// Compute prefixSum for pr
+			new PrefixSumGadget<T>(env, machine)
+				.setInputs(pr, new FloatLib<T>(env, FLOAT_V, FLOAT_P))
 				.compute();
-
-		data = (T[][]) Utils.flatten(env, v, pr, l);
-		new SortGadget<T>(env, machine)
-			.setInputs(u, data, firstSortComparator)
-			.compute();
-		Utils.unflatten(data, v, pr, l);
-
-		// Compute prefixSum for pr
-		new PrefixSumGadget<T>(env, machine)
-			.setInputs(pr, new FloatLib<T>(env, FLOAT_V, FLOAT_P))
-			.compute();
-
-		// get all vertices together to subtract
-		data = (T[][]) Utils.flatten(env, u, pr, l);
-		sortGadget = new SortGadget<T>(env, machine)
-				.setInputs(v, data, secondSortComparator);
-		Object[] output8 = (Object[]) sortGadget.compute();
-		v = (T[][]) output8[0];
-		Utils.unflatten((T[][]) output8[1], u, pr, l);
+	
+			// get all vertices together to subtract
+			data = (T[][]) Utils.flatten(env, u, pr, l);
+			sortGadget = new SortGadget<T>(env, machine)
+					.setInputs(v, data, secondSortComparator);
+			Object[] output8 = (Object[]) sortGadget.compute();
+			v = (T[][]) output8[0];
+			Utils.unflatten((T[][]) output8[1], u, pr, l);
+	
+			new SubtractGadgetForHistogram<T>(env, machine)
+				.setInputs(pr, new FloatLib<T>(env, FLOAT_V, FLOAT_P))
+				.compute();
+	
+			new SwapNonVertexEdges<T>(env, machine)
+				.setInputs(u, v, pr, false /* setVertexPrToZero */)
+				.compute();
+		}
 
 		print(machineId, env, u, v, pr, l);
 	}
