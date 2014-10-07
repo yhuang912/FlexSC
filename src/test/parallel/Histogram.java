@@ -102,13 +102,21 @@ public class Histogram<T> implements ParallelGadget<T> {
 				.setInputs(freq, new IntegerLib<T>(env))
 				.compute();
 
-		T[][] marker = (T[][]) env.newTArray(input.length, input[0].length);
+		T[][] flag = (T[][]) env.newTArray(input.length, input[0].length);
 		new MarkerWithLastValueGadget<T>(env, machine)
-				.setInputs(input, marker)
+				.setInputs(input, flag)
 				.compute();
 
+		T[][] data = (T[][]) Utils.flatten(env, input, freq);
+		SortGadget<T> gadge = new SortGadget<T>(env, machine)
+				.setInputs(flag, data, new SimpleComparator<T>(env));
+		Object[] sortOutput = (Object[]) gadge.secureCompute();
+		flag = (T[][]) sortOutput[0];
+		data = (T[][]) sortOutput[1];
+		Utils.unflatten(data, input, freq);
+
 		new SubtractGadgetForHistogram<T>(env, machine)
-				.setInputs(marker, input, freq)
+				.setInputs(flag, input, freq)
 				.compute();
 	}
 

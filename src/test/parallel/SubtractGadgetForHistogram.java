@@ -16,18 +16,18 @@ import gc.BadLabelException;
 public class SubtractGadgetForHistogram<T> extends Gadget<T> {
 
 	private T[][] flag;
-	private T[][] x;
-	private T[][] prefixSum;
+	private T[][] input;
+	private T[][] freq;
 
 	public SubtractGadgetForHistogram(CompEnv<T> env,
 			Machine machine) {
 		super(env, machine);
 	}
 
-	public SubtractGadgetForHistogram<T> setInputs(T[][] flag, T[][] x, T[][] prefixSum) {
+	public SubtractGadgetForHistogram<T> setInputs(T[][] flag, T[][] input, T[][] freq) {
 		this.flag = flag;
-		this.x = x;
-		this.prefixSum = prefixSum;
+		this.input = input;
+		this.freq = freq;
 		return this;
 	}
 	@SuppressWarnings("unchecked")
@@ -37,36 +37,26 @@ public class SubtractGadgetForHistogram<T> extends Gadget<T> {
 
 		IntegerLib<T> lib = new IntegerLib<>(env);
 
-		T[][] data = Utils.flatten(env, x, prefixSum);
-		SortGadget<T> gadge = new SortGadget<T>(env, machine)
-				.setInputs(flag, data, new SimpleComparator<T>(env));
-		Object[] sortOutput = (Object[]) gadge.secureCompute();
-
-		
-		flag = (T[][]) sortOutput[0];
-		data = (T[][]) sortOutput[1];
-		Utils.unflatten(data, x, prefixSum);
-
 		// send and receive values
 		if (machine.numberOfIncomingConnections > 0) {
-			send(machine.peerOsDown[0], prefixSum[prefixSum.length - 1]);
+			send(machine.peerOsDown[0], freq[freq.length - 1]);
 			((BufferedOutputStream) machine.peerOsDown[0]).flush();
 		}
 		T[] last = env.inputOfAlice(Utils.fromInt(-1, 32));
 		if (machine.numberOfOutgoingConnections > 0) {
-			last = read(machine.peerIsUp[0], prefixSum[0].length);
+			last = read(machine.peerIsUp[0], freq[0].length);
 		}
-		for (int i = x.length - 1; i > 0; i--) {
-			prefixSum[i] = lib.sub(prefixSum[i], prefixSum[i - 1]);
+		for (int i = input.length - 1; i > 0; i--) {
+			freq[i] = lib.sub(freq[i], freq[i - 1]);
 		}
 		if (machine.numberOfOutgoingConnections > 0) {
-			prefixSum[0] = lib.sub(prefixSum[0], last);
+			freq[0] = lib.sub(freq[0], last);
 		}
 		if (machine.machineId == 0) {
 				for (int i = 0; i < 4; i++) {
 					int int1 = Utils.toInt(env.outputToAlice(flag[i]));
-					int int2 = Utils.toInt(env.outputToAlice(x[i]));
-					int int3 = Utils.toInt(env.outputToAlice(prefixSum[i]));
+					int int2 = Utils.toInt(env.outputToAlice(input[i]));
+					int int3 = Utils.toInt(env.outputToAlice(freq[i]));
 					if (Party.Alice.equals(env.party)) {
 						System.out.println(machine.machineId + ": " + int2 + ", " + int3);
 					}
