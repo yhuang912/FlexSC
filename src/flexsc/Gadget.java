@@ -56,6 +56,19 @@ public abstract class Gadget<T> {
 		}
 	}
 
+	protected void send(OutputStream os, T data) throws IOException {
+		Mode mode = env.getMode();
+		if (mode == Mode.REAL) {
+			GCSignal gcData = (GCSignal) data;
+			gcData.send(os);
+		} else if(mode == Mode.VERIFY) {
+			Boolean vData = (Boolean) data;
+			NetworkUtil.writeBoolean(os, (Boolean) data);
+		} else if (mode == Mode.COUNT) {
+			
+		}
+	}
+
 	protected T[] read(InputStream is, int length) throws IOException {
 		Mode mode = env.getMode();
 		if (mode == Mode.REAL) {
@@ -70,6 +83,21 @@ public abstract class Gadget<T> {
 				vData[i] = NetworkUtil.readBoolean(is);
 			}
 			return (T[]) vData;
+		} else if (mode == Mode.COUNT) {
+			
+		}
+		// shouldn't happen;
+		return null;
+	}
+
+	protected T read(InputStream is) throws IOException {
+		Mode mode = env.getMode();
+		if (mode == Mode.REAL) {
+			GCSignal signal = GCSignal.receive(is);
+			return (T) signal;
+		} else if(mode == Mode.VERIFY) {
+			Boolean vData = NetworkUtil.readBoolean(is);
+			return (T) vData;
 		} else if (mode == Mode.COUNT) {
 			
 		}

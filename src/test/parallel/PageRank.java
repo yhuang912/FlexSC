@@ -21,6 +21,9 @@ import gc.BadLabelException;
 import gc.GCSignal;
 
 public class PageRank<T> implements ParallelGadget<T> {
+	static int FLOAT_V = 20;
+	static int FLOAT_P = 11;
+	static int INT_LEN = 32;
 
 	private boolean[][][] getInput(int inputLength) throws IOException {
 		int[] u = new int[inputLength];
@@ -35,8 +38,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 		boolean[][] a = new boolean[u.length][];
 		boolean[][] b = new boolean[v.length][];
 		for(int i = 0; i < u.length; ++i) {
-			a[i] = Utils.fromInt(u[i], 32);
-			b[i] = Utils.fromInt(v[i], 32);
+			a[i] = Utils.fromInt(u[i], INT_LEN);
+			b[i] = Utils.fromInt(v[i], INT_LEN);
 		}
 		boolean[][][] ret = new boolean[2][][];
 		ret[0] = a;
@@ -51,9 +54,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 		GCSignal[][] tv = env.newTArray(inputLength /* number of entries in the input */, 0);
 		if (isGen) {
 			for(int i = 0; i < tu.length; ++i)
-				tu[i] = env.inputOfBob(new boolean[32]);
+				tu[i] = env.inputOfBob(new boolean[INT_LEN]);
 			for(int i = 0; i < tv.length; ++i)
-				tv[i] = env.inputOfBob(new boolean[32]);
+				tv[i] = env.inputOfBob(new boolean[INT_LEN]);
 		} else {
 			boolean[][][] input = getInput(inputLength);
 			for(int i = 0; i < tu.length; ++i)
@@ -127,10 +130,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 
 			@Override
 			public T leq(T[] ui, T[] uj, T[] datai, T[] dataj) {
-				T[] vi = (T[]) env.newTArray(32);
-				T[] pri = (T[]) env.newTArray(32);
-				T[] vj = (T[]) env.newTArray(32);
-				T[] prj = (T[]) env.newTArray(32);
+				T[] vi = (T[]) env.newTArray(INT_LEN);
+				T[] pri = (T[]) env.newTArray(INT_LEN);
+				T[] vj = (T[]) env.newTArray(INT_LEN);
+				T[] prj = (T[]) env.newTArray(INT_LEN);
 				Utils.unflatten(datai, vi, pri);
 				Utils.unflatten(dataj, vj, prj);
 				IntegerLib<T> lib = new IntegerLib<>(env);
@@ -139,8 +142,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 //				T u = lib.leq(ui, uj);
 //				return lib.mux(u, v, eq);
 
-				T[] ai = (T[]) env.newTArray(64);
-				T[] aj = (T[]) env.newTArray(64);
+				T[] ai = (T[]) env.newTArray(2 * INT_LEN);
+				T[] aj = (T[]) env.newTArray(2 * INT_LEN);
 				ai = (T[]) Utils.flatten(env, lib.not(vi), ui);
 				aj = (T[]) Utils.flatten(env, lib.not(vj), uj);
 				return lib.leq(ai, aj);
@@ -151,13 +154,13 @@ public class PageRank<T> implements ParallelGadget<T> {
 			@Override
 			public T leq(T[] ui, T[] uj, T[] datai, T[] dataj) {
 				IntegerLib<T> lib = new IntegerLib<>(env);
-				T[] pri = (T[]) env.newTArray(32);
-				T[] prj = (T[]) env.newTArray(32);
-				T[] li = (T[]) env.newTArray(32);
-				T[] lj = (T[]) env.newTArray(32);
+				T[] pri = (T[]) env.newTArray(INT_LEN);
+				T[] prj = (T[]) env.newTArray(INT_LEN);
+				T[] li = (T[]) env.newTArray(INT_LEN);
+				T[] lj = (T[]) env.newTArray(INT_LEN);
 
-				T[] vi = (T[]) env.newTArray(32);
-				T[] vj = (T[]) env.newTArray(32);
+				T[] vi = (T[]) env.newTArray(INT_LEN);
+				T[] vj = (T[]) env.newTArray(INT_LEN);
 				Utils.unflatten(datai, vi, pri, li);
 				Utils.unflatten(dataj, vj, prj, lj);
 //				T v = lib.leq(vi, vj);
@@ -165,64 +168,67 @@ public class PageRank<T> implements ParallelGadget<T> {
 //				T u = lib.leq(ui, uj);
 //				return lib.mux(u, v, eq);
 
-				T[] ai = (T[]) env.newTArray(64);
-				T[] aj = (T[]) env.newTArray(64);
+				T[] ai = (T[]) env.newTArray(2 * INT_LEN);
+				T[] aj = (T[]) env.newTArray(2 * INT_LEN);
 				ai = (T[]) Utils.flatten(env, vi, ui);
 				aj = (T[]) Utils.flatten(env, vj, uj);
 				return lib.leq(ai, aj);
 			}
 		};
 
+		T[][] u = (T[][]) ((Object[]) machine.input)[0];
+		T[][] v = (T[][]) ((Object[]) machine.input)[1];
+		T[][] pr = (T[][]) env.newTArray(u.length, u[0].length);
+		T[][] l = (T[][]) env.newTArray(u.length, u[0].length);
+		
+		// set initial pagerank
+		new SetInitialPageRankGadget<T>(null /* input */, env, machine)
+				.setInputs(u, v, pr, l)
+				.compute();
 
-		SetInitialPageRankGadget<T> initialPageRank = new SetInitialPageRankGadget<>((Object []) machine.input, env, machine);
-		Object[] output = (Object[]) initialPageRank.compute();
-		T[][] u = (T[][]) output[0];
-		T[][] v = (T[][]) output[1];
-		T[][] pr = (T[][]) output[2];
-		T[][] l = (T[][]) output[3];
-
+		// Sort to get edges followed by the vertex
 		T[][] data = (T[][]) Utils.flatten(env, v, pr, l);
-		Object[] inputs = new Object[2];
-		inputs[0] = output[0];
-		inputs[1] = data;
-		SortGadget sortGadget = new SortGadget<>(inputs, env, machine);
-		sortGadget.setComparator(firstSortComparator);
+		SortGadget sortGadget = new SortGadget<T>(null /* inputs */, env, machine)
+				.setInputs(u, data, firstSortComparator);
 		Object[] output2 = (Object[]) sortGadget.compute();
-
 		u = (T[][]) output2[0];
 		Utils.unflatten((T[][]) output2[1], v, pr, l);
 
-		Object[] prefixSumInputs = new Object[1];
-		prefixSumInputs[0] = l;
-		PrefixSumGadget<T> prefixSumGadget = new PrefixSumGadget<>(prefixSumInputs, env, machine);
-		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
+		// Compute prefixSum for L
+		new PrefixSumGadget<T>(null /* input */, env, machine)
+				.setInputs(l)
+				.compute();
 
+		// Weird sort
 		// key is v
 		data = (T[][]) Utils.flatten(env, u, pr, l);
-		inputs = new Object[2];
-		inputs[0] = v;
-		inputs[1] = data;
-		sortGadget = new SortGadget<>(inputs, env, machine);
-		sortGadget.setComparator(firstSortComparator);
+		sortGadget = new SortGadget<T>(null /* inputs */, env, machine)
+				.setInputs(v, data, firstSortComparator);
 		Object[] output3 = (Object[]) sortGadget.compute();
-
 		v = (T[][]) output3[0];
 		Utils.unflatten((T[][]) output3[1], u, pr, l);
 
-		inputs = new Object[1];
-		inputs[0] = l;
-		SubtractGadgetForPageRank subtractGadget = new SubtractGadgetForPageRank<>(inputs, env, machine);
-		l = (T[][]) subtractGadget.compute();
+		// Subtract to obtain l
+		new SubtractGadgetForPageRank<>(null /* inputs */, env, machine)
+				.setInputs(l)
+				.compute();
 
+		// Sort so that all vertices are followed by edges
 		data = (T[][]) Utils.flatten(env, v, pr, l);
-		inputs = new Object[2];
-		inputs[0] = u;
-		inputs[1] = data;
-		sortGadget = new SortGadget<>(inputs, env, machine);
-		sortGadget.setComparator(secondSortComparator);
+		sortGadget = new SortGadget<T>(null /* inputs */, env, machine)
+				.setInputs(u, data, secondSortComparator);
 		Object[] output4 = (Object[]) sortGadget.compute();
 		u = (T[][]) output4[0];
 		Utils.unflatten((T[][]) output4[1], v, pr, l);
+
+		// Write PR to edge
+		new WritePrPartToEdge<>(null /* inputs */, env, machine)
+				.setInputs(u, v, pr, l)
+				.compute();
+
+		new SwapNonVertexEdges<T>(null /* inputs */, env, machine)
+				.setInputs(u, v)
+				.compute();
 
 		print(machineId, env, u, v, pr, l);
 	}
@@ -232,7 +238,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(u[i]));
 			int b = Utils.toInt(env.outputToAlice(v[i]));
-			double c2 = Utils.toFloat(env.outputToAlice(pr[i]), 20, 12);
+			double c2 = Utils.toFloat(env.outputToAlice(pr[i]), FLOAT_P, PageRank.FLOAT_V);
 			int d = Utils.toInt(env.outputToAlice(l[i]));
 			if (Party.Alice.equals(env.party)) {
 				System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);

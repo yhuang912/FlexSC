@@ -87,34 +87,28 @@ public class Histogram<T> implements ParallelGadget<T> {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
-		Object[] histogramInputs = new Object[1];
-		histogramInputs[0] = machine.input;
-		HistogramMapper<T> histogramMapper = new HistogramMapper<>(histogramInputs, env, machine);
-		Object[] output = (Object[]) histogramMapper.compute();
+		T[][] input = (T[][]) machine.input;
+		T[][] freq = (T[][]) env.newTArray(input.length, input[0].length);
+		new HistogramMapper<>(null /* input */, env, machine)
+				.setInputs(input, freq)
+				.compute();
 
-		Object[] inputs = new Object[2];
-		inputs[0] = output[0];
-		inputs[1] = output[1];
-		SortGadget gadge = new SortGadget<>(inputs, env, machine);
-		gadge.comp = new SimpleComparator<>(env);
-		output = (Object[]) gadge.compute();
+		new SortGadget<T>(null /* inputs */, env, machine)
+				.setInputs(input, freq, new SimpleComparator<T>(env))
+				.compute();
 
-		Object[] prefixSumInputs = new Object[1];
-		prefixSumInputs[0] = output[1];
-		PrefixSumGadget prefixSumGadget = new PrefixSumGadget<>(prefixSumInputs, env, machine);
-		Object[] prefixSumDataResult = (Object[]) prefixSumGadget.compute();
+		new PrefixSumGadget<T>(null /* input */, env, machine)
+				.setInputs(freq)
+				.compute();
 
-		Object[] markerInputs = new Object[1];
-		markerInputs[0] = output[0];
-		MarkerWithLastValueGadget<T> markerGadget = new MarkerWithLastValueGadget<>(markerInputs, env, machine);
-		Object marker = markerGadget.compute();
+		T[][] marker = (T[][]) env.newTArray(input.length, input[0].length);
+		new MarkerWithLastValueGadget<T>(null /* markerInputs */, env, machine)
+				.setInputs(input, marker)
+				.compute();
 
-		inputs = new Object[3];
-		inputs[0] = marker; // sort by flag
-		inputs[1] = markerInputs[0]; // actual value
-		inputs[2] = prefixSumDataResult[0]; // frequency
-		SubtractGadgetForHistogram<T> subtractGadget = new SubtractGadgetForHistogram<>(inputs, env, machine);
-		output = (Object[]) subtractGadget.compute();
+		new SubtractGadgetForHistogram<T>(null /* inputs */, env, machine)
+				.setInputs(marker, input, freq)
+				.compute();
 	}
 
 }

@@ -2,8 +2,6 @@ package test.parallel;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import network.BadCommandException;
 import network.Machine;
@@ -17,28 +15,31 @@ import gc.BadLabelException;
 
 public class SubtractGadgetForHistogram<T> extends Gadget<T> {
 
+	private T[][] flag;
+	private T[][] x;
+	private T[][] prefixSum;
+
 	public SubtractGadgetForHistogram(Object[] inputs, CompEnv<T> env,
 			Machine machine) {
 		super(inputs, env, machine);
 	}
 
+	public SubtractGadgetForHistogram<T> setInputs(T[][] flag, T[][] x, T[][] prefixSum) {
+		this.flag = flag;
+		this.x = x;
+		this.prefixSum = prefixSum;
+		return this;
+	}
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
 
 		IntegerLib<T> lib = new IntegerLib<>(env);
-		T[][] flag = (T[][]) inputs[0];
-		T[][] x = (T[][]) inputs[1];
-		T[][] prefixSum = (T[][]) inputs[2];
 
 		T[][] data = Utils.flatten(env, x, prefixSum);
-		Class c;
-		Object[] inputs = new Object[2];
-		inputs[0] = flag;
-		inputs[1] = data;
-		SortGadget<T> gadge = new SortGadget<>(inputs, env, machine);
-		gadge.setComparator(new SimpleComparator<>(env));
+		SortGadget<T> gadge = new SortGadget<T>(inputs, env, machine)
+				.setInputs(flag, data, new SimpleComparator<T>(env));
 		Object[] sortOutput = (Object[]) gadge.secureCompute();
 
 		

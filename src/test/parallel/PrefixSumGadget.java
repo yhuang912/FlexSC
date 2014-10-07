@@ -12,14 +12,19 @@ import gc.BadLabelException;
 
 public class PrefixSumGadget<T> extends Gadget<T> {
 
+	private T[][] x;
+
 	public PrefixSumGadget(Object[] inputs, CompEnv<T> env, Machine machine) {
 		super(inputs, env, machine);
 	}
 
+	public PrefixSumGadget<T> setInputs(T[][] x) {
+		this.x = x;
+		return this;
+	}
+
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException {
-
-		T[][] x = (T[][]) inputs[0];
 
 		IntegerLib<T> lib =  new IntegerLib<T>(env);
 
@@ -35,9 +40,7 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 		for (int i = 0; i < x.length; i++) {
 			x[i] = lib.add(otherSum, x[i]);
 		}
-		T[][][] output = env.newTArray(1, x.length, x[0].length);
-		output[0] = x;
-		return output;
+		return null;
 	}
 
 	private T[] prefixSum(T[] prefixSum, IntegerLib<T> lib) throws IOException, BadLabelException {

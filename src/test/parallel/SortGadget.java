@@ -11,16 +11,24 @@ import circuits.BitonicSortLib;
 import circuits.Comparator;
 import flexsc.CompEnv;
 import flexsc.Gadget;
-import flexsc.Party;
 import gc.BadLabelException;
 
 public class SortGadget<T>  extends Gadget<T> {
+
+	private T[][] x;
+	private T[][] data;
+	private Comparator<T> comp;
 
 	public SortGadget(Object[] inputs, CompEnv<T> env, Machine machine) {
 		super(inputs, env, machine);
 	}
 
-	Comparator<T> comp = null;
+	public SortGadget<T> setInputs(T[][] x, T[][] data, Comparator<T> comp) {
+		this.x = x;
+		this.data = data;
+		this.comp = comp;
+		return this;
+	}
 
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,
@@ -29,8 +37,6 @@ public class SortGadget<T>  extends Gadget<T> {
 		long compute = 0;
 		long concatenate = 0;
 		long initTimer = System.nanoTime();
-		T[][] x = (T[][]) inputs[0];
-		T[][] data = (T[][]) inputs[1];
 		BitonicSortLib<T> lib =  new BitonicSortLib<T>(env, comp);
 		T dir = (machine.machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 		lib.sort(x, data, dir);
@@ -128,9 +134,5 @@ public class SortGadget<T>  extends Gadget<T> {
 	    System.arraycopy(B, 0, C, aLen, bLen);
 
 	    return C;
-	}
-
-	public void setComparator(Comparator<T> comp) {
-		this.comp = comp;
 	}
 }

@@ -16,15 +16,23 @@ import gc.BadLabelException;
 
 public class MarkerWithLastValueGadget<T> extends Gadget<T> {
 
+	private T[][] x;
+	private T[][] marker;
+
 	public MarkerWithLastValueGadget(Object[] inputs, CompEnv<T> env,
 			Machine machine) {
 		super(inputs, env, machine);
 	}
 
+	public MarkerWithLastValueGadget<T> setInputs(T[][] x, T[][] marker) {
+		this.x = x;
+		this.marker = marker;
+		return this;
+	}
+
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
-		T[][] x = (T[][]) inputs[0];
 		if (machine.numberOfOutgoingConnections > 0) {
 			send(machine.peerOsUp[0], x[0]);
 			((BufferedOutputStream) machine.peerOsUp[0]).flush();
@@ -34,7 +42,6 @@ public class MarkerWithLastValueGadget<T> extends Gadget<T> {
 			last = read(machine.peerIsDown[0], x[0].length);
 		}
 		IntegerLib<T> lib =  new IntegerLib<T>(env);
-		T[][] marker = env.newTArray(x.length, x[0].length);
 		int unwanted = machine.totalMachines * x.length + x.length;
 		int wanted = machine.machineId * x.length;
 		for (int i = 1; i < x.length; i++) {
