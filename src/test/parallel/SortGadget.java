@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 
+import test.Utils;
 import network.BadCommandException;
 import network.Machine;
 import circuits.BitonicSortLib;
@@ -23,9 +24,9 @@ public class SortGadget<T>  extends Gadget<T> {
 		super(env, machine);
 	}
 
-	public SortGadget<T> setInputs(T[][] x, T[][] data, Comparator<T> comp) {
+	public SortGadget<T> setInputs(T[][] x, Comparator<T> comp, T[][] ... data) {
 		this.x = x;
-		this.data = data;
+		this.data = Utils.flatten(env, data);
 		this.comp = comp;
 		return this;
 	}
@@ -100,7 +101,7 @@ public class SortGadget<T>  extends Gadget<T> {
 			System.out.println((1 << logMachines) + "," + inputLength + "," + concatenate/1000000000.0 + ",Concatenate");
 			System.out.println((1 << logMachines) + "," + inputLength + "," + communicate/1000000000.0 + ",Communicate");
 		}*/
-		return output;
+		return data;
 	}
 
 	private T[][] sendReceive(OutputStream os, InputStream is, T[][] x, int arrayLength, int intLength) throws IOException {

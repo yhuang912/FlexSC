@@ -96,7 +96,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 				.compute();
 
 		new SortGadget<T>(env, machine)
-				.setInputs(input, freq, new SimpleComparator<T>(env))
+				.setInputs(input, new SimpleComparator<T>(env), freq)
 				.compute();
 
 		new PrefixSumGadget<T>(env, machine)
@@ -109,11 +109,9 @@ public class Histogram<T> implements ParallelGadget<T> {
 				.compute();
 
 		T[][] data = (T[][]) Utils.flatten(env, input, freq);
-		SortGadget<T> gadge = new SortGadget<T>(env, machine)
-				.setInputs(flag, data, new SimpleComparator<T>(env));
-		Object[] sortOutput = (Object[]) gadge.secureCompute();
-		flag = (T[][]) sortOutput[0];
-		data = (T[][]) sortOutput[1];
+		data = (T[][]) new SortGadget<T>(env, machine)
+				.setInputs(flag, new SimpleComparator<T>(env), input, freq)
+				.compute();
 		Utils.unflatten(data, input, freq);
 
 		new SubtractGadgetForHistogram<T>(env, machine)
