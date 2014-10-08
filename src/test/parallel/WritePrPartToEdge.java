@@ -44,8 +44,9 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 		T[] lastLToSend = lib.zeros(PageRank.INT_LEN);
 		for (int i = 0; i < u.length; i++) {
 			isVertex = lib.eq(v[i], intZero);
-			foundToSend = lib.mux(foundToSend, _true, isVertex);
-			lastPrToSend = lib.mux(lastPrToSend, pr[i], isVertex);
+			foundToSend = lib.mux(foundToSend, _true, isVertex); // always sent
+			lastPrToSend = lib.mux(lastPrToSend, pr[i], isVertex); // specify what needs to be sent
+
 			lastLToSend = lib.mux(lastLToSend, l[i], isVertex);
 		}
 
@@ -57,6 +58,7 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
 		for (int k = 0; k < machine.logMachines; k++) {
 			if (noOfIncomingConnections > 0) {
+				// send corresponding values
 				send(machine.peerOsDown[k], foundToSend);
 				send(machine.peerOsDown[k], lastPrToSend);
 				send(machine.peerOsDown[k], lastLToSend);
@@ -64,9 +66,12 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 				noOfIncomingConnections--;
 			}
 			if (noOfOutgoingConnections > 0) {
+				// read corresponding values
 				T foundRead = read(machine.peerIsUp[k]);
 				T[] lastPrRead = read(machine.peerIsUp[k], pr[0].length);
 				T[] lastLRead = read(machine.peerIsUp[k], l[0].length);
+
+				// compute the value for the last vertex
 				lastPr = lib.mux(lastPrRead, lastPr, found);
 				lastL = lib.mux(lastLRead, lastL, found);
 				found = lib.mux(found, _true, foundRead);

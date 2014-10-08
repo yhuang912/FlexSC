@@ -20,10 +20,10 @@ public class TestSort extends TestSortHarness<GCSignal> {
 		int testCases = 1;
 
 		for (int i = 0; i < testCases; i++) {
-			int [] a = new int[560];
+			int [] a = new int[512];
 			for(int j = 0; j < a.length; ++j)
 				a[j] = rnd.nextInt()%(1<<30);
-			
+
 			Helper helper = new Helper(a, Mode.REAL) {
 				public GCSignal[][] secureCompute(GCSignal[][] Signala, final CompEnv<GCSignal> e) throws Exception {
 					BitonicSortLib<GCSignal> lib =  new BitonicSortLib<GCSignal>(e, new SimpleComparator<>(e));

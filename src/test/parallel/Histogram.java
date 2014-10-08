@@ -6,14 +6,13 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
-import circuits.IntegerLib;
-import circuits.SimpleComparator;
 import network.BadCommandException;
 import network.Machine;
 import network.NetworkUtil;
 import test.Utils;
+import circuits.IntegerLib;
+import circuits.SimpleComparator;
 import flexsc.CompEnv;
-import flexsc.Gadget;
 import flexsc.Party;
 import gc.BadLabelException;
 import gc.GCSignal;

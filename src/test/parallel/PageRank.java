@@ -126,6 +126,19 @@ public class PageRank<T> implements ParallelGadget<T> {
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
 
+		
+		
+		
+		// TODO(kartiknayak): introduce isVertex
+		
+		
+		
+		
+		
+		
+		
+		
+		// sort on u and have the vertex last
 		Comparator<T> firstSortComparator = new Comparator<T>() {
 
 			@Override
@@ -149,6 +162,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 				return lib.leq(ai, aj);
 			}
 		};
+		// sort on u and have the vertex first
 		Comparator<T> secondSortComparator = new Comparator<T>() {
 
 			@Override
@@ -186,30 +200,40 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.setInputs(u, v, pr, l)
 				.compute();
 
+		T[][] data;
+		// 1. Compute number of neighbors for each vertex
+
 		// Sort to get edges followed by the vertex
-		T[][] data = (T[][]) new SortGadget<T>(env, machine)
+		data = (T[][]) new SortGadget<T>(env, machine)
 				.setInputs(u, firstSortComparator, v, pr, l)
 				.compute();
 		Utils.unflatten(data, v, pr, l);
 
-		// Compute prefixSum for L
-		new PrefixSumGadget<T>(env, machine)
-				.setInputs(l, new IntegerLib<T>(env))
-				.compute();
+		new ComputeL<>(env, machine)
+			.setInputs(u, v, l)
+			.compute();
 
-		// Weird sort
-		// key is v
-		data = (T[][]) new SortGadget<T>(env, machine)
-				.setInputs(v, firstSortComparator, u, pr, l)
-				.compute();
-		Utils.unflatten(data, u, pr, l);
 
-		// Subtract to obtain l
-		new SubtractGadgetForPageRank<>(env, machine)
-				.setInputs(l)
-				.compute();
+
+//		// Compute prefixSum for L
+//		new PrefixSumGadget<T>(env, machine)
+//				.setInputs(l, new IntegerLib<T>(env))
+//				.compute();
+//
+//		// Weird sort
+//		// key is v
+//		data = (T[][]) new SortGadget<T>(env, machine)
+//				.setInputs(v, firstSortComparator, u, pr, l)
+//				.compute();
+//		Utils.unflatten(data, u, pr, l);
+//
+//		// Subtract to obtain l
+//		new SubtractGadgetForPageRank<>(env, machine)
+//				.setInputs(l)
+//				.compute();
 
 		for (int i = 0; i < ITERATIONS; i++) {
+			// 2. Write weighted PR to edges
 			// Sort so that all vertices are followed by edges
 			data = (T[][]) new SortGadget<T>(env, machine)
 					.setInputs(u, secondSortComparator, v, pr, l)
@@ -220,7 +244,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 			new WritePrPartToEdge<>(env, machine)
 					.setInputs(u, v, pr, l)
 					.compute();
-	
+
+
+
+			// 3. Compute PR based on edges
 			new SwapNonVertexEdges<T>(env, machine)
 					.setInputs(u, v, pr, true /* setVertexPrToZero */)
 					.compute();
