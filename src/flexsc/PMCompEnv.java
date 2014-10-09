@@ -13,6 +13,7 @@ import test.Utils;
  * The computational environment for performance measurement. 
  */
 public class PMCompEnv extends BooleanCompEnv {
+	public static int ENVS_USED = 0; 
 	public static class Statistics {
 		public long andGate = 0;
 		public long xorGate = 0;
@@ -56,7 +57,7 @@ public class PMCompEnv extends BooleanCompEnv {
 			return s;
 		}
 	}
-	
+
 	public Statistics statistic;
 	Boolean t = true;
 	Boolean f = false;
@@ -67,6 +68,7 @@ public class PMCompEnv extends BooleanCompEnv {
 		t = true;
 		f = false;
 		statistic = new Statistics();
+		ENVS_USED++;
 	}
 	
 	@Override

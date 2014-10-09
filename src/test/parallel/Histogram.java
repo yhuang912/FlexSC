@@ -13,9 +13,11 @@ import test.Utils;
 import circuits.IntegerLib;
 import circuits.SimpleComparator;
 import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.PMCompEnv;
+import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
 import gc.BadLabelException;
-import gc.GCSignal;
 
 public class Histogram<T> implements ParallelGadget<T> {
 
@@ -40,9 +42,9 @@ public class Histogram<T> implements ParallelGadget<T> {
 	}
 
 	private Object[] performOTAndReturnMachineInputs(int inputLength,
-			int machines, boolean isGen, CompEnv<GCSignal> env)
+			int machines, boolean isGen, CompEnv<T> env)
 			throws IOException {
-		GCSignal[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
 		if (isGen) {
 			for(int i = 0; i < Ta.length; ++i)
 				Ta[i] = env.inputOfBob(new boolean[32]);
@@ -61,30 +63,35 @@ public class Histogram<T> implements ParallelGadget<T> {
 	public void sendInputToMachines(int inputLength,
 			int machines,
 			boolean isGen, 
-			CompEnv<GCSignal> env,
+			CompEnv<T> env,
 			OutputStream[] os) throws IOException {
 		Object[] input = performOTAndReturnMachineInputs(inputLength, machines, isGen, env);
 		for (int i = 0; i < machines; i++) {
-			GCSignal[][] gcInput = (GCSignal[][]) input[i];
+			T[][] gcInput = (T[][]) input[i];
 			NetworkUtil.writeInt(os[i], gcInput.length);
 			NetworkUtil.writeInt(os[i], gcInput[0].length);
-			for (int j = 0; j < gcInput.length; j++)
-				for (int k = 0; k < gcInput[j].length; k++)
-					gcInput[j][k].send(os[i]);
+			for (int j = 0; j < gcInput.length; j++) {
+				for (int k = 0; k < gcInput[j].length; k++) {
+					NetworkUtil.send(os[i], gcInput[j][k], env);
+//					gcInput[j][k].send(os[i]);
+				}
+			}
 			os[i].flush();
 		}
 	}
 
-	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs) {
-		GCSignal[][] gcInput = new GCSignal[inputLength][inputSize];
+	@Override
+	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs, CompEnv<T> env) throws IOException {
+		T[][] gcInput = env.newTArray(inputLength, inputSize);//new T[inputLength][inputSize];
 		 for (int j = 0; j < inputLength; j++)
 				for (int k = 0; k < inputSize; k++)
-					gcInput[j][k] = GCSignal.receive(masterIs);
+					gcInput[j][k] = NetworkUtil.read(masterIs, env);// env.ZERO();//new Boolean(true);//Boolean.receive(masterIs);
 		 return gcInput;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void compute(int machineId, Machine machine, CompEnv env)
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public <T> void compute(int machineId, Machine machine, CompEnv<T> env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
@@ -117,7 +124,12 @@ public class Histogram<T> implements ParallelGadget<T> {
 				.setInputs(freq, new IntegerLib<T>(env))
 				.compute();
 
-		if (machine.machineId == 0) {
+		if (Mode.COUNT.equals(env.getMode())) {
+			Statistics a = ((PMCompEnv) env).statistic;
+			a.finalize();
+			System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);
+			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
+		} else if (machine.machineId == 0) {
 			for (int i = 0; i < 4; i++) {
 				int int1 = Utils.toInt(env.outputToAlice(flag[i]));
 				int int2 = Utils.toInt(env.outputToAlice(input[i]));
@@ -128,5 +140,4 @@ public class Histogram<T> implements ParallelGadget<T> {
 			}
 		}
 	}
-
 }

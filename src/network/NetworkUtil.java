@@ -1,10 +1,16 @@
 package network;
 
+import flexsc.CompEnv;
+import flexsc.Mode;
+import gc.GCSignal;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+
+import circuits.IntegerLib;
 
 public class NetworkUtil {
 
@@ -64,5 +70,71 @@ public class NetworkUtil {
 			}
 		}
 		return sock;
+	}
+
+	public static <T> void send(OutputStream os, T[] data, CompEnv<T> env) throws IOException {
+		Mode mode = env.getMode();
+		if (mode == Mode.REAL) {
+			GCSignal[] gcData = (GCSignal []) data;
+			for (int i = 0; i < gcData.length; i++) {
+				gcData[i].send(os);
+			}
+		} else if(mode == Mode.VERIFY) {
+			Boolean[] vData = (Boolean[]) data;
+			for (int i = 0; i < vData.length; i++) {
+				NetworkUtil.writeBoolean(os, (Boolean) data[i]);
+			}
+		} else if (mode == Mode.COUNT) {
+			
+		}
+	}
+
+	public static <T> void send(OutputStream os, T data, CompEnv<T> env) throws IOException {
+		Mode mode = env.getMode();
+		if (mode == Mode.REAL) {
+			GCSignal gcData = (GCSignal) data;
+			gcData.send(os);
+		} else if(mode == Mode.VERIFY) {
+			Boolean vData = (Boolean) data;
+			NetworkUtil.writeBoolean(os, (Boolean) data);
+		} else if (mode == Mode.COUNT) {
+
+		}
+	}
+
+	public static <T> T[] read(InputStream is, int length, CompEnv<T> env) throws IOException {
+		Mode mode = env.getMode();
+		if (mode == Mode.REAL) {
+			GCSignal[] signal = new GCSignal[length];
+			for (int i = 0; i < length; i++) {
+				signal[i] = GCSignal.receive(is);
+			}
+			return (T[]) signal;
+		} else if(mode == Mode.VERIFY) {
+			Boolean[] vData = new Boolean[length];
+			for (int i = 0; i < length; i++) {
+				vData[i] = NetworkUtil.readBoolean(is);
+			}
+			return (T[]) vData;
+		} else if (mode == Mode.COUNT) {
+			return new IntegerLib<T>(env).zeros(length);
+		}
+		// shouldn't happen;
+		return null;
+	}
+
+	public static <T> T read(InputStream is, CompEnv<T> env) throws IOException {
+		Mode mode = env.getMode();
+		if (mode == Mode.REAL) {
+			GCSignal signal = GCSignal.receive(is);
+			return (T) signal;
+		} else if(mode == Mode.VERIFY) {
+			Boolean vData = NetworkUtil.readBoolean(is);
+			return (T) vData;
+		} else if (mode == Mode.COUNT) {
+			return env.ZERO();
+		}
+		// shouldn't happen;
+		return null;
 	}
 }

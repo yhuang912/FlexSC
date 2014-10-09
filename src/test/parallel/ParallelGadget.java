@@ -8,7 +8,6 @@ import network.BadCommandException;
 import network.Machine;
 import flexsc.CompEnv;
 import gc.BadLabelException;
-import gc.GCSignal;
 
 public interface ParallelGadget<T> {
 
@@ -19,12 +18,12 @@ public interface ParallelGadget<T> {
 	public void sendInputToMachines(int inputLength,
 			int machines,
 			boolean isGen, 
-			CompEnv<GCSignal> env,
+			CompEnv<T> env,
 			OutputStream[] os) throws IOException;
 
-	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs);
+	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs, CompEnv<T> env) throws IOException ;
 
-	public <T> void compute(int machineId, Machine machine, CompEnv env)
+	public <T> void compute(int machineId, Machine machine, CompEnv<T> env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException;

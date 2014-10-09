@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import network.BadCommandException;
 import network.Machine;
+import network.NetworkUtil;
 import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
@@ -59,17 +60,17 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 		for (int k = 0; k < machine.logMachines; k++) {
 			if (noOfIncomingConnections > 0) {
 				// send corresponding values
-				send(machine.peerOsDown[k], foundToSend);
-				send(machine.peerOsDown[k], lastPrToSend);
-				send(machine.peerOsDown[k], lastLToSend);
+				NetworkUtil.send(machine.peerOsDown[k], foundToSend, env);
+				NetworkUtil.send(machine.peerOsDown[k], lastPrToSend, env);
+				NetworkUtil.send(machine.peerOsDown[k], lastLToSend, env);
 				((BufferedOutputStream) machine.peerOsDown[k]).flush();
 				noOfIncomingConnections--;
 			}
 			if (noOfOutgoingConnections > 0) {
 				// read corresponding values
-				T foundRead = read(machine.peerIsUp[k]);
-				T[] lastPrRead = read(machine.peerIsUp[k], pr[0].length);
-				T[] lastLRead = read(machine.peerIsUp[k], l[0].length);
+				T foundRead = NetworkUtil.read(machine.peerIsUp[k], env);
+				T[] lastPrRead = NetworkUtil.read(machine.peerIsUp[k], pr[0].length, env);
+				T[] lastLRead = NetworkUtil.read(machine.peerIsUp[k], l[0].length, env);
 
 				// compute the value for the last vertex
 				lastPr = lib.mux(lastPrRead, lastPr, found);

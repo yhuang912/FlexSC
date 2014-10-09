@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import network.BadCommandException;
 import network.Machine;
+import network.NetworkUtil;
 import circuits.ArithmeticLib;
 import flexsc.CompEnv;
 import flexsc.Gadget;
@@ -48,12 +49,12 @@ public class PrefixSumGadget<T> extends Gadget<T> {
 		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
 		for (int k = 0; k < machine.logMachines; k++) {
 			if (noOfIncomingConnections > 0) {
-				send(machine.peerOsDown[k], prefixSum);
+				NetworkUtil.send(machine.peerOsDown[k], prefixSum, env);
 				((BufferedOutputStream) machine.peerOsDown[k]).flush();
 				noOfIncomingConnections--;
 			}
 			if (noOfOutgoingConnections > 0) {
-				T[] read = read(machine.peerIsUp[k], prefixSum.length);
+				T[] read = NetworkUtil.read(machine.peerIsUp[k], prefixSum.length, env);
 				prefixSum = lib.add(prefixSum, read);
 				noOfOutgoingConnections--;
 			}

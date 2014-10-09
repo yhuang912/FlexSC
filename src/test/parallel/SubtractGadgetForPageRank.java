@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import network.BadCommandException;
 import network.Machine;
+import network.NetworkUtil;
 import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
@@ -30,12 +31,12 @@ public class SubtractGadgetForPageRank<T> extends Gadget<T> {
 			BadCommandException, BadLabelException {
 		IntegerLib<T> lib = new IntegerLib<>(env);
 		if (machine.numberOfOutgoingConnections > 0) {
-			send(machine.peerOsUp[0], l[0]);
+			NetworkUtil.send(machine.peerOsUp[0], l[0], env);
 			((BufferedOutputStream) machine.peerOsUp[0]).flush();
 		}
 		T[] first = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 		if (machine.numberOfIncomingConnections > 0) {
-			first = read(machine.peerIsDown[0], l[0].length);
+			first = NetworkUtil.read(machine.peerIsDown[0], l[0].length, env);
 		}
 		for (int i = 0; i < l.length - 1; i++) {
 			l[i] = lib.sub(l[i], l[i + 1]);

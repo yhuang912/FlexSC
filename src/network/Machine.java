@@ -1,13 +1,5 @@
 package network;
 
-import flexsc.CompEnv;
-import flexsc.Gadget;
-import flexsc.Mode;
-import flexsc.Party;
-import gc.BadLabelException;
-import gc.GCGen;
-import gc.GCSignal;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -17,8 +9,13 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import test.parallel.PageRank;
 import test.parallel.ParallelGadget;
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
+import gc.BadLabelException;
+import gc.GCGen;
+import gc.GCSignal;
 
 public class Machine {
 	public static boolean DEBUG = false;
@@ -46,6 +43,8 @@ public class Machine {
 	public int numberOfOutgoingConnections;
 	ParallelGadget parallelGadget;
 
+	public CompEnv env;
+
 	public Machine(int masterPort) {
 		this.masterPort = masterPort;
 	}
@@ -69,7 +68,7 @@ public class Machine {
 									 }
 									 int inputLength = NetworkUtil.readInt(masterIs);
 									 int inputSize = NetworkUtil.readInt(masterIs);
-				                     input = parallelGadget.readInputFromMaster(inputLength, inputSize, masterIs);
+				                     input = parallelGadget.readInputFromMaster(inputLength, inputSize, masterIs, env);
 									 int logMachines = Machine.log2(machines);
 									 peerIsUp = new BufferedInputStream[logMachines];
 									 peerOsUp = new BufferedOutputStream[logMachines];
@@ -241,7 +240,7 @@ public class Machine {
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
 		int compPoolGenEvaPort = Integer.parseInt(args[2]);
-		Mode mode = Mode.REAL;
+		Mode mode = Mode.COUNT;
 		Machine machine = new Machine(masterPort);
 		machine.isGen = Boolean.parseBoolean(args[3]);
 		machine.inputLength = Integer.parseInt(args[4]);
@@ -253,14 +252,14 @@ public class Machine {
 		machine.parallelGadget = (ParallelGadget) c.newInstance();
 		// TODO(OT)
 		// Connect to the other party
-		CompEnv env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);
+		machine.env = machine.connectToOtherParty(machine.isGen, mode, compPoolGenEvaPort, ipManager);
 
 		// Connect to master and then to peers
 		machine.connect(ipManager);
 
 		long startTime = System.nanoTime();
 		machine.debug("Calling compute");
-		machine.parallelGadget.compute(machineId, machine, env);
+		machine.parallelGadget.compute(machineId, machine, machine.env);
 
 		long endTime = System.nanoTime();
 		/*Statistics a = ((PMCompEnv) env).statistic;

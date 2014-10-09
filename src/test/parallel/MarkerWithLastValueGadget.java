@@ -2,16 +2,14 @@ package test.parallel;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-import test.Utils;
-import circuits.IntegerLib;
 import network.BadCommandException;
 import network.Machine;
+import network.NetworkUtil;
+import test.Utils;
+import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Gadget;
-import flexsc.Party;
 import gc.BadLabelException;
 
 public class MarkerWithLastValueGadget<T> extends Gadget<T> {
@@ -34,12 +32,12 @@ public class MarkerWithLastValueGadget<T> extends Gadget<T> {
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
 		if (machine.numberOfOutgoingConnections > 0) {
-			send(machine.peerOsUp[0], x[0]);
+			NetworkUtil.send(machine.peerOsUp[0], x[0], env);
 			((BufferedOutputStream) machine.peerOsUp[0]).flush();
 		}
 		T[] last = env.inputOfAlice(Utils.fromInt(-1, 32));
 		if (machine.numberOfIncomingConnections > 0) {
-			last = read(machine.peerIsDown[0], x[0].length);
+			last = NetworkUtil.read(machine.peerIsDown[0], x[0].length, env);
 		}
 		IntegerLib<T> lib =  new IntegerLib<T>(env);
 		int unwanted = machine.totalMachines * x.length + x.length;

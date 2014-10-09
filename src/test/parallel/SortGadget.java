@@ -5,9 +5,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 
-import test.Utils;
 import network.BadCommandException;
 import network.Machine;
+import network.NetworkUtil;
+import test.Utils;
 import circuits.BitonicSortLib;
 import circuits.Comparator;
 import flexsc.CompEnv;
@@ -112,11 +113,11 @@ public class SortGadget<T>  extends Gadget<T> {
 			int curTransfer = Math.min(toTransfer, 256);
 			toTransfer -= curTransfer;
 			for (int k = 0; k < curTransfer; k++, i++) {
-				send(os, x[i]);
+				NetworkUtil.send(os, x[i], env);
 			}
 			os.flush();
 			for (int k = 0; k < curTransfer; k++, j++) {
-				y[j] = (T[]) read(is, intLength);
+				y[j] = NetworkUtil.read(is, intLength, env);
 			}
 		}
 		return y;

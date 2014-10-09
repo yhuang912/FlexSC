@@ -15,9 +15,11 @@ import circuits.Comparator;
 import circuits.IntegerLib;
 import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.PMCompEnv;
 import flexsc.Party;
+import flexsc.PMCompEnv.Statistics;
 import gc.BadLabelException;
-import gc.GCSignal;
 
 public class PageRank<T> implements ParallelGadget<T> {
 	static int FLOAT_V = 20;
@@ -48,10 +50,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 	}
 
 	private Object[] performOTAndReturnMachineInputs(int inputLength,
-			int machines, boolean isGen, CompEnv<GCSignal> env)
+			int machines, boolean isGen, CompEnv<T> env)
 			throws IOException {
-		GCSignal[][] tu = env.newTArray(inputLength /* number of entries in the input */, 0);
-		GCSignal[][] tv = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[][] tu = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[][] tv = env.newTArray(inputLength /* number of entries in the input */, 0);
 		if (isGen) {
 			for(int i = 0; i < tu.length; ++i)
 				tu[i] = env.inputOfBob(new boolean[INT_LEN]);
@@ -81,47 +83,50 @@ public class PageRank<T> implements ParallelGadget<T> {
 	public void sendInputToMachines(int inputLength,
 			int machines,
 			boolean isGen, 
-			CompEnv<GCSignal> env,
+			CompEnv<T> env,
 			OutputStream[] os) throws IOException {
 		Object[] input = performOTAndReturnMachineInputs(inputLength, machines, isGen, env);
 		Object[] inputU = (Object[]) input[0];
 		Object[] inputV = (Object[]) input[1];
 		for (int i = 0; i < machines; i++) {
-			GCSignal[][] gcInputU = (GCSignal[][]) inputU[i];
-			GCSignal[][] gcInputV = (GCSignal[][]) inputV[i];
+			T[][] gcInputU = (T[][]) inputU[i];
+			T[][] gcInputV = (T[][]) inputV[i];
 			NetworkUtil.writeInt(os[i], gcInputU.length);
 			NetworkUtil.writeInt(os[i], gcInputU[0].length);
 			for (int j = 0; j < gcInputU.length; j++)
 				for (int k = 0; k < gcInputU[j].length; k++)
-					gcInputU[j][k].send(os[i]);
+					NetworkUtil.send(os[i], gcInputU[j][k], env);
+					// gcInputU[j][k].send(os[i]);
 	
 			for (int j = 0; j < gcInputV.length; j++)
 				for (int k = 0; k < gcInputV[j].length; k++)
-					gcInputV[j][k].send(os[i]);
+					NetworkUtil.send(os[i], gcInputV[j][k], env);
+					// gcInputV[j][k].send(os[i]);
 			os[i].flush();
 		}
 	}
 
 	@Override
 	public Object readInputFromMaster(int inputLength, int inputSize,
-			InputStream masterIs) {
-		GCSignal[][] gcInputU = new GCSignal[inputLength][inputSize];
-		GCSignal[][] gcInputV = new GCSignal[inputLength][inputSize];
+			InputStream masterIs,
+			CompEnv<T> env) throws IOException {
+		T[][] gcInputU = env.newTArray(inputLength, inputSize);// 'new GCSignal[inputLength][inputSize];
+		T[][] gcInputV = env.newTArray(inputLength, inputSize);// new GCSignal[inputLength][inputSize];
 		for (int j = 0; j < inputLength; j++)
 			for (int k = 0; k < inputSize; k++)
-				gcInputU[j][k] = GCSignal.receive(masterIs);
+				gcInputU[j][k] = NetworkUtil.read(masterIs, env);// GCSignal.receive(masterIs);
 		for (int j = 0; j < inputLength; j++)
 			for (int k = 0; k < inputSize; k++)
-				gcInputV[j][k] = GCSignal.receive(masterIs);
+				gcInputV[j][k] = NetworkUtil.read(masterIs, env);// GCSignal.receive(masterIs);
 		Object[] ret = new Object[2];
 		ret[0] = gcInputU;
 		ret[1] = gcInputV;
 	    return ret;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	@Override
-	public <T> void compute(int machineId, Machine machine, final CompEnv env)
+	public <T> void compute(int machineId, Machine machine, final CompEnv<T> env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException {
@@ -277,10 +282,17 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.compute();
 		}
 
-		print(machineId, env, u, v, pr, l);
+		if (Mode.COUNT.equals(env.getMode())) {
+			Statistics a = ((PMCompEnv) env).statistic;
+			a.finalize();
+			System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);
+			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
+		} else {
+			print(machineId, env, u, v, pr, l);
+		}
 	}
 
-	private <T> void print(int machineId, final CompEnv env, T[][] u, T[][] v,
+	private <T> void print(int machineId, final CompEnv<T> env, T[][] u, T[][] v,
 			T[][] pr, T[][] l) throws IOException, BadLabelException {
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(u[i]));
