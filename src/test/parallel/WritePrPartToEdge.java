@@ -14,20 +14,14 @@ import gc.BadLabelException;
 
 public class WritePrPartToEdge<T> extends Gadget<T> {
 
-	private T[][] u;
-	private T[][] v;
-	private T[][] pr;
-	private T[][] l;
+	private PageRankNode<T>[] prNodes;
 
 	public WritePrPartToEdge(CompEnv<T> env, Machine machine) {
 		super(env, machine);
 	}
 
-	public WritePrPartToEdge<T> setInputs(T[][] u, T[][] v, T[][] pr, T[][] l) {
-		this.u = u;
-		this.v = v;
-		this.pr = pr;
-		this.l = l;
+	public WritePrPartToEdge<T> setInputs(PageRankNode<T>[] prNodes) {
+		this.prNodes = prNodes;
 		return this;
 	}
 
@@ -42,12 +36,12 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 		T foundToSend = env.newT(false);
 		T[] lastPrToSend = lib.zeros(PageRank.INT_LEN);
 		T[] lastLToSend = lib.zeros(PageRank.INT_LEN);
-		for (int i = 0; i < u.length; i++) {
-			isVertex = lib.eq(v[i], intZero);
+		for (int i = 0; i < prNodes.length; i++) {
+			isVertex = lib.eq(prNodes[i].v, intZero);
 			foundToSend = lib.mux(foundToSend, _true, isVertex); // always sent
-			lastPrToSend = lib.mux(lastPrToSend, pr[i], isVertex); // specify what needs to be sent
+			lastPrToSend = lib.mux(lastPrToSend, prNodes[i].pr, isVertex); // specify what needs to be sent
 
-			lastLToSend = lib.mux(lastLToSend, l[i], isVertex);
+			lastLToSend = lib.mux(lastLToSend, prNodes[i].l, isVertex);
 		}
 
 		T found = env.newT(false);
@@ -68,8 +62,8 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 			if (noOfOutgoingConnections > 0) {
 				// read corresponding values
 				T foundRead = NetworkUtil.read(machine.peerIsUp[k], env);
-				T[] lastPrRead = NetworkUtil.read(machine.peerIsUp[k], pr[0].length, env);
-				T[] lastLRead = NetworkUtil.read(machine.peerIsUp[k], l[0].length, env);
+				T[] lastPrRead = NetworkUtil.read(machine.peerIsUp[k], prNodes[0].pr.length, env);
+				T[] lastLRead = NetworkUtil.read(machine.peerIsUp[k], prNodes[0].l.length, env);
 
 				// compute the value for the last vertex
 				lastPr = lib.mux(lastPrRead, lastPr, found);
@@ -80,12 +74,12 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 		}
 
 		// found will always be true in the end!
-		for (int i = 0; i < u.length; i++) {
-			isVertex = lib.eq(v[i], intZero);
-			pr[i] = lib.mux(lastPr, pr[i], isVertex);
+		for (int i = 0; i < prNodes.length; i++) {
+			isVertex = lib.eq(prNodes[i].v, intZero);
+			prNodes[i].pr = lib.mux(lastPr, prNodes[i].pr, isVertex);
 			// l[i] = lib.mux(lastL, l[i], isVertex);
-			lastL = lib.mux(lastL, l[i], isVertex);
-			lastPr = lib.mux(lastPr, pr[i], isVertex);
+			lastL = lib.mux(lastL, prNodes[i].l, isVertex);
+			lastPr = lib.mux(lastPr, prNodes[i].pr, isVertex);
 		}
 		return null;
 	}

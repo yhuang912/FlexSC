@@ -12,15 +12,15 @@ import gc.BadLabelException;
 
 public class SetInitialPageRankGadget<T> extends Gadget<T> {
 
-	private PageRankNode<T>[] prNode;
+	private PageRankNode<T>[] prNodes;
 
 	public SetInitialPageRankGadget(CompEnv<T> env,
 			Machine machine) {
 		super(env, machine);
 	}
 
-	public SetInitialPageRankGadget<T> setInputs(GraphNode<T>[] graphNodes) {
-		this.prNode = (PageRankNode<T>[]) graphNodes;
+	public SetInitialPageRankGadget<T> setInputs(PageRankNode<T>[] prNodes) {
+		this.prNodes = prNodes;
 		return this;
 	}
 
@@ -33,10 +33,10 @@ public class SetInitialPageRankGadget<T> extends Gadget<T> {
 		T[] vertex = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 		T[] intOne = env.inputOfAlice(Utils.fromInt(1, PageRank.INT_LEN));
 		T[] intZero = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
-		for (int i = 0; i < prNode.length; i++) {
-			T isVertex = intLib.eq(prNode[i].v, vertex);
-			prNode[i].pr = intLib.mux(zero, one, isVertex);
-			prNode[i].l = intLib.mux(intOne, intZero, isVertex);
+		for (int i = 0; i < prNodes.length; i++) {
+			T isVertex = intLib.eq(prNodes[i].v, vertex);
+			prNodes[i].pr = intLib.mux(zero, one, isVertex);
+			prNodes[i].l = intLib.mux(intOne, intZero, isVertex);
 		}
 		return null;
 	}

@@ -12,9 +12,6 @@ import network.BadCommandException;
 import network.Machine;
 import network.NetworkUtil;
 import test.Utils;
-import circuits.Comparator;
-import circuits.IntegerLib;
-import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
@@ -111,14 +108,14 @@ public class PageRank<T> implements ParallelGadget<T> {
 	public Object readInputFromMaster(int inputLength, int inputSize,
 			InputStream masterIs,
 			CompEnv<T> env) throws IOException {
-		T[][] gcInputU = env.newTArray(inputLength, inputSize);// 'new GCSignal[inputLength][inputSize];
-		T[][] gcInputV = env.newTArray(inputLength, inputSize);// new GCSignal[inputLength][inputSize];
+		T[][] gcInputU = env.newTArray(inputLength, inputSize);
+		T[][] gcInputV = env.newTArray(inputLength, inputSize);
 		for (int j = 0; j < inputLength; j++)
 			for (int k = 0; k < inputSize; k++)
-				gcInputU[j][k] = NetworkUtil.read(masterIs, env);// GCSignal.receive(masterIs);
+				gcInputU[j][k] = NetworkUtil.read(masterIs, env);
 		for (int j = 0; j < inputLength; j++)
 			for (int k = 0; k < inputSize; k++)
-				gcInputV[j][k] = NetworkUtil.read(masterIs, env);// GCSignal.receive(masterIs);
+				gcInputV[j][k] = NetworkUtil.read(masterIs, env);
 		Object[] ret = new Object[2];
 		ret[0] = gcInputU;
 		ret[1] = gcInputV;
@@ -146,8 +143,6 @@ public class PageRank<T> implements ParallelGadget<T> {
 		
 		T[][] u = (T[][]) ((Object[]) machine.input)[0];
 		T[][] v = (T[][]) ((Object[]) machine.input)[1];
-		T[][] pr = (T[][]) env.newTArray(u.length, u[0].length);
-		T[][] l = (T[][]) env.newTArray(u.length, u[0].length);
 
 		PageRankNode<T>[] aa = (PageRankNode<T>[]) Array.newInstance(PageRankNode.class, u.length);
 		for (int i = 0; i < aa.length; i++) {
@@ -159,83 +154,49 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.setInputs(aa)
 				.compute();
 
-		T[][] data;
 		// 1. Compute number of neighbors for each vertex
 
-        // print(machineId, env, aa);
 		// Sort to get edges followed by the vertex
 		new SortGadget<T>(env, machine)
 				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
 				.compute();
-		// Utils.unflatten(data, v, pr, l);
 
-		/*new ComputeL<>(env, machine)
-			.setInputs(u, v, l)
-			.compute();*/
-
+		new ComputeL<>(env, machine)
+			.setInputs(aa)
+			.compute();
 
 
-//		// Compute prefixSum for L
-//		new PrefixSumGadget<T>(env, machine)
-//				.setInputs(l, new IntegerLib<T>(env))
-//				.compute();
-//
-//		// Weird sort
-//		// key is v
-//		data = (T[][]) new SortGadget<T>(env, machine)
-//				.setInputs(v, firstSortComparator, u, pr, l)
-//				.compute();
-//		Utils.unflatten(data, u, pr, l);
-//
-//		// Subtract to obtain l
-//		new SubtractGadgetForPageRank<>(env, machine)
-//				.setInputs(l)
-//				.compute();
-
-		/*for (int i = 0; i < ITERATIONS; i++) {
+		for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges
 			// Sort so that all vertices are followed by edges
-			data = (T[][]) new SortGadget<T>(env, machine)
-					.setInputs(u, secondSortComparator, v, pr, l)
-					.compute();
-			Utils.unflatten(data, v, pr, l);
+			new SortGadget<T>(env, machine)
+				.setInputs(aa, PageRankNode.getComparator(env, false /* isVertexLast */))
+				.compute();
 	
 			// Write PR to edge
 			new WritePrPartToEdge<>(env, machine)
-					.setInputs(u, v, pr, l)
-					.compute();
+				.setInputs(aa)
+				.compute();
 
 
 
 			// 3. Compute PR based on edges
 			new SwapNonVertexEdges<T>(env, machine)
-					.setInputs(u, v, pr, true /* setVertexPrToZero )
+					.setInputs(aa, true /* setVertexPrToZero */)
 					.compute();
 	
-			data = (T[][]) new SortGadget<T>(env, machine)
-				.setInputs(u, firstSortComparator, v, pr, l)
-				.compute();
-			Utils.unflatten(data, v, pr, l);
-	
-			// Compute prefixSum for pr
-			new PrefixSumGadget<T>(env, machine)
-				.setInputs(pr, new FloatLib<T>(env, FLOAT_V, FLOAT_P))
+			new SortGadget<T>(env, machine)
+				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
 				.compute();
 
-			// get all vertices together to subtract
-			data = (T[][]) new SortGadget<T>(env, machine)
-					.setInputs(v, secondSortComparator, u, pr, l)
-					.compute();
-			Utils.unflatten(data, u, pr, l);
-	
-			new SubtractGadgetForHistogram<T>(env, machine)
-				.setInputs(pr, new FloatLib<T>(env, FLOAT_V, FLOAT_P))
+			new ComputePr<T>(env, machine)
+				.setInputs(aa)
 				.compute();
-	
+
 			new SwapNonVertexEdges<T>(env, machine)
-				.setInputs(u, v, pr, false /* setVertexPrToZero )
+				.setInputs(aa, false /* setVertexPrToZero */)
 				.compute();
-		}*/
+		}
 
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
@@ -243,26 +204,11 @@ public class PageRank<T> implements ParallelGadget<T> {
 			System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);
 			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
 		} else {
-			if (machineId == 0) {
-				print(machineId, env, aa);
-			}
+			print(machineId, env, aa);
 		}
 	}
 
-	private <T> void print(int machineId, final CompEnv<T> env, T[][] u, T[][] v,
-			T[][] pr, T[][] l) throws IOException, BadLabelException {
-		for (int i = 0; i < pr.length; i++) {
-			int a = Utils.toInt(env.outputToAlice(u[i]));
-			int b = Utils.toInt(env.outputToAlice(v[i]));
-			double c2 = Utils.toFloat(env.outputToAlice(pr[i]), FLOAT_V, PageRank.FLOAT_P);
-			int d = Utils.toInt(env.outputToAlice(l[i]));
-			if (Party.Alice.equals(env.party)) {
-				System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);
-			}
-	    }
-	}
-
-	public static <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr) throws IOException, BadLabelException {
+	public <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr) throws IOException, BadLabelException {
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(pr[i].u));
 			int b = Utils.toInt(env.outputToAlice(pr[i].v));
