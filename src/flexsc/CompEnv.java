@@ -52,7 +52,7 @@ public abstract class CompEnv<T> {
 	}
 	
 	public abstract T inputOfAlice(boolean in) throws IOException;
-	public 	abstract T inputOfBob(boolean in) throws IOException, IncorrectOtUsageException;
+	public abstract T inputOfBob(boolean in) throws IOException, IncorrectOtUsageException;
 	public abstract boolean outputToAlice(T out) throws IOException, BadLabelException;
 	public abstract boolean outputToBob(T out) throws IOException, BadLabelException;
 	

@@ -63,7 +63,7 @@ public class Utils {
 		
 		return res;
 	}
-	
+
 	public static long toUnSignedInt(boolean[] v) {
 		long result = 0;
 		for(int i = 0; i < v.length; ++i) {

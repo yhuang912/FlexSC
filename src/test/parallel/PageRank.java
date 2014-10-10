@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
+import ot.IncorrectOtUsageException;
 import network.BadCommandException;
 import network.Machine;
 import network.NetworkUtil;
@@ -25,55 +26,78 @@ public class PageRank<T> implements ParallelGadget<T> {
 	static int INT_LEN = 32;
 	static int ITERATIONS = 3;
 
-	private boolean[][][] getInput(int inputLength) throws IOException {
+	private Object[] getInput(int inputLength) throws IOException {
 		int[] u = new int[inputLength];
 		int[] v = new int[inputLength];
+		boolean[] isVertex = new boolean[inputLength];
 		BufferedReader br = new BufferedReader(new FileReader("PageRank.in"));
 		for (int i = 0; i < inputLength; i++) {
 			String readLine = br.readLine();
 			String[] split = readLine.split(" ");
 			u[i] = Integer.parseInt(split[0]);
 			v[i] = Integer.parseInt(split[1]);
+			isVertex[i] = (Integer.parseInt(split[2]) == 1);
 		}
+		br.close();
 		boolean[][] a = new boolean[u.length][];
 		boolean[][] b = new boolean[v.length][];
+		boolean[] c = new boolean[isVertex.length];
 		for(int i = 0; i < u.length; ++i) {
 			a[i] = Utils.fromInt(u[i], INT_LEN);
 			b[i] = Utils.fromInt(v[i], INT_LEN);
+			c[i] = isVertex[i];
 		}
-		boolean[][][] ret = new boolean[2][][];
+		Object[] ret = new Object[3];
 		ret[0] = a;
 		ret[1] = b;
+		ret[2] = c;
 		return ret;
 	}
 
 	private Object[] performOTAndReturnMachineInputs(int inputLength,
 			int machines, boolean isGen, CompEnv<T> env)
-			throws IOException {
+			throws IOException, IncorrectOtUsageException {
 		T[][] tu = env.newTArray(inputLength /* number of entries in the input */, 0);
 		T[][] tv = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[] tIsV = env.newTArray(inputLength /* number of entries in the input */);
 		if (isGen) {
 			for(int i = 0; i < tu.length; ++i)
 				tu[i] = env.inputOfBob(new boolean[INT_LEN]);
 			for(int i = 0; i < tv.length; ++i)
 				tv[i] = env.inputOfBob(new boolean[INT_LEN]);
+			for(int i = 0; i < tv.length; ++i) {
+				tIsV[i] = env.inputOfBob(false /* does not matter */);
+//				if (i == 0)
+//					System.out.println("Garbler In OT " + tIsV[i].getClass());
+			}
 		} else {
-			boolean[][][] input = getInput(inputLength);
+			Object[] input = getInput(inputLength);
+			boolean[][] u = (boolean[][]) input[0];
+			boolean[][] v = (boolean[][]) input[1];
+			boolean[] isV = (boolean[]) input[2];
 			for(int i = 0; i < tu.length; ++i)
-				tu[i] = env.inputOfBob(input[0][i]);
+				tu[i] = env.inputOfBob((boolean[]) u[i]);
 			for(int i = 0; i < tv.length; ++i)
-				tv[i] = env.inputOfBob(input[1][i]);
+				tv[i] = env.inputOfBob((boolean[]) v[i]);
+			for(int i = 0; i < tIsV.length; ++i) {
+				tIsV[i] = env.inputOfBob((boolean) isV[i]);
+//				if (i == 0)
+//					System.out.println("In OT " + tIsV[i].getClass());
+			}
 		}
 		Object[] inputU = new Object[machines];
 		Object[] inputV = new Object[machines];
+		Object[] inputIsVertex = new Object[machines];
 
 		for(int i = 0; i < machines; ++i) {
 			inputU[i] = Arrays.copyOfRange(tu, i * tu.length / machines, (i + 1) * tu.length / machines);
 			inputV[i] = Arrays.copyOfRange(tv, i * tv.length / machines, (i + 1) * tv.length / machines);
+			inputIsVertex[i] = Arrays.copyOfRange(tIsV, i * tIsV.length / machines, (i + 1) * tIsV.length / machines);
 		}
-		Object[] input = new Object[2][];
+		Object[] input = new Object[3];
 		input[0] = inputU;
 		input[1] = inputV;
+		input[2] = inputIsVertex;
 		return input;
 	}
 
@@ -82,24 +106,27 @@ public class PageRank<T> implements ParallelGadget<T> {
 			int machines,
 			boolean isGen, 
 			CompEnv<T> env,
-			OutputStream[] os) throws IOException {
+			OutputStream[] os) throws IOException, IncorrectOtUsageException {
 		Object[] input = performOTAndReturnMachineInputs(inputLength, machines, isGen, env);
 		Object[] inputU = (Object[]) input[0];
 		Object[] inputV = (Object[]) input[1];
+		Object[] inputIsVertex = (Object[]) input[2];
 		for (int i = 0; i < machines; i++) {
 			T[][] gcInputU = (T[][]) inputU[i];
 			T[][] gcInputV = (T[][]) inputV[i];
+			T[] gcInputIsVertex = (T[]) inputIsVertex[i];
 			NetworkUtil.writeInt(os[i], gcInputU.length);
 			NetworkUtil.writeInt(os[i], gcInputU[0].length);
 			for (int j = 0; j < gcInputU.length; j++)
 				for (int k = 0; k < gcInputU[j].length; k++)
 					NetworkUtil.send(os[i], gcInputU[j][k], env);
-					// gcInputU[j][k].send(os[i]);
 	
 			for (int j = 0; j < gcInputV.length; j++)
 				for (int k = 0; k < gcInputV[j].length; k++)
 					NetworkUtil.send(os[i], gcInputV[j][k], env);
-					// gcInputV[j][k].send(os[i]);
+			for (int j = 0; j < gcInputIsVertex.length; j++) {
+				NetworkUtil.send(os[i], gcInputIsVertex[j], env);
+			}
 			os[i].flush();
 		}
 	}
@@ -110,15 +137,19 @@ public class PageRank<T> implements ParallelGadget<T> {
 			CompEnv<T> env) throws IOException {
 		T[][] gcInputU = env.newTArray(inputLength, inputSize);
 		T[][] gcInputV = env.newTArray(inputLength, inputSize);
+		T[] gcInputIsVertex = env.newTArray(inputLength);
 		for (int j = 0; j < inputLength; j++)
 			for (int k = 0; k < inputSize; k++)
 				gcInputU[j][k] = NetworkUtil.read(masterIs, env);
 		for (int j = 0; j < inputLength; j++)
 			for (int k = 0; k < inputSize; k++)
 				gcInputV[j][k] = NetworkUtil.read(masterIs, env);
-		Object[] ret = new Object[2];
+		for (int j = 0; j < inputLength; j++)
+			gcInputIsVertex[j] = NetworkUtil.read(masterIs, env);
+		Object[] ret = new Object[3];
 		ret[0] = gcInputU;
 		ret[1] = gcInputV;
+		ret[2] = gcInputIsVertex;
 	    return ret;
 	}
 
@@ -143,10 +174,11 @@ public class PageRank<T> implements ParallelGadget<T> {
 		
 		T[][] u = (T[][]) ((Object[]) machine.input)[0];
 		T[][] v = (T[][]) ((Object[]) machine.input)[1];
+		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
 
 		PageRankNode<T>[] aa = (PageRankNode<T>[]) Array.newInstance(PageRankNode.class, u.length);
 		for (int i = 0; i < aa.length; i++) {
-			aa[i] = new PageRankNode<T>(u[i], v[i], env);
+			aa[i] = new PageRankNode<T>(u[i], v[i], isVertex[i], env);
 		}
 
 		// set initial pagerank

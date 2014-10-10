@@ -30,13 +30,11 @@ public class SetInitialPageRankGadget<T> extends Gadget<T> {
 		IntegerLib<T> intLib = new IntegerLib<T>(env);
 		T[] one = env.inputOfAlice(Utils.fromFloat(1, PageRank.FLOAT_V, PageRank.FLOAT_P));
 		T[] zero = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
-		T[] vertex = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 		T[] intOne = env.inputOfAlice(Utils.fromInt(1, PageRank.INT_LEN));
 		T[] intZero = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 		for (int i = 0; i < prNodes.length; i++) {
-			T isVertex = intLib.eq(prNodes[i].v, vertex);
-			prNodes[i].pr = intLib.mux(zero, one, isVertex);
-			prNodes[i].l = intLib.mux(intOne, intZero, isVertex);
+			prNodes[i].pr = intLib.mux(zero, one, prNodes[i].isVertex);
+			prNodes[i].l = intLib.mux(intOne, intZero, prNodes[i].isVertex);
 		}
 		return null;
 	}

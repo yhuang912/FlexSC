@@ -6,6 +6,7 @@ import java.io.OutputStream;
 
 import network.BadCommandException;
 import network.Machine;
+import ot.IncorrectOtUsageException;
 import flexsc.CompEnv;
 import gc.BadLabelException;
 
@@ -19,7 +20,7 @@ public interface ParallelGadget<T> {
 			int machines,
 			boolean isGen, 
 			CompEnv<T> env,
-			OutputStream[] os) throws IOException;
+			OutputStream[] os) throws IOException, IncorrectOtUsageException;
 
 	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs, CompEnv<T> env) throws IOException ;
 

@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import ot.IncorrectOtUsageException;
 import test.parallel.ParallelGadget;
 import flexsc.CompEnv;
 import flexsc.Mode;
@@ -74,7 +75,7 @@ public class Master {
 		}
 	}*/
 
-	public void setUp(int peerPort, int inputLength, CompEnv env) throws IOException, BadResponseException {
+	public void setUp(int peerPort, int inputLength, CompEnv env) throws IOException, BadResponseException, IncorrectOtUsageException {
 		// set machineId for each of the machines
 		for (int i = 0; i < machines; i++) {
 			NetworkUtil.writeInt(os[i], Command.SET_MACHINE_ID.getValue());
@@ -127,7 +128,7 @@ public class Master {
 		}
 	}
 
-	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException, IncorrectOtUsageException {
 		IPManager ipManager = IPManager.loadIPs();
 		int machines = Integer.parseInt(args[4]);
 		Master master = new Master(machines);

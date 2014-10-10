@@ -30,23 +30,21 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 			BadCommandException, BadLabelException {
 		IntegerLib<T> lib = new IntegerLib<>(env);
 		T[] intZero = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
-		T isVertex;
 		T _true = env.newT(true);
 
 		T foundToSend = env.newT(false);
 		T[] lastPrToSend = lib.zeros(PageRank.INT_LEN);
 		T[] lastLToSend = lib.zeros(PageRank.INT_LEN);
 		for (int i = 0; i < prNodes.length; i++) {
-			isVertex = lib.eq(prNodes[i].v, intZero);
-			foundToSend = lib.mux(foundToSend, _true, isVertex); // always sent
-			lastPrToSend = lib.mux(lastPrToSend, prNodes[i].pr, isVertex); // specify what needs to be sent
+			foundToSend = lib.mux(foundToSend, _true, prNodes[i].isVertex); // always sent
 
-			lastLToSend = lib.mux(lastLToSend, prNodes[i].l, isVertex);
+			lastPrToSend = lib.mux(lastPrToSend, prNodes[i].pr, prNodes[i].isVertex); // specify what needs to be sent
+			lastLToSend = lib.mux(lastLToSend, prNodes[i].l, prNodes[i].isVertex);
 		}
 
 		T found = env.newT(false);
-		T[] lastPr = lib.zeros(32);
-		T[] lastL = lib.zeros(32);
+		T[] lastPr = lib.zeros(PageRank.INT_LEN);
+		T[] lastL = lib.zeros(PageRank.INT_LEN);
 
 		int noOfIncomingConnections = machine.numberOfIncomingConnections;
 		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
@@ -54,6 +52,7 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 			if (noOfIncomingConnections > 0) {
 				// send corresponding values
 				NetworkUtil.send(machine.peerOsDown[k], foundToSend, env);
+
 				NetworkUtil.send(machine.peerOsDown[k], lastPrToSend, env);
 				NetworkUtil.send(machine.peerOsDown[k], lastLToSend, env);
 				((BufferedOutputStream) machine.peerOsDown[k]).flush();
@@ -62,6 +61,7 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 			if (noOfOutgoingConnections > 0) {
 				// read corresponding values
 				T foundRead = NetworkUtil.read(machine.peerIsUp[k], env);
+
 				T[] lastPrRead = NetworkUtil.read(machine.peerIsUp[k], prNodes[0].pr.length, env);
 				T[] lastLRead = NetworkUtil.read(machine.peerIsUp[k], prNodes[0].l.length, env);
 
@@ -75,11 +75,10 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 
 		// found will always be true in the end!
 		for (int i = 0; i < prNodes.length; i++) {
-			isVertex = lib.eq(prNodes[i].v, intZero);
-			prNodes[i].pr = lib.mux(lastPr, prNodes[i].pr, isVertex);
+			prNodes[i].pr = lib.mux(lastPr, prNodes[i].pr, prNodes[i].isVertex);
 			// l[i] = lib.mux(lastL, l[i], isVertex);
-			lastL = lib.mux(lastL, prNodes[i].l, isVertex);
-			lastPr = lib.mux(lastPr, prNodes[i].pr, isVertex);
+			lastL = lib.mux(lastL, prNodes[i].l, prNodes[i].isVertex);
+			lastPr = lib.mux(lastPr, prNodes[i].pr, prNodes[i].isVertex);
 		}
 		return null;
 	}

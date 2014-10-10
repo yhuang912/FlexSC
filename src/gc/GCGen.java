@@ -60,6 +60,7 @@ public class GCGen extends GCCompEnv {
 		Flag.sw.startOT();
 		GCSignal[] label = genPair();
 		snd.send(label);
+		os.flush();
 		Flag.sw.stopOT();
 		return label[0];
 	}

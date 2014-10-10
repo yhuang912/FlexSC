@@ -62,11 +62,6 @@ public class SortGadget<T>  extends Gadget<T> {
 				long startConcatenate2 = System.nanoTime();
 				int srcPos = up ? concatenatedNodes.length / 2 : 0;
 				System.arraycopy(concatenatedNodes, srcPos, nodes, 0, concatenatedNodes.length / 2);
-				/*if (up) {
-					System.arraycopy(concatenatedNodes, concatenatedNodes.length / 2, nodes, 0, concatenatedNodes.length / 2);
-				} else {
-					System.arraycopy(concatenatedNodes, 0, nodes, 0, concatenatedNodes.length / 2);
-				}*/
 				long endConcatenate2 = System.nanoTime();
 				communicate += (endCommunicate - startCommunicate);
 				concatenate += (endConcatenate2 - startConcatenate2) + (endConcatenate - startConcatenate);
