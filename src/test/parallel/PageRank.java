@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import network.BadCommandException;
@@ -17,8 +18,8 @@ import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
-import flexsc.Party;
 import flexsc.PMCompEnv.Statistics;
+import flexsc.Party;
 import gc.BadLabelException;
 
 public class PageRank<T> implements ParallelGadget<T> {
@@ -68,7 +69,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 		}
 		Object[] inputU = new Object[machines];
 		Object[] inputV = new Object[machines];
-	
+
 		for(int i = 0; i < machines; ++i) {
 			inputU[i] = Arrays.copyOfRange(tu, i * tu.length / machines, (i + 1) * tu.length / machines);
 			inputV[i] = Arrays.copyOfRange(tv, i * tv.length / machines, (i + 1) * tv.length / machines);
@@ -143,80 +144,34 @@ public class PageRank<T> implements ParallelGadget<T> {
 		
 		
 		
-		// sort on u and have the vertex last
-		Comparator<T> firstSortComparator = new Comparator<T>() {
-
-			@Override
-			public T leq(T[] ui, T[] uj, T[] datai, T[] dataj) {
-				T[] vi = (T[]) env.newTArray(INT_LEN);
-				T[] pri = (T[]) env.newTArray(INT_LEN);
-				T[] vj = (T[]) env.newTArray(INT_LEN);
-				T[] prj = (T[]) env.newTArray(INT_LEN);
-				Utils.unflatten(datai, vi, pri);
-				Utils.unflatten(dataj, vj, prj);
-				IntegerLib<T> lib = new IntegerLib<>(env);
-//				T v = lib.geq(vi, vj);
-//				T eq = lib.eq(ui, uj);
-//				T u = lib.leq(ui, uj);
-//				return lib.mux(u, v, eq);
-
-				T[] ai = (T[]) env.newTArray(2 * INT_LEN);
-				T[] aj = (T[]) env.newTArray(2 * INT_LEN);
-				ai = (T[]) Utils.flatten(env, lib.not(vi), ui);
-				aj = (T[]) Utils.flatten(env, lib.not(vj), uj);
-				return lib.leq(ai, aj);
-			}
-		};
-		// sort on u and have the vertex first
-		Comparator<T> secondSortComparator = new Comparator<T>() {
-
-			@Override
-			public T leq(T[] ui, T[] uj, T[] datai, T[] dataj) {
-				IntegerLib<T> lib = new IntegerLib<>(env);
-				T[] pri = (T[]) env.newTArray(INT_LEN);
-				T[] prj = (T[]) env.newTArray(INT_LEN);
-				T[] li = (T[]) env.newTArray(INT_LEN);
-				T[] lj = (T[]) env.newTArray(INT_LEN);
-
-				T[] vi = (T[]) env.newTArray(INT_LEN);
-				T[] vj = (T[]) env.newTArray(INT_LEN);
-				Utils.unflatten(datai, vi, pri, li);
-				Utils.unflatten(dataj, vj, prj, lj);
-//				T v = lib.leq(vi, vj);
-//				T eq = lib.eq(ui, uj);
-//				T u = lib.leq(ui, uj);
-//				return lib.mux(u, v, eq);
-
-				T[] ai = (T[]) env.newTArray(2 * INT_LEN);
-				T[] aj = (T[]) env.newTArray(2 * INT_LEN);
-				ai = (T[]) Utils.flatten(env, vi, ui);
-				aj = (T[]) Utils.flatten(env, vj, uj);
-				return lib.leq(ai, aj);
-			}
-		};
-
 		T[][] u = (T[][]) ((Object[]) machine.input)[0];
 		T[][] v = (T[][]) ((Object[]) machine.input)[1];
 		T[][] pr = (T[][]) env.newTArray(u.length, u[0].length);
 		T[][] l = (T[][]) env.newTArray(u.length, u[0].length);
-		
+
+		PageRankNode<T>[] aa = (PageRankNode<T>[]) Array.newInstance(PageRankNode.class, u.length);
+		for (int i = 0; i < aa.length; i++) {
+			aa[i] = new PageRankNode<T>(u[i], v[i], env);
+		}
+
 		// set initial pagerank
 		new SetInitialPageRankGadget<T>(env, machine)
-				.setInputs(u, v, pr, l)
+				.setInputs(aa)
 				.compute();
 
 		T[][] data;
 		// 1. Compute number of neighbors for each vertex
 
+        // print(machineId, env, aa);
 		// Sort to get edges followed by the vertex
-		data = (T[][]) new SortGadget<T>(env, machine)
-				.setInputs(u, firstSortComparator, v, pr, l)
+		new SortGadget<T>(env, machine)
+				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
 				.compute();
-		Utils.unflatten(data, v, pr, l);
+		// Utils.unflatten(data, v, pr, l);
 
-		new ComputeL<>(env, machine)
+		/*new ComputeL<>(env, machine)
 			.setInputs(u, v, l)
-			.compute();
+			.compute();*/
 
 
 
@@ -237,7 +192,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 //				.setInputs(l)
 //				.compute();
 
-		for (int i = 0; i < ITERATIONS; i++) {
+		/*for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges
 			// Sort so that all vertices are followed by edges
 			data = (T[][]) new SortGadget<T>(env, machine)
@@ -254,7 +209,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 
 			// 3. Compute PR based on edges
 			new SwapNonVertexEdges<T>(env, machine)
-					.setInputs(u, v, pr, true /* setVertexPrToZero */)
+					.setInputs(u, v, pr, true /* setVertexPrToZero )
 					.compute();
 	
 			data = (T[][]) new SortGadget<T>(env, machine)
@@ -278,9 +233,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.compute();
 	
 			new SwapNonVertexEdges<T>(env, machine)
-				.setInputs(u, v, pr, false /* setVertexPrToZero */)
+				.setInputs(u, v, pr, false /* setVertexPrToZero )
 				.compute();
-		}
+		}*/
 
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
@@ -288,7 +243,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 			System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);
 			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
 		} else {
-			print(machineId, env, u, v, pr, l);
+			if (machineId == 0) {
+				print(machineId, env, aa);
+			}
 		}
 	}
 
@@ -299,6 +256,18 @@ public class PageRank<T> implements ParallelGadget<T> {
 			int b = Utils.toInt(env.outputToAlice(v[i]));
 			double c2 = Utils.toFloat(env.outputToAlice(pr[i]), FLOAT_V, PageRank.FLOAT_P);
 			int d = Utils.toInt(env.outputToAlice(l[i]));
+			if (Party.Alice.equals(env.party)) {
+				System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);
+			}
+	    }
+	}
+
+	public static <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr) throws IOException, BadLabelException {
+		for (int i = 0; i < pr.length; i++) {
+			int a = Utils.toInt(env.outputToAlice(pr[i].u));
+			int b = Utils.toInt(env.outputToAlice(pr[i].v));
+			double c2 = Utils.toFloat(env.outputToAlice(pr[i].pr), FLOAT_V, PageRank.FLOAT_P);
+			int d = Utils.toInt(env.outputToAlice(pr[i].l));
 			if (Party.Alice.equals(env.party)) {
 				System.out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d);
 			}

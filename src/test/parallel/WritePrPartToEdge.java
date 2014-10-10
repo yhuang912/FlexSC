@@ -37,7 +37,6 @@ public class WritePrPartToEdge<T> extends Gadget<T> {
 		IntegerLib<T> lib = new IntegerLib<>(env);
 		T[] intZero = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 		T isVertex;
-		T[] val = lib.zeros(PageRank.INT_LEN);
 		T _true = env.newT(true);
 
 		T foundToSend = env.newT(false);

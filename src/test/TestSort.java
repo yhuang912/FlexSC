@@ -4,14 +4,19 @@ import flexsc.CompEnv;
 import flexsc.Mode;
 import gc.GCSignal;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Random;
 
 import org.junit.Test;
 
 import test.harness.TestSortHarness;
+import test.parallel.GraphNode;
 import circuits.BitonicSortLib;
-import circuits.SimpleComparator;
+import circuits.TestComparator;
 
 public class TestSort extends TestSortHarness<GCSignal> {
 	@Test
@@ -21,13 +26,21 @@ public class TestSort extends TestSortHarness<GCSignal> {
 
 		for (int i = 0; i < testCases; i++) {
 			int [] a = new int[512];
-			for(int j = 0; j < a.length; ++j)
-				a[j] = rnd.nextInt()%(1<<30);
+			for(int j = 0; j < a.length; ++j) {
+				a[j] = rnd.nextInt() % (1 << 30);
+			}
 
 			Helper helper = new Helper(a, Mode.REAL) {
 				public GCSignal[][] secureCompute(GCSignal[][] Signala, final CompEnv<GCSignal> e) throws Exception {
-					BitonicSortLib<GCSignal> lib =  new BitonicSortLib<GCSignal>(e, new SimpleComparator<>(e));
-					lib.sort(Signala, null /* data */, lib.SIGNAL_ONE);
+					TestGraphNode<GCSignal>[] input = (TestGraphNode<GCSignal>[]) Array.newInstance(TestGraphNode.class, Signala.length);
+					for (int i = 0; i < input.length; i++) {
+						input[i] = new TestGraphNode<>(Signala[i]);
+					}
+					BitonicSortLib<GCSignal> lib =  new BitonicSortLib<GCSignal>(e, new TestComparator<>(e));
+					lib.sort(input, lib.SIGNAL_ONE);
+					for (int i = 0; i < input.length; i++) {
+						Signala[i] = input[i].u;
+					}
 					return Signala;
 				}
 				
@@ -39,5 +52,25 @@ public class TestSort extends TestSortHarness<GCSignal> {
 			};
 			runThreads(helper);
 		}
+	}
+
+	public class TestGraphNode<T> extends GraphNode<T> {
+
+		public T[] u;
+
+		public TestGraphNode(T[] u) {
+			this.u = u;
+		}
+
+		@Override
+		public void send(OutputStream os, CompEnv<T> env) throws IOException {
+			
+		}
+
+		@Override
+		public void read(InputStream is, CompEnv<T> env) throws IOException {
+			
+		}
+		
 	}
 }

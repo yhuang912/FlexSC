@@ -1,7 +1,6 @@
 package circuits;
 
-import java.io.IOException;
-
+import test.parallel.GraphNode;
 import flexsc.CompEnv;
 
 public class BitonicSortLib<T> extends IntegerLib<T> {
@@ -13,76 +12,50 @@ public class BitonicSortLib<T> extends IntegerLib<T> {
 		this.comparator = comparator;
 	}
 
-	public void sort(T[][] a, T[][] data, T isAscending) {
+	public void sort(GraphNode<T>[] nodes, T isAscending) {
 		this.isAscending = isAscending;
-		bitonicSort(a, data, 0, a.length, isAscending);
+		bitonicSort(nodes, 0, nodes.length, isAscending);
 	}
 
-	private void bitonicSort(T[][] a, T[][] data, int start, int n, T dir) {
+	private void bitonicSort(GraphNode<T>[] nodes, int start, int n, T dir) {
 		if (n > 1) {
 			int m = n / 2;
-			bitonicSort(a, data, start, m, isAscending);
-			bitonicSort(a, data, start + m, n - m, not(isAscending));
-			bitonicMerge(a, data, start, n, dir);
+			bitonicSort(nodes, start, m, isAscending);
+			bitonicSort(nodes, start + m, n - m, not(isAscending));
+			bitonicMerge(nodes, start, n, dir);
 //			bitonicSort(a, data, start, m, not(dir));
 //			bitonicSort(a, data, start + m, n - m, dir);
 //			bitonicMerge(a, data, start, n, dir);
-
 		}
 	}
 
-	public void bitonicMerge(T[][] a, T[][] data, int start, int n, T dir) {
+	public void bitonicMerge(GraphNode<T>[] nodes, int start, int n, T dir) {
 		if (n > 1) {
-			int m = compareAndSwapFirst(a, data, start, n, dir);
-			bitonicMerge(a, data, start, m, dir);
-			bitonicMerge(a, data, start + m, n - m, dir);
+			int m = compareAndSwapFirst(nodes, start, n, dir);
+			bitonicMerge(nodes, start, m, dir);
+			bitonicMerge(nodes, start + m, n - m, dir);
 		}
 	}
 
-	public int compareAndSwapFirst(T[][] a, T[][] data, int start, int n, T dir) {
-		// int m = n / 2;
+	public int compareAndSwapFirst(GraphNode<T>[] nodes, int start, int n, T dir) {
 		int m = greatestPowerOfTwoLessThan(n);
 		for (int i = start; i < start + n - m; i++) {
-			compareAndSwap(a, data, i, i + m, dir);
+			compareAndSwap(nodes, i, i + m, dir);
 		}
-		/*try {
-			env.os.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}*/
 		return m;
 	}
 
-	private void compareAndSwap(T[][] a, T[][] data, int i, int j, T dir) {
-		T[] tempdi = null, tempdj = null;
-		if (data != null) {
-			tempdi = data[i];
-			tempdj = data[j];
-		}
-    	T greater = not(comparator.leq(a[i], a[j], tempdi, tempdj));
+	private void compareAndSwap(GraphNode<T>[] nodes, int i, int j, T dir) {
+    	T greater = not(comparator.leq(nodes[i], nodes[j]));
     	T swap = eq(greater, dir);
-    	T[] s = mux(a[j], a[i], swap);
-    	s = xor(s, a[i]);
-    	T[] ki = xor(a[j], s);
-    	T[] kj = xor(a[i], s);
-    	a[i] = ki;
-    	a[j] = kj;
 
-    	if (data != null) {
-	    	T[] s2 = mux(data[j], data[i], swap);
-	    	s2 = xor(s2, data[i]);
-	    	T[] di = xor(data[j], s2);
-	    	T[] dj = xor(data[i], s2);
-	    	data[i] = di;
-	    	data[j] = dj;
-    	}
+    	comparator.swap(nodes[i], nodes[j], swap);
     }
 
-	private int greatestPowerOfTwoLessThan(int n)
-    {
-        int k=1;
-        while (k<n)
-            k=k<<1;
-        return k>>1;
+	private int greatestPowerOfTwoLessThan(int n) {
+        int k = 1;
+        while(k < n)
+            k = k << 1;
+        return k >> 1;
     }
 }

@@ -7,8 +7,6 @@ import java.lang.reflect.Array;
 
 import network.BadCommandException;
 import network.Machine;
-import network.NetworkUtil;
-import test.Utils;
 import circuits.BitonicSortLib;
 import circuits.Comparator;
 import flexsc.CompEnv;
@@ -17,17 +15,15 @@ import gc.BadLabelException;
 
 public class SortGadget<T>  extends Gadget<T> {
 
-	private T[][] x;
-	private T[][] data;
+	private GraphNode<T>[] nodes;
 	private Comparator<T> comp;
 
 	public SortGadget(CompEnv<T> env, Machine machine) {
 		super(env, machine);
 	}
 
-	public SortGadget<T> setInputs(T[][] x, Comparator<T> comp, T[][] ... data) {
-		this.x = x;
-		this.data = Utils.flatten(env, data);
+	public SortGadget<T> setInputs(GraphNode<T>[] nodes, Comparator<T> comp) {
+		this.nodes = nodes;
 		this.comp = comp;
 		return this;
 	}
@@ -41,7 +37,7 @@ public class SortGadget<T>  extends Gadget<T> {
 		long initTimer = System.nanoTime();
 		BitonicSortLib<T> lib =  new BitonicSortLib<T>(env, comp);
 		T dir = (machine.machineId % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
-		lib.sort(x, data, dir);
+		lib.sort(nodes, dir);
 
 		for (int k = 0; k < machine.logMachines; k++) {
 			int diff = (1 << k);
@@ -52,49 +48,34 @@ public class SortGadget<T>  extends Gadget<T> {
 				InputStream is;
 				OutputStream os;
 				int commMachine = Machine.log2(diff);
-				if (up) {
-					is = machine.peerIsUp[commMachine];
-					os = machine.peerOsUp[commMachine];
-				} else {
-					is = machine.peerIsDown[commMachine];
-					os = machine.peerOsDown[commMachine];
-				}
+				is = up ? machine.peerIsUp[commMachine] : machine.peerIsDown[commMachine];
+				os = up ? machine.peerOsUp[commMachine] : machine.peerOsDown[commMachine]; 
 
-				T[][] receiveKey = sendReceive(os, is, x, x.length, x[0].length);
-				T[][] receiveData = sendReceive(os, is, data, data.length, data[0].length);
+				GraphNode<T>[] receivedNodes = sendReceive(os, is, nodes, nodes.length);
 				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
 
-				T[][] arrayKey, arrayData;
-				if (up) {
-					arrayKey = concatenate(receiveKey, x);
-					arrayData = concatenate(receiveData, data);
-				} else {
-					arrayKey = concatenate(x, receiveKey);
-					arrayData = concatenate(data, receiveData);
-				}
+				GraphNode<T>[] concatenatedNodes = up ? concatenate(receivedNodes, nodes) : concatenate(nodes, receivedNodes); 
+
 				long endConcatenate = System.nanoTime();
-				lib.compareAndSwapFirst(arrayKey, arrayData, 0, arrayKey.length, mergeDir);
+				lib.compareAndSwapFirst(concatenatedNodes, 0, concatenatedNodes.length, mergeDir);
 
 				long startConcatenate2 = System.nanoTime();
-				if (up) {
-					System.arraycopy(arrayKey, arrayKey.length / 2, x, 0, arrayKey.length / 2);
-					System.arraycopy(arrayData, arrayData.length / 2, data, 0, arrayData.length / 2);
+				int srcPos = up ? concatenatedNodes.length / 2 : 0;
+				System.arraycopy(concatenatedNodes, srcPos, nodes, 0, concatenatedNodes.length / 2);
+				/*if (up) {
+					System.arraycopy(concatenatedNodes, concatenatedNodes.length / 2, nodes, 0, concatenatedNodes.length / 2);
 				} else {
-					System.arraycopy(arrayKey, 0, x, 0, arrayKey.length / 2);
-					System.arraycopy(arrayData, 0, data, 0, arrayData.length / 2);
-				}
+					System.arraycopy(concatenatedNodes, 0, nodes, 0, concatenatedNodes.length / 2);
+				}*/
 				long endConcatenate2 = System.nanoTime();
 				communicate += (endCommunicate - startCommunicate);
 				concatenate += (endConcatenate2 - startConcatenate2) + (endConcatenate - startConcatenate);
 				diff /= 2;
 			}
-			lib.bitonicMerge(x, data, 0, x.length, mergeDir);
+			lib.bitonicMerge(nodes, 0, nodes.length, mergeDir);
 		}
 
-		env.os.flush();
-		T[][][] output = env.newTArray(2, x.length, x[0].length);
-		output[0] = x;
-		output[1] = data;
+		// env.os.flush();
 		long finalTimer = System.nanoTime();
 		compute = finalTimer - initTimer - (communicate + concatenate);
 		/* if (machineId == 0 && env.party.equals(Party.Alice)) {
@@ -102,25 +83,30 @@ public class SortGadget<T>  extends Gadget<T> {
 			System.out.println((1 << logMachines) + "," + inputLength + "," + concatenate/1000000000.0 + ",Concatenate");
 			System.out.println((1 << logMachines) + "," + inputLength + "," + communicate/1000000000.0 + ",Communicate");
 		}*/
-		return data;
+		return null;
 	}
 
-	private T[][] sendReceive(OutputStream os, InputStream is, T[][] x, int arrayLength, int intLength) throws IOException {
-		T[][] y = env.newTArray(arrayLength, intLength);
-		int toTransfer = x.length;
+	private GraphNode<T>[] sendReceive(OutputStream os, InputStream is, GraphNode<T>[] nodes, int arrayLength) throws IOException {
+		GraphNode<T>[] a = (GraphNode<T>[]) Array.newInstance(nodes.getClass().getComponentType(), arrayLength);
+		int toTransfer = nodes.length;
 		int i = 0, j = 0;
 		while (toTransfer > 0) {
 			int curTransfer = Math.min(toTransfer, 256);
 			toTransfer -= curTransfer;
 			for (int k = 0; k < curTransfer; k++, i++) {
-				NetworkUtil.send(os, x[i], env);
+				nodes[i].send(os, env);
 			}
 			os.flush();
 			for (int k = 0; k < curTransfer; k++, j++) {
-				y[j] = NetworkUtil.read(is, intLength, env);
+				try {
+					a[j] = (GraphNode<T>) nodes.getClass().getComponentType().newInstance();
+				} catch (InstantiationException e) {
+				} catch (IllegalAccessException e) {
+				}
+				a[j].read(is, env);
 			}
 		}
-		return y;
+		return a;
 	}
 
 	public <T> T[] concatenate(T[] A, T[] B) {

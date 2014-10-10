@@ -11,7 +11,7 @@ import network.Machine;
 import network.NetworkUtil;
 import test.Utils;
 import circuits.IntegerLib;
-import circuits.SimpleComparator;
+import circuits.TestComparator;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
@@ -102,7 +102,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 				.compute();
 
 		new SortGadget<T>(env, machine)
-				.setInputs(input, new SimpleComparator<T>(env), freq)
+				.setInputs(input, new TestComparator<T>(env), freq)
 				.compute();
 
 		new PrefixSumGadget<T>(env, machine)
@@ -116,7 +116,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 
 		T[][] data = (T[][]) Utils.flatten(env, input, freq);
 		data = (T[][]) new SortGadget<T>(env, machine)
-				.setInputs(flag, new SimpleComparator<T>(env), input, freq)
+				.setInputs(flag, new TestComparator<T>(env), input, freq)
 				.compute();
 		Utils.unflatten(data, input, freq);
 

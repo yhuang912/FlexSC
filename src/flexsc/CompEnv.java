@@ -78,7 +78,7 @@ public abstract class CompEnv<T> {
 	public void flush() throws IOException {
 		os.flush();
 	}
-	
+
 	public void sync() throws IOException {
 		if(getParty() == Party.Alice){
 			is.read(); 

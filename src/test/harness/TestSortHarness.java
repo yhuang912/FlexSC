@@ -97,7 +97,7 @@ public class TestSortHarness<T> {
 		tGen.join();
 
 		for(int i = 0; i < gen.z.length-1; ++i) {
-			Assert.assertTrue(Utils.toInt(gen.z[i]) < Utils.toInt(gen.z[i+1]));
+			Assert.assertTrue(Utils.toInt(gen.z[i]) <= Utils.toInt(gen.z[i+1]));
 		}
 	}
 
