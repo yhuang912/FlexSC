@@ -6,8 +6,8 @@ import flexsc.CompEnv;
 
 public class WritePrPartToEdge<T> extends WriteToEdge<T> {
 
-	public WritePrPartToEdge(CompEnv<T> env, Machine machine) {
-		super(env, machine);
+	public WritePrPartToEdge(CompEnv<T> env, Machine machine, boolean isEdgeIncoming) {
+		super(env, machine, isEdgeIncoming);
 	}
 
 	@Override

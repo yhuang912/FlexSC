@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import circuits.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import ot.IncorrectOtUsageException;
 import network.BadCommandException;
 import network.Machine;
@@ -161,19 +162,6 @@ public class PageRank<T> implements ParallelGadget<T> {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
-
-		
-		
-		
-		// TODO(kartiknayak): introduce isVertex
-		
-		
-		
-		
-		
-		
-		
-		
 		T[][] u = (T[][]) ((Object[]) machine.input)[0];
 		T[][] v = (T[][]) ((Object[]) machine.input)[1];
 		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
@@ -191,12 +179,12 @@ public class PageRank<T> implements ParallelGadget<T> {
 		// 1. Compute number of neighbors for each vertex
 
 		// Sort to get edges followed by the vertex
-		new SortGadget<T>(env, machine)
-				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
-				.compute();
+//		new SortGadget<T>(env, machine)
+//				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
+//				.compute();
 
 		// this was computeL
-		new ComputeL<>(env, machine)
+		new ComputeL<>(env, machine, false /* isEdgeIncoming */)
 			.setInputs(aa)
 			.compute();
 
@@ -209,27 +197,49 @@ public class PageRank<T> implements ParallelGadget<T> {
 //				.compute();
 	
 			// Write PR to edge
-			new WritePrPartToEdge<T>(env, machine)
+			new WritePrPartToEdge<T>(env, machine, false /* isEdgeIncoming */)
 				.setInputs(aa)
 				.compute();
 
 
 			// 3. Compute PR based on edges
-			for (int j = 0; j < aa.length; j++) {
-				aa[j].swapEdgeDirections();
-			}
+//			for (int j = 0; j < aa.length; j++) {
+//				aa[j].swapEdgeDirections();
+//			}
 	
-			new SortGadget<T>(env, machine)
-				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
-				.compute();
+//			new SortGadget<T>(env, machine)
+//				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
+//				.compute();
 
-			new ComputePr<T>(env, machine)
-				.setInputs(aa)
-				.compute();
+//			new ComputePr<T>(env, machine)
+//				.setInputs(aa)
+//				.compute();
 
-			for (int j = 0; j < aa.length; j++) {
-				aa[j].swapEdgeDirections();
-			}
+			new WriteEdgeToVertex<T>(env, machine, true /* isEdgeIncoming */) {
+
+				@Override
+				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
+					PageRankNode<T> agg = (PageRankNode<T>) aggNode;
+					PageRankNode<T> b = (PageRankNode<T>) bNode;
+
+					FloatLib<T> lib = new FloatLib(env, FLOAT_V, FLOAT_P);
+					PageRankNode<T> ret = new PageRankNode<T>(env);
+					ret.pr = lib.add(agg.pr, b.pr);
+					return ret;
+				}
+
+				@Override
+				public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
+					PageRankNode<T> agg = (PageRankNode<T>) aggNode;
+					PageRankNode<T> b = (PageRankNode<T>) bNode;
+					IntegerLib<T> lib = new IntegerLib<>(env);
+					b.pr = lib.mux(b.pr, agg.pr, b.isVertex);
+				}
+			}.setInputs(aa).compute();
+
+//			for (int j = 0; j < aa.length; j++) {
+//				aa[j].swapEdgeDirections();
+//			}
 		}
 
 		if (Mode.COUNT.equals(env.getMode())) {

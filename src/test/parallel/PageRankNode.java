@@ -38,7 +38,8 @@ public class PageRankNode<T> extends GraphNode<T> {
 	}
 
 	// sort on u and have the vertex last/first
-	public static <T> Comparator<T> getComparator(final CompEnv<T> env, final boolean isVertexLast) {
+	@Override
+	public Comparator<T> getComparator(final CompEnv<T> env, final boolean isVertexLast) {
 		Comparator<T> firstSortComparator = new Comparator<T>() {
 
 			@Override

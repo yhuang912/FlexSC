@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import test.Utils;
+import circuits.Comparator;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 
@@ -42,6 +43,8 @@ public abstract class GraphNode<T> {
 	public abstract void read(InputStream is, CompEnv<T> env) throws IOException;
 
 	public abstract GraphNode<T> mux(GraphNode<T> b, T condition, CompEnv<T> env);
+
+	public abstract Comparator<T> getComparator(CompEnv<T> env, boolean isVertexLast);
 
 	public void swapEdgeDirections() {
 		T[] temp = this.u;

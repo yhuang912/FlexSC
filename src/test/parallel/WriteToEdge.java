@@ -16,9 +16,11 @@ import gc.BadLabelException;
 public abstract class WriteToEdge<T> extends Gadget<T> {
 
 	private GraphNode<T>[] nodes;
+	private boolean isEdgeIncoming;
 
-	public WriteToEdge(CompEnv<T> env, Machine machine) {
+	public WriteToEdge(CompEnv<T> env, Machine machine, boolean isEdgeIncoming) {
 		super(env, machine);
+		this.isEdgeIncoming = isEdgeIncoming;
 	}
 
 	public WriteToEdge<T> setInputs(GraphNode<T>[] prNodes) {
@@ -29,10 +31,14 @@ public abstract class WriteToEdge<T> extends Gadget<T> {
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-		// space for reversing edges
+		if (isEdgeIncoming) {
+			for (int j = 0; j < nodes.length; j++) {
+				nodes[j].swapEdgeDirections();
+			}
+		}
 
 		new SortGadget<T>(env, machine)
-			.setInputs(nodes, PageRankNode.getComparator(env, false /* isVertexLast */))
+			.setInputs(nodes, nodes[0].getComparator(env, false /* isVertexLast */))
 			.compute();
 
 		IntegerLib<T> lib = new IntegerLib<>(env);
@@ -78,7 +84,11 @@ public abstract class WriteToEdge<T> extends Gadget<T> {
 			graphNodeLast = nodes[i].mux(graphNodeLast, nodes[i].isVertex, env);
 		}
 
-		// space for reversing edges
+		if (isEdgeIncoming) {
+			for (int j = 0; j < nodes.length; j++) {
+				nodes[j].swapEdgeDirections();
+			}
+		}
 		return null;
 	}
 
