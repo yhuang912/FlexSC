@@ -27,7 +27,7 @@ public abstract class GCCompEnv extends CompEnv<GCSignal> {
 	public GCSignal[][] newTArray(int d1, int d2) {
 		return new GCSignal[d1][d2];
 	}
-	
+
 	public GCSignal[][][] newTArray(int d1, int d2, int d3) {
 		return new GCSignal[d1][d2][d3];
 	}
