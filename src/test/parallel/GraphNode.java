@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import test.Utils;
 import circuits.IntegerLib;
 import flexsc.CompEnv;
 
@@ -23,9 +24,13 @@ public abstract class GraphNode<T> {
 
 	public GraphNode(CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<>(env);
-		this.u = lib.zeros(VERTEX_LEN);
-		this.v = lib.zeros(VERTEX_LEN);
-		this.isVertex = env.ZERO();
+		try {
+			this.u = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
+			this.v = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
+			this.isVertex = env.inputOfAlice(false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public GraphNode() {

@@ -195,6 +195,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
 				.compute();
 
+		// this was computeL
 		new ComputeL<>(env, machine)
 			.setInputs(aa)
 			.compute();

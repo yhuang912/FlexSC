@@ -57,6 +57,7 @@ public class GCSignal extends Signal {
 	// 'send' and 'receive' are supposed to be used only for secret signals
 	public void send(OutputStream os) {
 		try {
+//			System.out.println("is null " + (bytes.length));
 			os.write(bytes);
 		} catch (Exception e) { e.printStackTrace(); }
 	}
