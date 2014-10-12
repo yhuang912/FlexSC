@@ -138,4 +138,15 @@ public class PageRankNode<T> extends GraphNode<T> {
 		ret.isVertex = lib.mux(((PageRankNode<T>) b1).isVertex, this.isVertex, condition);
 		return ret;
 	}
+
+	@Override
+	public GraphNode<T> getCopy(CompEnv<T> env) {
+		PageRankNode<T> a = new PageRankNode<>(env);
+		a.u = this.u;
+		a.v = this.v;
+		a.pr = this.pr;
+		a.l = this.l;
+		a.isVertex = this.isVertex;
+		return a;
+	}
 }

@@ -17,10 +17,12 @@ public abstract class WriteToVertex<T> extends Gadget<T> {
 
 	private GraphNode<T>[] nodes;
 	private boolean isEdgeIncoming;
+	private GraphNode<T> identityNode;
 
-	public WriteToVertex(CompEnv<T> env, Machine machine, boolean isEdgeIncoming) {
+	public WriteToVertex(CompEnv<T> env, Machine machine, boolean isEdgeIncoming, GraphNode<T> identityNode) {
 		super(env, machine);
 		this.isEdgeIncoming = isEdgeIncoming;
+		this.identityNode = identityNode;
 	}
 
 	public WriteToVertex<T> setInputs(GraphNode<T>[] nodes) {
@@ -40,11 +42,12 @@ public abstract class WriteToVertex<T> extends Gadget<T> {
 		new SortGadget<T>(env, machine)
 			.setInputs(nodes, nodes[0].getComparator(env, true /* isVertexLast */))
 			.compute();
+
+
 		IntegerLib<T> lib = new IntegerLib<>(env);
 
-		Class<?> componentType = nodes.getClass().getComponentType();
-		Constructor<?> constructor = componentType.getConstructor(new Class[]{CompEnv.class});
-		GraphNode<T> graphNodeVal = (GraphNode<T>) constructor.newInstance(env);
+		Constructor<?> constructor = nodes.getClass().getComponentType().getConstructor(new Class[]{CompEnv.class});
+		GraphNode<T> graphNodeVal = identityNode.getCopy(env);
 		GraphNode<T> zeroNode = (GraphNode<T>) constructor.newInstance(env);
 
 		for (int i = 0; i < nodes.length; i++) {
@@ -52,7 +55,7 @@ public abstract class WriteToVertex<T> extends Gadget<T> {
 			graphNodeVal = zeroNode.mux(tempAgg, nodes[i].isVertex, env);
 		}
 
-		GraphNode<T> nodeValForLaterComp = (GraphNode<T>) constructor.newInstance(env);
+		GraphNode<T> nodeValForLaterComp = identityNode.getCopy(env);
 
 		int noOfIncomingConnections = machine.numberOfIncomingConnections;
 		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
@@ -79,6 +82,7 @@ public abstract class WriteToVertex<T> extends Gadget<T> {
 			writeToVertex(nodeValForLaterComp, nodes[i]);
 			nodeValForLaterComp = zeroNode.mux(tempAgg, nodes[i].isVertex, env);
 		}
+
 
 		if (isEdgeIncoming) {
 			for (int j = 0; j < nodes.length; j++) {

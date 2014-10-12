@@ -215,7 +215,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 //				.setInputs(aa)
 //				.compute();
 
-			new WriteToVertex<T>(env, machine, true /* isEdgeIncoming */) {
+			new WriteToVertex<T>(env, machine, true /* isEdgeIncoming */, new PageRankNode<T>(env)) {
 
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {

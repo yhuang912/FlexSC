@@ -7,7 +7,7 @@ import flexsc.CompEnv;
 public class ComputeL<T> extends WriteToVertex<T> {
 
 	public ComputeL(CompEnv<T> env, Machine machine, boolean isEdgeIncoming) {
-		super(env, machine, isEdgeIncoming);
+		super(env, machine, isEdgeIncoming, new PageRankNode<T>(env));
 	}
 
 	@Override

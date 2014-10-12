@@ -24,7 +24,6 @@ public abstract class GraphNode<T> {
 	}
 
 	public GraphNode(CompEnv<T> env) {
-		IntegerLib<T> lib = new IntegerLib<>(env);
 		try {
 			this.u = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 			this.v = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
@@ -45,6 +44,8 @@ public abstract class GraphNode<T> {
 	public abstract GraphNode<T> mux(GraphNode<T> b, T condition, CompEnv<T> env);
 
 	public abstract Comparator<T> getComparator(CompEnv<T> env, boolean isVertexLast);
+
+	public abstract GraphNode<T> getCopy(CompEnv<T> env);
 
 	public void swapEdgeDirections() {
 		T[] temp = this.u;
