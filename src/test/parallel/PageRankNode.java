@@ -47,13 +47,13 @@ public class PageRankNode<T> extends GraphNode<T> {
 //					T u = lib.leq(ui, uj);
 //					return lib.mux(u, v, eq);
 
-				T[] v1, v2;
+				T[] v1 = env.newTArray(1), v2 = env.newTArray(1);
 				if (isVertexLast) {
-					v1 = lib.not(n1.v);
-					v2 = lib.not(n2.v);
+					v1[0] = n1.isVertex;
+					v2[0] = n2.isVertex;
 				} else {
-					v1 = n1.v;
-					v2 = n2.v;
+					v1[0] = lib.not(n1.isVertex);
+					v2[0] = lib.not(n2.isVertex);
 				}
 				T[] ai = (T[]) Utils.flatten(env, v1, n1.u);
 				T[] aj = (T[]) Utils.flatten(env, v2, n2.u);
@@ -127,14 +127,6 @@ public class PageRankNode<T> extends GraphNode<T> {
 	public GraphNode<T> mux(GraphNode<T> b1, T condition, CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
 		PageRankNode<T> ret = new PageRankNode<T>(env);
-//		if (((PageRankNode<T>) b1).u == null) {
-//			((PageRankNode<T>) b1).u = lib.zeros(INT_LEN);
-//			((PageRankNode<T>) b1).v = lib.zeros(INT_LEN);
-//			((PageRankNode<T>) b1).pr = lib.zeros(INT_LEN);
-//			((PageRankNode<T>) b1).l = lib.zeros(INT_LEN);
-//			((PageRankNode<T>) b1).isVertex = lib.SIGNAL_ZERO;
-//			System.out.println("-------------");
-//		}
 		ret.u = lib.mux(((PageRankNode<T>) b1).u, this.u, condition);
 		ret.v = lib.mux(((PageRankNode<T>) b1).v, this.v, condition);
 		ret.pr = lib.mux(((PageRankNode<T>) b1).pr, this.pr, condition);

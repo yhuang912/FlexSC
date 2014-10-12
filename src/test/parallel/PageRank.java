@@ -206,7 +206,6 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.setInputs(aa, PageRankNode.getComparator(env, false /* isVertexLast */))
 				.compute();
 	
-			//print(machineId, env, aa);
 			// Write PR to edge
 			new WritePrPartToEdge<T>(env, machine)
 				.setInputs(aa)
@@ -215,9 +214,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 
 
 			// 3. Compute PR based on edges
-			new SwapNonVertexEdges<T>(env, machine)
-					.setInputs(aa, true /* setVertexPrToZero */)
-					.compute();
+			for (int j = 0; j < aa.length; j++) {
+				aa[j].swapEdgeDirections();
+			}
 	
 			new SortGadget<T>(env, machine)
 				.setInputs(aa, PageRankNode.getComparator(env, true /* isVertexLast */))
@@ -227,9 +226,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.setInputs(aa)
 				.compute();
 
-			new SwapNonVertexEdges<T>(env, machine)
-				.setInputs(aa, false /* setVertexPrToZero */)
-				.compute();
+			for (int j = 0; j < aa.length; j++) {
+				aa[j].swapEdgeDirections();
+			}
 		}
 
 		if (Mode.COUNT.equals(env.getMode())) {

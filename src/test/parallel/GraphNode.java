@@ -37,4 +37,10 @@ public abstract class GraphNode<T> {
 	public abstract void read(InputStream is, CompEnv<T> env) throws IOException;
 
 	public abstract GraphNode<T> mux(GraphNode<T> b, T condition, CompEnv<T> env);
+
+	public void swapEdgeDirections() {
+		T[] temp = this.u;
+		this.u = this.v;
+		this.v = temp;
+	}
 }
