@@ -1,24 +1,20 @@
 package flexsc;
 
 import gc.BadLabelException;
-import gc.GCSignal;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 
-import circuits.IntegerLib;
 import network.BadCommandException;
 import network.Machine;
-import network.NetworkUtil;
 
 public abstract class Gadget<T> {
 	protected CompEnv<T> env;
 	protected Machine machine;
 
-	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException;
+	abstract public Object secureCompute() throws InterruptedException, IOException, BadCommandException, BadLabelException, InstantiationException, IllegalAccessException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException;
 
-	public Object compute() throws InterruptedException, IOException, BadCommandException, BadLabelException {
+	public Object compute() throws InterruptedException, IOException, BadCommandException, BadLabelException, InstantiationException, IllegalAccessException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
 		// connect(port);
 		long startTime = System.nanoTime();
 		Object ret = secureCompute();

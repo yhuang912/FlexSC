@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import ot.IncorrectOtUsageException;
@@ -158,7 +159,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 	public <T> void compute(int machineId, Machine machine, final CompEnv<T> env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
-			BadCommandException, BadLabelException {
+			BadCommandException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
 
 		
 		
@@ -205,8 +206,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.setInputs(aa, PageRankNode.getComparator(env, false /* isVertexLast */))
 				.compute();
 	
+			//print(machineId, env, aa);
 			// Write PR to edge
-			new WritePrPartToEdge<>(env, machine)
+			new WritePrPartToEdge<T>(env, machine)
 				.setInputs(aa)
 				.compute();
 

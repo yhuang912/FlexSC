@@ -3,6 +3,7 @@ package test.parallel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 
 import network.BadCommandException;
 import network.Machine;
@@ -27,5 +28,5 @@ public interface ParallelGadget<T> {
 	public <T> void compute(int machineId, Machine machine, CompEnv<T> env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
-			BadCommandException, BadLabelException;
+			BadCommandException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException;
 }
