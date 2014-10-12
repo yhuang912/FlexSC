@@ -29,6 +29,12 @@ public abstract class WriteToEdge<T> extends Gadget<T> {
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+		// space for reversing edges
+
+		new SortGadget<T>(env, machine)
+			.setInputs(nodes, PageRankNode.getComparator(env, false /* isVertexLast */))
+			.compute();
+
 		IntegerLib<T> lib = new IntegerLib<>(env);
 		T _true = env.newT(true);
 
@@ -71,6 +77,8 @@ public abstract class WriteToEdge<T> extends Gadget<T> {
 			writeToEdge(graphNodeLast, nodes[i], nodes[i].isVertex);
 			graphNodeLast = nodes[i].mux(graphNodeLast, nodes[i].isVertex, env);
 		}
+
+		// space for reversing edges
 		return null;
 	}
 

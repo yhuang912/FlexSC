@@ -9,6 +9,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
+import circuits.IntegerLib;
 import ot.IncorrectOtUsageException;
 import network.BadCommandException;
 import network.Machine;
@@ -202,15 +203,14 @@ public class PageRank<T> implements ParallelGadget<T> {
 		for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges
 			// Sort so that all vertices are followed by edges
-			new SortGadget<T>(env, machine)
-				.setInputs(aa, PageRankNode.getComparator(env, false /* isVertexLast */))
-				.compute();
+//			new SortGadget<T>(env, machine)
+//				.setInputs(aa, PageRankNode.getComparator(env, false /* isVertexLast */))
+//				.compute();
 	
 			// Write PR to edge
 			new WritePrPartToEdge<T>(env, machine)
 				.setInputs(aa)
 				.compute();
-
 
 
 			// 3. Compute PR based on edges
