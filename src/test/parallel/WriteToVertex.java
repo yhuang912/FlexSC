@@ -13,17 +13,17 @@ import flexsc.CompEnv;
 import flexsc.Gadget;
 import gc.BadLabelException;
 
-public abstract class WriteEdgeToVertex<T> extends Gadget<T> {
+public abstract class WriteToVertex<T> extends Gadget<T> {
 
 	private GraphNode<T>[] nodes;
 	private boolean isEdgeIncoming;
 
-	public WriteEdgeToVertex(CompEnv<T> env, Machine machine, boolean isEdgeIncoming) {
+	public WriteToVertex(CompEnv<T> env, Machine machine, boolean isEdgeIncoming) {
 		super(env, machine);
 		this.isEdgeIncoming = isEdgeIncoming;
 	}
 
-	public WriteEdgeToVertex<T> setInputs(GraphNode<T>[] nodes) {
+	public WriteToVertex<T> setInputs(GraphNode<T>[] nodes) {
 		this.nodes = nodes;
 		return this;
 	}

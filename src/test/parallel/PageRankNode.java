@@ -24,10 +24,9 @@ public class PageRankNode<T> extends GraphNode<T> {
 
 	public PageRankNode(CompEnv<T> env) {
 		super(env);
-		IntegerLib<T> lib = new IntegerLib<>(env);
 		try {
-			this.pr = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P)); //lib.zeros(INT_LEN);
-			this.l = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN)); //lib.zeros(INT_LEN);
+			this.pr = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
+			this.l = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 		} catch (IOException e) {
 			e.printStackTrace();
 		};
