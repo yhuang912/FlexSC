@@ -49,7 +49,19 @@ public class BitonicSortLib<T> extends IntegerLib<T> {
     	T greater = not(comparator.leq(nodes[i], nodes[j]));
     	T swap = eq(greater, dir);
 
-    	comparator.swap(nodes[i], nodes[j], swap);
+    	T[] ni = nodes[i].flatten(env);
+    	T[] nj = nodes[j].flatten(env);
+
+    	IntegerLib<T> lib = new IntegerLib<>(env);
+    	T[] s = lib.mux(nj, ni, swap);
+    	s = lib.xor(s, ni);
+    	T[] ki = lib.xor(nj, s);
+    	T[] kj = lib.xor(ni, s);
+    	ni = ki;
+    	nj = kj;
+
+    	nodes[i].unflatten(ni, env);
+    	nodes[j].unflatten(nj, env);
     }
 
 	private int greatestPowerOfTwoLessThan(int n) {

@@ -196,6 +196,20 @@ public class Utils {
 		return a;
 	}
 
+	public static <T> T[] flatten(CompEnv<T> env, T[] ... data) {
+		int length = 0;
+		for (int i = 0; i < data.length; i++) {
+			length += data[i].length;
+		}
+		T[] ret = env.newTArray(length);
+		int pos = 0;
+		for (int i = 0; i < data.length; i++) {
+			System.arraycopy(data[i], 0, ret, pos, data[i].length);
+			pos += data[i].length;
+		}
+		return ret;
+	}
+
 	public static <T> T[][] flatten(CompEnv<T> env, T[][] ... data) {
 		int length = 0;
 		for (int i = 0; i < data.length; i++) {
@@ -208,20 +222,6 @@ public class Utils {
 				System.arraycopy(data[i][j], 0, ret[j], pos, data[i][j].length);
 			}
 			pos += data[i][0].length;
-		}
-		return ret;
-	}
-
-	public static <T> T[] flatten(CompEnv<T> env, T[] ... data) {
-		int length = 0;
-		for (int i = 0; i < data.length; i++) {
-			length += data[i].length;
-		}
-		T[] ret = env.newTArray(length);
-		int pos = 0;
-		for (int i = 0; i < data.length; i++) {
-			System.arraycopy(data[i], 0, ret, pos, data[i].length);
-			pos += data[i].length;
 		}
 		return ret;
 	}
