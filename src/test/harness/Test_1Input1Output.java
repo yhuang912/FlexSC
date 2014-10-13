@@ -3,8 +3,8 @@ package test.harness;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.GCEva;
-import gc.GCGen;
+import gcHalfANDs.GCEva;
+import gcHalfANDs.GCGen;
 
 import org.junit.Assert;
 

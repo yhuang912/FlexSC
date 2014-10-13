@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.junit.Assert;
 
 import flexsc.*;
-import gc.GCGen;
-import gc.GCSignal;
+import gcHalfANDs.GCGen;
+import gcHalfANDs.GCSignal;
 import test.Utils;
 
 

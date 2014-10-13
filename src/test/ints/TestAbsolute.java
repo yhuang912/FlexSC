@@ -1,9 +1,12 @@
 package test.ints;
 
 import java.util.Random;
-import gc.GCSignal;
+
+import gcHalfANDs.GCSignal;
 import flexsc.*;
+
 import org.junit.Test;
+
 import test.harness.Test_1Input1Output;
 import circuits.IntegerLib;
 

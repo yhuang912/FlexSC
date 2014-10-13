@@ -8,7 +8,7 @@ import oram.CSCOram.CSCOramServer;
 import org.junit.Test;
 
 import flexsc.*;
-import gc.GCSignal;
+import gcHalfANDs.GCSignal;
 import test.Utils;
 
 

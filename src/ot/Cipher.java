@@ -2,7 +2,7 @@
 
 package ot;
 
-import gc.GCSignal;
+import gcHalfANDs.GCSignal;
 
 import java.security.*;
 import java.util.Arrays;

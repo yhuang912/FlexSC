@@ -1,9 +1,9 @@
 package test;
 
 import flexsc.CompEnv;
-import gc.GCEva;
-import gc.GCGen;
-import gc.GCSignal;
+import gcHalfANDs.GCEva;
+import gcHalfANDs.GCGen;
+import gcHalfANDs.GCSignal;
 
 import org.junit.Assert;
 

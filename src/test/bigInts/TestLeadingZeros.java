@@ -2,10 +2,13 @@ package test.bigInts;
 
 import java.math.BigInteger;
 import java.util.Random;
+
 import flexsc.CompEnv;
 import flexsc.Mode;
-import gc.GCSignal;
+import gcHalfANDs.GCSignal;
+
 import org.junit.Test;
+
 import test.harness.TestBigInteger;
 import circuits.IntegerLib;
 

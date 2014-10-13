@@ -3,8 +3,10 @@ package test.fixedpoints;
 import java.util.Random;
 
 import flexsc.*;
-import gc.GCSignal;
+import gcHalfANDs.GCSignal;
+
 import org.junit.Test;
+
 import test.harness.TestFixedPoint;
 import circuits.FixedPointLib;
 

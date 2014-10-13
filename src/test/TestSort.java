@@ -2,9 +2,11 @@ package test;
 
 import java.util.Arrays;
 import java.util.Random;
+
 import flexsc.CompEnv;
 import flexsc.Mode;
-import gc.GCSignal;
+import gcHalfANDs.GCSignal;
+
 import org.junit.Test;
 
 import test.harness.TestSortHarness;

@@ -3,8 +3,10 @@ package test;
 import java.util.Random;
 
 import flexsc.*;
-import gc.GCSignal;
+import gcHalfANDs.GCSignal;
+
 import org.junit.Test;
+
 import test.harness.Test_2Input1Output;
 import circuits.IntegerLib;
 

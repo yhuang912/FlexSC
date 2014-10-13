@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
 
-import gc.*;
+import gcHalfANDs.*;
 
 import org.junit.Assert;
 import org.junit.Test;

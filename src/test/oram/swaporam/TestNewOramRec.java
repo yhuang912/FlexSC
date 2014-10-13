@@ -1,7 +1,7 @@
 package test.oram.swaporam;
 
 import flexsc.*;
-import gc.GCSignal;
+import gcHalfANDs.GCSignal;
 import oram.CSCOram.RecursiveCSCOramClient;
 import oram.CSCOram.RecursiveCSCOramServer;
 

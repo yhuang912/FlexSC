@@ -1,9 +1,12 @@
 package test.binarygates;
 
 import java.util.Random;
+
 import flexsc.*;
-import gc.GCSignal;
+import gcHalfANDs.GCSignal;
+
 import org.junit.Test;
+
 import test.harness.Test_1Input1Output;
 import circuits.CircuitLib;
 
