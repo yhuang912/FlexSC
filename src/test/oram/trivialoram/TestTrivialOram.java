@@ -6,7 +6,7 @@ import oram.trivialoram.TrivialOramServer;
 import org.junit.Test;
 
 import flexsc.*;
-import gcHalfANDs.GCSignal;
+import gc.GCSignal;
 import test.Utils;
 
 

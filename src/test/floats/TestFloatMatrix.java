@@ -3,15 +3,13 @@ package test.floats;
 import java.util.Random;
 
 import objects.Float.Representation;
-import gcHalfANDs.GCEva;
-import gcHalfANDs.GCGen;
-import gcHalfANDs.GCSignal;
+import gc.halfANDs.GCEva;
+import gc.halfANDs.GCGen;
+import gc.GCSignal;
 
 import org.junit.Test;
 
 import circuits.FloatMatrixLib;
-
-
 
 public class TestFloatMatrix {
 	class GenRunnable extends network.Server implements Runnable {

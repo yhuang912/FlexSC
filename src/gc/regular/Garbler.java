@@ -1,4 +1,6 @@
-package gc;
+package gc.regular;
+
+import gc.GCSignal;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;

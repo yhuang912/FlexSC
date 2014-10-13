@@ -2,7 +2,7 @@ package test.ot;
 
 import java.security.SecureRandom;
 
-import gcHalfANDs.*;
+import gc.*;
 
 import org.junit.Assert;
 import org.junit.Test;

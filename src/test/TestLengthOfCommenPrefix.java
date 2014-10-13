@@ -3,7 +3,7 @@ package test;
 import java.util.Random;
 
 import flexsc.*;
-import gcHalfANDs.GCSignal;
+import gc.GCSignal;
 
 import org.junit.Test;
 

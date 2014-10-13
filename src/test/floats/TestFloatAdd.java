@@ -4,7 +4,7 @@ import java.util.Random;
 
 import objects.Float.Representation;
 import flexsc.*;
-import gcHalfANDs.GCSignal;
+import gc.GCSignal;
 
 import org.junit.Test;
 

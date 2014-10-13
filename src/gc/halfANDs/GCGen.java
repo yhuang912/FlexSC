@@ -1,4 +1,4 @@
-package gcHalfANDs;
+package gc.halfANDs;
 
 import java.security.*;
 import java.io.*;
@@ -6,6 +6,8 @@ import java.math.BigInteger;
 
 import circuits.FloatFormat;
 import flexsc.Flag;
+import gc.GCCompEnv;
+import gc.GCSignal;
 import objects.Float.Representation;
 import ot.*;
 import test.Utils;

@@ -1,6 +1,6 @@
 package ot;
 
-import gcHalfANDs.GCSignal;
+import gc.GCSignal;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

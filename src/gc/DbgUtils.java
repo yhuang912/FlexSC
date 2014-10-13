@@ -1,6 +1,8 @@
 package gc;
 
 import flexsc.CompEnv;
+import gc.regular.GCEva;
+import gc.regular.GCGen;
 
 public class DbgUtils {
 

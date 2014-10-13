@@ -1,6 +1,9 @@
-package gcHalfANDs;
+package gc.halfANDs;
+
+import gc.GCSignal;
 
 import java.security.SecureRandom;
+
 import org.junit.Test;
 
 public class TestGarbler {

@@ -1,4 +1,4 @@
-package gcHalfANDs;
+package gc.regular;
 
 import objects.Float.Representation;
 
@@ -7,12 +7,14 @@ import java.security.SecureRandom;
 
 import circuits.FloatFormat;
 import flexsc.Flag;
+import gc.GCCompEnv;
+import gc.GCSignal;
 import ot.*;
 import test.Utils;
 
 public class GCEva extends GCCompEnv {
-	InputStream is;
-	OutputStream os;
+	public InputStream is;
+	public OutputStream os;
 	OTReceiver rcv;
 	Garbler gb;
 	public int nonFreeGate = 0;
@@ -135,20 +137,20 @@ public class GCEva extends GCCompEnv {
 	private GCSignal[][] gtt = new GCSignal[2][2];
 
 	SecureRandom rng = new SecureRandom();
-//	private void receiveGTT() {
-//		try {
-//			long t = System.currentTimeMillis();
-//			gtt[0][1] = GCSignal.receive(is);
-//			gtt[1][0] = GCSignal.receive(is);
-//			gtt[1][1] = GCSignal.receive(is);
-//			Flag.GargleIOTime += (System.currentTimeMillis()-t);
-//
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			System.exit(1);
-//		}
-//	}
+	private void receiveGTT() {
+		try {
+			long t = System.currentTimeMillis();
+			gtt[0][1] = GCSignal.receive(is);
+			gtt[1][0] = GCSignal.receive(is);
+			gtt[1][1] = GCSignal.receive(is);
+			Flag.GargleIOTime += (System.currentTimeMillis()-t);
+
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
 
 	public GCSignal and(GCSignal a, GCSignal b) {
 		long t = System.currentTimeMillis();
@@ -161,24 +163,12 @@ public class GCEva extends GCCompEnv {
 		else if (b.isPublic())
 			res = b.v ? a : new GCSignal(false);
 		else {
-//			receiveGTT();
+			receiveGTT();
 
 			int i0 = a.getLSB() ? 1 : 0;
 			int i1 = b.getLSB() ? 1 : 0;
 
-			GCSignal TG = GCSignal.ZERO, WG, TE = GCSignal.ZERO, WE;
-			try {
-				TG = GCSignal.receive(is);
-				TE = GCSignal.receive(is);
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-
-			WG = gb.hash(a, gid, false).xor((i0 == 1) ? TG : GCSignal.ZERO);
-			WE = gb.hash(b, gid, true).xor((i1 == 1) ? (TE.xor(a)) : GCSignal.ZERO);
-			
-			GCSignal out = WG.xor(WE);
+			GCSignal out = gb.dec(a, b, gid, gtt[i0][i1]);
 			
 			gid++;
 			res =  out;

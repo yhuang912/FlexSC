@@ -5,9 +5,9 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import flexsc.CompEnv;
-import gcHalfANDs.GCEva;
-import gcHalfANDs.GCGen;
-import gcHalfANDs.GCSignal;
+import gc.halfANDs.GCEva;
+import gc.halfANDs.GCGen;
+import gc.GCSignal;
 import test.Utils;
 
 

@@ -4,13 +4,12 @@ import java.util.Random;
 
 import objects.Float.Representation;
 import flexsc.*;
-import gcHalfANDs.GCSignal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
 import test.harness.TestFloat;
 import circuits.FloatLib;
-
 
 public class TestFloatDivide extends TestFloat<GCSignal> {
 

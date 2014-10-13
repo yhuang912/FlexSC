@@ -3,7 +3,7 @@ package test.ot;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import gcHalfANDs.*;
+import gc.*;
 
 import org.junit.Assert;
 import org.junit.Test;

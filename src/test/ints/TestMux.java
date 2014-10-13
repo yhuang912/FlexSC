@@ -5,7 +5,7 @@ import org.junit.Test;
 import test.harness.Test_2Input1Output;
 import circuits.CircuitLib;
 import flexsc.*;
-import gcHalfANDs.GCSignal;
+import gc.GCSignal;
 
 public class TestMux extends Test_2Input1Output<GCSignal>{
 

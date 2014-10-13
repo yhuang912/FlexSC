@@ -1,8 +1,8 @@
 package test.harness;
 
 import flexsc.*;
-import gcHalfANDs.GCEva;
-import gcHalfANDs.GCGen;
+import gc.halfANDs.GCEva;
+import gc.halfANDs.GCGen;
 
 import org.junit.Assert;
 

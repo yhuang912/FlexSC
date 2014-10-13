@@ -7,11 +7,11 @@ import java.util.Arrays;
 import flexsc.Signal;
 
 public class GCSignal extends Signal {
-	static final int len = 10;
+	public static final int len = 10;
 	public byte[] bytes;
-	boolean v;
+	public boolean v;
 	
-	static final GCSignal ZERO = new GCSignal(new byte[len]);
+	public static final GCSignal ZERO = new GCSignal(new byte[len]);
 
 	private GCSignal(byte[] b) { bytes = b; }
 	

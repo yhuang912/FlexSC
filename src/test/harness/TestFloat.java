@@ -1,8 +1,8 @@
 package test.harness;
 
 import objects.Float.Representation;
-import gcHalfANDs.GCEva;
-import gcHalfANDs.GCGen;
+import gc.halfANDs.GCEva;
+import gc.halfANDs.GCGen;
 import flexsc.*;
 
 import org.junit.Assert;

@@ -6,8 +6,8 @@ import java.util.Arrays;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gcHalfANDs.GCEva;
-import gcHalfANDs.GCGen;
+import gc.halfANDs.GCEva;
+import gc.halfANDs.GCGen;
 
 import org.junit.Assert;
 

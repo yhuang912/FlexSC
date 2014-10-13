@@ -1,6 +1,9 @@
-package gc;
+package gc.regular;
+
+import gc.GCSignal;
 
 import java.security.SecureRandom;
+
 import org.junit.Test;
 
 public class TestGarbler {

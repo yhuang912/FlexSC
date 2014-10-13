@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 import objects.Float.Representation;
 import flexsc.*;
-import gcHalfANDs.GCEva;
-import gcHalfANDs.GCGen;
+import gc.halfANDs.GCEva;
+import gc.halfANDs.GCGen;
 
 import org.junit.Assert;
 

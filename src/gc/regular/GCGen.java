@@ -1,10 +1,12 @@
-package gc;
+package gc.regular;
 
 import java.security.*;
 import java.io.*;
 
 import circuits.FloatFormat;
 import flexsc.Flag;
+import gc.GCCompEnv;
+import gc.GCSignal;
 import objects.Float.Representation;
 import ot.*;
 import test.Utils;
@@ -14,8 +16,8 @@ public class GCGen extends GCCompEnv {
 	public final GCSignal R;
 	SecureRandom rnd = new SecureRandom();
 
-	InputStream is;
-	OutputStream os;
+	public InputStream is;
+	public OutputStream os;
 	OTSender snd;
 	Garbler gb;
 

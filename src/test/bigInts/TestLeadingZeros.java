@@ -5,7 +5,7 @@ import java.util.Random;
 
 import flexsc.CompEnv;
 import flexsc.Mode;
-import gcHalfANDs.GCSignal;
+import gc.GCSignal;
 
 import org.junit.Test;
 
