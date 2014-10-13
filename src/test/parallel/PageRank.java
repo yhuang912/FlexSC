@@ -166,14 +166,31 @@ public class PageRank<T> implements ParallelGadget<T> {
 				.compute();
 
 		// 1. Compute number of neighbors for each vertex
-		new ComputeL<>(env, machine, false /* isEdgeIncoming */)
-			.setInputs(aa)
-			.compute();
+		new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new PageRankNode<T>(env)) {
 
+			@Override
+			public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
+				PageRankNode<T> agg = (PageRankNode<T>) aggNode;
+				PageRankNode<T> b = (PageRankNode<T>) bNode;
+
+				IntegerLib<T> lib = new IntegerLib<>(env);
+				PageRankNode<T> ret = new PageRankNode<T>(env);
+				ret.l = lib.add(agg.l, b.l);
+				return ret;
+			}
+
+			@Override
+			public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
+				PageRankNode<T> agg = (PageRankNode<T>) aggNode;
+				PageRankNode<T> b = (PageRankNode<T>) bNode;
+				IntegerLib<T> lib = new IntegerLib<>(env);
+				b.l = lib.mux(b.l, agg.l, b.isVertex);
+			}
+		};
 
 		for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges
-			new WriteToEdge<T>(env, machine, false /* isEdgeIncoming */) {
+			new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
 
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -186,7 +203,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 			}.setInputs(aa).compute();
 
 			// 3. Compute PR based on edges
-			new WriteToVertex<T>(env, machine, true /* isEdgeIncoming */, new PageRankNode<T>(env)) {
+			new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new PageRankNode<T>(env)) {
 
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -213,6 +230,11 @@ public class PageRank<T> implements ParallelGadget<T> {
 			.setInputs(aa, PageRankNode.vertexFirstComparator(env))
 			.compute();
 
+		output(machineId, env, aa);
+	}
+
+	private <T> void output(int machineId, final CompEnv<T> env,
+			PageRankNode<T>[] aa) throws IOException, BadLabelException {
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
@@ -223,7 +245,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 		}
 	}
 
-	public <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr) throws IOException, BadLabelException {
+	private <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr) throws IOException, BadLabelException {
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(pr[i].u));
 			int b = Utils.toInt(env.outputToAlice(pr[i].v));

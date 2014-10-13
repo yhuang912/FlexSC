@@ -4,7 +4,7 @@ import circuits.IntegerLib;
 import network.Machine;
 import flexsc.CompEnv;
 
-public class WritePrPartToEdge<T> extends WriteToEdge<T> {
+public class WritePrPartToEdge<T> extends ScatterToEdges<T> {
 
 	public WritePrPartToEdge(CompEnv<T> env, Machine machine, boolean isEdgeIncoming) {
 		super(env, machine, isEdgeIncoming);
