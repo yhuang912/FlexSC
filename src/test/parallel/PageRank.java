@@ -46,8 +46,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 		boolean[][] b = new boolean[v.length][];
 		boolean[] c = new boolean[isVertex.length];
 		for(int i = 0; i < u.length; ++i) {
-			a[i] = Utils.fromInt(u[i], INT_LEN);
-			b[i] = Utils.fromInt(v[i], INT_LEN);
+			a[i] = Utils.fromInt(u[i], GraphNode.VERTEX_LEN);
+			b[i] = Utils.fromInt(v[i], GraphNode.VERTEX_LEN);
 			c[i] = isVertex[i];
 		}
 		Object[] ret = new Object[3];
@@ -65,9 +65,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 		T[] tIsV = env.newTArray(inputLength /* number of entries in the input */);
 		if (isGen) {
 			for(int i = 0; i < tu.length; ++i)
-				tu[i] = env.inputOfBob(new boolean[INT_LEN]);
+				tu[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
 			for(int i = 0; i < tv.length; ++i)
-				tv[i] = env.inputOfBob(new boolean[INT_LEN]);
+				tv[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
 			tIsV = env.inputOfBob(new boolean[tIsV.length]);
 		} else {
 			Object[] input = getInput(inputLength);
@@ -186,7 +186,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 				IntegerLib<T> lib = new IntegerLib<>(env);
 				b.l = lib.mux(b.l, agg.l, b.isVertex);
 			}
-		};
+		}.setInputs(aa).compute();
 
 		for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges

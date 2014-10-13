@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import network.NetworkUtil;
 import test.Utils;
 import circuits.Comparator;
 import circuits.IntegerLib;
@@ -11,7 +12,7 @@ import flexsc.CompEnv;
 
 public abstract class GraphNode<T> {
 
-	static int VERTEX_LEN = 32;
+	static int VERTEX_LEN = 10;
 
 	T[] u;
 	T[] v;
@@ -25,8 +26,8 @@ public abstract class GraphNode<T> {
 
 	public GraphNode(CompEnv<T> env) {
 		try {
-			this.u = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
-			this.v = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
+			this.u = env.inputOfAlice(Utils.fromInt(0, VERTEX_LEN));
+			this.v = env.inputOfAlice(Utils.fromInt(0, VERTEX_LEN));
 			this.isVertex = env.inputOfAlice(false);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -37,9 +38,17 @@ public abstract class GraphNode<T> {
 
 	}
 
-	public abstract void send(OutputStream os, CompEnv<T> env) throws IOException;
+	public void send(OutputStream os, CompEnv<T> env) throws IOException {
+		NetworkUtil.send(os, u, env);
+		NetworkUtil.send(os, v, env);
+		NetworkUtil.send(os, isVertex, env);
+	}
 
-	public abstract void read(InputStream is, CompEnv<T> env) throws IOException;
+	public void read(InputStream is, CompEnv<T> env) throws IOException {
+		this.u = NetworkUtil.read(is, VERTEX_LEN, env);
+		this.v = NetworkUtil.read(is, VERTEX_LEN, env);
+		this.isVertex = NetworkUtil.read(is, env);
+	}
 
 	public abstract GraphNode<T> mux(GraphNode<T> b, T condition, CompEnv<T> env);
 

@@ -37,20 +37,16 @@ public class PageRankNode<T> extends GraphNode<T> {
 
 	@Override
 	public void send(OutputStream os, CompEnv<T> env) throws IOException {
-		NetworkUtil.send(os, u, env);
-		NetworkUtil.send(os, v, env);
+		super.send(os, env);
 		NetworkUtil.send(os, pr, env);
 		NetworkUtil.send(os, l, env);
-		NetworkUtil.send(os, isVertex, env);
 	}
 
 	@Override
 	public void read(InputStream is, CompEnv<T> env) throws IOException {
-		this.u = NetworkUtil.read(is, INT_LEN, env);
-		this.v = NetworkUtil.read(is, INT_LEN, env);
+		super.read(is, env);
 		this.pr = NetworkUtil.read(is, INT_LEN, env);
 		this.l = NetworkUtil.read(is, INT_LEN, env);
-		this.isVertex = NetworkUtil.read(is, env); 
 	}
 
 	@Override
