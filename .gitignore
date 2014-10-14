@@ -5,9 +5,7 @@
 *.ear
 /bin
 .DS_Store
-.classpath
 *.swp
 NPOTKey
-.classpath
 .project
 source.txt

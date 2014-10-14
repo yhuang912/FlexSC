@@ -3,7 +3,7 @@
 
 package flexsc;
 
-import test.StopWatch;
+import util.StopWatch;
 
 public class Flag {
 	public static boolean CountTime = false;
