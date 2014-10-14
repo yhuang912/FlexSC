@@ -1,7 +1,7 @@
 package test.oram.swaporam;
 
+import test.oram.swaporam.TestNewOramRec.GenRunnable;
 import flexsc.Flag;
-import test.oram.cscoram.TestNewOramRec.GenRunnable;
 
 public class TestNewOramRecServer {
 	public static void main(String [ ] args) throws InterruptedException {

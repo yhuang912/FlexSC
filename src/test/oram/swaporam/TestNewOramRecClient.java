@@ -1,7 +1,7 @@
 package test.oram.swaporam;
 
+import test.oram.swaporam.TestNewOramRec.EvaRunnable;
 import flexsc.Flag;
-import test.oram.cscoram.TestNewOramRec.EvaRunnable;
 
 public class TestNewOramRecClient {
 	
