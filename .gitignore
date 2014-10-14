@@ -4,4 +4,8 @@
 *.war
 *.ear
 /bin
-/bin1/
+.DS_Store
+.classpath
+*.swp
+NPOTKey
+.classpath
