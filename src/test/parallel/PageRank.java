@@ -112,13 +112,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 			T[] gcInputIsVertex = (T[]) inputIsVertex[i];
 			NetworkUtil.writeInt(os[i], gcInputU.length);
 			NetworkUtil.writeInt(os[i], gcInputU[0].length);
-			for (int j = 0; j < gcInputU.length; j++)
-				for (int k = 0; k < gcInputU[j].length; k++)
-					NetworkUtil.send(os[i], gcInputU[j][k], env);
-	
-			for (int j = 0; j < gcInputV.length; j++)
-				for (int k = 0; k < gcInputV[j].length; k++)
-					NetworkUtil.send(os[i], gcInputV[j][k], env);
+			NetworkUtil.send(os[i], gcInputU, env);
+			NetworkUtil.send(os[i], gcInputV, env);
 			NetworkUtil.send(os[i], gcInputIsVertex, env);
 			os[i].flush();
 		}
@@ -128,16 +123,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 	public Object readInputFromMaster(int inputLength, int inputSize,
 			InputStream masterIs,
 			CompEnv<T> env) throws IOException {
-		T[][] gcInputU = env.newTArray(inputLength, inputSize);
-		T[][] gcInputV = env.newTArray(inputLength, inputSize);
-		T[] gcInputIsVertex = env.newTArray(inputLength);
-		for (int j = 0; j < inputLength; j++)
-			for (int k = 0; k < inputSize; k++)
-				gcInputU[j][k] = NetworkUtil.read(masterIs, env);
-		for (int j = 0; j < inputLength; j++)
-			for (int k = 0; k < inputSize; k++)
-				gcInputV[j][k] = NetworkUtil.read(masterIs, env);
-		gcInputIsVertex = NetworkUtil.read(masterIs, gcInputIsVertex.length, env);
+		T[][] gcInputU = NetworkUtil.read(masterIs, inputLength, inputSize, env);
+		T[][] gcInputV = NetworkUtil.read(masterIs, inputLength, inputSize, env);
+		T[] gcInputIsVertex = NetworkUtil.read(masterIs, inputLength, env);
 		Object[] ret = new Object[3];
 		ret[0] = gcInputU;
 		ret[1] = gcInputV;

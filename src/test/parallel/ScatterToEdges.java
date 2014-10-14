@@ -92,5 +92,5 @@ public abstract class ScatterToEdges<T> extends Gadget<T> {
 		return null;
 	}
 
-	public abstract void writeToEdge(GraphNode<T> vertexNode, GraphNode<T> edgeNode, T cond);
+	public abstract void writeToEdge(GraphNode<T> vertexNode, GraphNode<T> edgeNode, T isVertex);
 }

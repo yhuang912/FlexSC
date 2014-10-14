@@ -186,6 +186,16 @@ public class CircuitLib<T> {
 
 		return ret;
 	}
+
+	public T[][] mux(T[][] x, T[][] y, T c) {
+		assert (x != null && y != null && x.length == y.length) : "CircuitLib.mux[]: bad inputs";
+
+		T[][] ret = env.newTArray(x.length, 1);
+		for (int i = 0; i < x.length; i++)
+			ret[i] = mux(x[i], y[i], c);
+
+		return ret;
+	}
 	
 	public T[] padSignal(T[] a, int length) {
 		T[] res = zeros(length);
