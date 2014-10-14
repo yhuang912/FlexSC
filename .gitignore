@@ -9,3 +9,5 @@
 *.swp
 NPOTKey
 .classpath
+.project
+source.txt
