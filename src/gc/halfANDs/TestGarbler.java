@@ -4,8 +4,6 @@ import gc.GCSignal;
 
 import java.security.SecureRandom;
 
-import org.junit.Test;
-
 public class TestGarbler {
 	SecureRandom rnd = new SecureRandom();
 	GCSignal a = GCSignal.freshLabel(rnd);

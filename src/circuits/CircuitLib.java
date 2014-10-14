@@ -1,11 +1,15 @@
+// Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package circuits;
 
+import java.io.IOException;
+import java.util.Arrays;
+
 import flexsc.CompEnv;
+import flexsc.Party;
+import gc.GCSignal;
 
 public class CircuitLib<T> {
-	protected CompEnv<T> env;
-//	public final static Signal SIGNAL_ZERO = new Signal(false);
-//	public final static Signal SIGNAL_ONE = new Signal(true);
+	public CompEnv<T> env;
 	public final T SIGNAL_ZERO;
 	public final T SIGNAL_ONE;
 
@@ -27,9 +31,61 @@ public class CircuitLib<T> {
 		return result;
 	}
 
+	public T[] randBools(int length) {
+		boolean[] res = new boolean[length];
+		for (int i = 0; i < length; ++i)
+			res[i] = env.rnd.nextBoolean();
+		T[] alice = env.inputOfAlice(res);
+		T[] bob = env.inputOfBob(res);
+		T[] resSC = xor(alice, bob);
+
+		return resSC;
+	}
+
+	public boolean[] declassifyToAlice(T[] x) {
+		return env.outputToAlice(x);
+	}
+
+	public boolean[] declassifyToBob(T[] x) {
+		return env.outputToBob(x);
+	}
+
+	public boolean[] declassifyToBoth(T[] x) {
+		boolean[] pos = env.outputToAlice(x);
+		try {
+			if (env.getParty() == Party.Alice) {
+				// send pos to bob
+
+				env.os.write(new byte[] { (byte) pos.length });
+				byte[] tmp = new byte[pos.length];
+				for (int i = 0; i < pos.length; ++i)
+					tmp[i] = (byte) (pos[i] ? 1 : 0);
+				env.os.write(tmp);
+				env.os.flush();
+			} else {
+				byte[] l = new byte[1];
+				env.is.read(l);
+				byte tmp[] = new byte[l[0]];
+				env.is.read(tmp);
+				pos = new boolean[l[0]];
+				for (int k = 0; k < tmp.length; ++k) {
+					pos[k] = ((tmp[k] - 1) == 0);
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return pos;
+	}
+
 	// Defaults to 32 bit constants.
 	public T[] toSignals(int value) {
 		return toSignals(value, 32);
+	}
+
+	public GCSignal[] toSignals(GCSignal[] value) {
+		return value;
 	}
 
 	public T[] zeros(int length) {
@@ -51,13 +107,13 @@ public class CircuitLib<T> {
 	/*
 	 * Basic logical operations on Signal and Signal[]
 	 */
-	public T and(T x, T y) throws Exception {
+	public T and(T x, T y) {
 		assert (x != null && y != null) : "CircuitLib.and: bad inputs";
 
 		return env.and(x, y);
 	}
 
-	public T[] and(T[] x, T[] y) throws Exception {
+	public T[] and(T[] x, T[] y) {
 		assert (x != null && y != null && x.length == y.length) : "CircuitLib.and[]: bad inputs";
 
 		T[] result = env.newTArray(x.length);
@@ -100,13 +156,13 @@ public class CircuitLib<T> {
 		return result;
 	}
 
-	public T or(T x, T y) throws Exception {
+	public T or(T x, T y) {
 		assert (x != null && y != null) : "CircuitLib.or: bad inputs";
 
 		return xor(xor(x, y), and(x, y)); // http://stackoverflow.com/a/2443029
 	}
 
-	public T[] or(T[] x, T[] y) throws Exception {
+	public T[] or(T[] x, T[] y) {
 		assert (x != null && y != null && x.length == y.length) : "CircuitLib.or[]: bad inputs";
 
 		T[] result = env.newTArray(x.length);
@@ -119,7 +175,7 @@ public class CircuitLib<T> {
 	/*
 	 * Output x when c == 0; Otherwise output y.
 	 */
-	public T mux(T x, T y, T c) throws Exception {
+	public T mux(T x, T y, T c) {
 		assert (x != null && y != null && c != null) : "CircuitLib.mux: bad inputs";
 		T t = xor(x, y);
 		t = and(t, c);
@@ -127,7 +183,7 @@ public class CircuitLib<T> {
 		return ret;
 	}
 
-	public T[] mux(T[] x, T[] y, T c) throws Exception {
+	public T[] mux(T[] x, T[] y, T c) {
 		assert (x != null && y != null && x.length == y.length) : "CircuitLib.mux[]: bad inputs";
 
 		T[] ret = env.newTArray(x.length);
@@ -136,11 +192,24 @@ public class CircuitLib<T> {
 
 		return ret;
 	}
-	
-	protected T[] padSignal(T[] a, int length) {
+
+	public T[] padSignal(T[] a, int length) {
 		T[] res = zeros(length);
-		for(int i = 0; i < a.length && i < length; ++i)
+		for (int i = 0; i < a.length && i < length; ++i)
 			res[i] = a[i];
 		return res;
+	}
+
+	public T[] padSignedSignal(T[] a, int length) {
+		T[] res = env.newTArray(length);
+		for (int i = 0; i < a.length && i < length; ++i)
+			res[i] = a[i];
+		for (int i = a.length; i < length; ++i)
+			res[i] = a[a.length - 1];
+		return res;
+	}
+
+	public T[] copy(T[] x) {
+		return Arrays.copyOf(x, x.length);
 	}
 }

@@ -1,26 +1,19 @@
 package test.harness;
 
+import org.junit.Assert;
+
+import util.Utils;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
-import gc.halfANDs.GCEva;
-import gc.halfANDs.GCGen;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import pm.PMCompEnv;
-import cv.CVCompEnv;
-import test.Utils;
 
 
-public class TestSortHarness<T> {
+public class TestSortHarness<T> extends TestHarness<T>{
 	public abstract class Helper {
 		int[] intA;
 		boolean[][] a;
 		Mode m;
-		public Helper(int[] aa, Mode m) {
-			this.m = m;
+		public Helper(int[] aa) {
 			intA = aa;
 			a = new boolean[aa.length][32];
 			for(int i = 0; i < intA.length; ++i)
@@ -40,14 +33,8 @@ public class TestSortHarness<T> {
 		public void run() {
 			try {
 				listen(54321);
-
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);				
-				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);			
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
 
 				T[][] a = gen.newTArray(h.a.length, h.a[0].length);//new T[h.a.length][h.a[0].length];
 				for(int i = 0; i < a.length; ++i)
@@ -78,15 +65,9 @@ public class TestSortHarness<T> {
 		public void run() {
 			try {
 				connect("localhost", 54321);				
+				@SuppressWarnings("unchecked")
+				CompEnv<T> eva = CompEnv.getEnv(m, Party.Bob, is, os);
 				
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL) 
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
-
 				T[][] a = eva.newTArray(h.a.length, h.a[0].length);
 				for(int i = 0; i < a.length; ++i)
 					a[i] = eva.inputOfBob(h.a[i]);

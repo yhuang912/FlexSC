@@ -4,7 +4,6 @@ import gc.GCSignal;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
 
 final class Garbler {
 	private MessageDigest sha1 = null;

@@ -1,18 +1,60 @@
+// Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>, Yan Huang <yhuang@cs.umd.edu> and Kartik Nayak <kartik@cs.umd.edu>
 package circuits;
-
-import flexsc.CompEnv;
 
 import java.util.Arrays;
 
-public class IntegerLib<T> extends CircuitLib<T> {
+import util.Utils;
+import circuits.arithmetic.ArithmeticLib;
+import circuits.arithmetic.FixedPointLib;
+import circuits.arithmetic.FloatLib;
+import flexsc.CompEnv;
+import flexsc.Comparator;
+import flexsc.IWritable;
 
+public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
+
+	public int width;
+	SortLib<T> sortlib;
 	public IntegerLib(CompEnv<T> e) {
 		super(e);
+		width = 32;
+		sortlib = new SortLib<T>(e, this);
+	}
+
+	public void sort(T[][] a, T dir, Comparator<T> c){
+		sortlib.sort(a, dir, c);
+	}
+
+	public <V extends IWritable<V, T>>void sort(V[] a, T dir, Comparator<T> c) {
+		try {
+			T[][] data = env.newTArray(a.length, 1);
+			for(int i = 0; i < a.length; ++i)
+				data[i] = a[i].getBits();
+			sortlib.sort(data, dir, c);
+			for(int i = 0; i < a.length; ++i)
+				a[i] = a[0].newObj(data[i]);
+			//			data[i] = a[i].getBits();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public IntegerLib(CompEnv<T> e, int width) {
+		super(e);
+		this.width = width;
 	}
 
 	static final int S = 0;
 	static final int COUT = 1;
-	protected T[] add(T x, T y, T cin) throws Exception {
+
+	public T[] publicValue(double v) {
+		int intv = (int) v;
+		return toSignals(intv, width);
+	}
+
+	// full 1-bit adder
+	protected T[] add(T x, T y, T cin) {
 		T[] res = env.newTArray(2);
 
 		T t1 = env.xor(x, cin);
@@ -24,319 +66,288 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		return res;
 	}
 
-	T[] add(T[] x, T[] y, boolean cin) throws Exception {
-		assert(x != null && y != null && x.length == y.length) : "add: bad inputs.";
-		T[] res = env.newTArray(x.length);
-
-//		T[] t = add(x[0], y[0], new Signal(cin));
+	// full n-bit adder
+	public T[] addFull(T[] x, T[] y, boolean cin) {
+		assert (x != null && y != null && x.length == y.length) : "add: bad inputs.";
+		T[] res = env.newTArray(x.length + 1);
 		T[] t = add(x[0], y[0], env.newT(cin));
 		res[0] = t[S];
-		for (int i = 0; i < x.length-1; i++) {
-			t = add(x[i+1], y[i+1], t[COUT]);
-			res[i+1] = t[S];
+		for (int i = 0; i < x.length - 1; i++) {
+			t = add(x[i + 1], y[i + 1], t[COUT]);
+			res[i + 1] = t[S];
 		}
-
+		res[res.length - 1] = t[COUT];
 		return res;
 	}
 
-	//tested
-	public T[] add(T[] x, T[] y) throws Exception {
+	public T[] add(T[] x, T[] y, boolean cin) {
+		return Arrays.copyOf(addFull(x, y, cin), x.length);
+	}
+
+	public T[] add(T[] x, T[] y) {
 
 		return add(x, y, false);
 	}
 
-	//tested
-	public T[] sub(T[] x, T[] y) throws Exception {
-		assert(x != null && y != null && x.length == y.length) : "sub: bad inputs.";
+	public T[] sub(T x, T y) throws Exception {
+		T[] ax = env.newTArray(2);
+		ax[1] = SIGNAL_ZERO;
+		ax[0] = x;
+		T[] ay = env.newTArray(2);
+		ay[1] = SIGNAL_ZERO;
+		ay[0] = y;
+		return sub(x, y);
+	}
+
+	public T[] sub(T[] x, T[] y) {
+		assert (x != null && y != null && x.length == y.length) : "sub: bad inputs.";
 
 		return add(x, not(y), true);
 	}
 
-	//tested
-	public T[] incrementByOne(T[] x) throws Exception {
+	public T[] incrementByOne(T[] x) {
 		T[] one = zeros(x.length);
 		one[0] = SIGNAL_ONE;
 		return add(x, one);
 	}
 
-	//tested
-	public T[] decrementByOne(T[] x) throws Exception {
+	public T[] decrementByOne(T[] x) {
 		T[] one = zeros(x.length);
 		one[0] = SIGNAL_ONE;
 		return sub(x, one);
 	}
 
-	//tested
-	public T[] conditionalIncreament(T[] x, T flag) throws Exception {
+	public T[] conditionalIncreament(T[] x, T flag) {
 		T[] one = zeros(x.length);
 		one[0] = mux(SIGNAL_ZERO, SIGNAL_ONE, flag);
 		return add(x, one);
 	}
 
-	//tested
-	public T[] conditionalDecrement(T[] x, T flag) throws Exception {
+	public T[] conditionalDecrement(T[] x, T flag) {
 		T[] one = zeros(x.length);
 		one[0] = mux(SIGNAL_ZERO, SIGNAL_ONE, flag);
 		return sub(x, one);
 	}
 
-	//tested
-	public T geq(T[] x, T[] y) throws Exception {
-		assert(x.length == y.length) : "bad input";
+	public T geq(T[] x, T[] y) {
+		assert (x.length == y.length) : "bad input";
 
 		T[] result = sub(x, y);
-		return not(result[result.length-1]);
+		return not(result[result.length - 1]);
 	}
 
-	//tested
-	public T leq(T[] x, T[] y) throws Exception {
+	public T leq(T[] x, T[] y) {
 		return geq(y, x);
 	}
 
-	//tested
-	public T[] multiply(T[] x, T[] y) throws Exception {
-		assert(x != null && y!= null) : "multiply: bad inputs";	
-
-		T[] res = zeros(x.length+y.length);
-		T[] zero = zeros(res.length);
-		T longerX[] = zeros(res.length);
-		System.arraycopy(x, 0, longerX, 0, x.length);
-
-		for(int i = 0; i < y.length; ++i) {
-			res = add(res, mux(zero, longerX, y[i]));
-			longerX = leftShift(longerX);
-		}
-		return Arrays.copyOf(res, x.length);//res;
+	public T[] multiply(T[] x, T[] y) {
+		return Arrays.copyOf(multiplyInternal(x, y), x.length);// res;
 	}
 
-	//tested
-	public T[] absolute(T[] x) throws Exception {
+	// This multiplication does not truncate the length of x and y
+	public T[] multiplyFull(T[] x, T[] y) {
+		return multiplyInternal(x, y);// res;
+	}
+
+	private T[] multiplyInternal(T[] x, T[] y) {
+		assert (x != null && y != null) : "multiply: bad inputs";
+		T[] res = zeros(x.length + y.length);
+		T[] zero = zeros(x.length);
+
+		T[] toAdd = mux(zero, x, y[0]);
+		System.arraycopy(toAdd, 0, res, 0, toAdd.length);
+
+		for (int i = 1; i < y.length; ++i) {
+			toAdd = Arrays.copyOfRange(res, i, i + x.length);
+			toAdd = add(toAdd, mux(zero, x, y[i]), false);
+			System.arraycopy(toAdd, 0, res, i, toAdd.length);
+		}
+		return res;
+	}
+
+	public T[] absolute(T[] x) {
 		T reachedOneSignal = SIGNAL_ZERO;
 		T[] result = zeros(x.length);
-		for(int i = 0; i < x.length; ++i) {
+		for (int i = 0; i < x.length; ++i) {
 			T comp = eq(SIGNAL_ONE, x[i]);
 			result[i] = xor(x[i], reachedOneSignal);
 			reachedOneSignal = or(reachedOneSignal, comp);
 		}
-		return mux(x, result, x[x.length-1]);
+		return mux(x, result, x[x.length - 1]);
 	}
 
-
-	//tested
-	public T[] divide(T[] x, T[] y) throws Exception {
+	public T[] div(T[] x, T[] y) {
 		T[] absoluteX = absolute(x);
-		T[] dividend = zeros(x.length + y.length);
-		System.arraycopy(absoluteX, 0, dividend, 0, absoluteX.length);
 		T[] absoluteY = absolute(y);
-		T[] divisor = zeros(x.length + y.length);
-		System.arraycopy(absoluteY, 0, divisor, x.length, absoluteY.length);
+		T[] PA = divInternal(absoluteX, absoluteY);
+		return addSign(Arrays.copyOf(PA, x.length),
+				xor(x[x.length - 1], y[y.length - 1]));
 
-		T[] quotient = zeros(dividend.length);
-		T[] zero = zeros(dividend.length);
-		for(int i = 0; i < x.length+1; ++i) {
-			quotient = leftShift(quotient);
-
-			T divisorIsLEQ = leq(divisor, dividend);
-			T[] temp = mux(zero, divisor, divisorIsLEQ);
-			dividend = sub(dividend, temp);
-			quotient[0] = divisorIsLEQ;
-
-			divisor = rightShift(divisor);
-		}
-		//return quotient;
-		return addSign(quotient, xor(x[x.length-1], y[y.length-1]));
 	}
 
-
-	//tested
-	public T[] reminder(T[] x, T[] y) throws Exception {
-		//can be better.
-		T[] q = divide(x, y);
-		return sub(x, multiply(y, q));
-		/*
-		Signal[] absoluteX = absolute(x);
-		Signal[] dividend = zeros(x.length + y.length);
-		System.arraycopy(absoluteX, 0, dividend, 0, absoluteX.length);
-		Signal[] absoluteY = absolute(y);
-		Signal[] divisor = zeros(x.length + y.length);
-		System.arraycopy(absoluteY, 0, divisor, x.length, absoluteY.length);
-
-		Signal[] zero = zeros(dividend.length);
-		for(int i = 0; i < x.length+1; ++i) {
-			Signal divisorIsLEQ = leq(divisor, dividend);
-			Signal[] temp = mux(zero, divisor, divisorIsLEQ);
-			dividend = sub(dividend, temp);	
-			divisor = rightShift(divisor);
+	// Restoring Division Algorithm
+	public T[] divInternal(T[] x, T[] y) {
+		T[] PA = zeros(x.length + y.length);
+		T[] B = y;
+		System.arraycopy(x, 0, PA, 0, x.length);
+		for (int i = 0; i < x.length; ++i) {
+			PA = leftShift(PA);
+			T[] tempP = sub(Arrays.copyOfRange(PA, x.length, PA.length), B);
+			PA[0] = not(tempP[tempP.length - 1]);
+			System.arraycopy(
+					mux(tempP, Arrays.copyOfRange(PA, x.length, PA.length),
+							tempP[tempP.length - 1]), 0, PA, x.length, y.length);
 		}
-
-		//return dividend;
-		return addSign(dividend, xor(x[x.length-1], y[y.length-1]));*/
+		return PA;
 	}
 
-	private T[] addSign(T[] x, T sign) throws Exception {
+	public T[] mod(T[] x, T[] y) {
+		T Xneg = x[x.length - 1];
+		T[] absoluteX = absolute(x);
+		T[] absoluteY = absolute(y);
+		T[] PA = divInternal(absoluteX, absoluteY);
+		T[] res = Arrays.copyOfRange(PA, y.length, PA.length);
+		return mux(res, sub(toSignals(0), res), Xneg);
+	}
 
+	public T[] addSign(T[] x, T sign) {
 		T[] reachedOneSignal = zeros(x.length);
 		T[] result = env.newTArray(x.length);
-		for(int i = 0; i < x.length-1; ++i) {
-			//Signal comp = x[i];
-			reachedOneSignal[i+1] = or(reachedOneSignal[i], x[i]);
+		for (int i = 0; i < x.length - 1; ++i) {
+			// Signal comp = x[i];
+			reachedOneSignal[i + 1] = or(reachedOneSignal[i], x[i]);
 			result[i] = xor(x[i], reachedOneSignal[i]);
 		}
-		result[x.length-1] = xor(x[x.length-1], reachedOneSignal[x.length-1]);
+		result[x.length - 1] = xor(x[x.length - 1],
+				reachedOneSignal[x.length - 1]);
 		return mux(x, result, sign);
-		 
-		 
 	}
 
-	//tested
-	public T[] commonPrefix(T[] x, T[] y) throws Exception {
-		assert(x != null && y!= null) : "multiply: bad inputs";
+	public T[] commonPrefix(T[] x, T[] y) {
+		assert (x != null && y != null) : "multiply: bad inputs";
 		T[] result = xor(x, y);
 
-		for(int i = x.length-2; i>=0; --i) {
-			result[i] = or(result[i], result[i+1]);
+		for (int i = x.length - 2; i >= 0; --i) {
+			result[i] = or(result[i], result[i + 1]);
 		}
 		return result;
 	}
 
-	//tested
-	public T[] leadingZeros(T[] x) throws Exception {
-		assert(x!= null) : "leading zeros: bad inputs";
+	public T[] leadingZeros(T[] x) {
+		assert (x != null) : "leading zeros: bad inputs";
 
 		T[] result = Arrays.copyOf(x, x.length);
-		for(int i = result.length-2; i>=0; --i) {
-			result[i] = or(result[i], result[i+1]);
-		}	
+		for (int i = result.length - 2; i >= 0; --i) {
+			result[i] = or(result[i], result[i + 1]);
+		}
 
 		return numberOfOnes(not(result));
 	}
 
-//	final static T[][] B = {
-//		toSignals(0x55555555),
-//		toSignals(0x33333333),
-//		toSignals(0x0F0F0F0F),
-//		toSignals(0x00FF00FF),
-//		toSignals(0x0000FFFF)
-//	};
-//
-//	public T[] numberOfOnes32(T[] x) throws Exception {
-//		assert(x!= null): "numberOfOnes : bad input";
-//		assert(x.length == 32) : "numberOfOnes : input should be of length 32";
-//
-//		T[] c = sub(x, and(rightShift(x), B[0]));//c = v - ((v >> 1) & B[0]);
-//		c = add(and(rightPublicShift(c, (1<<1) ), B[1]), and(c, B[1]));//c = ((c >> S[1]) & B[1]) + (c & B[1]);
-//		c = and(add(rightPublicShift(c, (1<<2) ), c), B[2]);//c = ((c >> S[2]) + c) & B[2];
-//		c = and(add(rightPublicShift(c, (1<<3) ), c), B[3]);//c = ((c >> S[3]) + c) & B[3];
-//		T[] result = and(add(rightPublicShift(c, (1<<4) ), c), B[4]);//c = ((c >> S[4]) + c) & B[4];
-//
-//		return result; 
-//
-//	}
-
-	//tested
-	public T[] lengthOfCommenPrefix(T[] x, T [] y) throws Exception {
-		assert(x!= null) : "lengthOfCommenPrefix : bad inputs";
+	public T[] lengthOfCommenPrefix(T[] x, T[] y) {
+		assert (x != null) : "lengthOfCommenPrefix : bad inputs";
 
 		return leadingZeros(xor(x, y));
 	}
 
-
-	/* Integer manipulation
-	 * */
-	public T[] leftShift(T[] x){
-		assert(x!= null) : "leftShift: bad inputs";
+	/*
+	 * Integer manipulation
+	 */
+	public T[] leftShift(T[] x) {
+		assert (x != null) : "leftShift: bad inputs";
 		return leftPublicShift(x, 1);
 	}
 
-	public T[] rightShift(T[] x){
-		assert(x!= null) : "rightShift: bad inputs";
+	public T[] rightShift(T[] x) {
+		assert (x != null) : "rightShift: bad inputs";
 		return rightPublicShift(x, 1);
 	}
 
-	//tested
 	public T[] leftPublicShift(T[] x, int s) {
-		assert(x!= null && s < x.length) : "leftshift: bad inputs";
+		assert (x != null && s < x.length) : "leftshift: bad inputs";
 
 		T res[] = env.newTArray(x.length);
 		System.arraycopy(zeros(s), 0, res, 0, s);
-		System.arraycopy(x, 0, res, s, x.length-s);
+		System.arraycopy(x, 0, res, s, x.length - s);
 
 		return res;
 	}
 
-	//tested
 	public T[] rightPublicShift(T[] x, int s) {
-		assert(x!= null && s < x.length) : "leftshift: bad inputs";
+		assert (x != null && s < x.length) : "rightshift: bad inputs";
 
 		T[] res = env.newTArray(x.length);
-		System.arraycopy(x, s, res, 0, x.length-s);
-		System.arraycopy(zeros(s), 0, res, x.length-s, s);//assume that this function is operated on 32bit word
+		System.arraycopy(x, s, res, 0, x.length - s);
+		System.arraycopy(zeros(s), 0, res, x.length - s, s);
 
 		return res;
 	}
 
-	//tested
-	public T[] conditionalLeftPublicShift(T[] x, int s, T sign) throws Exception {
-		assert(x!= null && s < x.length) : "leftshift: bad inputs";
+	public T[] conditionalLeftPublicShift(T[] x, int s, T sign) {
+		assert (x != null && s < x.length) : "leftshift: bad inputs";
 
 		T[] res = env.newTArray(x.length);
-		System.arraycopy(mux(Arrays.copyOfRange(x, 0, s), zeros(s), sign), 0, res, 0, s);
-		//System.arraycopy(sign, s, res, s, s);
-		System.arraycopy(mux(Arrays.copyOfRange(x, s, x.length), Arrays.copyOfRange(x, 0, x.length)
-				, sign), 0, res, s, x.length-s);
+		System.arraycopy(mux(Arrays.copyOfRange(x, 0, s), zeros(s), sign), 0,
+				res, 0, s);
+		// System.arraycopy(sign, s, res, s, s);
+		System.arraycopy(
+				mux(Arrays.copyOfRange(x, s, x.length),
+						Arrays.copyOfRange(x, 0, x.length), sign), 0, res, s,
+						x.length - s);
 		return res;
 	}
 
-	//tested
-	public T[] conditionalRightPublicShift(T[] x, int s, T sign) throws Exception {
-		assert(x!= null && s < x.length) : "rightshift: bad inputs";
+	public T[] conditionalRightPublicShift(T[] x, int s, T sign) {
+		assert (x != null && s < x.length) : "rightshift: bad inputs";
 
 		T res[] = env.newTArray(x.length);
-		System.arraycopy(mux(Arrays.copyOfRange(x, 0, x.length-s), Arrays.copyOfRange(x, s, x.length), sign), 0, res, 0, x.length-s);
-		System.arraycopy(mux(Arrays.copyOfRange(x, x.length-s, x.length), zeros(s), sign), 0, res, x.length-s, s);
+		System.arraycopy(
+				mux(Arrays.copyOfRange(x, 0, x.length - s),
+						Arrays.copyOfRange(x, s, x.length), sign), 0, res, 0,
+						x.length - s);
+		System.arraycopy(
+				mux(Arrays.copyOfRange(x, x.length - s, x.length), zeros(s),
+						sign), 0, res, x.length - s, s);
 		return res;
 	}
 
-
-	//tested
-	public T[] leftPrivateShift(T[] x, T[] lengthToShift) throws Exception {
+	public T[] leftPrivateShift(T[] x, T[] lengthToShift) {
 		T[] res = Arrays.copyOf(x, x.length);
 
-		for(int i = 0; ((1<<i) < x.length) && i < lengthToShift.length; ++i)
-			res = conditionalLeftPublicShift(res, (1<<i), lengthToShift[i]);
+		for (int i = 0; ((1 << i) < x.length) && i < lengthToShift.length; ++i)
+			res = conditionalLeftPublicShift(res, (1 << i), lengthToShift[i]);
 		T clear = SIGNAL_ZERO;
-		for(int i = 0; i < lengthToShift.length; ++i) {
-			if((1<<i) >= x.length)
+		for (int i = 0; i < lengthToShift.length; ++i) {
+			if ((1 << i) >= x.length)
 				clear = or(clear, lengthToShift[i]);
 		}
 
 		return mux(res, zeros(x.length), clear);
 	}
 
-	//tested
-	public T[] rightPrivateShift(T[] x, T[] lengthToShift) throws Exception {
+	public T[] rightPrivateShift(T[] x, T[] lengthToShift) {
 		T[] res = Arrays.copyOf(x, x.length);
 
-		for(int i = 0; ((1<<i) < x.length) && i < lengthToShift.length; ++i)
-			res = conditionalRightPublicShift(res, (1<<i), lengthToShift[i]);
+		for (int i = 0; ((1 << i) < x.length) && i < lengthToShift.length; ++i)
+			res = conditionalRightPublicShift(res, (1 << i), lengthToShift[i]);
 		T clear = SIGNAL_ZERO;
-		for(int i = 0; i < lengthToShift.length; ++i) {
-			if((1<<i) >= x.length)
+		for (int i = 0; i < lengthToShift.length; ++i) {
+			if ((1 << i) >= x.length)
 				clear = or(clear, lengthToShift[i]);
 		}
 
 		return mux(res, zeros(x.length), clear);
 	}
 
-	T compare(T x, T y, T cin) throws Exception {
+	T compare(T x, T y, T cin) {
 		T t1 = xor(x, cin);
 		T t2 = xor(y, cin);
 		t1 = and(t1, t2);
 		return xor(x, t1);
 	}
 
-	public T compare(T[] x, T[] y) throws Exception {
-		assert(x != null && y != null && x.length == y.length) : "compare: bad inputs.";
+	public T compare(T[] x, T[] y) {
+		assert (x != null && y != null && x.length == y.length) : "compare: bad inputs.";
 
 		T t = env.newT(false);
 		for (int i = 0; i < x.length; i++) {
@@ -346,15 +357,14 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		return t;
 	}
 
-	protected T eq(T x, T y) {
-		assert(x != null && y!= null) : "CircuitLib.eq: bad inputs";
+	public T eq(T x, T y) {
+		assert (x != null && y != null) : "CircuitLib.eq: bad inputs";
 
 		return not(xor(x, y));
 	}
 
-	//tested
-	public T eq(T[] x, T[] y) throws Exception {
-		assert(x != null && y != null && x.length == y.length) : "CircuitLib.eq[]: bad inputs.";
+	public T eq(T[] x, T[] y) {
+		assert (x != null && y != null && x.length == y.length) : "CircuitLib.eq[]: bad inputs.";
 
 		T res = env.newT(true);
 		for (int i = 0; i < x.length; i++) {
@@ -365,134 +375,200 @@ public class IntegerLib<T> extends CircuitLib<T> {
 		return res;
 	}
 
-	public T[] twosComplement(T[] x) throws Exception {
+	public T[] twosComplement(T[] x) {
 		T reachOne = SIGNAL_ZERO;
 		T[] result = env.newTArray(x.length);
-		for(int i = 0; i < x.length; ++i) {
+		for (int i = 0; i < x.length; ++i) {
 			result[i] = xor(x[i], reachOne);
 			reachOne = or(reachOne, x[i]);
 		}
 		return result;
 	}
 
-	public T[] hammingDistance(T[] x, T[] y) throws Exception {
+	public T[] hammingDistance(T[] x, T[] y) {
 		T[] a = xor(x, y);
 		return numberOfOnes(a);
-		//return a;
 	}
 
-	public T[] numberOfOnes(T[] t) throws Exception {
-		if(t.length == 0) {
+	public T[] numberOfOnes(T[] t) {
+		if (t.length == 0) {
 			T[] res = env.newTArray(1);
 			res[0] = SIGNAL_ZERO;
 			return res;
 		}
-		if(t.length == 1) {
+		if (t.length == 1) {
 			return t;
-		}
-		else {
+		} else {
 			int length = 1;
 			int w = 1;
-			while(length <= t.length){length<<=1;w++;}
-			length>>=1;
+			while (length <= t.length) {
+				length <<= 1;
+				w++;
+			}
+			length >>= 1;
 
-			T[] res1 = numberOfOnesN(Arrays.copyOfRange(t, 0, length));
-			T[] res2 = numberOfOnes(Arrays.copyOfRange(t, length, t.length));
-			return add(padSignal(res1, w), padSignal(res2, w));
+				T[] res1 = numberOfOnesN(Arrays.copyOfRange(t, 0, length));
+				T[] res2 = numberOfOnes(Arrays.copyOfRange(t, length, t.length));
+				return add(padSignal(res1, w), padSignal(res2, w));
 		}
 	}
-	public T[] numberOfOnesN(T[] t) throws Exception {
-		assert(t!= null): "numberOfOnes : bad input";
+
+	public T[] numberOfOnesN(T[] t) {
+		assert (t != null) : "numberOfOnes : bad input";
 
 		T[] x = Arrays.copyOf(t, t.length);
-		for(int width = 1; width < x.length; width*=2)
-			for(int i = 0; i < x.length; i+=(2*width)) {
-				T[] re = padSignal(unSignedAdd(Arrays.copyOfRange(x, i, i+width), 
-						Arrays.copyOfRange(x, i+width,i + 2*width)), 2*width);
-				System.arraycopy(re, 0, x, i, 2*width);
+		for (int width = 1; width < x.length; width *= 2)
+			for (int i = 0; i < x.length; i += (2 * width)) {
+				T[] re = padSignal(
+						unSignedAdd(Arrays.copyOfRange(x, i, i + width),
+								Arrays.copyOfRange(x, i + width, i + 2 * width)),
+								2 * width);
+				System.arraycopy(re, 0, x, i, 2 * width);
 			}
 
-		return x; 
+		return x;
 
 	}
 
-	public T[] unSignedAdd(T[] x, T[] y) throws Exception {
-		assert(x != null && y != null && x.length == y.length) : "add: bad inputs.";
-		T[] res = env.newTArray(x.length+1);
+	public T[] unSignedAdd(T[] x, T[] y) {
+		assert (x != null && y != null && x.length == y.length) : "add: bad inputs.";
+		T[] res = env.newTArray(x.length + 1);
 
 		T[] t = add(x[0], y[0], env.newT(false));
 		res[0] = t[S];
-		for (int i = 0; i < x.length-1; i++) {
-			t = add(x[i+1], y[i+1], t[COUT]);
-			res[i+1] = t[S];
+		for (int i = 0; i < x.length - 1; i++) {
+			t = add(x[i + 1], y[i + 1], t[COUT]);
+			res[i + 1] = t[S];
 		}
-		res[res.length-1] = t[COUT];
+		res[res.length - 1] = t[COUT];
 		return res;
 	}
 
-	public T[] unSignedMultiply(T[] x, T[] y) throws Exception {
-		assert(x != null && y!= null) : "multiply: bad inputs";	
+	public T[] unSignedMultiply(T[] x, T[] y) {
+		assert (x != null && y != null) : "multiply: bad inputs";
 
-		T[] res = zeros(x.length+y.length);
+		T[] res = zeros(x.length + y.length);
 		T[] zero = zeros(x.length);
-		T[] longerX = Arrays.copyOf(x, x.length);
-		System.arraycopy(mux(zero, longerX, y[0]), 0, res, 0, x.length);
 
-		for(int i = 1; i < y.length; ++i) {
-			T[] toAdd = mux(zero, longerX, y[i]);
-			T[] tmp = unSignedAdd(Arrays.copyOfRange(res, i, i+x.length), toAdd);
-			System.arraycopy(tmp, 0, res, i, tmp.length);
+		T[] toAdd = mux(zero, x, y[0]);
+		System.arraycopy(toAdd, 0, res, 0, toAdd.length);
+
+		for (int i = 1; i < y.length; ++i) {
+			toAdd = Arrays.copyOfRange(res, i, i + x.length);
+			toAdd = unSignedAdd(toAdd, mux(zero, x, y[i]));
+			System.arraycopy(toAdd, 0, res, i, toAdd.length);
+
 		}
 		return res;
+
 	}
 
-	public T[] karatsubaMultiply(T[]x, T[]y) throws Exception {	
-		if(x.length <= 18)
+	public T[] karatsubaMultiply(T[] x, T[] y) {
+		if (x.length <= 18)
 			return unSignedMultiply(x, y);
 
 		int length = (x.length + y.length);
 
-		T[] xlo = Arrays.copyOfRange(x, 0, x.length/2);
-		T[] xhi = Arrays.copyOfRange(x, x.length/2, x.length);
-		T[] ylo = Arrays.copyOfRange(y, 0, y.length/2);
-		T[] yhi = Arrays.copyOfRange(y, y.length/2, y.length);
+		T[] xlo = Arrays.copyOfRange(x, 0, x.length / 2);
+		T[] xhi = Arrays.copyOfRange(x, x.length / 2, x.length);
+		T[] ylo = Arrays.copyOfRange(y, 0, y.length / 2);
+		T[] yhi = Arrays.copyOfRange(y, y.length / 2, y.length);
 
-
-		int nextlength = Math.max(x.length/2, x.length-x.length/2);
-		//nextlength = nextlength/2+nextlength%2;
+		int nextlength = Math.max(x.length / 2, x.length - x.length / 2);
+		// nextlength = nextlength/2+nextlength%2;
 		xlo = padSignal(xlo, nextlength);
 		xhi = padSignal(xhi, nextlength);
 		ylo = padSignal(ylo, nextlength);
 		yhi = padSignal(yhi, nextlength);
 
-
 		T[] z0 = karatsubaMultiply(xlo, ylo);
 		T[] z2 = karatsubaMultiply(xhi, yhi);
-		//System.out.println(z0.length+" "+z2.length);
+		// System.out.println(z0.length+" "+z2.length);
 
 		T[] z1 = sub(
 				padSignal(
-						karatsubaMultiply(
-								unSignedAdd(xlo, xhi),
-								unSignedAdd(ylo, yhi)
-								)
-								, 2*nextlength+2)
-								, padSignal(
-										unSignedAdd( padSignal(z2,2*nextlength), 
-												padSignal(z0,2*nextlength) ) 
-												, 2*nextlength+2)
-				);
+						karatsubaMultiply(unSignedAdd(xlo, xhi),
+								unSignedAdd(ylo, yhi)), 2 * nextlength + 2),
+								padSignal(
+										unSignedAdd(padSignal(z2, 2 * nextlength),
+												padSignal(z0, 2 * nextlength)),
+												2 * nextlength + 2));
 		z1 = padSignal(z1, length);
-		z1 = leftPublicShift(z1, x.length/2);
+		z1 = leftPublicShift(z1, x.length / 2);
 
 		T[] z0Pad = padSignal(z0, length);
 		T[] z2Pad = padSignal(z2, length);
-		z2Pad = leftPublicShift(z2Pad, 2*(x.length/2));
+		z2Pad = leftPublicShift(z2Pad, 2 * (x.length / 2));
 		return add(add(z0Pad, z1), z2Pad);
 	}
-	
-	public T[] min(T[] x, T[] y) throws Exception {
+
+	public T[] min(T[] x, T[] y) {
 		T leq = leq(x, y);
 		return mux(y, x, leq);
+	}
+
+	public T[] sqrt(T[] a) {
+		int newLength = a.length;
+		if (newLength % 2 == 1)
+			newLength++;
+		T[] x = padSignal(a, newLength);
+
+		T[] rem = zeros(x.length);
+		T[] root = zeros(x.length);
+		for (int i = 0; i < x.length / 2; i++) {
+			root = leftShift(root);
+			rem = add(leftPublicShift(rem, 2),
+					rightPublicShift(x, x.length - 2));
+			x = leftPublicShift(x, 2);
+			T[] oldRoot = root;
+			root = copy(root);
+			root[0] = SIGNAL_ONE;
+			// root= incrementByOne(root);
+			T[] remMinusRoot = sub(rem, root);
+			T isRootSmaller = not(remMinusRoot[remMinusRoot.length - 1]);
+			rem = mux(rem, remMinusRoot, isRootSmaller);
+			root = mux(oldRoot, incrementByOne(root), isRootSmaller);
+		}
+		return padSignal(rightShift(root), a.length);
+	}
+
+	public T[] inputOfAlice(double d) {
+		return env.inputOfAlice(Utils.fromLong((long) d, width));
+	}
+
+	public T[] inputOfBob(double d) {
+		return env.inputOfBob(Utils.fromLong((long) d, width));
+	}
+
+	@Override
+	public CompEnv<T> getEnv() {
+		return env;
+	}
+
+	@Override
+	public T[] toSecureInt(T[] a, IntegerLib<T> lib) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public T[] toSecureFloat(T[] a, FloatLib<T> lib) {
+		return null;
+	}
+
+	@Override
+	public T[] toSecureFixPoint(T[] a, FixedPointLib<T> lib) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double outputToAlice(T[] a) {
+		return Utils.toInt(env.outputToAlice(a));
+	}
+
+	@Override
+	public int numBits() {
+		return width;
 	}
 }

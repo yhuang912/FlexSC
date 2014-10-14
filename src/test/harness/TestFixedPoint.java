@@ -1,55 +1,49 @@
 package test.harness;
 
-import flexsc.*;
-import gc.halfANDs.GCEva;
-import gc.halfANDs.GCGen;
-
 import org.junit.Assert;
 
-import pm.PMCompEnv;
-import cv.CVCompEnv;
+import util.Utils;
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.PMCompEnv;
+import flexsc.Party;
 
+public class TestFixedPoint<T> extends TestHarness<T> {
+	public final int width = 32, offset = 16;
 
-public class TestFixedPoint<T> {
-	final int len = 32;
-	final int offset = 20;
 	public abstract class Helper {
-		Mode m;
-		double a,b;
-		public Helper(double a, double b, Mode m) {
-			this.m = m;
+		double a, b;
+
+		public Helper(double a, double b) {
 			this.b = b;
 			this.a = a;
 		}
-		public abstract T[] secureCompute(T[] a, T[] b, int offset, CompEnv<T> env) throws Exception;
+
+		public abstract T[] secureCompute(T[] a, T[] b, int offset,
+				CompEnv<T> env) throws Exception;
+
 		public abstract double plainCompute(double a, double b);
 	}
-	
+
 	class GenRunnable extends network.Server implements Runnable {
 		Helper h;
 		double z;
 
-		GenRunnable (Helper h) {
+		GenRunnable(Helper h) {
 			this.h = h;
 		}
 
 		public void run() {
 			try {
 				listen(54321);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> env = CompEnv.getEnv(m, Party.Alice, is, os);
 
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
-
-				T[] fgc1 = gen.inputOfAliceFixedPoint(h.a, len, offset);
-				T[] fgc2 = gen.inputOfBobFixedPoint(0, len, offset);
-				T[] re = h.secureCompute(fgc1, fgc2, offset, gen);
-									
-				z = gen.outputToAliceFixedPoint(re, offset);
+				T[] f1 = env.inputOfAlice(Utils
+						.fromFixPoint(h.a, width, offset));
+				T[] f2 = env.inputOfBob(Utils.fromFixPoint(0, width, offset));
+				T[] re = h.secureCompute(f1, f2, offset, env);
+				z = Utils.toFixPoint(env.outputToAlice(re), offset);
 
 				disconnect();
 			} catch (Exception e) {
@@ -61,31 +55,35 @@ public class TestFixedPoint<T> {
 
 	class EvaRunnable extends network.Client implements Runnable {
 		Helper h;
+		public double andgates;
+		public double encs;
 
-		EvaRunnable (Helper h) {
+		EvaRunnable(Helper h) {
 			this.h = h;
 		}
 
 		public void run() {
 			try {
-				connect("localhost", 54321);	
+				connect("localhost", 54321);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
 
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
+				T[] f1 = env.inputOfAlice(Utils.fromFixPoint(0, width, offset));
+				T[] f2 = env.inputOfBob(Utils.fromFixPoint(h.b, width, offset));
 
-				
-				T[] fgc1 = eva.inputOfAliceFixedPoint(0, len, offset);
-				T[] fgc2 = eva.inputOfBobFixedPoint(h.b, len, offset);
-				T[] re = h.secureCompute(fgc1, fgc2, offset, eva);
-									
-				eva.outputToAliceFixedPoint(re, offset);
+				if (m == Mode.COUNT) {
+					((PMCompEnv) env).statistic.flush();
+					;
+				}
+				T[] re = h.secureCompute(f1, f2, offset, env);
+				if (m == Mode.COUNT) {
+					((PMCompEnv) env).statistic.finalize();
+					andgates = ((PMCompEnv) env).statistic.andGate;
+					encs = ((PMCompEnv) env).statistic.NumEncAlice;
+				}
 
-				
+				env.outputToAlice(re);
+
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -94,19 +92,30 @@ public class TestFixedPoint<T> {
 		}
 	}
 
-	public void runThreads(Helper h) throws Exception {
+	public void runThreads(Helper h, double error) throws Exception {
 		GenRunnable gen = new GenRunnable(h);
-		EvaRunnable eva = new EvaRunnable(h);
+		EvaRunnable env = new EvaRunnable(h);
 
 		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start(); Thread.sleep(1);
+		Thread tEva = new Thread(env);
+		tGen.start();
+		Thread.sleep(1);
 		tEva.start();
 		tGen.join();
 
-		
-		if(Math.abs(h.plainCompute(h.a, h.b)-gen.z)>1E-5)
-			System.out.print(Math.abs(h.plainCompute(h.a, h.b)-gen.z)+" "+gen.z+" "+h.plainCompute(h.a, h.b)+" "+h.a+" "+h.b+"\n");
-		Assert.assertTrue(Math.abs(h.plainCompute(h.a, h.b)-gen.z)<1E-5);
+		if (m == Mode.COUNT) {
+			System.out.println(env.andgates + " " + env.encs);
+		} else {
+			if (Math.abs(h.plainCompute(h.a, h.b) - gen.z) > error)
+				System.out.print(Math.abs(h.plainCompute(h.a, h.b) - gen.z)
+						+ " " + gen.z + " " + h.plainCompute(h.a, h.b) + " "
+						+ h.a + " " + h.b + "\n");
+			Assert.assertTrue(Math.abs(h.plainCompute(h.a, h.b) - gen.z) < error);
+		}
 	}
+
+	public void runThreads(Helper h) throws Exception {
+		runThreads(h, 1E-5);
+	}
+
 }

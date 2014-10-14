@@ -1,54 +1,51 @@
 package test.harness;
 
-import objects.Float.Representation;
-import gc.halfANDs.GCEva;
-import gc.halfANDs.GCGen;
-import flexsc.*;
-
 import org.junit.Assert;
 
-import pm.PMCompEnv;
-import cv.CVCompEnv;
+import util.Utils;
+import circuits.arithmetic.FloatLib;
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.PMCompEnv;
+import flexsc.Party;
 
+public class TestFloat<T> extends TestHarness<T> {
+	public static int widthV = 24, widthP = 8;
 
-public class TestFloat<T> {
 	public abstract class Helper {
-		double a,b;
-		Mode m;
-		public Helper(double a, double b, Mode m) {
-			this.m = m;
+		double a, b;
+
+		public Helper(double a, double b) {
 			this.b = b;
 			this.a = a;
 		}
-		public abstract Representation<T> secureCompute(Representation<T> a, Representation<T> b, CompEnv<T> env) throws Exception;
+
+		public abstract T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+				throws Exception;
+
 		public abstract double plainCompute(double a, double b);
 	}
-	
+
 	class GenRunnable extends network.Server implements Runnable {
 		Helper h;
 		double z;
 
-		GenRunnable (Helper h) {
+		GenRunnable(Helper h) {
 			this.h = h;
 		}
 
 		public void run() {
 			try {
 				listen(54321);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
 
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT)
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);
-				
-				Representation<T> fgc1 = (Representation<T>) gen.inputOfAliceFloatPoint(h.a, 23, 9);
-				Representation<T> fgc2 = (Representation<T>) gen.inputOfBobFloatPoint(0, 23, 9);
-				Representation<T> re = h.secureCompute(fgc1, fgc2, gen);
-									
-				z = gen.outputToAliceFloatPoint(re);
+				FloatLib<T> lib = new FloatLib<T>(gen, widthV, widthP);
+				T[] f1 = lib.inputOfAlice(h.a);
+				T[] f2 = lib.inputOfBob(0);
+				T[] re = h.secureCompute(f1, f2, lib);
+				Assert.assertTrue(re.length == widthP + widthV + 1);
+				z = Utils.toFloat(gen.outputToAlice(re), widthV, widthP);
 
 				disconnect();
 			} catch (Exception e) {
@@ -60,29 +57,37 @@ public class TestFloat<T> {
 
 	class EvaRunnable extends network.Client implements Runnable {
 		Helper h;
+		public double andgates;
+		public double encs;
 
-		EvaRunnable (Helper h) {
+		EvaRunnable(Helper h) {
 			this.h = h;
 		}
 
 		public void run() {
 			try {
-				connect("localhost", 54321);	
+				connect("localhost", 54321);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
 
-				CompEnv<T> eva = null;
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is, os, Party.Bob);
-				else if(h.m == Mode.COUNT)
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
+				FloatLib<T> lib = new FloatLib<T>(env, widthV, widthP);
+				T[] f1 = lib.inputOfAlice(0);
+				T[] f2 = lib.inputOfBob(h.b);
+				if (m == Mode.COUNT) {
+					((PMCompEnv) env).statistic.flush();
+					;
+				}
 
-				Representation<T> fgc1 = eva.inputOfAliceFloatPoint(0, 23, 9);
-				Representation<T> fgc2 = eva.inputOfBobFloatPoint(h.b, 23, 9);
-				Representation<T> re = h.secureCompute(fgc1, fgc2, eva);
-									
-				eva.outputToAliceFloatPoint(re);
-				
+				T[] re = h.secureCompute(f1, f2, lib);
+
+				if (m == Mode.COUNT) {
+					((PMCompEnv) env).statistic.finalize();
+					andgates = ((PMCompEnv) env).statistic.andGate;
+					encs = ((PMCompEnv) env).statistic.NumEncAlice;
+				}
+
+				env.outputToAlice(re);
+
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -93,16 +98,28 @@ public class TestFloat<T> {
 
 	public void runThreads(Helper h) throws Exception {
 		GenRunnable gen = new GenRunnable(h);
-		EvaRunnable eva = new EvaRunnable(h);
+		EvaRunnable env = new EvaRunnable(h);
 
 		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start(); Thread.sleep(1);
+		Thread tEva = new Thread(env);
+		tGen.start();
+		Thread.sleep(1);
 		tEva.start();
 		tGen.join();
+		if (m == Mode.COUNT) {
+			System.out.println(env.andgates + " " + env.encs);
+		} else {
+			double error = 0;
+			if (gen.z != 0)
+				error = Math.abs((h.plainCompute(h.a, h.b) - gen.z) / gen.z);
+			else
+				error = Math.abs((h.plainCompute(h.a, h.b) - gen.z));
 
-		if(Math.abs(h.plainCompute(h.a, h.b)-gen.z)>3E-6)
-			System.out.print(gen.z+" "+h.plainCompute(h.a, h.b)+" "+h.a+" "+h.b+"\n");
-		Assert.assertTrue(Math.abs(h.plainCompute(h.a, h.b)-gen.z)<=3E-6);
+			if (Math.abs((h.plainCompute(h.a, h.b) - gen.z) / gen.z) > 1E-3)
+				System.out.print(error + " " + gen.z + " "
+						+ h.plainCompute(h.a, h.b) + " " + h.a + " " + h.b
+						+ "\n");
+			Assert.assertTrue(error <= 1E-3);
+		}
 	}
 }

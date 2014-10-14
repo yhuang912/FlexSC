@@ -1,55 +1,48 @@
 package test.harness;
 
-import flexsc.*;
-import gc.halfANDs.GCEva;
-import gc.halfANDs.GCGen;
-
 import org.junit.Assert;
 
-import pm.PMCompEnv;
-import cv.CVCompEnv;
-import test.Utils;
+import util.Utils;
+import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.PMCompEnv;
+import flexsc.Party;
 
+public class Test_2Input1Output<T> extends TestHarness<T> {
 
-public class Test_2Input1Output<T> {
-	
 	public abstract class Helper {
 		int intA, intB;
 		boolean[] a;
 		boolean[] b;
-		Mode m;
-		public Helper(int aa, int bb, Mode m) {
-			this.m = m;
+
+		public Helper(int aa, int bb) {
 			intA = aa;
 			intB = bb;
 
 			a = Utils.fromInt(aa, 32);
 			b = Utils.fromInt(bb, 32);
 		}
-		public abstract T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception;
+
+		public abstract T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e)
+				throws Exception;
+
 		public abstract int plainCompute(int x, int y);
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
 		boolean[] z;
 		Helper h;
-		GenRunnable (Helper h) {
+
+		GenRunnable(Helper h) {
 			this.h = h;
 		}
 
 		public void run() {
 			try {
 				listen(54321);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
 
-
-				CompEnv<T> gen = null;
-				if(h.m == Mode.REAL)
-					gen = (CompEnv<T>) new GCGen(is, os);
-				else if(h.m == Mode.VERIFY)
-					gen = (CompEnv<T>) new CVCompEnv(is, os, Party.Alice);
-				else if(h.m == Mode.COUNT) 
-					gen = (CompEnv<T>) new PMCompEnv(is, os, Party.Alice);						
-				
 				T[] a = gen.inputOfAlice(h.a);
 				T[] b = gen.inputOfBob(new boolean[32]);
 
@@ -68,30 +61,34 @@ public class Test_2Input1Output<T> {
 
 	class EvaRunnable extends network.Client implements Runnable {
 		Helper h;
-		EvaRunnable (Helper h) {
+		public double andgates;
+		public double encs;
+
+		EvaRunnable(Helper h) {
 			this.h = h;
 		}
 
 		public void run() {
 			try {
-				connect("localhost", 54321);				
+				connect("localhost", 54321);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
 
-				CompEnv<T> eva = null;
+				T[] a = env.inputOfAlice(new boolean[32]);
+				T[] b = env.inputOfBob(h.b);
 
-				if(h.m == Mode.REAL)
-					eva = (CompEnv<T>) new GCEva(is, os);
-				else if(h.m == Mode.VERIFY)
-					eva = (CompEnv<T>) new CVCompEnv(is ,os, Party.Bob);
-				else if (h.m == Mode.COUNT) 
-					eva = (CompEnv<T>) new PMCompEnv(is, os, Party.Bob);
+				if (m == Mode.COUNT) {
+					((PMCompEnv) env).statistic.flush();
+					;
+				}
+				T[] d = h.secureCompute(a, b, env);
+				if (m == Mode.COUNT) {
+					((PMCompEnv) env).statistic.finalize();
+					andgates = ((PMCompEnv) env).statistic.andGate;
+					encs = ((PMCompEnv) env).statistic.NumEncAlice;
+				}
 
-				
-				T[] a = eva.inputOfAlice(new boolean[32]);
-				T[] b = eva.inputOfBob(h.b);
-
-				T[] d = h.secureCompute(a, b, eva);
-				
-				eva.outputToAlice(d);
+				env.outputToAlice(d);
 				os.flush();
 
 				disconnect();
@@ -104,18 +101,23 @@ public class Test_2Input1Output<T> {
 
 	public void runThreads(Helper h) throws Exception {
 		GenRunnable gen = new GenRunnable(h);
-		EvaRunnable eva = new EvaRunnable(h);
+		EvaRunnable env = new EvaRunnable(h);
 		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start(); Thread.sleep(5);
+		Thread tEva = new Thread(env);
+		tGen.start();
+		Thread.sleep(5);
 		tEva.start();
 		tGen.join();
 		tEva.join();
 
-		//System.out.println(Arrays.toString(gen.z));
-		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toSignedInt(gen.z));
-	}
+		if (m == Mode.COUNT) {
+			System.out.println(env.andgates + " " + env.encs);
+		} else {
+			Assert.assertEquals(h.plainCompute(h.intA, h.intB),
+					Utils.toSignedInt(gen.z));
+		}
+		// System.out.println(Arrays.toString(gen.z));
 
-	
+	}
 
 }

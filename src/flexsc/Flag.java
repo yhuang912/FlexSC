@@ -1,14 +1,17 @@
+// Copyright (C) 2013 by Yan Huang <yhuang@cs.umd.edu>
+// 					 and Xiao Shaun Wang <wangxiao@cs.umd.edu>
+
 package flexsc;
 
+import test.StopWatch;
+
 public class Flag {
-	public static long bandwidth = 0;
-	public static long TotalTime = 0;
-	public static long OTTotalTime = 0;
-	public static long OTIOTime = 0;
-	public static long GarbleTime = 0;
-	public static long GargleIOTime = 0;
+	public static boolean CountTime = false;
+	public static StopWatch sw = new StopWatch(CountTime);
+	public static boolean countIO = false;
+	public static boolean FakeOT = true;
+
 	public Flag() {
 		// TODO Auto-generated constructor stub
 	}
-
 }
