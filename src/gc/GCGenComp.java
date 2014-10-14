@@ -8,7 +8,6 @@ import java.security.SecureRandom;
 import ot.FakeOTSender;
 import ot.OTExtSender;
 import ot.OTSender;
-import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
 
@@ -42,13 +41,10 @@ public abstract class GCGenComp extends GCCompEnv{
 	public GCSignal inputOfAlice(boolean in) {
 		Flag.sw.startOT();
 		GCSignal[] label = genPair();
+		Flag.sw.startOTIO();
 		label[in ? 1 : 0].send(os);
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		flush();
+		Flag.sw.stopOTIO();
 		Flag.sw.stopOT();
 		return label[0];
 	}
@@ -74,14 +70,11 @@ public abstract class GCGenComp extends GCCompEnv{
 			pairs[i] = genPair();
 			result[i] = pairs[i][0];
 		}
+		Flag.sw.startOTIO();
 		for (int i = 0; i < x.length; ++i)
 			pairs[i][x[i] ? 1 : 0].send(os);
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		flush();
+		Flag.sw.stopOTIO();
 		Flag.sw.stopOT();
 		return result;
 	}
@@ -110,12 +103,7 @@ public abstract class GCGenComp extends GCCompEnv{
 	public boolean outputToAlice(GCSignal out) {
 		if (gatesRemain) {
 			gatesRemain = false;
-			try {
-				os.flush();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			flush();
 		}
 		if (out.isPublic())
 			return out.v;
@@ -148,12 +136,7 @@ public abstract class GCGenComp extends GCCompEnv{
 			if (!out[i].isPublic())
 				out[i].send(os);
 		}
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		flush();
 
 		for (int i = 0; i < result.length; ++i)
 			result[i] = false;
@@ -186,11 +169,5 @@ public abstract class GCGenComp extends GCCompEnv{
 			return new GCSignal(!a.v);
 		else
 			return R.xor(a);
-	}
-
-	@Override
-	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os)
-			throws Exception {
-		return null;
 	}
 }

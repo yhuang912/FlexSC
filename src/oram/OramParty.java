@@ -1,15 +1,10 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package oram;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.Security;
 import java.util.Arrays;
 
-import rand.ISAACProvider;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
@@ -29,16 +24,6 @@ public abstract class OramParty<T> {
 	public Party p;
 	public Mode mode;
 
-	static protected SecureRandom rng;
-	static {
-		Security.addProvider(new ISAACProvider());
-		try {
-			rng = SecureRandom.getInstance("ISAACRandom");
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	public BucketLib<T> lib;
 	boolean[] dummyArray;
 
@@ -116,11 +101,7 @@ public abstract class OramParty<T> {
 		return lib.xor(s, c);
 	}
 
-	public Block<T> prepareBlock(PlainBlock clientBlock, PlainBlock serverBlock/*
-																				 * ,
-																				 * PlainBlock
-																				 * randomBlock
-																				 */) {
+	public Block<T> prepareBlock(PlainBlock clientBlock, PlainBlock serverBlock) {
 		Block<T> s = inputBlockOfServer(serverBlock);
 		Block<T> c = inputBlockOfClient(clientBlock);
 		return lib.xor(s, c);
@@ -170,12 +151,7 @@ public abstract class OramParty<T> {
 
 	public Block<T>[] inputBucketOfClient(PlainBlock[] b) {
 		T[] TArray = env.inputOfAlice(PlainBlock.toBooleanArray(b));
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		env.flush();
 		return toBlocks(TArray, lengthOfIden, lengthOfPos, lengthOfData,
 				b.length);
 	}
@@ -200,12 +176,7 @@ public abstract class OramParty<T> {
 		PlainBlock[][] result = new PlainBlock[b.length][];
 		for (int i = 0; i < b.length; ++i)
 			result[i] = outputBucket(b[i]);
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		env.flush();
 		return result;
 	}
 
@@ -234,12 +205,12 @@ public abstract class OramParty<T> {
 
 		PlainBlock result = getDummyBlock(true);
 		for (int i = 0; i < lengthOfIden; ++i)
-			result.iden[i] = rng.nextBoolean();
+			result.iden[i] = CompEnv.rnd.nextBoolean();
 		for (int i = 0; i < lengthOfPos; ++i)
-			result.pos[i] = rng.nextBoolean();
+			result.pos[i] = CompEnv.rnd.nextBoolean();
 		for (int i = 0; i < lengthOfData; ++i)
-			result.data[i] = rng.nextBoolean();
-		result.isDummy = rng.nextBoolean();
+			result.data[i] = CompEnv.rnd.nextBoolean();
+		result.isDummy = CompEnv.rnd.nextBoolean();
 		return result;
 	}
 

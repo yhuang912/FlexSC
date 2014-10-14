@@ -1,7 +1,6 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package oram;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import flexsc.CompEnv;
@@ -94,12 +93,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 		lib.add(scQueue, b);
 
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		env.flush();
 		ControlEviction();
 	}
 

@@ -64,7 +64,7 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 		if (p == Party.Alice) {
 			boolean[] pos = new boolean[lengthOfPos];
 			for (int i = 0; i < lengthOfPos; ++i) {
-				pos[i] = rng.nextBoolean();
+				pos[i] = CompEnv.rnd.nextBoolean();
 				if (pos[i])
 					os.write(1);
 				else
@@ -141,12 +141,8 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 		for (int i = 0; i < randomPath.length; ++i) {
 			randomPath[i] = randomBucket(blocks[i].length);
 		}
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		env.flush();
+		
 		randomSCPath = inputPathOfServer(randomPath);
 
 		PlainBlock[][] result = outputBuckets(lib.xor(blocks, randomSCPath));

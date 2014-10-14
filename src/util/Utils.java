@@ -4,38 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import flexsc.CompEnv;
-import flexsc.Party;
-
 public class Utils {
-	public static <T> void print(CompEnv<T> env, String name, T[] data,
-			T[] data2, T con) throws Exception {
-		int a = toInt(env.outputToAlice(data));
-		int ab = toInt(env.outputToAlice(data2));
-		boolean cc = env.outputToAlice(con);
-
-		if (cc)
-			if (env.getParty() == Party.Alice && a != 0)
-				System.out.println(name + " " + a + " " + ab);
-
-	}
-
-	public static <T> void print(CompEnv<T> env, String name, T[] data)
-			throws Exception {
-		long a = toSignedInt(env.outputToAlice(data));
-
-		if (env.getParty() == Party.Alice && a != 0)
-			System.out.println(name + " " + a);
-	}
-
-	public static <T> void print(CompEnv<T> env, String name, T data)
-			throws Exception {
-		boolean a = env.outputToAlice(data);
-
-		if (env.getParty() == Party.Alice)
-			System.out.println(name + " " + a);
-	}
-
 	public static Boolean[] toBooleanArray(boolean[] a) {
 		Boolean[] res = new Boolean[a.length];
 		for (int i = 0; i < a.length; i++)
@@ -121,12 +90,8 @@ public class Utils {
 		// +" "+toSignedInt(p));
 		BigDecimal b = new BigDecimal(result);
 		// return b.setScale(v.length/10*3,
-		// BigDecimal.ROUND_HALF_UP).doubleValue(); // 6 is should not be fixed.
-		return b.setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue(); // 6 is
-																		// should
-																		// not
-																		// be
-																		// fixed.
+		// BigDecimal.ROUND_HALF_UP).doubleValue(); 
+		return b.setScale(6, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
 
 	public static boolean[] fromFloat(double d, int widthV, int widthP) {

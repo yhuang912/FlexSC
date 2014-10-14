@@ -1,6 +1,6 @@
 package flexsc;
 
-// for compiled code
+// for compiler generated code
 public interface IWritable<T1, T2> {
 	public int numBits();
 

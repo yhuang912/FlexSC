@@ -3,10 +3,8 @@ package oram;
 
 import flexsc.CompEnv;
 
-//this should be the interface used in practice for ram model secure computation
-// it determine the best oram scheme according to size of array.
 public class SecureArray<T> {
-	static final int threshold = 128;
+	static final int threshold = 256;
 	boolean useTrivialOram = false;
 	TrivialPrivateOram<T> trivialOram = null;
 	RecursiveCircuitOram<T> circuitOram = null;

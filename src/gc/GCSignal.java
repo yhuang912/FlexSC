@@ -9,9 +9,8 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 import network.Server;
-import flexsc.Signal;
 
-public class GCSignal extends Signal {
+public class GCSignal {
 	public static final int len = 10;
 	public byte[] bytes;
 	public boolean v;
@@ -101,15 +100,5 @@ public class GCSignal extends Signal {
 		for (byte b : bytes)
 			str.append(Integer.toHexString(b & 0xff));
 		return str.toString();
-	}
-
-	@Override
-	public Signal ONE() {
-		return new GCSignal(true);
-	}
-
-	@Override
-	public Signal ZERO() {
-		return new GCSignal(false);
 	}
 }

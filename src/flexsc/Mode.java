@@ -4,5 +4,12 @@
 package flexsc;
 
 public enum Mode {
-	VERIFY, REAL, COUNT, OPT;
+	// verify the correctness of the circuit without running the protocol
+	VERIFY, 
+	//GRR3 + Free XOR
+	REAL,
+	//Simulating the protocol and count number of gates/encs
+	COUNT,
+	//Half Gates
+	OPT;
 }

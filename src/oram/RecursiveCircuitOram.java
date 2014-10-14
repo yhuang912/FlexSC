@@ -127,7 +127,6 @@ public class RecursiveCircuitOram<T> {
 
 	public T[] subIdentifier(T[] iden, OramParty<T> o) {
 		// int a = iden & ((1<<o.lengthOfIden)-1);//(iden % (1<<o.lengthOfIden))
-		// ;
 		return o.lib.padSignal(iden, o.lengthOfIden);
 	}
 

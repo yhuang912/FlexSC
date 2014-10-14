@@ -12,7 +12,16 @@ import rand.ISAACProvider;
 
 public abstract class CompEnv<T> {
 
-	public SecureRandom rnd;
+	public static SecureRandom rnd;
+	static{
+		Security.addProvider(new ISAACProvider());
+		try {
+			rnd = SecureRandom.getInstance("ISAACRandom");
+
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@SuppressWarnings("rawtypes")
 	public static CompEnv getEnv(Mode mode, Party p, InputStream is,
@@ -45,13 +54,6 @@ public abstract class CompEnv<T> {
 		this.os = os;
 		this.m = m;
 		this.p = p;
-		Security.addProvider(new ISAACProvider());
-		try {
-			rnd = SecureRandom.getInstance("ISAACRandom");
-
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public abstract T inputOfAlice(boolean in);
@@ -87,9 +89,6 @@ public abstract class CompEnv<T> {
 	public abstract T[][][] newTArray(int d1, int d2, int d3);
 
 	public abstract T newT(boolean v);
-
-	abstract public CompEnv<T> getNewInstance(InputStream in, OutputStream os)
-			throws Exception;
 
 	public Party getParty() {
 		return p;

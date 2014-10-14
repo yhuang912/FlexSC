@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import ot.FakeOTReceiver;
 import ot.OTExtReceiver;
 import ot.OTReceiver;
-import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
 
@@ -131,10 +130,5 @@ public abstract class GCEvaComp extends GCCompEnv{
 		else {
 			return new GCSignal(a);
 		}
-	}
-
-	@Override
-	public CompEnv<GCSignal> getNewInstance(InputStream in, OutputStream os) {
-		return null;
 	}
 }

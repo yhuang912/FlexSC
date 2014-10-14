@@ -34,7 +34,7 @@ public class CircuitLib<T> {
 	public T[] randBools(int length) {
 		boolean[] res = new boolean[length];
 		for (int i = 0; i < length; ++i)
-			res[i] = env.rnd.nextBoolean();
+			res[i] = CompEnv.rnd.nextBoolean();
 		T[] alice = env.inputOfAlice(res);
 		T[] bob = env.inputOfBob(res);
 		T[] resSC = xor(alice, bob);
@@ -54,7 +54,6 @@ public class CircuitLib<T> {
 		boolean[] pos = env.outputToAlice(x);
 		try {
 			if (env.getParty() == Party.Alice) {
-				// send pos to bob
 
 				env.os.write(new byte[] { (byte) pos.length });
 				byte[] tmp = new byte[pos.length];

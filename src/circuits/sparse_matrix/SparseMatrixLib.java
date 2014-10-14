@@ -117,7 +117,7 @@ public class SparseMatrixLib<T> {
 	}
 
 	public MatrixNode<T>[] matrix_vector_multiplication(MatrixNode<T>[] m, MatrixNode<T>[] vector) {
-		MatrixNode<T>[] vec = new MatrixNode[5];
+		MatrixNode<T>[] vec = getMatrixNodeArray(5);
 		for(int i = 0; i < 5; ++i) {
 			vec[i] = new MatrixNode<T>(integerlib.ones(m[0].x.length), 
 									   integerlib.toSignals(i, m[0].y.length), 
@@ -139,7 +139,7 @@ public class SparseMatrixLib<T> {
 	}
 	
 	private MatrixNode<T>[] merge(MatrixNode<T>[] m1, MatrixNode<T>[] m2) {
-		MatrixNode<T> [] res = new MatrixNode[m1.length + m2.length];
+		MatrixNode<T> [] res = getMatrixNodeArray(m1.length + m2.length);
 		for(int i = 0; i < m1.length; ++i)
 			res[i] = m1[i];
 		for(int i = 0; i < m2.length; ++i)
@@ -167,5 +167,10 @@ public class SparseMatrixLib<T> {
 		res.value = res.ilib.mux(a.value, b.value, c);
 		res.isDummy = res.ilib.mux(a.isDummy, b.isDummy, c);
 		return res;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public MatrixNode<T>[] getMatrixNodeArray(int length) {
+		return new MatrixNode[length];
 	}
 }

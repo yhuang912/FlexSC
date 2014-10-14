@@ -17,7 +17,6 @@ public class CVCompEnv extends BooleanCompEnv {
 	public Boolean inputOfAlice(boolean in) {
 		Boolean res = null;
 		try {
-			os.flush();
 			res = in;
 			if (p == Party.Alice)
 				os.write(in ? 1 : 0);
@@ -25,7 +24,7 @@ public class CVCompEnv extends BooleanCompEnv {
 				int re = is.read();
 				res = re == 1;
 			}
-			os.flush();
+			flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -78,16 +77,6 @@ public class CVCompEnv extends BooleanCompEnv {
 		return !a;
 	}
 
-	@Override
-	public Boolean ONE() {
-		return true;
-	}
-
-	@Override
-	public Boolean ZERO() {
-		return false;
-	}
-
 	public Boolean[] inputOfAlice(boolean[] in) {
 		Boolean[] res = new Boolean[in.length];
 		for (int i = 0; i < res.length; ++i)
@@ -111,11 +100,5 @@ public class CVCompEnv extends BooleanCompEnv {
 	@Override
 	public boolean[] outputToBob(Boolean[] out) {
 		return Utils.tobooleanArray(out);
-	}
-
-	@Override
-	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os)
-			throws Exception {
-		return new CVCompEnv(in, os, getParty());
 	}
 }

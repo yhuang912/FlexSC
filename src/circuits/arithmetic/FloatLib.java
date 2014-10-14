@@ -28,7 +28,7 @@ public class FloatLib<T> implements ArithmeticLib<T> {
 		return env.inputOfBob(Utils.fromFloat(d, VLength, PLength));
 	}
 
-	public T[] pack(Representation<T> f) {
+	private T[] pack(Representation<T> f) {
 		assert (f.v.length == VLength && f.p.length == PLength) : "pack: not compatiable";
 		T[] res = env.newTArray(1 + f.v.length + f.p.length);
 		res[0] = f.s;
@@ -37,7 +37,7 @@ public class FloatLib<T> implements ArithmeticLib<T> {
 		return res;
 	}
 
-	public Representation<T> unpack(T[] data) {
+	private Representation<T> unpack(T[] data) {
 		assert (data.length == VLength + PLength + 1) : "unpack: not compatiable";
 
 		T[] v = Arrays.copyOfRange(data, 1, 1 + VLength);
@@ -45,7 +45,7 @@ public class FloatLib<T> implements ArithmeticLib<T> {
 		return new Representation<T>(data[0], v, p);
 	}
 
-	public static class Representation<T> {
+	static class Representation<T> {
 		public T s;
 		public T[] v;
 		public T[] p;
@@ -113,7 +113,7 @@ public class FloatLib<T> implements ArithmeticLib<T> {
 	}
 
 	// assuming na = va*2^p, nb = vb*2^(p+pDiff)
-	public T[] addInternal(T sa, T sb, T[] va, T[] vb, T[] p, T[] pDiff) {
+	private T[] addInternal(T sa, T sb, T[] va, T[] vb, T[] p, T[] pDiff) {
 		int temp_length = 2 * VLength + 1;
 		T[] signedVa = lib.padSignal(va, temp_length);
 		T[] signedVb = lib.padSignal(vb, temp_length);

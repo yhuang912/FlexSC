@@ -5,7 +5,7 @@ import util.Utils;
 import flexsc.CompEnv;
 import flexsc.Party;
 
-public class CircuitOramLib<T> extends BucketLib<T> {// TreeBasedOramLib<T> {
+public class CircuitOramLib<T> extends BucketLib<T> {
 	int logN;
 	int loglogN;
 	int capacity;

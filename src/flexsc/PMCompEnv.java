@@ -58,8 +58,7 @@ public class PMCompEnv extends BooleanCompEnv {
 	}
 
 	public Statistics statistic;
-	Boolean t = true;
-	Boolean f = false;
+
 
 	public PMCompEnv(InputStream is, OutputStream os, Party p) {
 		super(is, os, p, Mode.COUNT);
@@ -113,16 +112,6 @@ public class PMCompEnv extends BooleanCompEnv {
 	}
 
 	@Override
-	public Boolean ONE() {
-		return t;
-	}
-
-	@Override
-	public Boolean ZERO() {
-		return f;
-	}
-
-	@Override
 	public boolean[] outputToAlice(Boolean[] out) {
 		statistic.bandwidth += 10 * out.length;
 		return Utils.tobooleanArray(out);
@@ -136,7 +125,7 @@ public class PMCompEnv extends BooleanCompEnv {
 
 	@Override
 	public Boolean[] inputOfAlice(boolean[] in) {
-
+		statistic.bandwidth += 10*in.length;
 		return Utils.toBooleanArray(in);
 	}
 
@@ -145,10 +134,5 @@ public class PMCompEnv extends BooleanCompEnv {
 		statistic.OTs += in.length;
 		statistic.bandwidth += 10 * 2 * (80 + in.length);
 		return Utils.toBooleanArray(in);
-	}
-
-	@Override
-	public CompEnv<Boolean> getNewInstance(InputStream in, OutputStream os) {
-		return new PMCompEnv(in, os, this.getParty());
 	}
 }
