@@ -1,7 +1,7 @@
 package compiledlib.stack;
 import oram.SecureArray;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 public class OramStack<T extends IWritable<T,Boolean>> {

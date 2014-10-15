@@ -1,7 +1,7 @@
 package compiledlib.queue;
 import oram.CircuitOram;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 public class Queue<T extends IWritable<T,Boolean>> {

@@ -1,6 +1,5 @@
 package circuits.arithmetic;
 
-import circuits.IntegerLib;
 import flexsc.CompEnv;
 
 public interface ArithmeticLib<T> {

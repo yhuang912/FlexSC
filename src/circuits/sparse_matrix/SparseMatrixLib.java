@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import util.ComparatorTransformer;
 import util.IObjectComparator;
-import circuits.IntegerLib;
 import circuits.SortLib;
 import circuits.arithmetic.ArithmeticLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 
 public class SparseMatrixLib<T> {

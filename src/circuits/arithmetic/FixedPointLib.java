@@ -3,7 +3,6 @@ package circuits.arithmetic;
 import java.util.Arrays;
 
 import util.Utils;
-import circuits.IntegerLib;
 import flexsc.CompEnv;
 
 //http://x86asm.net/articles/fixed-point-arithmetic-and-tricks/

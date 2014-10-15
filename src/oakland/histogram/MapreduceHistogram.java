@@ -5,7 +5,7 @@ import java.util.Random;
 import oakland.KeyValue;
 import oakland.MapReduceBackEnd;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;

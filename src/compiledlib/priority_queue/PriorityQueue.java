@@ -1,7 +1,7 @@
 package compiledlib.priority_queue;
 import oram.CircuitOram;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 class PriorityQueue<T extends IWritable<T,Boolean>> {

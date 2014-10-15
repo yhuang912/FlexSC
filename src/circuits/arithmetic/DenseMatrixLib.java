@@ -1,7 +1,6 @@
 package circuits.arithmetic;
 
 import util.Pair;
-import circuits.IntegerLib;
 import flexsc.CompEnv;
 
 public class DenseMatrixLib<T> {

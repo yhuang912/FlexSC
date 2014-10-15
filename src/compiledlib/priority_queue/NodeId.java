@@ -1,6 +1,6 @@
 package compiledlib.priority_queue;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 class NodeId implements IWritable<NodeId, Boolean> {

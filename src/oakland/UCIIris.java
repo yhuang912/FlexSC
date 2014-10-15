@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-import circuits.IntegerLib;
 import circuits.arithmetic.ArithmeticLib;
 import circuits.arithmetic.FixedPointLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv.Statistics;

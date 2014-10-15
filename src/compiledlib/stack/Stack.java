@@ -1,7 +1,7 @@
 package compiledlib.stack;
 import oram.CircuitOram;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 public class Stack<T extends IWritable<T,Boolean>> {

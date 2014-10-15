@@ -1,14 +1,14 @@
-package testlibs;
+package test.testlibs;
 
-import harness.TestSortHarness;
+import test.harness.TestSortHarness;
 
 import java.util.Arrays;
 import java.util.Random;
 
 import org.junit.Test;
 
-import circuits.IntegerLib;
 import circuits.SortLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Comparator;
 
