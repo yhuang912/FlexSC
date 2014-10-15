@@ -9,7 +9,7 @@ public class Flag {
 	public static boolean CountTime = false;
 	public static StopWatch sw = new StopWatch(CountTime);
 	public static boolean countIO = false;
-	public static boolean FakeOT = true;
+	public static boolean FakeOT = false;
 
 	public Flag() {
 		// TODO Auto-generated constructor stub

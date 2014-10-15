@@ -13,7 +13,7 @@ public class TestCircuitOramRec {
 
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 4, 7);
+		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 8, 6);
 		EvaRunnable eva = new EvaRunnable("localhost", 12345);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);

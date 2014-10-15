@@ -407,27 +407,19 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 			}
 			length >>= 1;
 
-				T[] res1 = numberOfOnesN(Arrays.copyOfRange(t, 0, length));
-				T[] res2 = numberOfOnes(Arrays.copyOfRange(t, length, t.length));
-				return add(padSignal(res1, w), padSignal(res2, w));
+			T[] res1 = numberOfOnesN(Arrays.copyOfRange(t, 0, length));
+			T[] res2 = numberOfOnes(Arrays.copyOfRange(t, length, t.length));
+			return add(padSignal(res1, w), padSignal(res2, w));
 		}
 	}
-
-	public T[] numberOfOnesN(T[] t) {
-		assert (t != null) : "numberOfOnes : bad input";
-
-		T[] x = Arrays.copyOf(t, t.length);
-		for (int width = 1; width < x.length; width *= 2)
-			for (int i = 0; i < x.length; i += (2 * width)) {
-				T[] re = padSignal(
-						unSignedAdd(Arrays.copyOfRange(x, i, i + width),
-								Arrays.copyOfRange(x, i + width, i + 2 * width)),
-								2 * width);
-				System.arraycopy(re, 0, x, i, 2 * width);
-			}
-
-		return x;
-
+	
+	public T[] numberOfOnesN(T[] res) {
+		if(res.length == 1)
+			return res;
+		T[] left = numberOfOnesN(Arrays.copyOfRange(res, 0, res.length/2));
+		T[] right = numberOfOnesN(Arrays.copyOfRange(res, res.length/2, res.length));
+//		System.out.println(res.length/2+" "+left.length);
+		return unSignedAdd(left, right);
 	}
 
 	public T[] unSignedAdd(T[] x, T[] y) {
@@ -460,7 +452,6 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 
 		}
 		return res;
-
 	}
 
 	public T[] karatsubaMultiply(T[] x, T[] y) {

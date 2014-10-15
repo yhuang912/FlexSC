@@ -75,7 +75,6 @@ public class TestFloat<T> extends TestHarness<T> {
 				T[] f2 = lib.inputOfBob(h.b);
 				if (m == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
-					;
 				}
 
 				T[] re = h.secureCompute(f1, f2, lib);

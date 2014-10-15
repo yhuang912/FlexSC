@@ -23,7 +23,6 @@ public class Server {
 
 		os = new BufferedOutputStream(clientSock.getOutputStream(), bufferSize);
 		is = new BufferedInputStream(clientSock.getInputStream(), bufferSize);
-
 	}
 
 	public void disconnect() throws Exception {
