@@ -1,6 +1,6 @@
-package test.testlibs;
+package testlibs;
 
-import test.harness.TestSortHarness;
+import harness.TestSortHarness;
 
 import java.util.Arrays;
 import java.util.Random;
