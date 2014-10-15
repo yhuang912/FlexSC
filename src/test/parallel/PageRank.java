@@ -142,6 +142,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 		T[][] u = (T[][]) ((Object[]) machine.input)[0];
 		T[][] v = (T[][]) ((Object[]) machine.input)[1];
 		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
+		final IntegerLib<T> lib = new IntegerLib<>(env);
+		final FloatLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
 
 		PageRankNode<T>[] aa = (PageRankNode<T>[]) Array.newInstance(PageRankNode.class, u.length);
 		for (int i = 0; i < aa.length; i++) {
@@ -161,7 +163,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 				PageRankNode<T> agg = (PageRankNode<T>) aggNode;
 				PageRankNode<T> b = (PageRankNode<T>) bNode;
 
-				IntegerLib<T> lib = new IntegerLib<>(env);
+//				IntegerLib<T> lib = new IntegerLib<>(env);
 				PageRankNode<T> ret = new PageRankNode<T>(env);
 				ret.l = lib.add(agg.l, b.l);
 				return ret;
@@ -171,7 +173,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 			public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
 				PageRankNode<T> agg = (PageRankNode<T>) aggNode;
 				PageRankNode<T> b = (PageRankNode<T>) bNode;
-				IntegerLib<T> lib = new IntegerLib<>(env);
+//				IntegerLib<T> lib = new IntegerLib<>(env);
 				b.l = lib.mux(b.l, agg.l, b.isVertex);
 			}
 		}.setInputs(aa).compute();
@@ -185,7 +187,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 						GraphNode<T> edgeNode, T cond) {
 					PageRankNode<T> vertex = (PageRankNode<T>) vertexNode;
 					PageRankNode<T> edge = (PageRankNode<T>) edgeNode;
-					IntegerLib<T> lib = new IntegerLib<>(env);
+//					IntegerLib<T> lib = new IntegerLib<>(env);
 					edge.pr = lib.mux(vertex.pr, edge.pr, cond);
 				}
 			}.setInputs(aa).compute();
@@ -198,9 +200,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 					PageRankNode<T> agg = (PageRankNode<T>) aggNode;
 					PageRankNode<T> b = (PageRankNode<T>) bNode;
 
-					FloatLib<T> lib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
+//					FloatLib<T> lib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
 					PageRankNode<T> ret = new PageRankNode<T>(env);
-					ret.pr = lib.add(agg.pr, b.pr);
+					ret.pr = flib.add(agg.pr, b.pr);
 					return ret;
 				}
 
@@ -208,7 +210,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 				public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
 					PageRankNode<T> agg = (PageRankNode<T>) aggNode;
 					PageRankNode<T> b = (PageRankNode<T>) bNode;
-					IntegerLib<T> lib = new IntegerLib<>(env);
+//					IntegerLib<T> lib = new IntegerLib<>(env);
 					b.pr = lib.mux(b.pr, agg.pr, b.isVertex);
 				}
 			}.setInputs(aa).compute();
@@ -234,11 +236,13 @@ public class PageRank<T> implements ParallelGadget<T> {
 	}
 
 	private <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr) throws IOException, BadLabelException {
+		final IntegerLib<T> lib = new IntegerLib<>(env);
+		final FloatLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(pr[i].u));
 			int b = Utils.toInt(env.outputToAlice(pr[i].v));
-			double c2 = Utils.toFloat(env.outputToAlice(pr[i].pr), FLOAT_V, PageRank.FLOAT_P);
-			int d = Utils.toInt(env.outputToAlice(pr[i].l));
+			double c2 = flib.outputToAlice(pr[i].pr);// Utils.toFloat(env.outputToAlice(pr[i].pr), FLOAT_V, PageRank.FLOAT_P);
+			double d = flib.outputToAlice(pr[i].l);
 			boolean e = env.outputToAlice(pr[i].isVertex);
 			env.os.flush();
 			if (Party.Alice.equals(env.party)) {
