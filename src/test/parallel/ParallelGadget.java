@@ -23,7 +23,7 @@ public interface ParallelGadget<T> {
 			CompEnv<T> env,
 			OutputStream[] os) throws IOException, IncorrectOtUsageException;
 
-	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs, CompEnv<T> env) throws IOException ;
+	public Object readInputFromMaster(int inputLength, InputStream masterIs, CompEnv<T> env) throws IOException ;
 
 	public <T> void compute(int machineId, Machine machine, CompEnv<T> env)
 			throws ClassNotFoundException, InstantiationException,

@@ -69,9 +69,9 @@ public abstract class GraphNode<T> {
 		Comparator<T> firstSortComparator = new Comparator<T>() {
 
 			@Override
-			public T leq(GraphNode<T> node1, GraphNode<T> node2) {
-				PageRankNode<T> n1 = (PageRankNode<T>) node1;
-				PageRankNode<T> n2 = (PageRankNode<T>) node2;
+			public T leq(GraphNode<T> n1, GraphNode<T> n2) {
+//				PageRankNode<T> n1 = (PageRankNode<T>) node1;
+//				PageRankNode<T> n2 = (PageRankNode<T>) node2;
 				IntegerLib<T> lib = new IntegerLib<>(env);
 //							T v = lib.geq(vi, vj);
 //							T eq = lib.eq(ui, uj);
@@ -98,9 +98,9 @@ public abstract class GraphNode<T> {
 		Comparator<T> firstSortComparator = new Comparator<T>() {
 
 			@Override
-			public T leq(GraphNode<T> node1, GraphNode<T> node2) {
-				PageRankNode<T> n1 = (PageRankNode<T>) node1;
-				PageRankNode<T> n2 = (PageRankNode<T>) node2;
+			public T leq(GraphNode<T> n1, GraphNode<T> n2) {
+//				PageRankNode<T> n1 = (PageRankNode<T>) node1;
+//				PageRankNode<T> n2 = (PageRankNode<T>) node2;
 				IntegerLib<T> lib = new IntegerLib<>(env);
 
 				T[] v1 = env.newTArray(2), v2 = env.newTArray(2);

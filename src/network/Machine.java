@@ -68,8 +68,8 @@ public class Machine {
 										 GCGen.R = GCSignal.receive(masterIs);
 									 }
 									 int inputLength = NetworkUtil.readInt(masterIs);
-									 int inputSize = NetworkUtil.readInt(masterIs);
-				                     input = parallelGadget.readInputFromMaster(inputLength, inputSize, masterIs, env);
+//									 int inputSize = NetworkUtil.readInt(masterIs);
+				                     input = parallelGadget.readInputFromMaster(inputLength, masterIs, env);
 									 int logMachines = Machine.log2(machines);
 									 peerIsUp = new BufferedInputStream[logMachines];
 									 peerOsUp = new BufferedOutputStream[logMachines];
