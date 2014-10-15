@@ -2,7 +2,7 @@ package compiledlib;
 
 import oram.SecureArray;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 

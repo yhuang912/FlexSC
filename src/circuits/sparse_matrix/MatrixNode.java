@@ -2,8 +2,8 @@ package circuits.sparse_matrix;
 
 import java.util.Arrays;
 
-import circuits.IntegerLib;
 import circuits.arithmetic.ArithmeticLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.IWritable;
 
 public class MatrixNode<T> implements IWritable<MatrixNode<T>, T> {

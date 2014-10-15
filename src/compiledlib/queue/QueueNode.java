@@ -1,6 +1,6 @@
 package compiledlib.queue;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 public class QueueNode<T extends IWritable<T,Boolean>> implements IWritable<QueueNode<T>, Boolean> {

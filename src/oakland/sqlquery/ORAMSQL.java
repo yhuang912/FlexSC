@@ -5,7 +5,7 @@ import java.util.Random;
 
 import oram.RecursiveCircuitOram;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;

@@ -2,10 +2,8 @@
 
 import oram.SecureArray;
 import util.Utils;
-import circuits.IntegerLib;
-
+import circuits.arithmetic.IntegerLib;
 import compiledlib.CPU;
-
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;

@@ -1,12 +1,11 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>, Yan Huang <yhuang@cs.umd.edu> and Kartik Nayak <kartik@cs.umd.edu>
-package circuits;
+package circuits.arithmetic;
 
 import java.util.Arrays;
 
 import util.Utils;
-import circuits.arithmetic.ArithmeticLib;
-import circuits.arithmetic.FixedPointLib;
-import circuits.arithmetic.FloatLib;
+import circuits.CircuitLib;
+import circuits.SortLib;
 import flexsc.CompEnv;
 import flexsc.Comparator;
 import flexsc.IWritable;

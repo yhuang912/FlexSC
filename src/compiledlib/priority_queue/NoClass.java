@@ -1,5 +1,5 @@
 package compiledlib.priority_queue;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 class NoClass implements IWritable<NoClass, Boolean> {

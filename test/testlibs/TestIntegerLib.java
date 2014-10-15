@@ -7,7 +7,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 
 //import gc.Boolean;

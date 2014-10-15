@@ -1,7 +1,7 @@
 package compiledlib.sketch;
 import oram.SecureArray;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 public class count_sketch {
 	public SecureArray<Boolean>[] sketch;

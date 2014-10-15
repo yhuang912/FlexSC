@@ -1,6 +1,7 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package circuits;
 
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 
 public class BitonicSortLib<T> extends IntegerLib<T> {

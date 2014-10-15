@@ -8,10 +8,8 @@ import oram.CircuitOram;
 import org.junit.Test;
 
 import util.Utils;
-import circuits.IntegerLib;
-
+import circuits.arithmetic.IntegerLib;
 import compiledlib.BoolArray;
-
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;

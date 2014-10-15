@@ -1,6 +1,6 @@
 package compiledlib.stack;
 import util.Utils;
-import circuits.IntegerLib;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.IWritable;
 public class BoolArray implements IWritable<BoolArray, Boolean> {

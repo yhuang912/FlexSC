@@ -3,7 +3,6 @@ package circuits.arithmetic;
 import java.util.Arrays;
 
 import util.Utils;
-import circuits.IntegerLib;
 import flexsc.CompEnv;
 
 public class FloatLib<T> implements ArithmeticLib<T> {
