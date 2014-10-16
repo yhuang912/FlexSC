@@ -14,9 +14,9 @@ public abstract class GraphNode<T> {
 
 	static int VERTEX_LEN = 10;
 
-	T[] u;
-	T[] v;
-	T isVertex;
+	public T[] u;
+	public T[] v;
+	public T isVertex;
 	
 	public GraphNode(T[] u, T[] v, T isVertex) {
 		this.u = u;

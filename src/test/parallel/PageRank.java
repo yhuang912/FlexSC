@@ -26,8 +26,8 @@ import flexsc.Party;
 import gc.BadLabelException;
 
 public class PageRank<T> implements ParallelGadget<T> {
-//	static int FLOAT_V = 20;
-//	static int FLOAT_P = 11;
+	static int UNUSED_FLOAT_V = 20;
+	static int UNUSED_FLOAT_P = 11;
 	static int INT_LEN = 32;
 	static int ITERATIONS = 3;
 	static int WIDTH = 40;

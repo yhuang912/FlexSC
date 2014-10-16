@@ -34,12 +34,12 @@ public class TestSort extends TestSortHarness<GCSignal> {
 				public GCSignal[][] secureCompute(GCSignal[][] Signala, final CompEnv<GCSignal> e) throws Exception {
 					TestGraphNode<GCSignal>[] input = (TestGraphNode<GCSignal>[]) Array.newInstance(TestGraphNode.class, Signala.length);
 					for (int i = 0; i < input.length; i++) {
-						input[i] = new TestGraphNode<>(Signala[i]);
+						input[i] = new TestGraphNode<>(Signala[i], Signala[i], Signala[i][0]);
 					}
 					BitonicSortLib<GCSignal> lib =  new BitonicSortLib<GCSignal>(e, new TestComparator<>(e));
 					lib.sort(input, lib.SIGNAL_ONE);
 					for (int i = 0; i < input.length; i++) {
-						Signala[i] = input[i].u;
+						Signala[i] = input[i].getU();
 					}
 					return Signala;
 				}
@@ -56,21 +56,48 @@ public class TestSort extends TestSortHarness<GCSignal> {
 
 	public class TestGraphNode<T> extends GraphNode<T> {
 
-		public T[] u;
-
-		public TestGraphNode(T[] u) {
-			this.u = u;
+		public TestGraphNode(T[] u, T[] v, T isVertex) {
+			super(u, v, isVertex);
 		}
 
 		@Override
 		public void send(OutputStream os, CompEnv<T> env) throws IOException {
-			
+			super.send(os, env);
 		}
 
 		@Override
 		public void read(InputStream is, CompEnv<T> env) throws IOException {
-			
+			super.read(is, env);
 		}
-		
+
+		@Override
+		public GraphNode<T> mux(GraphNode<T> b, T condition, CompEnv<T> env) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public GraphNode<T> getCopy(CompEnv<T> env) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public T[] flatten(CompEnv<T> env) {
+			T[] vert = env.newTArray(1);
+			vert[0] = (T) isVertex;
+			return Utils.flatten(env, u, v, vert);
+		}
+
+		@Override
+		public void unflatten(T[] flat, CompEnv<T> env) {
+			T[] vert = env.newTArray(1);
+			Utils.unflatten(flat, u, v, vert);
+			isVertex = vert[0];
+		}
+
+		public T[] getU() {
+			return u;
+		}
 	}
 }

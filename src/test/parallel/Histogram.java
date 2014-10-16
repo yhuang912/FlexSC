@@ -3,6 +3,7 @@ package test.parallel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -21,6 +22,8 @@ import gc.BadLabelException;
 
 public class Histogram<T> implements ParallelGadget<T> {
 
+	public static int DATASIZE = 32;
+
 	private boolean[][] getInput(int inputLength) {
 		int[] aa = new int[inputLength];
 		boolean[][] a = new boolean[aa.length][];
@@ -34,7 +37,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 			freq[aa[i]]++;
 		}
 		for(int i = 0; i < aa.length; ++i)
-			a[i] = Utils.fromInt(aa[i], 32);
+			a[i] = Utils.fromInt(aa[i], DATASIZE);
 		System.out.println("Frequencies");
 		for (int i = 0; i < limit + 1; i++)
 			System.out.println(i + ": " + freq[i]);
@@ -47,7 +50,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 		T[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
 		if (isGen) {
 			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(new boolean[32]);
+				Ta[i] = env.inputOfBob(new boolean[DATASIZE]);
 		} else {
 			boolean[][] a = getInput(inputLength);
 			for(int i = 0; i < Ta.length; ++i)
@@ -81,10 +84,10 @@ public class Histogram<T> implements ParallelGadget<T> {
 	}
 
 	@Override
-	public Object readInputFromMaster(int inputLength, int inputSize, InputStream masterIs, CompEnv<T> env) throws IOException {
-		T[][] gcInput = env.newTArray(inputLength, inputSize);//new T[inputLength][inputSize];
+	public Object readInputFromMaster(int inputLength, InputStream masterIs, CompEnv<T> env) throws IOException {
+		T[][] gcInput = env.newTArray(inputLength, DATASIZE);//new T[inputLength][inputSize];
 		 for (int j = 0; j < inputLength; j++)
-				for (int k = 0; k < inputSize; k++)
+				for (int k = 0; k < DATASIZE; k++)
 					gcInput[j][k] = NetworkUtil.read(masterIs, env);// env.ZERO();//new Boolean(true);//Boolean.receive(masterIs);
 		 return gcInput;
 	}
@@ -94,7 +97,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 	public <T> void compute(int machineId, Machine machine, CompEnv<T> env)
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
-			BadCommandException, BadLabelException {
+			BadCommandException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
 		T[][] input = (T[][]) machine.input;
 		T[][] freq = (T[][]) env.newTArray(input.length, input[0].length);
 		new HistogramMapper<T>(env, machine)
@@ -102,7 +105,8 @@ public class Histogram<T> implements ParallelGadget<T> {
 				.compute();
 
 		new SortGadget<T>(env, machine)
-				.setInputs(input, new TestComparator<T>(env), freq)
+//		        .setInputs(input, new TestComparator<T>env, freq)
+				.setInputs(null /*input, should pass graph nodes*/, new TestComparator<T>(env))
 				.compute();
 
 		new PrefixSumGadget<T>(env, machine)
@@ -116,7 +120,8 @@ public class Histogram<T> implements ParallelGadget<T> {
 
 		T[][] data = (T[][]) Utils.flatten(env, input, freq);
 		data = (T[][]) new SortGadget<T>(env, machine)
-				.setInputs(flag, new TestComparator<T>(env), input, freq)
+//				.setInputs(flag, new TestComparator<T>(env), input, freq)
+				.setInputs(null /* input, should pass graph nodes */, new TestComparator<T>(env))
 				.compute();
 		Utils.unflatten(data, input, freq);
 
