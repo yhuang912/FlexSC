@@ -52,7 +52,8 @@ public class BitonicSortLib<T> extends IntegerLib<T> {
     	T[] ni = nodes[i].flatten(env);
     	T[] nj = nodes[j].flatten(env);
 
-    	IntegerLib<T> lib = new IntegerLib<>(env);
+//    	System.out.println(ni.length + " " + nj.length);
+    	IntegerLib<T> lib = new IntegerLib<>(env, ni.length);
     	T[] s = lib.mux(nj, ni, swap);
     	s = lib.xor(s, ni);
     	T[] ki = lib.xor(nj, s);

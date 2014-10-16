@@ -10,6 +10,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import circuits.arithmetic.FloatLib;
+import test.Utils;
+import test.parallel.PageRank;
 import test.parallel.ParallelGadget;
 import flexsc.CompEnv;
 import flexsc.Mode;
@@ -236,7 +239,7 @@ public class Machine {
 		return CompEnv.getEnv(mode, party, is, os);
 	}
 
-	public static void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+	public static <T> void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
 		IPManager ipManager = IPManager.loadIPs();
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
@@ -272,5 +275,14 @@ public class Machine {
 			PrintWriter writer = new PrintWriter("mutex.txt");
 			writer.close();
 		}
+//		FloatLib lib = new FloatLib(machine.env, 20, 11);
+//		T[] one = (T[]) machine.env.inputOfAlice(Utils.fromFloat(0, 20, 11));
+//		T[] two = (T[]) machine.env.inputOfAlice(Utils.fromFloat(2, 20, 11));
+//		T[] div = (T[]) lib.div((T[]) one, (T[]) two);
+//		double d = lib.outputToAlice(div);
+//		if (Party.Alice.equals(machine.env.party)) {
+//			System.out.println("hello " + d);
+//		}
+		
 	}
 }

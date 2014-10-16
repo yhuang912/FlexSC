@@ -126,11 +126,11 @@ public class Utils {
 			v = new boolean[widthV];
 			p = new boolean[widthP];
 			s = d < 0;
-			if ( Math.abs(d - 0) < 0.00001 ) {
+			if (d == 0) {
 			//	   d = 0.000001;
 				for(int i  = 0; i < widthV; ++i)
 					v[i] = false;
-				v[widthV-1]=true;
+//				v[widthV-1]=true;
 				for(int i  = 0; i < widthP; ++i)
 					p[i] = false;
 				p[widthP-1]=true;
