@@ -90,17 +90,15 @@ public class ORAMHistogram {
 
 				RecursiveCircuitOram<Boolean> oram = new RecursiveCircuitOram<Boolean>(
 						env, 1 << logDomain, 32);
+				sta = ((PMCompEnv) env).statistic;
+				sta.flush();
 				for (int i = 0; i < sc.length; ++i) {
 					Boolean[] temp = lib.rightPublicShift(sc[i], 32 - 11);
 					Boolean[] cnt = oram.read(temp);
 					cnt = lib.incrementByOne(cnt);
 					oram.write(temp, cnt);
 				}
-
-				sta = ((PMCompEnv) env).statistic;
 				sta.finalize();
-				// System.out.println("Number of Enc:"+ sta.NumEncAlice+
-				// "\nNumber of ANDs:" + sta.andGate);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -140,9 +138,6 @@ public class ORAMHistogram {
 					cnt = lib.incrementByOne(cnt);
 					oram.write(temp, cnt);
 				}
-
-				// for(int i = 0; i < res.length; ++i)
-				// env.outputToAlice(res[i]);
 
 				disconnect();
 			} catch (Exception e) {

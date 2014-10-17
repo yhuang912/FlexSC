@@ -12,6 +12,5 @@ public class ComputeResult {
 					+ oram.andGate + "\t" + mapreduce.NumEncAlice + "\t"
 					+ oram.NumEncAlice);
 		}
-
 	}
 }

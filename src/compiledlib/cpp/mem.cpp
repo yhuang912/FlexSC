@@ -1,10 +1,8 @@
 #define OP_LW 35
 #define OP_SW 43
-#define INPUT_A_pcOffset 10//?
-#define INPUT_A_dataOffset 10//?
 struct MEM{};
 
-int32 MEM.function(int32[32]reg, int32[2048]mem, int32 pc, int32 inst){
+int32 MEM.function(int32[32]reg, int32[2048]mem, int32 pc, int32 inst, public int INPUT_A_pcOffset, public int INPUT_A_dataOffset){
 
    int32 index = (pc-INPUT_A_pcOffset) >> 2;
    int32 newInst = mem[index];
@@ -18,8 +16,8 @@ int32 MEM.function(int32[32]reg, int32[2048]mem, int32 pc, int32 inst){
 
    if(op == OP_LW)
       reg[rt] = mem[(reg[rs] + unsignExt - INPUT_A_dataOffset)>>2];
-   else if(op == OP_SW)
-      mem[(reg[rs] + unsignExt - INPUT_A_dataOffset)>>2] = reg[rt];
+   else if(op == OP_SW) 
+      mem[(reg[rs] + unsignExt - INPUT_A_dataOffset)>>2] = reg[rt]; 
    return newInst;
 }
 

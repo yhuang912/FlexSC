@@ -97,7 +97,7 @@ public class FloatLib<T> implements ArithmeticLib<T> {
 		T[] new_v = Arrays.copyOf(sh, length);
 		T[] new_p = lib.add(lib.sub(a.p, b.p), lib.toSignals(1, a.p.length));
 		new_p = lib.sub(lib.padSignal(new_p, leadingzero.length), leadingzero);
-		new_p = lib.padSignedSignal(new_p, a.p.length);// !!
+		new_p = lib.padSignedSignal(new_p, a.p.length);
 
 		Representation<T> res = new Representation<T>(new_s, new_v, new_p);
 		return pack(res);

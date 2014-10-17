@@ -133,14 +133,12 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 				System.arraycopy(sca, 0, sc, 0, sca.length);
 				System.arraycopy(scb, 0, sc, sca.length, scb.length);
 
-				// double t1 = System.nanoTime();
 				MapreduceHistogram<Boolean> wc = new MapreduceHistogram<Boolean>(
-						env);
+						env);				
+				sta = ((PMCompEnv) env).statistic;
+				sta.flush();
 				KeyValue<Boolean>[] res = wc.MapReduce(sc);
-				// System.out.println(System.nanoTime()-t1);
-
 				if (env.m == Mode.COUNT) {
-					sta = ((PMCompEnv) env).statistic;
 					sta.finalize();
 				} else {
 					z = new int[res.length];
@@ -184,18 +182,16 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 				System.arraycopy(sca, 0, sc, 0, sca.length);
 				System.arraycopy(scb, 0, sc, sca.length, scb.length);
 
-				MapreduceHistogram<Boolean> wc = new MapreduceHistogram<Boolean>(
-						env);
+				MapreduceHistogram<Boolean> wc = new MapreduceHistogram<Boolean>(env);
 				KeyValue<Boolean>[] res = wc.MapReduce(sc);
 
-				env.os.flush();
 				if (env.m != Mode.COUNT) {
 					for (int i = 0; i < res.length; ++i) {
 						env.outputToAlice(res[i].key);
 						env.outputToAlice(res[i].value);
 					}
 				}
-				env.os.flush();
+				env.flush();
 
 				disconnect();
 			} catch (Exception e) {

@@ -56,11 +56,11 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 	protected T[] add(T x, T y, T cin) {
 		T[] res = env.newTArray(2);
 
-		T t1 = env.xor(x, cin);
-		T t2 = env.xor(y, cin);
-		res[S] = env.xor(x, t2);
-		t1 = env.and(t1, t2);
-		res[COUT] = env.xor(cin, t1);
+		T t1 = xor(x, cin);
+		T t2 = xor(y, cin);
+		res[S] = xor(x, t2);
+		t1 = and(t1, t2);
+		res[COUT] = xor(cin, t1);
 
 		return res;
 	}
@@ -68,6 +68,7 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 	// full n-bit adder
 	public T[] addFull(T[] x, T[] y, boolean cin) {
 		assert (x != null && y != null && x.length == y.length) : "add: bad inputs.";
+		
 		T[] res = env.newTArray(x.length + 1);
 		T[] t = add(x[0], y[0], env.newT(cin));
 		res[0] = t[S];

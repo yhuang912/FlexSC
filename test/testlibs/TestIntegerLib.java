@@ -56,7 +56,7 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 
 		for (int i = 0; i < testCases; i++) {
 			int b = rnd.nextInt() % (1 << 15);
-			int a = rnd.nextInt() % (1 << 15);
+			int a = 0;//rnd.nextInt() % (1 << 15);
 			b = (b == 0) ? 1 : b;
 			runThreads(new Helper(a, b) {
 				public Boolean[] secureCompute(Boolean[] Signala,

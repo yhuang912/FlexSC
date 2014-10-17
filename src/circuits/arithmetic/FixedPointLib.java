@@ -44,7 +44,7 @@ public class FixedPointLib<T> implements ArithmeticLib<T> {
 
 	public T[] div(T[] x, T[] y) {
 		T[] padX = lib.padSignedSignal(x, x.length + offset);
-		return lib.div(lib.leftPublicShift(padX, offset), y);
+		return Arrays.copyOf(lib.div(lib.leftPublicShift(padX, offset), y), width);
 	}
 
 	public T[] publicValue(double d) {

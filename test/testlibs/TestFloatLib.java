@@ -1,6 +1,5 @@
 package testlibs;
 
-import gc.GCSignal;
 import harness.TestFloat;
 
 import java.util.Random;
@@ -9,12 +8,33 @@ import org.junit.Test;
 
 import circuits.arithmetic.FloatLib;
 
-//import gc.GCSignal;
+//import gc.Boolean;
 
-public class TestFloatLib extends TestFloat<GCSignal> {
+public class TestFloatLib extends TestFloat<Boolean> {
 
 	Random rng = new Random();
 
+	@Test
+	public void testFloat() throws Exception {
+		for (int i = 0; i < testCases; i++) {
+			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
+			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
+
+			runThreads(new Helper(a, b) {
+				@Override
+				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
+						FloatLib<Boolean> lib) throws Exception {
+					return a;
+				}
+
+				@Override
+				public double plainCompute(double a, double b) {
+					return a;
+				}
+			});
+		}
+	}
+	
 	@Test
 	public void testFloatAdd() throws Exception {
 		for (int i = 0; i < testCases; i++) {
@@ -23,8 +43,8 @@ public class TestFloatLib extends TestFloat<GCSignal> {
 
 			runThreads(new Helper(a, b) {
 				@Override
-				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b,
-						FloatLib<GCSignal> lib) throws Exception {
+				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
+						FloatLib<Boolean> lib) throws Exception {
 					return lib.add(a, b);
 				}
 
@@ -38,8 +58,8 @@ public class TestFloatLib extends TestFloat<GCSignal> {
 		double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 		runThreads(new Helper(a, -a) {
 			@Override
-			public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b,
-					FloatLib<GCSignal> lib) throws Exception {
+			public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
+					FloatLib<Boolean> lib) throws Exception {
 				return lib.add(a, b);
 			}
 
@@ -59,8 +79,8 @@ public class TestFloatLib extends TestFloat<GCSignal> {
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
 			runThreads(new Helper(a, b) {
 				@Override
-				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b,
-						FloatLib<GCSignal> lib) throws Exception {
+				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
+						FloatLib<Boolean> lib) throws Exception {
 					return lib.sub(a, b);
 				}
 
@@ -73,8 +93,8 @@ public class TestFloatLib extends TestFloat<GCSignal> {
 		double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 		runThreads(new Helper(a, a) {
 			@Override
-			public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b,
-					FloatLib<GCSignal> lib) throws Exception {
+			public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
+					FloatLib<Boolean> lib) throws Exception {
 				return lib.sub(a, b);
 			}
 
@@ -93,11 +113,11 @@ public class TestFloatLib extends TestFloat<GCSignal> {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
-			a = (a == 0) ? 1 : a;
-			runThreads(new Helper(b, a) {
+//			a = (a == 0) ? 1 : a;
+			runThreads(new Helper(a, b) {
 				@Override
-				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b,
-						FloatLib<GCSignal> lib) throws Exception {
+				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
+						FloatLib<Boolean> lib) throws Exception {
 					return lib.div(a, b);
 				}
 
@@ -118,9 +138,9 @@ public class TestFloatLib extends TestFloat<GCSignal> {
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
 			runThreads(new Helper(a, b) {
 				@Override
-				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b,
-						FloatLib<GCSignal> lib) throws Exception {
-					GCSignal[] res = lib.multiply(a, b);
+				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
+						FloatLib<Boolean> lib) throws Exception {
+					Boolean[] res = lib.multiply(a, b);
 					return res;
 				}
 
@@ -140,8 +160,8 @@ public class TestFloatLib extends TestFloat<GCSignal> {
 			double a = rng.nextDouble() * (1 << 10);
 			runThreads(new Helper(a, 1) {
 				@Override
-				public GCSignal[] secureCompute(GCSignal[] a, GCSignal[] b,
-						FloatLib<GCSignal> lib) throws Exception {
+				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
+						FloatLib<Boolean> lib) throws Exception {
 					return lib.sqrt(a);
 				}
 
