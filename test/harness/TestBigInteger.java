@@ -12,10 +12,10 @@ import flexsc.Party;
 
 
 
-public class TestBigInteger<T> extends TestHarness<T>{
-	public final int LENGTH = 32;
-	final int RANGE = LENGTH;
-	public abstract class Helper {
+public class TestBigInteger extends TestHarness{
+	public static final int LENGTH = 32;
+	final static int RANGE = LENGTH;
+	public static abstract class Helper {
 		BigInteger intA, intB;
 		boolean[] a;
 		boolean[] b;
@@ -26,11 +26,11 @@ public class TestBigInteger<T> extends TestHarness<T>{
 			a = Utils.fromBigInteger(aa, RANGE);
 			b = Utils.fromBigInteger(bb, RANGE);
 		}
-		public abstract T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception;
+		public abstract <T>T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception;
 		public abstract BigInteger plainCompute(BigInteger x, BigInteger y);
 	}
 
-	class GenRunnable extends network.Server implements Runnable {
+	public static class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[] z;
 		Helper h;
 		GenRunnable (Helper h) {
@@ -57,7 +57,7 @@ public class TestBigInteger<T> extends TestHarness<T>{
 		}
 	}
 
-	class EvaRunnable extends network.Client implements Runnable {
+	public static class EvaRunnable<T> extends network.Client implements Runnable {
 		Helper h;
 		public double andgates;
 		public double encs;
@@ -94,7 +94,7 @@ public class TestBigInteger<T> extends TestHarness<T>{
 		}
 	}
 
-	public void runThreads(Helper h) throws Exception {
+	static public void runThreads(Helper h) throws Exception {
 		GenRunnable gen = new GenRunnable(h);
 		EvaRunnable eva = new EvaRunnable(h);
 		Thread tGen = new Thread(gen);

@@ -9,9 +9,9 @@ import org.junit.Test;
 import circuits.arithmetic.FixedPointLib;
 import flexsc.CompEnv;
 
-//import gc.Boolean;
+//import gc.T;
 
-public class TestFixedPointLib extends TestFixedPoint<Boolean> {
+public class TestFixedPointLib extends TestFixedPoint {
 
 	@Test
 	public void testFixPointAdd() throws Exception {
@@ -20,18 +20,16 @@ public class TestFixedPointLib extends TestFixedPoint<Boolean> {
 		for (int i = 0; i < testCases; i++) {
 			double d1 = rng.nextInt(1 << 30) % 10000.0;
 			double d2 = rng.nextInt(1 << 30) % 10000.0;
-			runThreads(new Helper(d1, d2) {
-
-				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						int offset, CompEnv<Boolean> env) throws Exception {
-					return new FixedPointLib<Boolean>(env, width, offset).add(
-							a, b);
-				}
-
+			TestFixedPoint.runThreads(new Helper(d1, d2) {
 				@Override
 				public double plainCompute(double a, double b) {
 					return a + b;
+				}
+
+				@Override
+				public <T> T[] secureCompute(T[] a, T[] b, int offset,
+						CompEnv<T> env) throws Exception {
+					return new FixedPointLib<T>(env, width, offset).add(a, b);
 				}
 			});
 		}
@@ -44,15 +42,12 @@ public class TestFixedPointLib extends TestFixedPoint<Boolean> {
 		for (int i = 0; i < testCases; i++) {
 			double d1 = rng.nextInt(1 << 30) % 10000.0;
 			double d2 = rng.nextInt(1 << 30) % 10000.0;
-			runThreads(new Helper(d1, d2) {
-
+			TestFixedPoint.runThreads(new Helper(d1, d2) {
 				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						int offset, CompEnv<Boolean> env) throws Exception {
-					return new FixedPointLib<Boolean>(env, width, offset).sub(
-							a, b);
+				public <T>T[] secureCompute(T[] a, T[] b,
+						int offset, CompEnv<T> env) throws Exception {
+					return new FixedPointLib<T>(env, width, offset).sub(a, b);
 				}
-
 				@Override
 				public double plainCompute(double a, double b) {
 					return a - b;
@@ -68,12 +63,12 @@ public class TestFixedPointLib extends TestFixedPoint<Boolean> {
 		for (int i = 0; i < testCases; i++) {
 			double d1 = rng.nextInt(1 << 30) % 100.0;
 			double d2 = rng.nextInt(1 << 30) % 100.0;
-			runThreads(new Helper(d1, d2) {
+			TestFixedPoint.runThreads(new Helper(d1, d2) {
 
 				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						int offset, CompEnv<Boolean> env) throws Exception {
-					return new FixedPointLib<Boolean>(env, width, offset)
+				public <T>T[] secureCompute(T[] a, T[] b,
+						int offset, CompEnv<T> env) throws Exception {
+					return new FixedPointLib<T>(env, width, offset)
 							.multiply(a, b);
 				}
 
@@ -94,12 +89,12 @@ public class TestFixedPointLib extends TestFixedPoint<Boolean> {
 			double d2 = rng.nextInt(1 << 30) % 100.0;
 			if (d2 == 0)
 				++d2;
-			runThreads(new Helper(d1, d2) {
+			TestFixedPoint.runThreads(new Helper(d1, d2) {
 
 				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						int offset, CompEnv<Boolean> env) throws Exception {
-					return new FixedPointLib<Boolean>(env, width, offset).div(
+				public<T> T[] secureCompute(T[] a, T[] b,
+						int offset, CompEnv<T> env) throws Exception {
+					return new FixedPointLib<T>(env, width, offset).div(
 							a, b);
 				}
 
@@ -120,12 +115,12 @@ public class TestFixedPointLib extends TestFixedPoint<Boolean> {
 			double d2 = rng.nextInt(1 << 30) % 100.0;
 			if (d2 == 0)
 				++d2;
-			runThreads(new Helper(d1, d2) {
+			TestFixedPoint.runThreads(new Helper(d1, d2) {
 
 				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						int offset, CompEnv<Boolean> env) throws Exception {
-					return new FixedPointLib<Boolean>(env, width, offset).sqrt(a);
+				public <T>T[] secureCompute(T[] a, T[] b,
+						int offset, CompEnv<T> env) throws Exception {
+					return new FixedPointLib<T>(env, width, offset).sqrt(a);
 				}
 
 				@Override

@@ -92,13 +92,15 @@ public class ORAMHistogram {
 						env, 1 << logDomain, 32);
 				sta = ((PMCompEnv) env).statistic;
 				sta.flush();
-				for (int i = 0; i < sc.length; ++i) {
+				for (int i = 0; i < 1; ++i) {
 					Boolean[] temp = lib.rightPublicShift(sc[i], 32 - 11);
 					Boolean[] cnt = oram.read(temp);
 					cnt = lib.incrementByOne(cnt);
 					oram.write(temp, cnt);
 				}
 				sta.finalize();
+				sta.andGate*=sc.length;
+				sta.NumEncAlice*=sc.length;
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -132,7 +134,7 @@ public class ORAMHistogram {
 
 				RecursiveCircuitOram<Boolean> oram = new RecursiveCircuitOram<Boolean>(
 						env, 1 << logDomain, 32);
-				for (int i = 0; i < sc.length; ++i) {
+				for (int i = 0; i < 1; ++i) {
 					Boolean[] temp = lib.rightPublicShift(sc[i], 32 - 11);
 					Boolean[] cnt = oram.read(temp);
 					cnt = lib.incrementByOne(cnt);

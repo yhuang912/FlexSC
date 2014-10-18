@@ -13,7 +13,7 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
 
-public class TestMatrix<T> extends TestHarness<T> {
+public class TestMatrix<T> extends TestHarness {
 	public final int len = 32;
 	public final int offset = 15;
 	public final int VLength = 24;

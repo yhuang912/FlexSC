@@ -7,7 +7,7 @@ import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 
-public class TestSortHarness<T> extends TestHarness<T> {
+public class TestSortHarness<T> extends TestHarness {
 	public abstract class Helper {
 		int[] intA;
 		boolean[][] a;

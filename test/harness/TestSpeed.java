@@ -13,7 +13,7 @@ import flexsc.PMCompEnv;
 import flexsc.Party;
 import gc.GCSignal;
 
-public class TestSpeed<T> extends TestHarness<T> {
+public class TestSpeed<T> extends TestHarness {
 
 	Mode mode = Mode.REAL;
 	public T[] secureCompute(T[] a, T[] b, CompEnv env) {

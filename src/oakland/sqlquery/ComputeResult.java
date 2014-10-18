@@ -5,7 +5,7 @@ import flexsc.PMCompEnv.Statistics;
 public class ComputeResult {
 
 	static public void main(String args[]) throws InterruptedException {
-		for (int logN = 12; logN <= 18; ++logN) {
+		for (int logN = 10; logN <= 18; logN+=2) {
 			Statistics mapreduce = MapreduceSQL.getCount(1 << logN);
 			Statistics oram = ORAMSQL.getCount(1 << logN);
 			System.out.println(logN + "\t" + mapreduce.andGate + "\t"

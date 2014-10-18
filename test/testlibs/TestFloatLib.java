@@ -1,6 +1,8 @@
 package testlibs;
 
 import harness.TestFloat;
+import harness.TestFloat.Helper;
+import harness.TestHarness;
 
 import java.util.Random;
 
@@ -8,9 +10,8 @@ import org.junit.Test;
 
 import circuits.arithmetic.FloatLib;
 
-//import gc.Boolean;
 
-public class TestFloatLib extends TestFloat<Boolean> {
+public class TestFloatLib extends TestHarness {
 
 	Random rng = new Random();
 
@@ -20,52 +21,51 @@ public class TestFloatLib extends TestFloat<Boolean> {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
 
-			runThreads(new Helper(a, b) {
-				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						FloatLib<Boolean> lib) throws Exception {
-					return a;
-				}
-
+			TestFloat.runThreads(new Helper(a, b) {
 				@Override
 				public double plainCompute(double a, double b) {
+					return a;
+				}
+				@Override
+				public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+						throws Exception {
 					return a;
 				}
 			});
 		}
 	}
-	
+
 	@Test
 	public void testFloatAdd() throws Exception {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
 
-			runThreads(new Helper(a, b) {
+			TestFloat.runThreads(new Helper(a, b) {
 				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						FloatLib<Boolean> lib) throws Exception {
-					return lib.add(a, b);
+				public double plainCompute(double a, double b) {
+					return a+b;
 				}
 
 				@Override
-				public double plainCompute(double a, double b) {
-					return a + b;
+				public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+						throws Exception {
+					return env.add(a, b);
 				}
 			});
 		}
 
 		double a = rng.nextDouble() * (1 << 20) - (1 << 19);
-		runThreads(new Helper(a, -a) {
+		TestFloat.runThreads(new Helper(a, -a) {
 			@Override
-			public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-					FloatLib<Boolean> lib) throws Exception {
-				return lib.add(a, b);
+			public double plainCompute(double a, double b) {
+				return a+b;
 			}
 
 			@Override
-			public double plainCompute(double a, double b) {
-				return a + b;
+			public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+					throws Exception {
+				return env.add(a, b);
 			}
 		});
 	}
@@ -77,30 +77,30 @@ public class TestFloatLib extends TestFloat<Boolean> {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
-			runThreads(new Helper(a, b) {
+			TestFloat.runThreads(new Helper(a, b) {
 				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						FloatLib<Boolean> lib) throws Exception {
-					return lib.sub(a, b);
+				public double plainCompute(double a, double b) {
+					return a-b;
 				}
 
 				@Override
-				public double plainCompute(double a, double b) {
-					return a - b;
+				public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+						throws Exception {
+					return env.sub(a, b);
 				}
 			});
 		}
 		double a = rng.nextDouble() * (1 << 20) - (1 << 19);
-		runThreads(new Helper(a, a) {
+		TestFloat.runThreads(new Helper(a, -a) {
 			@Override
-			public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-					FloatLib<Boolean> lib) throws Exception {
-				return lib.sub(a, b);
+			public double plainCompute(double a, double b) {
+				return a-b;
 			}
 
 			@Override
-			public double plainCompute(double a, double b) {
-				return a - b;
+			public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+					throws Exception {
+				return env.sub(a, b);
 			}
 		});
 
@@ -113,17 +113,16 @@ public class TestFloatLib extends TestFloat<Boolean> {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
-//			a = (a == 0) ? 1 : a;
-			runThreads(new Helper(a, b) {
+			TestFloat.runThreads(new Helper(a, b) {
 				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						FloatLib<Boolean> lib) throws Exception {
-					return lib.div(a, b);
+				public double plainCompute(double a, double b) {
+					return a/b;
 				}
 
 				@Override
-				public double plainCompute(double a, double b) {
-					return a / b;
+				public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+						throws Exception {
+					return env.div(a, b);
 				}
 			});
 		}
@@ -136,17 +135,16 @@ public class TestFloatLib extends TestFloat<Boolean> {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
-			runThreads(new Helper(a, b) {
+			TestFloat.runThreads(new Helper(a, b) {
 				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						FloatLib<Boolean> lib) throws Exception {
-					Boolean[] res = lib.multiply(a, b);
-					return res;
+				public double plainCompute(double a, double b) {
+					return a*b;
 				}
 
 				@Override
-				public double plainCompute(double a, double b) {
-					return a * b;
+				public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+						throws Exception {
+					return env.multiply(a, b);
 				}
 			});
 		}
@@ -158,16 +156,16 @@ public class TestFloatLib extends TestFloat<Boolean> {
 
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 10);
-			runThreads(new Helper(a, 1) {
-				@Override
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						FloatLib<Boolean> lib) throws Exception {
-					return lib.sqrt(a);
-				}
-
+			TestFloat.runThreads(new Helper(a, a) {
 				@Override
 				public double plainCompute(double a, double b) {
 					return Math.sqrt(a);
+				}
+
+				@Override
+				public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+						throws Exception {
+					return env.sqrt(a);
 				}
 			});
 		}

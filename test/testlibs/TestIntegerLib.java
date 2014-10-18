@@ -1,6 +1,8 @@
 package testlibs;
 
+import harness.TestHarness;
 import harness.Test_2Input1Output;
+import harness.Test_2Input1Output.Helper;
 
 import java.util.Random;
 
@@ -10,20 +12,20 @@ import util.Utils;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 
-//import gc.Boolean;
+//import gc.T;
 
-public class TestIntegerLib extends Test_2Input1Output<Boolean> {
+public class TestIntegerLib extends TestHarness {
 
 	Random rnd = new Random();
 
 	@Test
 	public void testIntAdd() throws Exception {
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt() % (1 << 31), rnd.nextInt()
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 31), rnd.nextInt()
 					% (1 << 31)) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).add(Signala, Signalb);
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).add(Signala, Signalb);
 				}
 
 				public int plainCompute(int x, int y) {
@@ -37,11 +39,11 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 	public void testIntSub() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
 					% (1 << 30)) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).sub(Signala, Signalb);
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).sub(Signala, Signalb);
 				}
 
 				public int plainCompute(int x, int y) {
@@ -58,10 +60,10 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 			int b = rnd.nextInt() % (1 << 15);
 			int a = 0;//rnd.nextInt() % (1 << 15);
 			b = (b == 0) ? 1 : b;
-			runThreads(new Helper(a, b) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).div(Signala, Signalb);
+			Test_2Input1Output.runThreads(new Helper(a, b) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).div(Signala, Signalb);
 				}
 
 				public int plainCompute(int x, int y) {
@@ -75,11 +77,11 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 	public void testIntMultiplication() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
 					% (1 << 30)) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e)
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e)
 							.multiply(Signala, Signalb);
 				}
 
@@ -96,10 +98,10 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 		for (int i = 0; i < testCases; i++) {
 			int b = rnd.nextInt() % (1 << 15);
 			b = (b == 0) ? 1 : b;
-			runThreads(new Helper(rnd.nextInt() % (1 << 15), b) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).mod(Signala, Signalb);
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 15), b) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).mod(Signala, Signalb);
 				}
 
 				public int plainCompute(int x, int y) {
@@ -113,12 +115,14 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 	public void testIntEq() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
 					% (1 << 30)) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new Boolean[] { new IntegerLib<Boolean>(e).eq(
-							Signala, Signalb) };
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					T[] res = e.newTArray(1);
+					res[0] = new IntegerLib<T>(e).eq(
+							Signala, Signalb);
+					return res;
 				}
 
 				public int plainCompute(int x, int y) {
@@ -129,11 +133,13 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 
 		for (int i = 0; i < testCases; i++) {
 			int a = rnd.nextInt(1 << 30);
-			runThreads(new Helper(a, a) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new Boolean[] { new IntegerLib<Boolean>(e).eq(
-							Signala, Signalb) };
+			Test_2Input1Output.runThreads(new Helper(a, a) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					T[] res = e.newTArray(1);
+					res[0] = new IntegerLib<T>(e).eq(
+							Signala, Signalb);
+					return res;
 				}
 
 				public int plainCompute(int x, int y) {
@@ -147,12 +153,14 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 	public void testIntGeq() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
 					% (1 << 30)) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new Boolean[] { new IntegerLib<Boolean>(e).geq(
-							Signala, Signalb) };
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					T[] res = e.newTArray(1);
+					res[0] = new IntegerLib<T>(e).geq(
+							Signala, Signalb);
+					return res;
 				}
 
 				public int plainCompute(int x, int y) {
@@ -163,11 +171,13 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 
 		for (int i = 0; i < testCases; i++) {
 			int a = rnd.nextInt() % (1 << 30);
-			runThreads(new Helper(a, a) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new Boolean[] { new IntegerLib<Boolean>(e).geq(
-							Signala, Signalb) };
+			Test_2Input1Output.runThreads(new Helper(a, a) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					T[] res = e.newTArray(1);
+					res[0] = new IntegerLib<T>(e).geq(
+							Signala, Signalb);
+					return res;
 				}
 
 				public int plainCompute(int x, int y) {
@@ -181,12 +191,14 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 	public void testIntLeq() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 30), rnd.nextInt()
 					% (1 << 30)) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new Boolean[] { new IntegerLib<Boolean>(e).leq(
-							Signala, Signalb) };
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					T[] res = e.newTArray(1);
+					res[0] = new IntegerLib<T>(e).leq(
+							Signala, Signalb);
+					return res;
 				}
 
 				public int plainCompute(int x, int y) {
@@ -197,11 +209,13 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 
 		for (int i = 0; i < testCases; i++) {
 			int a = rnd.nextInt(1 << 30);
-			runThreads(new Helper(a, a) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new Boolean[] { new IntegerLib<Boolean>(e).leq(
-							Signala, Signalb) };
+			Test_2Input1Output.runThreads(new Helper(a, a) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					T[] res = e.newTArray(1);
+					res[0] = new IntegerLib<T>(e).leq(
+							Signala, Signalb);
+					return res;
 				}
 
 				public int plainCompute(int x, int y) {
@@ -214,11 +228,11 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 	@Test
 	public void testIntSqrt() throws Exception {
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
 				@Override
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).sqrt(Signala);
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).sqrt(Signala);
 				}
 
 				@Override
@@ -234,10 +248,10 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 		Random rnd = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).absolute(Signala);
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).absolute(Signala);
 				}
 
 				public int plainCompute(int x, int y) {
@@ -252,10 +266,10 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 		Random rnd = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).incrementByOne(Signala);
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).incrementByOne(Signala);
 				}
 
 				public int plainCompute(int x, int y) {
@@ -270,10 +284,10 @@ public class TestIntegerLib extends Test_2Input1Output<Boolean> {
 		Random rnd = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).decrementByOne(Signala);
+			Test_2Input1Output.runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).decrementByOne(Signala);
 				}
 
 				public int plainCompute(int x, int y) {
