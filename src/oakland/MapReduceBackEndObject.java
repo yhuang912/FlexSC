@@ -40,7 +40,7 @@ public abstract class MapReduceBackEndObject<T, K extends IWritable<K, T>, V ext
 			cnt = lib.conditionalIncreament(cnt, lib.not(same));
 
 			kv[i] = mux(kv[i], result, same);
-			kv[i - 1] = mux(kv[i - 1], lib.zeros(kv[i - 1].numBits()), same);
+//			kv[i - 1] = mux(kv[i - 1], lib.zeros(kv[i - 1].numBits()), same);
 		}
 
 		lib.sort(kv, lib.SIGNAL_ONE, new ComparatorTransformer<KeyValueObject<K, V, T>, T>(kv[0], cmp2).toComparator());
