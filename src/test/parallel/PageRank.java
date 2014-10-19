@@ -28,7 +28,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 	static int UNUSED_FLOAT_V = 20;
 	static int UNUSED_FLOAT_P = 11;
 	static int INT_LEN = 32;
-	static int ITERATIONS = 10;
+	static int ITERATIONS = 50;
 	static int WIDTH = 40;
 	static int OFFSET = 20;
 
@@ -234,41 +234,42 @@ public class PageRank<T> implements ParallelGadget<T> {
 					b.pr = lib.mux(b.pr, agg.pr, b.isVertex);
 				}
 			}.setInputs(aa).compute();
+			output(machineId, env, aa, i /* iterations */);
 		}
 		new SortGadget<T>(env, machine)
 			.setInputs(aa, PageRankNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
-		if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
-			System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "PageRank");
-		}
+//		if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
+//			System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "PageRank");
+//		}
 		// output(machineId, env, aa);
 	}
 
 	private <T> void output(int machineId, final CompEnv<T> env,
-			PageRankNode<T>[] aa) throws IOException, BadLabelException {
+			PageRankNode<T>[] aa, int iterations) throws IOException, BadLabelException {
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
 			System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);
 			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
 		} else {
-			print(machineId, env, aa);
+			print(machineId, env, aa, iterations);
 		}
 	}
 
-	private <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr) throws IOException, BadLabelException {
+	private <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr, int iterations) throws IOException, BadLabelException {
 		final IntegerLib<T> lib = new IntegerLib<>(env);
 //		final FloatLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
 		final FixedPointLib<T> flib = new FixedPointLib<T>(env, 40, 20);
-		if (machineId == 1) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
+//		if (machineId == 1) {
+//			try {
+//				Thread.sleep(1000);
+//			} catch (InterruptedException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//		}
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(pr[i].u));
 			int b = Utils.toInt(env.outputToAlice(pr[i].v));
@@ -279,12 +280,13 @@ public class PageRank<T> implements ParallelGadget<T> {
 			if (Party.Alice.equals(env.party)) {
 				PrintStream out = new PrintStream(System.out, false /* autoFlush */);
 				if (e) {
-					out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d + "\t" + e);
+//					out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d + "\t" + e);
+					out.println(iterations + "," + a + "," + c2);
 				}
 			}
 	    }
 		if (Party.Alice.equals(env.party)) {
-			System.out.println("-------");
+//			System.out.println("-------");
 		}
 	}
 

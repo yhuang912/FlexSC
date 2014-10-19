@@ -17,7 +17,7 @@ public abstract class GraphNode<T> {
 	public T[] u;
 	public T[] v;
 	public T isVertex;
-	
+
 	public GraphNode(T[] u, T[] v, T isVertex) {
 		this.u = u;
 		this.v = v;
