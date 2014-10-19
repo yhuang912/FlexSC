@@ -234,6 +234,11 @@ public class PageRank<T> implements ParallelGadget<T> {
 					b.pr = lib.mux(b.pr, agg.pr, b.isVertex);
 				}
 			}.setInputs(aa).compute();
+
+			// osrting to get output in a nice form
+			new SortGadget<T>(env, machine)
+				.setInputs(aa, PageRankNode.vertexFirstComparator(env))
+				.compute();
 			output(machineId, env, aa, i /* iterations */);
 		}
 		new SortGadget<T>(env, machine)
