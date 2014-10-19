@@ -94,9 +94,11 @@ public class TestBigInteger extends TestHarness{
 		}
 	}
 
+
 	static public <T>void runThreads(Helper h) throws Exception {
 		GenRunnable<T> gen = new GenRunnable<T>(h);
 		EvaRunnable<T> eva = new EvaRunnable<T>(h);
+
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
 		tGen.start(); Thread.sleep(5);

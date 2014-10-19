@@ -95,6 +95,7 @@ public class TestFloat extends TestHarness {
 		}
 	}
 
+
 	static public <T>void runThreads(Helper h) throws Exception {
 		GenRunnable<T> gen = new GenRunnable<T>(h);
 		EvaRunnable<T> env = new EvaRunnable<T>(h);

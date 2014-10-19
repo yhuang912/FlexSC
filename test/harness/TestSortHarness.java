@@ -7,6 +7,7 @@ import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 
+
 public class TestSortHarness extends TestHarness {
 	public static abstract class Helper {
 		int[] intA;

@@ -13,6 +13,7 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
 
+
 public class TestMatrix extends TestHarness {
 	public static final int len = 32;
 	public static final int offset = 15;

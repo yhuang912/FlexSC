@@ -12,8 +12,6 @@ import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
 
-//import gc.Boolean;
-
 public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 
 	static public Mode m = Mode.COUNT;

@@ -95,7 +95,6 @@ public class TestFixedPoint extends TestHarness {
 	static public <T>void runThreads(Helper h, double error) throws Exception {
 		GenRunnable<T> gen = new GenRunnable<T>(h);
 		EvaRunnable<T> env = new EvaRunnable<T>(h);
-
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
 		tGen.start();
