@@ -9,10 +9,10 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
 
-public class TestFloat<T> extends TestHarness<T> {
+public class TestFloat extends TestHarness {
 	public static int widthV = 24, widthP = 8;
 
-	public abstract class Helper {
+	public static abstract class Helper {
 		double a, b;
 
 		public Helper(double a, double b) {
@@ -20,13 +20,13 @@ public class TestFloat<T> extends TestHarness<T> {
 			this.a = a;
 		}
 
-		public abstract T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+		public abstract<T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
 				throws Exception;
 
 		public abstract double plainCompute(double a, double b);
 	}
 
-	class GenRunnable extends network.Server implements Runnable {
+	static public class GenRunnable<T> extends network.Server implements Runnable {
 		Helper h;
 		double z;
 
@@ -55,7 +55,7 @@ public class TestFloat<T> extends TestHarness<T> {
 		}
 	}
 
-	class EvaRunnable extends network.Client implements Runnable {
+	static public class EvaRunnable<T> extends network.Client implements Runnable {
 		Helper h;
 		public double andgates;
 		public double encs;
@@ -95,9 +95,9 @@ public class TestFloat<T> extends TestHarness<T> {
 		}
 	}
 
-	public void runThreads(Helper h) throws Exception {
-		GenRunnable gen = new GenRunnable(h);
-		EvaRunnable env = new EvaRunnable(h);
+	static public <T>void runThreads(Helper h) throws Exception {
+		GenRunnable<T> gen = new GenRunnable<T>(h);
+		EvaRunnable<T> env = new EvaRunnable<T>(h);
 
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
@@ -105,7 +105,7 @@ public class TestFloat<T> extends TestHarness<T> {
 		Thread.sleep(1);
 		tEva.start();
 		tGen.join();
-		if (m == Mode.COUNT) {
+		if (TestHarness.m == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
 			double error = 0;

@@ -1,8 +1,6 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package oram;
 
-import java.io.IOException;
-
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
@@ -57,28 +55,6 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 			if (path[lengthOfPos - i])
 				++index;
 			tree[index] = blocks[i];
-		}
-	}
-
-	public boolean[] getRandomPath() throws IOException {
-		if (p == Party.Alice) {
-			boolean[] pos = new boolean[lengthOfPos];
-			for (int i = 0; i < lengthOfPos; ++i) {
-				pos[i] = CompEnv.rnd.nextBoolean();
-				if (pos[i])
-					os.write(1);
-				else
-					os.write(0);
-			}
-			os.flush();
-			return pos;
-		} else {
-			boolean[] pos = new boolean[lengthOfPos];
-			for (int i = 0; i < lengthOfPos; ++i) {
-				pos[i] = (is.read() == 1);
-			}
-			return pos;
-
 		}
 	}
 

@@ -120,11 +120,14 @@ public class MapreduceSQL<T> extends MapReduceBackEnd<T> {
 				for (int i = 0; i < sc.length; ++i)
 					sc[i] = lib.xor(sca[i], scb[i]);
 
+				if (env.m == Mode.COUNT) {
+					sta = ((PMCompEnv) env).statistic;
+					sta.flush();
+				}
 				MapreduceSQL<Boolean> wc = new MapreduceSQL<Boolean>(env);
 				KeyValue<Boolean>[] res = wc.MapReduce(sc);
 
 				if (env.m == Mode.COUNT) {
-					sta = ((PMCompEnv) env).statistic;
 					sta.finalize();
 				} else {
 					z = new int[res.length];

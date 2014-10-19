@@ -132,6 +132,7 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 
 				System.arraycopy(sca, 0, sc, 0, sca.length);
 				System.arraycopy(scb, 0, sc, sca.length, scb.length);
+				sca=null;scb=null;System.gc();
 
 				MapreduceHistogram<Boolean> wc = new MapreduceHistogram<Boolean>(
 						env);				
@@ -181,6 +182,7 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 
 				System.arraycopy(sca, 0, sc, 0, sca.length);
 				System.arraycopy(scb, 0, sc, sca.length, scb.length);
+				sca=null;scb=null;System.gc();
 
 				MapreduceHistogram<Boolean> wc = new MapreduceHistogram<Boolean>(env);
 				KeyValue<Boolean>[] res = wc.MapReduce(sc);

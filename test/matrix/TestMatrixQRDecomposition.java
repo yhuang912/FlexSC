@@ -1,13 +1,14 @@
 package matrix;
 
-//import gc.Boolean;
+import harness.TestHarness;
 import harness.TestMatrix;
+import harness.TestMatrix.Helper;
 
 import org.junit.Test;
 
 import circuits.arithmetic.DenseMatrixLib;
 
-public class TestMatrixQRDecomposition extends TestMatrix<Boolean> {
+public class TestMatrixQRDecomposition extends TestHarness {
 
 	@Test
 	public void testAllCases() throws Exception {
@@ -16,13 +17,13 @@ public class TestMatrixQRDecomposition extends TestMatrix<Boolean> {
 					new double[] { 30, 50, 8, 44 },
 					new double[] { 49, 8, 46, 16 },
 					new double[] { 28, 44, 16, 22 } };// randomMatrix(10, 10);
-			double[][] d2 = randomMatrix(10, 10);
+			double[][] d2 = TestMatrix.randomMatrix(10, 10);
 
-			runThreads(new Helper(d1, d2) {
+			TestMatrix.runThreads(new Helper(d1, d2) {
 
 				@Override
-				public Boolean[][][] secureCompute(Boolean[][][] a,
-						Boolean[][][] b, DenseMatrixLib<Boolean> lib)
+				public <T>T[][][] secureCompute(T[][][] a,
+						T[][][] b, DenseMatrixLib<T> lib)
 						throws Exception {
 					return lib.QRDecomposition(a).getElement0();
 				}

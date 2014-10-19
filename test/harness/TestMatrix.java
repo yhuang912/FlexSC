@@ -13,14 +13,14 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
 
-public class TestMatrix<T> extends TestHarness<T> {
-	public final int len = 32;
-	public final int offset = 15;
-	public final int VLength = 24;
-	public final int PLength = 8;
-	public final boolean testFixedPoint = false;
+public class TestMatrix extends TestHarness {
+	public static final int len = 32;
+	public static final int offset = 15;
+	public static final int VLength = 24;
+	public static final int PLength = 8;
+	public static final boolean testFixedPoint = false;
 
-	public abstract class Helper {
+	public static abstract class Helper {
 		double[][] a, b;
 
 		public Helper(double[][] a, double[][] b) {
@@ -28,7 +28,7 @@ public class TestMatrix<T> extends TestHarness<T> {
 			this.a = a;
 		}
 
-		public abstract T[][][] secureCompute(T[][][] a, T[][][] b,
+		public abstract<T> T[][][] secureCompute(T[][][] a, T[][][] b,
 				DenseMatrixLib<T> lib) throws Exception;
 
 		public abstract double[][] plainCompute(double[][] a, double[][] b);
@@ -36,7 +36,7 @@ public class TestMatrix<T> extends TestHarness<T> {
 
 	static Random rng = new Random(123);
 
-	public double[][] randomMatrix(int n, int m) {
+	public static double[][] randomMatrix(int n, int m) {
 		double[][] d1 = new double[n][m];
 		for (int k = 0; k < d1.length; ++k)
 			for (int j = 0; j < d1[0].length; ++j)
@@ -54,7 +54,7 @@ public class TestMatrix<T> extends TestHarness<T> {
 		System.out.print("]\n");
 	}
 
-	class GenRunnable extends network.Server implements Runnable {
+	public static class GenRunnable<T> extends network.Server implements Runnable {
 		Helper h;
 		double[][] z;
 		DenseMatrixLib<T> lib;
@@ -118,7 +118,7 @@ public class TestMatrix<T> extends TestHarness<T> {
 		}
 	}
 
-	class EvaRunnable extends network.Client implements Runnable {
+	public static class EvaRunnable<T> extends network.Client implements Runnable {
 		Helper h;
 		DenseMatrixLib<T> lib;
 		public double andgates;
@@ -186,9 +186,9 @@ public class TestMatrix<T> extends TestHarness<T> {
 		}
 	}
 
-	public void runThreads(Helper h) throws Exception {
-		GenRunnable gen = new GenRunnable(h);
-		EvaRunnable env = new EvaRunnable(h);
+	public static <T>void runThreads(Helper h) throws Exception {
+		GenRunnable<T> gen = new GenRunnable<T>(h);
+		EvaRunnable<T> env = new EvaRunnable<T>(h);
 
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);

@@ -8,9 +8,9 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
 
-public class Test_2Input1Output<T> extends TestHarness<T> {
+public class Test_2Input1Output extends TestHarness {
 
-	public abstract class Helper {
+	public static abstract class Helper {
 		int intA, intB;
 		boolean[] a;
 		boolean[] b;
@@ -23,13 +23,13 @@ public class Test_2Input1Output<T> extends TestHarness<T> {
 			b = Utils.fromInt(bb, 32);
 		}
 
-		public abstract T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e)
+		public abstract<T> T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e)
 				throws Exception;
 
 		public abstract int plainCompute(int x, int y);
 	}
 
-	class GenRunnable extends network.Server implements Runnable {
+	public static class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[] z;
 		Helper h;
 
@@ -59,7 +59,7 @@ public class Test_2Input1Output<T> extends TestHarness<T> {
 		}
 	}
 
-	class EvaRunnable extends network.Client implements Runnable {
+	public static class EvaRunnable<T> extends network.Client implements Runnable {
 		Helper h;
 		public double andgates;
 		public double encs;
@@ -99,9 +99,9 @@ public class Test_2Input1Output<T> extends TestHarness<T> {
 		}
 	}
 
-	public void runThreads(Helper h) throws Exception {
-		GenRunnable gen = new GenRunnable(h);
-		EvaRunnable env = new EvaRunnable(h);
+	static public <T>void runThreads(Helper h) throws Exception {
+		GenRunnable<T> gen = new GenRunnable<T>(h);
+		EvaRunnable<T> env = new EvaRunnable<T>(h);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
 		tGen.start();

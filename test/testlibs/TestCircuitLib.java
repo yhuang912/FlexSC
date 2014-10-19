@@ -1,31 +1,55 @@
 package testlibs;
 
+import flexsc.CompEnv;
+import harness.TestBigInteger;
+import harness.TestHarness;
 import harness.Test_2Input1Output;
 
+import java.math.BigInteger;
 import java.util.Random;
 
 import org.junit.Test;
 
 import circuits.CircuitLib;
 import circuits.arithmetic.IntegerLib;
-import flexsc.CompEnv;
 
-//import gc.Boolean;
 
-public class TestCircuitLib extends Test_2Input1Output<Boolean> {
-
+public class TestCircuitLib extends TestHarness {
 	Random rnd = new Random();
+	
+	@Test
+	public void testHammingDistance() throws Exception {
+		
+		for (int i = 0; i < testCases; i++) {
+			BigInteger a = new BigInteger(TestBigInteger.LENGTH, rnd);
+			BigInteger b = new BigInteger(TestBigInteger.LENGTH, rnd);
+			TestBigInteger.runThreads(new TestBigInteger.Helper(a, b) {
+				public <T>T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).hammingDistance(Signala, Signalb);}
 
+				public BigInteger plainCompute(BigInteger x, BigInteger y) {
+					BigInteger rb = x.xor(y);
+					BigInteger res = new BigInteger("0");
+					for(int i = 0; i < rb.bitLength(); ++i) {
+							if( rb.testBit(i) )
+								res = res.add(new BigInteger("1"));
+					}
+					return res;
+					}
+			});
+		}
+	}
+	
 	@Test
 	public void testRightPublicShift() throws Exception {
-		Random rnd = new Random();
+		
 
 		for (int i = 0; i < testCases; i++) {
 			final int shift = Math.abs(rnd.nextInt() % 32);
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).rightPublicShift(Signala,
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), 0) {
+				public <T>T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).rightPublicShift(Signala,
 							shift);
 				}
 
@@ -38,14 +62,14 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 
 	@Test
 	public void testConditionalLeftPublicShift() throws Exception {
-		Random rnd = new Random();
+		
 
 		for (int i = 0; i < testCases; i++) {
 			final int shift = Math.abs(rnd.nextInt() % 32);
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					IntegerLib<Boolean> lib = new IntegerLib<Boolean>(e);
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), 0) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					IntegerLib<T> lib = new IntegerLib<T>(e);
 					return lib.conditionalLeftPublicShift(Signala, shift,
 							lib.SIGNAL_ONE);
 				}
@@ -55,10 +79,10 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 				}
 			});
 
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					IntegerLib<Boolean> lib = new IntegerLib<Boolean>(e);
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), 0) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					IntegerLib<T> lib = new IntegerLib<T>(e);
 					return lib.conditionalLeftPublicShift(Signala, shift,
 							lib.SIGNAL_ZERO);
 				}
@@ -73,14 +97,14 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 
 	@Test
 	public void testConditionalRightPublicShift() throws Exception {
-		Random rnd = new Random();
+		
 
 		for (int i = 0; i < testCases; i++) {
 			final int shift = Math.abs(rnd.nextInt() % 32);
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					IntegerLib<Boolean> lib = new IntegerLib<Boolean>(e);
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), 0) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					IntegerLib<T> lib = new IntegerLib<T>(e);
 					return lib.conditionalRightPublicShift(Signala, shift,
 							lib.SIGNAL_ONE);
 				}
@@ -90,10 +114,10 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 				}
 			});
 
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					IntegerLib<Boolean> lib = new IntegerLib<Boolean>(e);
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), 0) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					IntegerLib<T> lib = new IntegerLib<T>(e);
 					return lib.conditionalRightPublicShift(Signala, shift,
 							lib.SIGNAL_ZERO);
 				}
@@ -108,14 +132,14 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 
 	@Test
 	public void testLeftPrivateShift() throws Exception {
-		Random rnd = new Random();
+		
 
 		for (int i = 0; i < testCases; i++) {
 			int shift = rnd.nextInt(1 << 5);
-			runThreads(new Helper(rnd.nextInt(1 << 30), shift) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).leftPrivateShift(Signala,
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), shift) {
+				public <T>T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).leftPrivateShift(Signala,
 							Signalb);
 				}
 
@@ -128,14 +152,14 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 
 	@Test
 	public void testLeftPublicShift() throws Exception {
-		Random rnd = new Random();
+		
 
 		for (int i = 0; i < testCases; i++) {
 			final int shift = Math.abs(rnd.nextInt() % 32);
-			runThreads(new Helper(rnd.nextInt(1 << 30), 0) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).leftPublicShift(Signala,
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), 0) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).leftPublicShift(Signala,
 							shift);
 				}
 
@@ -177,13 +201,13 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 
 	@Test
 	public void testLengthOfCommenPrefix() throws Exception {
-		Random rnd = new Random();
+		
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(rnd.nextInt(1 << 30), rnd.nextInt(1 << 30)) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).lengthOfCommenPrefix(
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), rnd.nextInt(1 << 30)) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).lengthOfCommenPrefix(
 							Signala, Signalb);
 				}
 
@@ -196,14 +220,14 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 
 	@Test
 	public void testRightPrivateShift() throws Exception {
-		Random rnd = new Random();
+		
 
 		for (int i = 0; i < testCases; i++) {
 			int shift = rnd.nextInt(1 << 5);
-			runThreads(new Helper(rnd.nextInt(1 << 30), shift) {
-				public Boolean[] secureCompute(Boolean[] Signala,
-						Boolean[] Signalb, CompEnv<Boolean> e) throws Exception {
-					return new IntegerLib<Boolean>(e).rightPrivateShift(
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(rnd.nextInt(1 << 30), shift) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).rightPrivateShift(
 							Signala, Signalb);
 				}
 
@@ -218,14 +242,14 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 	public void testAllCases() throws Exception {
 
 		for (int i = 0; i < 1; i++) {
-			runThreads(new Helper(0b1100, 0b1010) { // This particular pair of
-													// inputs exhausts 4
-													// possible inputs,
-													// excluding selection
-													// signal
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						CompEnv<Boolean> e) throws Exception {
-					CircuitLib<Boolean> lib = new CircuitLib<Boolean>(e);
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(0b1100, 0b1010) { // This particular pair of
+				// inputs exhausts 4
+				// possible inputs,
+				// excluding selection
+				// signal
+				public <T>T[] secureCompute(T[] a, T[] b,
+						CompEnv<T> e) throws Exception {
+					CircuitLib<T> lib = new CircuitLib<T>(e);
 					return lib.mux(a, b, lib.SIGNAL_ONE);
 				}
 
@@ -236,14 +260,14 @@ public class TestCircuitLib extends Test_2Input1Output<Boolean> {
 		}
 
 		for (int i = 0; i < testCases; i++) {
-			runThreads(new Helper(0b1100, 0b1010) { // This particular pair of
-													// inputs exhausts 4
-													// possible inputs,
-													// excluding selection
-													// signal
-				public Boolean[] secureCompute(Boolean[] a, Boolean[] b,
-						CompEnv<Boolean> e) throws Exception {
-					CircuitLib<Boolean> lib = new CircuitLib<Boolean>(e);
+			Test_2Input1Output.runThreads(new Test_2Input1Output.Helper(0b1100, 0b1010) { // This particular pair of
+				// inputs exhausts 4
+				// possible inputs,
+				// excluding selection
+				// signal
+				public<T> T[] secureCompute(T[] a, T[] b,
+						CompEnv<T> e) throws Exception {
+					CircuitLib<T> lib = new CircuitLib<T>(e);
 					return lib.mux(a, b, lib.SIGNAL_ZERO);
 				}
 

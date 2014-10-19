@@ -89,14 +89,16 @@ public class ORAMSQL {
 				for (int i = 0; i < scb.length; ++i)
 					scb[i] = env.inputOfBob(new boolean[bloodPressureBit
 							+ pidBit]);
-				IntegerLib<Boolean> lib = new IntegerLib(env);
+				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				for (int i = 0; i < sc.length; ++i)
 					sc[i] = lib.xor(sca[i], scb[i]);
 
 				RecursiveCircuitOram<Boolean> oram = new RecursiveCircuitOram<Boolean>(
 						env, numEntries, bloodPressureBit + pidBit);
+				sta = ((PMCompEnv) env).statistic;
+				sta.flush();
 				Boolean[] counter = lib.toSignals(0);
-				for (int i = 0; i < sc.length; ++i) {
+				for (int i = 0; i < 1; ++i) {
 					Boolean[] inputs = sc[i];
 					Boolean[] bloodPressure = Arrays.copyOf(inputs,
 							bloodPressureBit);
@@ -108,6 +110,8 @@ public class ORAMSQL {
 
 				sta = ((PMCompEnv) env).statistic;
 				sta.finalize();
+				sta.andGate*=sc.length;
+				sta.NumEncAlice*=sc.length;
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

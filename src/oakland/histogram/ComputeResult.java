@@ -9,7 +9,7 @@ public class ComputeResult {
 			Statistics oram = ORAMHistogram.getCount(1 << logN);
 			System.out.println(logN + "\t" + mapreduce.andGate + "\t"
 					+ oram.andGate + "\t" + mapreduce.NumEncAlice + "\t"
-					+ oram.NumEncAlice);
+					+ oram.NumEncAlice + " "+(oram.andGate/(double)mapreduce.andGate) );
 		}
 	}
 }

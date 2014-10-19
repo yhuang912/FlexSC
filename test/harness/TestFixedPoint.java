@@ -8,10 +8,10 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
 
-public class TestFixedPoint<T> extends TestHarness<T> {
-	public final int width = 32, offset = 16;
+public class TestFixedPoint extends TestHarness {
+	public static final int width = 32, offset = 16;
 
-	public abstract class Helper {
+	public static abstract class Helper {
 		double a, b;
 
 		public Helper(double a, double b) {
@@ -19,13 +19,13 @@ public class TestFixedPoint<T> extends TestHarness<T> {
 			this.a = a;
 		}
 
-		public abstract T[] secureCompute(T[] a, T[] b, int offset,
+		public abstract <T>T[] secureCompute(T[] a, T[] b, int offset,
 				CompEnv<T> env) throws Exception;
 
 		public abstract double plainCompute(double a, double b);
 	}
 
-	class GenRunnable extends network.Server implements Runnable {
+	static public class GenRunnable<T> extends network.Server implements Runnable {
 		Helper h;
 		double z;
 
@@ -53,7 +53,7 @@ public class TestFixedPoint<T> extends TestHarness<T> {
 		}
 	}
 
-	class EvaRunnable extends network.Client implements Runnable {
+	static public class EvaRunnable<T> extends network.Client implements Runnable {
 		Helper h;
 		public double andgates;
 		public double encs;
@@ -92,9 +92,9 @@ public class TestFixedPoint<T> extends TestHarness<T> {
 		}
 	}
 
-	public void runThreads(Helper h, double error) throws Exception {
-		GenRunnable gen = new GenRunnable(h);
-		EvaRunnable env = new EvaRunnable(h);
+	static public <T>void runThreads(Helper h, double error) throws Exception {
+		GenRunnable<T> gen = new GenRunnable<T>(h);
+		EvaRunnable<T> env = new EvaRunnable<T>(h);
 
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
@@ -114,7 +114,7 @@ public class TestFixedPoint<T> extends TestHarness<T> {
 		}
 	}
 
-	public void runThreads(Helper h) throws Exception {
+	public static void runThreads(Helper h) throws Exception {
 		runThreads(h, 1E-5);
 	}
 

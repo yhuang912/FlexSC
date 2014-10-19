@@ -11,12 +11,11 @@ import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
-import gc.GCSignal;
 
-public class TestSpeed<T> extends TestHarness<T> {
+public class TestSpeed extends TestHarness {
 
 	Mode mode = Mode.REAL;
-	public T[] secureCompute(T[] a, T[] b, CompEnv env) {
+	public <T>T[] secureCompute(T[] a, T[] b, CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
 		T[] res = null;
 		double t1 = System.nanoTime();
@@ -32,7 +31,7 @@ public class TestSpeed<T> extends TestHarness<T> {
 		return res;
 	}
 	int LEN = 1000000;
-	class GenRunnable extends network.Server implements Runnable {
+	class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[] z;
 
 		public void run() {
@@ -57,7 +56,7 @@ public class TestSpeed<T> extends TestHarness<T> {
 		}
 	}
 
-	class EvaRunnable extends network.Client implements Runnable {
+	class EvaRunnable<T> extends network.Client implements Runnable {
 		public double andgates;
 		public double encs;
 
@@ -93,9 +92,9 @@ public class TestSpeed<T> extends TestHarness<T> {
 	}
 
 	@Test
-	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable();
-		EvaRunnable env = new EvaRunnable();
+	public <T>void runThreads() throws Exception {
+		GenRunnable<T> gen = new GenRunnable<T>();
+		EvaRunnable<T> env = new EvaRunnable<T>();
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
 		tGen.start();
@@ -106,7 +105,7 @@ public class TestSpeed<T> extends TestHarness<T> {
 	}
 	
 	public static void main(String args[]) throws Exception{
-		 TestSpeed<GCSignal> test = new TestSpeed<GCSignal>();
+		 TestSpeed test = new TestSpeed();
 		 test.runThreads();
 	}
 }

@@ -90,7 +90,9 @@ public class ORAMKMeans {
 
 				RecursiveCircuitOram<Boolean> oram = new RecursiveCircuitOram<Boolean>(
 						env, 1, 32);
-				for (int i = 0; i < sc.length; ++i) {
+				sta = ((PMCompEnv) env).statistic;
+				sta.flush();
+				for (int i = 0; i < 1; ++i) {
 					Boolean[] temp = lib.rightPublicShift(sc[i], 32 - 11);
 					Boolean[] cnt = oram.read(temp);
 					cnt = lib.incrementByOne(cnt);
@@ -99,8 +101,8 @@ public class ORAMKMeans {
 
 				sta = ((PMCompEnv) env).statistic;
 				sta.finalize();
-				// System.out.println("Number of Enc:"+ sta.NumEncAlice+
-				// "\nNumber of ANDs:" + sta.andGate);
+				sta.andGate*=sc.length;
+				sta.NumEncAlice*=sc.length;
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -1,6 +1,8 @@
 package testlibs;
 
+import harness.TestHarness;
 import harness.TestSortHarness;
+import harness.TestSortHarness.Helper;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -12,7 +14,7 @@ import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Comparator;
 
-public class TestSortLib extends TestSortHarness<Boolean> {
+public class TestSortLib extends TestHarness {
 
 	class IntComparator<T> implements Comparator<T> {
 		IntegerLib<T> lib;
@@ -36,14 +38,14 @@ public class TestSortLib extends TestSortHarness<Boolean> {
 			for (int j = 0; j < a.length; ++j)
 				a[j] = rnd.nextInt() % (1 << 30);
 
-			Helper helper = new Helper(a) {
-				public Boolean[][] secureCompute(Boolean[][] Signala,
-						CompEnv<Boolean> e) throws Exception {
-					IntegerLib<Boolean> ilib = new IntegerLib<Boolean>(e);
+			TestSortHarness.runThreads(new Helper(a) {
+				public <T>T[][] secureCompute(T[][] Signala,
+						CompEnv<T> e) throws Exception {
+					IntegerLib<T> ilib = new IntegerLib<T>(e);
 
-					SortLib<Boolean> lib = new SortLib<Boolean>(e, ilib);
+					SortLib<T> lib = new SortLib<T>(e, ilib);
 					lib.sort(Signala, ilib.SIGNAL_ONE,
-							new IntComparator<Boolean>(ilib));
+							new IntComparator<T>(ilib));
 
 					return Signala;
 				}
@@ -53,8 +55,7 @@ public class TestSortLib extends TestSortHarness<Boolean> {
 					Arrays.sort(intA);
 					return intA;
 				}
-			};
-			runThreads(helper);
+			});
 		}
 	}
 

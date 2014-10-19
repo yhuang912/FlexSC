@@ -1,6 +1,9 @@
 package testlibs;
 
+import flexsc.CompEnv;
+import harness.TestHarness;
 import harness.TestSortHarness;
+import harness.TestSortHarness.Helper;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -8,9 +11,8 @@ import java.util.Random;
 import org.junit.Test;
 
 import circuits.BitonicSortLib;
-import flexsc.CompEnv;
 
-public class TestBitonicSortLib extends TestSortHarness<Boolean> {
+public class TestBitonicSortLib extends TestHarness {
 
 	@Test
 	public void testAllCases() throws Exception {
@@ -20,10 +22,10 @@ public class TestBitonicSortLib extends TestSortHarness<Boolean> {
 			for (int j = 0; j < a.length; ++j)
 				a[j] = rnd.nextInt() % (1 << 30);
 
-			Helper helper = new Helper(a) {
-				public Boolean[][] secureCompute(Boolean[][] Signala,
-						CompEnv<Boolean> e) throws Exception {
-					BitonicSortLib<Boolean> lib = new BitonicSortLib<Boolean>(e);
+			TestSortHarness.runThreads(new Helper(a) {
+				public <T>T[][] secureCompute(T[][] Signala,
+						CompEnv<T> e) throws Exception {
+					BitonicSortLib<T> lib = new BitonicSortLib<T>(e);
 					lib.sort(Signala, lib.SIGNAL_ONE);
 					return Signala;
 				}
@@ -33,8 +35,7 @@ public class TestBitonicSortLib extends TestSortHarness<Boolean> {
 					Arrays.sort(intA);
 					return intA;
 				}
-			};
-			runThreads(helper);
+			});
 		}
 	}
 

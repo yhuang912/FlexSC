@@ -14,7 +14,7 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
 
-public class TestSparseMatrix<T> extends TestHarness<T> {
+public class TestSparseMatrix<T> extends TestHarness {
 	public final int len = 64;
 	public final int offset = 30;
 	public final int VLength = 24;

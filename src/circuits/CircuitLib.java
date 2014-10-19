@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import flexsc.CompEnv;
+import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
 
@@ -32,6 +33,9 @@ public class CircuitLib<T> {
 	}
 
 	public T[] randBools(int length) {
+		if(env.m == Mode.COUNT) {
+			return zeros(length);
+		}
 		boolean[] res = new boolean[length];
 		for (int i = 0; i < length; ++i)
 			res[i] = CompEnv.rnd.nextBoolean();
@@ -51,6 +55,9 @@ public class CircuitLib<T> {
 	}
 
 	public boolean[] declassifyToBoth(T[] x) {
+		if(env.m == Mode.COUNT){
+			return new boolean[x.length];
+		}
 		boolean[] pos = env.outputToAlice(x);
 		try {
 			if (env.getParty() == Party.Alice) {
@@ -60,7 +67,7 @@ public class CircuitLib<T> {
 				for (int i = 0; i < pos.length; ++i)
 					tmp[i] = (byte) (pos[i] ? 1 : 0);
 				env.os.write(tmp);
-				env.os.flush();
+				env.flush();
 			} else {
 				byte[] l = new byte[1];
 				env.is.read(l);

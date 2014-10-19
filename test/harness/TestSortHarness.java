@@ -7,8 +7,8 @@ import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
 
-public class TestSortHarness<T> extends TestHarness<T> {
-	public abstract class Helper {
+public class TestSortHarness extends TestHarness {
+	public static abstract class Helper {
 		int[] intA;
 		boolean[][] a;
 		Mode m;
@@ -20,13 +20,13 @@ public class TestSortHarness<T> extends TestHarness<T> {
 				a[i] = Utils.fromInt(aa[i], 32);
 		}
 
-		public abstract T[][] secureCompute(T[][] Signala, CompEnv<T> e)
+		public abstract<T> T[][] secureCompute(T[][] Signala, CompEnv<T> e)
 				throws Exception;
 
 		public abstract int[] plainCompute(int[] intA2);
 	}
 
-	class GenRunnable extends network.Server implements Runnable {
+	public static class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[][] z;
 		Helper h;
 
@@ -61,7 +61,7 @@ public class TestSortHarness<T> extends TestHarness<T> {
 		}
 	}
 
-	class EvaRunnable extends network.Client implements Runnable {
+	public static class EvaRunnable<T> extends network.Client implements Runnable {
 		Helper h;
 
 		EvaRunnable(Helper h) {
@@ -92,9 +92,9 @@ public class TestSortHarness<T> extends TestHarness<T> {
 		}
 	}
 
-	public void runThreads(Helper helper) throws Exception {
-		GenRunnable gen = new GenRunnable(helper);
-		EvaRunnable eva = new EvaRunnable(helper);
+	public static <T>void runThreads(Helper helper) throws Exception {
+		GenRunnable<T> gen = new GenRunnable<T>(helper);
+		EvaRunnable<T> eva = new EvaRunnable<T>(helper);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
 		tGen.start();
