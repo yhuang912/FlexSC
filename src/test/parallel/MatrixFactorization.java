@@ -22,7 +22,7 @@ import gc.BadLabelException;
 
 public class MatrixFactorization<T> implements ParallelGadget<T> {
 
-	public static int ITERATIONS = 2;
+	public static int ITERATIONS = 10;
 	public static double GAMMA = 0.0001;
 	public static double LAMBDA = 0.001; 
 	public static double MU = 0.001;
