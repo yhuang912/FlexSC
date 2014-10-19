@@ -25,8 +25,8 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
 	int32 funct = 0;
 
    int32[64] b;
-   for(int i = 0; i < 32; ++i)
-      b[i] = reg[i];
+   for(public int32 k = 0; k < 32; k = k + 1)
+      b[k] = reg[k];
 	if (unsignExt >> 15 != 0)
 		unsignExt = unsignExt + 0xffff0000;
 
