@@ -18,6 +18,7 @@ public class IPManager {
 		BufferedReader br = null;
 		try {
 			// System.out.println(Constants.MACHINE_IPS);
+			System.out.println(Constants.MACHINE_IPS + "." + machines);
 			br = new BufferedReader(new FileReader(Constants.MACHINE_IPS + "." + machines));
 			ipManager.masterGarblerIp = br.readLine();
 			ipManager.masterEvaluatorIp = br.readLine();
