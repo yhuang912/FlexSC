@@ -17,7 +17,6 @@ import ot.IncorrectOtUsageException;
 import test.Utils;
 import circuits.IntegerLib;
 import circuits.arithmetic.FixedPointLib;
-import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
@@ -29,7 +28,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 	static int UNUSED_FLOAT_V = 20;
 	static int UNUSED_FLOAT_P = 11;
 	static int INT_LEN = 32;
-	static int ITERATIONS = 3;
+	static int ITERATIONS = 10;
 	static int WIDTH = 40;
 	static int OFFSET = 20;
 
@@ -155,6 +154,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 			aa[i] = new PageRankNode<T>(u[i], v[i], isVertex[i], env);
 		}
 
+		long startTime = System.nanoTime();
 		// set initial pagerank
 		new SetInitialPageRankGadget<T>(env, machine)
 				.setInputs(aa)
@@ -238,7 +238,11 @@ public class PageRank<T> implements ParallelGadget<T> {
 		new SortGadget<T>(env, machine)
 			.setInputs(aa, PageRankNode.vertexFirstComparator(env))
 			.compute();
-		output(machineId, env, aa);
+		long endTime = System.nanoTime();
+		if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
+			System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "PageRank");
+		}
+		// output(machineId, env, aa);
 	}
 
 	private <T> void output(int machineId, final CompEnv<T> env,

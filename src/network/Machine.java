@@ -240,7 +240,8 @@ public class Machine {
 	}
 
 	public static <T> void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
-		IPManager ipManager = IPManager.loadIPs();
+		int machines = Integer.parseInt(args[6]);
+		IPManager ipManager = IPManager.loadIPs(machines);
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
 		int compPoolGenEvaPort = Integer.parseInt(args[2]);
