@@ -57,9 +57,9 @@ public class Histogram<T> implements ParallelGadget<T> {
 			b[i] = Utils.fromInt(v[i], GraphNode.VERTEX_LEN);
 			c[i] = isVertex[i];
 		}
-		System.out.println("Frequencies");
-		for (int i = 0; i < limit + 1; i++)
-			System.out.println(i + ": " + freq[i]);
+//		System.out.println("Frequencies");
+//		for (int i = 0; i < limit + 1; i++)
+//			System.out.println(i + ": " + freq[i]);
 		Object[] ret = new Object[3];
 		ret[0] = a;
 		ret[1] = b;
@@ -158,6 +158,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 			aa[i] = new HistogramNode<T>(u[i], v[i], isVertex[i], env);
 		}
 
+		long startTime = System.nanoTime();
 		new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new HistogramNode<>(env)) {
 
 			@Override
@@ -180,6 +181,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 		new SortGadget<T>(env, machine)
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
+		long endTime = System.nanoTime();
 //		new HistogramMapper<T>(env, machine)
 //				.setInputs(freq)
 //				.compute();
@@ -215,13 +217,15 @@ public class Histogram<T> implements ParallelGadget<T> {
 			System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);
 			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
 		} else if (machine.machineId == 0) {
-			for (int i = 0; i < 4; i++) {
-//				int int1 = Utils.toInt(env.outputToAlice(flag[i]));
-				int int2 = Utils.toInt(env.outputToAlice(aa[i].v));
-				int int3 = Utils.toInt(env.outputToAlice(aa[i].count));
-				if (Party.Alice.equals(env.party)) {
-					System.out.println(machine.machineId + ": " + int2 + ", " + int3);
-				}
+//			for (int i = 0; i < 4; i++) {
+//				int int2 = Utils.toInt(env.outputToAlice(aa[i].v));
+//				int int3 = Utils.toInt(env.outputToAlice(aa[i].count));
+//				if (Party.Alice.equals(env.party)) {
+//					System.out.println(machine.machineId + ": " + int2 + ", " + int3);
+//				}
+//			}
+			if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
+				System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Histogram");
 			}
 		}
 	}
