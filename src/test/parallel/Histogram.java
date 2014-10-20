@@ -13,7 +13,6 @@ import network.Machine;
 import network.NetworkUtil;
 import test.Utils;
 import circuits.IntegerLib;
-import circuits.TestComparator;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
