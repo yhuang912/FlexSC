@@ -43,7 +43,6 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 			.setInputs(nodes, nodes[0].getComparator(env, true /* isVertexLast */))
 			.compute();
 
-
 		IntegerLib<T> lib = new IntegerLib<>(env);
 
 		Constructor<?> constructor = nodes.getClass().getComponentType().getConstructor(new Class[]{CompEnv.class});
@@ -92,7 +91,7 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 		return null;
 	}
 
-	public abstract GraphNode<T> aggFunc(GraphNode<T> agg, GraphNode<T> b);
+	public abstract GraphNode<T> aggFunc(GraphNode<T> agg, GraphNode<T> b) throws IOException;
 
 	public abstract void writeToVertex(GraphNode<T> agg, GraphNode<T> b);
 }

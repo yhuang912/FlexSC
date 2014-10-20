@@ -3,6 +3,7 @@ package test.parallel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Random;
@@ -22,74 +23,123 @@ import gc.BadLabelException;
 
 public class Histogram<T> implements ParallelGadget<T> {
 
-	public static int DATASIZE = 32;
-
-	private boolean[][] getInput(int inputLength) {
-		int[] aa = new int[inputLength];
-		boolean[][] a = new boolean[aa.length][];
+	private Object[] getInput(int inputLength) {
+		int[] u = new int[inputLength];
+		int[] v = new int[inputLength];
+		boolean[] isVertex = new boolean[inputLength];
+		boolean[][] a = new boolean[u.length][];
+		boolean[][] b = new boolean[v.length][];
+		boolean[] c = new boolean[isVertex.length];
 		int limit = 20;
+		for (int i = 0; i < limit; i++) {
+			u[i] = i + 1;
+			v[i] = i + 1;
+			isVertex[i] = true;
+		}
 		Random rn = new Random();
 		int[] freq = new int[limit + 1];
 		for (int i = 0; i < limit + 1; i++)
 			freq[i] = 0;
-		for (int i = 0; i < a.length; ++i) {
-			aa[i] = rn.nextInt(limit);
-			freq[aa[i]]++;
+		for (int i = limit; i < a.length; ++i) {
+//			int temp = rn.nextInt(limit) + 1;
+//			int temp2 = rn.nextInt(limit) + 1;
+//			if (temp == temp2) {
+//				i--;
+//				continue;
+//			}
+			u[i] = rn.nextInt(limit) + 1;
+			v[i] = u[i];
+			isVertex[i] = false;
+			freq[v[i]]++;
 		}
-		for(int i = 0; i < aa.length; ++i)
-			a[i] = Utils.fromInt(aa[i], DATASIZE);
+		for(int i = 0; i < u.length; ++i) {
+			a[i] = Utils.fromInt(u[i], GraphNode.VERTEX_LEN);
+			b[i] = Utils.fromInt(v[i], GraphNode.VERTEX_LEN);
+			c[i] = isVertex[i];
+		}
 		System.out.println("Frequencies");
 		for (int i = 0; i < limit + 1; i++)
 			System.out.println(i + ": " + freq[i]);
-		return a;
+		Object[] ret = new Object[3];
+		ret[0] = a;
+		ret[1] = b;
+		ret[2] = c;
+		return ret;
 	}
 
 	private Object[] performOTAndReturnMachineInputs(int inputLength,
 			int machines, boolean isGen, CompEnv<T> env)
 			throws IOException {
-		T[][] Ta = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[][] tu = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[][] tv = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[] tIsV = env.newTArray(inputLength /* number of entries in the input */);
 		if (isGen) {
-			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(new boolean[DATASIZE]);
+			for(int i = 0; i < tu.length; ++i)
+				tu[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
+			for(int i = 0; i < tv.length; ++i)
+				tv[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
+			tIsV = env.inputOfBob(new boolean[tIsV.length]);
 		} else {
-			boolean[][] a = getInput(inputLength);
-			for(int i = 0; i < Ta.length; ++i)
-				Ta[i] = env.inputOfBob(a[i]);
+			Object[] input = getInput(inputLength);
+			boolean[][] u = (boolean[][]) input[0];
+			boolean[][] v = (boolean[][]) input[1];
+			boolean[] isV = (boolean[]) input[2];
+			for(int i = 0; i < tu.length; ++i)
+				tu[i] = env.inputOfBob((boolean[]) u[i]);
+			for(int i = 0; i < tv.length; ++i)
+				tv[i] = env.inputOfBob((boolean[]) v[i]);
+			tIsV = env.inputOfBob(isV);
 		}
-		Object[] input = new Object[machines];
-	
-		for(int i = 0; i < machines; ++i)
-			input[i] = Arrays.copyOfRange(Ta, i * Ta.length / machines, (i + 1) * Ta.length / machines);
+		Object[] inputU = new Object[machines];
+		Object[] inputV = new Object[machines];
+		Object[] inputIsVertex = new Object[machines];
+
+		for(int i = 0; i < machines; ++i) {
+			inputU[i] = Arrays.copyOfRange(tu, i * tu.length / machines, (i + 1) * tu.length / machines);
+			inputV[i] = Arrays.copyOfRange(tv, i * tv.length / machines, (i + 1) * tv.length / machines);
+			inputIsVertex[i] = Arrays.copyOfRange(tIsV, i * tIsV.length / machines, (i + 1) * tIsV.length / machines);
+		}
+		Object[] input = new Object[3];
+		input[0] = inputU;
+		input[1] = inputV;
+		input[2] = inputIsVertex;
 		return input;
+
 	}
 
+	@Override
 	public void sendInputToMachines(int inputLength,
 			int machines,
 			boolean isGen, 
 			CompEnv<T> env,
 			OutputStream[] os) throws IOException {
 		Object[] input = performOTAndReturnMachineInputs(inputLength, machines, isGen, env);
+		Object[] inputU = (Object[]) input[0];
+		Object[] inputV = (Object[]) input[1];
+		Object[] inputIsVertex = (Object[]) input[2];
 		for (int i = 0; i < machines; i++) {
-			T[][] gcInput = (T[][]) input[i];
-			NetworkUtil.writeInt(os[i], gcInput.length);
-			NetworkUtil.writeInt(os[i], gcInput[0].length);
-			for (int j = 0; j < gcInput.length; j++) {
-				for (int k = 0; k < gcInput[j].length; k++) {
-					NetworkUtil.send(os[i], gcInput[j][k], env);
-//					gcInput[j][k].send(os[i]);
-				}
-			}
+			T[][] gcInputU = (T[][]) inputU[i];
+			T[][] gcInputV = (T[][]) inputV[i];
+			T[] gcInputIsVertex = (T[]) inputIsVertex[i];
+			NetworkUtil.writeInt(os[i], gcInputU.length);
+//			NetworkUtil.writeInt(os[i], gcInputU[0].length);
+			NetworkUtil.send(os[i], gcInputU, env);
+			NetworkUtil.send(os[i], gcInputV, env);
+			NetworkUtil.send(os[i], gcInputIsVertex, env);
 			os[i].flush();
 		}
 	}
 
 	@Override
 	public Object readInputFromMaster(int inputLength, InputStream masterIs, CompEnv<T> env) throws IOException {
-		T[][] gcInput = env.newTArray(inputLength, DATASIZE);//new T[inputLength][inputSize];
-		 for (int j = 0; j < inputLength; j++)
-				for (int k = 0; k < DATASIZE; k++)
-					gcInput[j][k] = NetworkUtil.read(masterIs, env);// env.ZERO();//new Boolean(true);//Boolean.receive(masterIs);
-		 return gcInput;
+		T[][] gcInputU = NetworkUtil.read(masterIs, inputLength, GraphNode.VERTEX_LEN, env);
+		T[][] gcInputV = NetworkUtil.read(masterIs, inputLength, GraphNode.VERTEX_LEN, env);
+		T[] gcInputIsVertex = NetworkUtil.read(masterIs, inputLength, env);
+		Object[] ret = new Object[3];
+		ret[0] = gcInputU;
+		ret[1] = gcInputV;
+		ret[2] = gcInputIsVertex;
+	    return ret;
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -98,36 +148,66 @@ public class Histogram<T> implements ParallelGadget<T> {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
-		T[][] input = (T[][]) machine.input;
-		T[][] freq = (T[][]) env.newTArray(input.length, input[0].length);
-		new HistogramMapper<T>(env, machine)
-				.setInputs(freq)
-				.compute();
+		T[][] u = (T[][]) ((Object[]) machine.input)[0];
+		T[][] v = (T[][]) ((Object[]) machine.input)[1];
+		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
+		final IntegerLib<T> lib = new IntegerLib<>(env);
+//		T[][] freq = (T[][]) env.newTArray(input.length, input[0].length);
+		HistogramNode<T>[] aa = (HistogramNode<T>[]) Array.newInstance(HistogramNode.class, u.length);
+		for (int i = 0; i < aa.length; i++) {
+			aa[i] = new HistogramNode<T>(u[i], v[i], isVertex[i], env);
+		}
+
+		new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new HistogramNode<>(env)) {
+
+			@Override
+			public GraphNode<T> aggFunc(GraphNode<T> agg, GraphNode<T> b) throws IOException {
+//				T[] one = lib.publicValue(1);
+				T[] one = env.inputOfAlice(Utils.fromInt(1, HistogramNode.LEN));
+				HistogramNode<T> ret = new HistogramNode<T>(env);
+				ret.count = lib.add(((HistogramNode<T>) agg).count, one);
+				return ret;
+			}
+
+			@Override
+			public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
+				HistogramNode<T> agg = (HistogramNode<T>) aggNode;
+				HistogramNode<T> b = (HistogramNode<T>) bNode;
+				b.count = lib.mux(b.count, agg.count, b.isVertex);
+			}
+		}.setInputs(aa).compute();
 
 		new SortGadget<T>(env, machine)
-//		        .setInputs(input, new TestComparator<T>env, freq)
-				.setInputs(null /*input, should pass graph nodes*/, new TestComparator<T>(env))
-				.compute();
-
-		new PrefixSumGadget<T>(env, machine)
-				.setInputs(freq, new IntegerLib<T>(env))
-				.compute();
-
-		T[][] flag = (T[][]) env.newTArray(input.length, input[0].length);
-		new MarkerWithLastValueGadget<T>(env, machine)
-				.setInputs(input, flag)
-				.compute();
-
-		T[][] data = (T[][]) Utils.flatten(env, input, freq);
-		data = (T[][]) new SortGadget<T>(env, machine)
-//				.setInputs(flag, new TestComparator<T>(env), input, freq)
-				.setInputs(null /* input, should pass graph nodes */, new TestComparator<T>(env))
-				.compute();
-		Utils.unflatten(data, input, freq);
-
-		new SubtractGadgetForHistogram<T>(env, machine)
-				.setInputs(freq, new IntegerLib<T>(env))
-				.compute();
+			.setInputs(aa, GraphNode.vertexFirstComparator(env))
+			.compute();
+//		new HistogramMapper<T>(env, machine)
+//				.setInputs(freq)
+//				.compute();
+//
+//		new SortGadget<T>(env, machine)
+////		        .setInputs(input, new TestComparator<T>env, freq)
+//				.setInputs(null /*input, should pass graph nodes*/, new TestComparator<T>(env))
+//				.compute();
+//
+//		new PrefixSumGadget<T>(env, machine)
+//				.setInputs(freq, new IntegerLib<T>(env))
+//				.compute();
+//
+//		T[][] flag = (T[][]) env.newTArray(input.length, input[0].length);
+//		new MarkerWithLastValueGadget<T>(env, machine)
+//				.setInputs(input, flag)
+//				.compute();
+//
+//		T[][] data = (T[][]) Utils.flatten(env, input, freq);
+//		data = (T[][]) new SortGadget<T>(env, machine)
+////				.setInputs(flag, new TestComparator<T>(env), input, freq)
+//				.setInputs(null /* input, should pass graph nodes */, new TestComparator<T>(env))
+//				.compute();
+//		Utils.unflatten(data, input, freq);
+//
+//		new SubtractGadgetForHistogram<T>(env, machine)
+//				.setInputs(freq, new IntegerLib<T>(env))
+//				.compute();
 
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
@@ -136,9 +216,9 @@ public class Histogram<T> implements ParallelGadget<T> {
 			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
 		} else if (machine.machineId == 0) {
 			for (int i = 0; i < 4; i++) {
-				int int1 = Utils.toInt(env.outputToAlice(flag[i]));
-				int int2 = Utils.toInt(env.outputToAlice(input[i]));
-				int int3 = Utils.toInt(env.outputToAlice(freq[i]));
+//				int int1 = Utils.toInt(env.outputToAlice(flag[i]));
+				int int2 = Utils.toInt(env.outputToAlice(aa[i].v));
+				int int3 = Utils.toInt(env.outputToAlice(aa[i].count));
 				if (Party.Alice.equals(env.party)) {
 					System.out.println(machine.machineId + ": " + int2 + ", " + int3);
 				}

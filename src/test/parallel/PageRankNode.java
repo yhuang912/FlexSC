@@ -17,8 +17,8 @@ public class PageRankNode<T> extends GraphNode<T> {
 
 	public PageRankNode(T[] u, T[] v, T isVertex, CompEnv<T> env) {
 		super(u, v, isVertex);
-		this.pr = env.newTArray(u.length);
-		this.l = env.newTArray(u.length);
+		this.pr = env.newTArray(PageRank.WIDTH);
+		this.l = env.newTArray(PageRank.WIDTH);
 	}
 
 	public PageRankNode(CompEnv<T> env) {
@@ -26,8 +26,8 @@ public class PageRankNode<T> extends GraphNode<T> {
 		try {
 //			this.pr = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
 //			this.l = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
-			this.pr = env.inputOfAlice(Utils.fromFixPoint(0, 40, 20));
-			this.l = env.inputOfAlice(Utils.fromFixPoint(0, 40, 20));
+			this.pr = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
+			this.l = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
 		} catch (IOException e) {
 			e.printStackTrace();
 		};
@@ -49,8 +49,8 @@ public class PageRankNode<T> extends GraphNode<T> {
 		super.read(is, env);
 //		this.pr = NetworkUtil.read(is, INT_LEN, env);
 //		this.l = NetworkUtil.read(is, INT_LEN, env);
-		this.pr = NetworkUtil.read(is, 40, env);
-		this.l = NetworkUtil.read(is, 40, env);
+		this.pr = NetworkUtil.read(is, PageRank.WIDTH, env);
+		this.l = NetworkUtil.read(is, PageRank.WIDTH, env);
 	}
 
 	@Override

@@ -181,8 +181,9 @@ public class CircuitLib<T> {
 		assert (x != null && y != null && x.length == y.length) : "CircuitLib.mux[]: bad inputs";
 
 		T[] ret = env.newTArray(x.length);
-		for (int i = 0; i < x.length; i++)
+		for (int i = 0; i < x.length; i++) {
 			ret[i] = mux(x[i], y[i], c);
+		}
 
 		return ret;
 	}
