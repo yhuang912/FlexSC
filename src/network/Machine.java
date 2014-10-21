@@ -270,7 +270,6 @@ public class Machine {
 		machine.disconnect();
 
 		if (machine.machineId == firstPhysicalMachineId) {
-			Thread.sleep(10000);
 			PrintWriter writer = new PrintWriter("mutex.txt");
 			writer.close();
 		}
