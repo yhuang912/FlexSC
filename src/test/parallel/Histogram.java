@@ -213,8 +213,10 @@ public class Histogram<T> implements ParallelGadget<T> {
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
-			System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);
-			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
+			if (Party.Alice.equals(env.party)) {
+				Thread.sleep(1000 * machineId);
+				System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+			}
 		} else if (machine.machineId == 0) {
 //			for (int i = 0; i < 4; i++) {
 //				int int2 = Utils.toInt(env.outputToAlice(aa[i].v));
