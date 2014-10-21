@@ -17,7 +17,7 @@ import rand.ISAACProvider;
 
 public abstract class CompEnv<T> {
 	
-	public SecureRandom rnd;
+	public static SecureRandom rnd;
 	
 	@SuppressWarnings("rawtypes")
 	public static CompEnv getEnv(Mode mode, Party p, InputStream is, OutputStream os) throws IOException, ClassNotFoundException {
@@ -75,8 +75,12 @@ public abstract class CompEnv<T> {
 	
 	abstract public CompEnv<T> getNewInstance(InputStream in, OutputStream os) throws Exception;
 	
-	public void flush() throws IOException {
-		os.flush();
+	public void flush() {
+		try {
+			os.flush();
+		} catch (IOException e) {
+			System.out.println(e);
+		}
 	}
 
 	public void sync() throws IOException {

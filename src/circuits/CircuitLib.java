@@ -32,13 +32,18 @@ public class CircuitLib<T> {
 		return result;
 	}
 
-	public T[] randBools(int length) throws Exception {
+	public T[] randBools(int length) {
 		boolean[] res = new boolean[length];
 		for(int i = 0; i < length; ++i)
 			res[i] = env.rnd.nextBoolean();
-		T[] alice = env.inputOfAlice(res);
-		T[] bob = env.inputOfBob(res);
-		T[] resSC = xor(alice, bob);
+		T[] resSC = null;
+		try {
+			T[] alice = env.inputOfAlice(res);
+			T[] bob = env.inputOfBob(res);
+			resSC = xor(alice, bob);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		return resSC;
 	}
@@ -50,27 +55,32 @@ public class CircuitLib<T> {
 		return env.outputToBob(x);
 	}
 	
-	public boolean[] declassifyToBoth(T[] x) throws IOException, BadLabelException {
-		boolean[] pos = env.outputToAlice(x);
-		if(env.getParty() == Party.Alice){
-			//send pos to bob
-			env.os.write(new byte[]{(byte) pos.length});
-			byte[] tmp = new byte[pos.length];
-			for(int i = 0; i < pos.length; ++i)
-				tmp[i] = (byte) (pos[i] ? 1 : 0);
-			env.os.write(tmp);
-			env.os.flush();
-		} else {
-			byte[] l = new byte[1];
-			env.is.read(l);
-			byte tmp[] = new byte[l[0]];
-			env.is.read(tmp);
-			pos = new boolean[l[0]];
-			for(int k = 0; k < tmp.length; ++k) {
-				pos[k] = ((tmp[k] - 1) == 0);
+	public boolean[] declassifyToBoth(T[] x) {
+		try {
+			boolean[] pos = env.outputToAlice(x);
+			if(env.getParty() == Party.Alice){
+				//send pos to bob
+				env.os.write(new byte[]{(byte) pos.length});
+				byte[] tmp = new byte[pos.length];
+				for(int i = 0; i < pos.length; ++i)
+					tmp[i] = (byte) (pos[i] ? 1 : 0);
+				env.os.write(tmp);
+				env.os.flush();
+			} else {
+				byte[] l = new byte[1];
+				env.is.read(l);
+				byte tmp[] = new byte[l[0]];
+				env.is.read(tmp);
+				pos = new boolean[l[0]];
+				for(int k = 0; k < tmp.length; ++k) {
+					pos[k] = ((tmp[k] - 1) == 0);
+				}
 			}
+			return pos;
+		} catch (IOException | BadLabelException e) {
+			e.printStackTrace();
 		}
-		return pos;
+		return null;
 	}
 	
 	// Defaults to 32 bit constants.
