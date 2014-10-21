@@ -269,8 +269,8 @@ public class Machine {
 		System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);*/
 		machine.disconnect();
 
-		Thread.sleep(10000);
 		if (machine.machineId == firstPhysicalMachineId) {
+			Thread.sleep(10000);
 			PrintWriter writer = new PrintWriter("mutex.txt");
 			writer.close();
 		}
