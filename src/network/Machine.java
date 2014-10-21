@@ -242,7 +242,7 @@ public class Machine {
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
 		int compPoolGenEvaPort = Integer.parseInt(args[2]);
-		Mode mode = Mode.REAL;
+		Mode mode = Mode.COUNT;
 		Machine machine = new Machine(masterPort);
 		machine.isGen = Boolean.parseBoolean(args[3]);
 		machine.inputLength = Integer.parseInt(args[4]);
@@ -269,6 +269,7 @@ public class Machine {
 		System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);*/
 		machine.disconnect();
 
+		Thread.sleep(10000);
 		if (machine.machineId == firstPhysicalMachineId) {
 			PrintWriter writer = new PrintWriter("mutex.txt");
 			writer.close();

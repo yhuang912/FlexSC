@@ -34,7 +34,7 @@ public class SubtractGadgetForPageRank<T> extends Gadget<T> {
 			NetworkUtil.send(machine.peerOsUp[0], l[0], env);
 			((BufferedOutputStream) machine.peerOsUp[0]).flush();
 		}
-		T[] first = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
+		T[] first = env.inputOfAlice(Utils.fromInt(0, 32 /* PageRank.INT_LEN */));
 		if (machine.numberOfIncomingConnections > 0) {
 			first = NetworkUtil.read(machine.peerIsDown[0], l[0].length, env);
 		}

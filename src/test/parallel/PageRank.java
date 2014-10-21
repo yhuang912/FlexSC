@@ -27,8 +27,7 @@ import gc.BadLabelException;
 public class PageRank<T> implements ParallelGadget<T> {
 	static int UNUSED_FLOAT_V = 20;
 	static int UNUSED_FLOAT_P = 11;
-	static int INT_LEN = 32;
-	static int ITERATIONS = 50;
+	static int ITERATIONS = 10;
 	static int WIDTH = 40;
 	static int OFFSET = 20;
 
@@ -248,16 +247,17 @@ public class PageRank<T> implements ParallelGadget<T> {
 //		if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
 //			System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "PageRank");
 //		}
-		// output(machineId, env, aa);
+		output(machineId, env, aa, 0 /* iterations */, machine);
 	}
 
 	private <T> void output(int machineId, final CompEnv<T> env,
-			PageRankNode<T>[] aa, int iterations) throws IOException, BadLabelException {
+			PageRankNode<T>[] aa, int iterations, Machine machine) throws IOException, BadLabelException {
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
-			System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);
-			System.out.println("ENVS " + PMCompEnv.ENVS_USED);
+			if (Party.Alice.equals(env.party)) {
+				System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+			}
 		} else {
 			print(machineId, env, aa, iterations);
 		}
@@ -290,9 +290,5 @@ public class PageRank<T> implements ParallelGadget<T> {
 				}
 			}
 	    }
-		if (Party.Alice.equals(env.party)) {
-//			System.out.println("-------");
-		}
 	}
-
 }
