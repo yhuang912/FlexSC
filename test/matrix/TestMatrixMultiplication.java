@@ -14,8 +14,8 @@ public class TestMatrixMultiplication extends TestHarness {
 	public void testAllCases() throws Exception {
 
 		for (int i = 0; i < 1; i++) {
-			double[][] d1 = TestMatrix.randomMatrix(100, 100);
-			double[][] d2 = TestMatrix.randomMatrix(100, 100);
+			double[][] d1 = TestMatrix.randomMatrix(8, 8);
+			double[][] d2 = TestMatrix.randomMatrix(8, 8);
 
 			TestMatrix.runThreads(new Helper(d1, d2) {
 

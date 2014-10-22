@@ -1,51 +1,45 @@
-package harness;
+package oakland;
 
-import java.util.Random;
-
-import org.junit.Assert;
-
-import circuits.arithmetic.DenseMatrixLib;
-import circuits.arithmetic.FloatLib;
-import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
+import harness.TestHarness;
+
+import java.util.Arrays;
+import java.util.Random;
+
+import org.junit.Test;
+
+import circuits.arithmetic.DenseMatrixLib;
+import circuits.arithmetic.FloatLib;
+import circuits.arithmetic.IntegerLib;
 
 
-public class TestMatrix extends TestHarness {
-	public static final int len = 32;
-	public static final int offset = 15;
-	public static final int VLength = 24;
-	public static final int PLength = 8;
-	public static final boolean testFixedPoint = true;
+public class TestRidgeRegression extends TestHarness {
+	public static int len = 32;
+	public static  int offset = 15;
+	public static  int VLength = 23;
+	public static  int PLength = 8;
+	public static  boolean testFixedPoint = true;
 
-	public static abstract class Helper {
+	public static  class Helper {
 		double[][] a, b;
 
 		public Helper(double[][] a, double[][] b) {
 			this.b = b;
 			this.a = a;
 		}
-
-		public abstract<T> T[][][] secureCompute(T[][][] a, T[][][] b,
-				DenseMatrixLib<T> lib) throws Exception;
-
-		public abstract double[][] plainCompute(double[][] a, double[][] b);
 	}
 
 	static Random rng = new Random(123);
 
-	public static double[][] randomMatrix(int n, int m, double s) {
+	public static double[][] randomMatrix(int n, int m) {
 		double[][] d1 = new double[n][m];
 		for (int k = 0; k < d1.length; ++k)
 			for (int j = 0; j < d1[0].length; ++j)
 				d1[k][j] = rng.nextInt(1000) / 100.0;
 		return d1;
-	}
-	
-	public static double[][] randomMatrix(int n, int m) {
-		return randomMatrix( n,  m, 1);
 	}
 
 	public void PrintMatrix(double[][] result) {
@@ -83,16 +77,24 @@ public class TestMatrix extends TestHarness {
 
 				T[][][] fgc1 = gen.newTArray(h.a.length, h.a[0].length, 1);
 				T[][][] fgc2 = gen.newTArray(h.b.length, h.b[0].length, 1);
+				T[][][] re = null;
+				for(int tt = 0; tt < 5; ++tt) {
+					System.gc();
 				for (int i = 0; i < h.a.length; ++i)
 					for (int j = 0; j < h.a[0].length; ++j) 
 							fgc1[i][j] = lib.lib.inputOfAlice(h.a[i][j]);
 					
 				for (int i = 0; i < h.b.length; ++i)
 					for (int j = 0; j < h.b[0].length; ++j)
-							fgc2[i][j] = lib.lib.inputOfAlice(h.b[i][j]);
+							fgc2[i][j] = lib.lib.inputOfBob(h.b[i][j]);
 					
 
-				T[][][] re = h.secureCompute(fgc1, fgc2, lib);
+
+				if(m == Mode.VERIFY)
+					re = lib.rref(fgc1);
+				else  re = lib.rref(lib.xor(fgc1, fgc2));
+				}
+				
 				z = new double[re.length][re[0].length];
 				for (int i = 0; i < re.length; ++i)
 					for (int j = 0; j < re[0].length; ++j)
@@ -132,19 +134,37 @@ public class TestMatrix extends TestHarness {
 
 				T[][][] fgc1 = env.newTArray(h.a.length, h.a[0].length, 1);
 				T[][][] fgc2 = env.newTArray(h.b.length, h.b[0].length, 1);
+				
+				double[] time = new double[5];
+				T[][][] re = null;
+				for(int tt = 0; tt < time.length; ++tt) {
+				double d1 = System.nanoTime();
 				for (int i = 0; i < h.a.length; ++i)
 					for (int j = 0; j < h.a[0].length; ++j)
 							fgc1[i][j] = lib.lib.inputOfAlice(h.a[i][j]);
 					
 				for (int i = 0; i < h.b.length; ++i)
 					for (int j = 0; j < h.b[0].length; ++j)
-						fgc2[i][j] = lib.lib.inputOfAlice(h.b[i][j]);
+						fgc2[i][j] = lib.lib.inputOfBob(h.b[i][j]);
 
 				if (m == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
-				T[][][] re = h.secureCompute(fgc1, fgc2, lib);
+				
+				if(m == Mode.VERIFY)
+					re = lib.rref(fgc1);
+				else  re = lib.rref(lib.xor(fgc1, fgc2));
+				
+				time[tt] = (System.nanoTime()-d1)/1000000000.0;
+				}
+				
+				if(m == Mode.REAL) {
+					Arrays.sort(time);
+					System.out.println(len+" "+time[time.length/2]);
+				}
+				
+				
 				if (m == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
@@ -174,13 +194,13 @@ public class TestMatrix extends TestHarness {
 		tEva.start();
 		tGen.join();
 
-		double[][] result = h.plainCompute(h.a, h.b);
+		double[][] result = DenseMatrixLib.rref(h.a);
 
 		// PrintMatrix(result);
 		// PrintMatrix(gen.z);
 		if (m == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
-		} else {
+		} else if(m == Mode.VERIFY){
 
 			for (int i = 0; i < result.length; ++i)
 				for (int j = 0; j < result[0].length; ++j) {
@@ -196,6 +216,17 @@ public class TestMatrix extends TestHarness {
 								+ result[i][j] + "(" + i + "," + j + ")\n");
 //					Assert.assertTrue(error < 1E-3);
 				}
+		}
+	}
+	@Test
+	public void testAllCases() throws Exception {
+		TestHarness.m = Mode.REAL;
+		for (int i = 22; i < 40; i++) {
+			TestRidgeRegression.len = i;
+			double[][] d1 = TestRidgeRegression.randomMatrix(14, 14);
+			double[][] d2 = TestRidgeRegression.randomMatrix(14, 14);
+
+			TestRidgeRegression.runThreads(new Helper(d1, d2));
 		}
 	}
 }

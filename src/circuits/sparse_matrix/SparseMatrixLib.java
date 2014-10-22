@@ -117,8 +117,8 @@ public class SparseMatrixLib<T> {
 	}
 
 	public MatrixNode<T>[] matrix_vector_multiplication(MatrixNode<T>[] m, MatrixNode<T>[] vector) {
-		MatrixNode<T>[] vec = getMatrixNodeArray(5);
-		for(int i = 0; i < 5; ++i) {
+		MatrixNode<T>[] vec = getMatrixNodeArray(vector.length);
+		for(int i = 0; i < vector.length; ++i) {
 			vec[i] = new MatrixNode<T>(integerlib.ones(m[0].x.length), 
 									   integerlib.toSignals(i, m[0].y.length), 
 									   vector[i].value, integerlib.SIGNAL_ZERO, lib, integerlib);

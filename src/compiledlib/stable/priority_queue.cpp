@@ -10,10 +10,10 @@ typedef intr_ = rnd;
 typedef key_t = ints_32;
 typedef PORAM<T> = native CircuitOram;
 
-intr_@m RND(intp_32 bit) = native lib.randBools;
+intr_@m RND(intp_@m bit) = native lib.randBools;
 dummy PriorityQueueNode@m<T> PORAM<T>.poram_retrieve(ints_@m id, intr_@m pos) = native conditionalReadAndRemove;
 dummy void PORAM<T>.poram_write(ints_@m id, intr_@m pos, PriorityQueueNode@m<T> node) = native conditionalPutBack;
-
+struct BoolArray{ints_32 data;};
 struct NodeId@m {
    ints_@m id;
    intr_@m pos;
@@ -52,14 +52,14 @@ KeyValue@m<T> PriorityQueue@m<T>.pqueue_op(key_t key, T operand, ints_2 op) {
    return ret;
 }
 
-ints_@m PriorityQueue@m<T>.right_shift(ints_@m id, intp_32 s) {
+ints_@m PriorityQueue@m<T>.right_shift(ints_@m id, intp_@m s) {
    ints_@m ret = id;
-   for(intp_32 i = 0; i < s; i = i + 1)
+   for(intp_@m i = 0; i < s; i = i + 1)
       ret = ret >> 1;
    return ret;
 }
 
-int2 PriorityQueue@m<T>.should_go_left(ints_@m id, intp_32 level) {
+int2 PriorityQueue@m<T>.should_go_left(ints_@m id, intp_@m level) {
    ints_2 ret;
    if(level >= logN-1)
       ret = true;
@@ -121,7 +121,7 @@ KeyValue@m<T> PriorityQueue@m<T>.extractMax(ints_2 dummy_bit) {
 }
 
 //top_node is RARed, heapify the rest and put back top_node;
-intr_@m PriorityQueue@m<T>.heapify(ints_@m top_id, PriorityQueueNode@m<T> top_node, intp_32 level, ints_2 dummy_bit) {
+intr_@m PriorityQueue@m<T>.heapify(ints_@m top_id, PriorityQueueNode@m<T> top_node, intp_@m level, ints_2 dummy_bit) {
    intr_@m ret;
    ints_2 newdummy_bit = false;
    ints_2 go_left = false;
@@ -187,7 +187,7 @@ intr_@m PriorityQueue@m<T>.heapify(ints_@m top_id, PriorityQueueNode@m<T> top_no
 }
 
 //return ret: ret.left is new top;
-PriorityQueueNode@m<T> PriorityQueue@m<T>.get_last(NodeId@m top, intp_32 level, ints_2 dummy_bit) {
+PriorityQueueNode@m<T> PriorityQueue@m<T>.get_last(NodeId@m top, intp_@m level, ints_2 dummy_bit) {
    PriorityQueueNode@m<T> ret;
    ints_2 newdummy_bit = false;
    if(level < logN) {
@@ -229,7 +229,7 @@ void PriorityQueue@m<T>.insert(KeyValue@m<T> kv, ints_2 dummy_bit) {
 }
 
 intr_@m PriorityQueue@m<T>.insert_internal(KeyValue@m<T> kv, KeyValue@m<T> parent_kv,
-      ints_@m iter_id, intr_@m iter_pos, intp_32 level, ints_2 dummy_bit) {
+      ints_@m iter_id, intr_@m iter_pos, intp_@m level, ints_2 dummy_bit) {
    intr_@m ret;
    ints_2 newdummy_bit = false;
    if(level < logN) {

@@ -11,6 +11,14 @@ public class VectorLib<T> {
 		this.lib = lib;
 	}
 
+	public T[][] xor(T[][] a, T[][] b) {
+		IntegerLib<T> ilib = new IntegerLib<T>(lib.getEnv());
+		T[][] res = env.newTArray(a.length, 1);
+		for (int i = 0; i < a.length; ++i)
+			res[i] = ilib.xor(a[i], b[i]);
+		return res;
+	}
+	
 	public T[][] add(T[][] a, T[][] b) {
 		T[][] res = env.newTArray(a.length, 1);
 		for (int i = 0; i < a.length; ++i)

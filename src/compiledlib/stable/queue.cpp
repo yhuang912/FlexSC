@@ -9,6 +9,7 @@ intr_@m RND(intp_32 m) = native lib.randBools;
 dummy QueueNode@m<T> NonRecursiveORAM@m<T>.oram_retrieve(ints_@m id, intr_@m pos) = native conditionalReadAndRemove;
 dummy void NonRecursiveORAM@m<T>.oram_write(ints_@m id, intr_@m pos, QueueNode@m<T> node) = native conditionalPutBack;
 
+struct BoolArray{ints_32 data;};
 struct QueueNode@m<T> {
   intr_@m next;
   T data;

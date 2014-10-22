@@ -1,6 +1,7 @@
 package compiledlib.priority_queue;
 
 import java.awt.Toolkit;
+import java.util.Arrays;
 import java.util.Random;
 
 import oram.CircuitOram;
@@ -9,12 +10,12 @@ import org.junit.Test;
 
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
-import compiledlib.BoolArray;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
+import gc.GCSignal;
 
 public class TestPriorityQueue {
 
@@ -54,11 +55,12 @@ public class TestPriorityQueue {
 
 	boolean debug = false;
 
-	public void compute(CompEnv<Boolean> env, PriorityQueue<BoolArray> ostack,
-			IntegerLib<Boolean> lib) throws Exception {
+	public void compute(CompEnv<GCSignal> env, PriorityQueue<BoolArray> ostack,
+			IntegerLib<GCSignal> lib) throws Exception {
+		double[] time = new double[op.length];
 
 		for (int i = 0; i < op.length; ++i) {
-			if (op[i] == 1 || debug == true) {
+			if (op[i] == 1 && m == Mode.VERIFY) {
 				int res = 0;
 				if (env.getParty() == Party.Alice) {
 					res = cstack.poll();
@@ -78,8 +80,15 @@ public class TestPriorityQueue {
 			} else {
 				int rand = next[i];// rnd.nextInt(100);
 				BoolArray tmp = new BoolArray(env, lib);
-				ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(rand, 32)),
-						tmp, lib.toSignals(0, 2));
+				GCSignal[] in = env.inputOfAlice(Utils.fromInt(rand, 32));
+				if(m == Mode.REAL && env.getParty() == Party.Alice) {
+					System.gc();
+					double a = System.nanoTime();
+					ostack.pqueue_op(in, tmp, lib.toSignals(0, 2));
+					time[i] = (System.nanoTime()-a)/1000000000.0;
+				} else 
+					ostack.pqueue_op(in, tmp, lib.toSignals(0, 2));
+				
 				int ssize = Utils.toInt(env.outputToAlice(ostack.size));
 				if (env.getParty() == Party.Alice && m == Mode.VERIFY) {
 					cstack.add(100 - rand);
@@ -88,6 +97,12 @@ public class TestPriorityQueue {
 				}
 			}
 			env.flush();
+		}
+		if(m == Mode.REAL && env.getParty() == Party.Alice) {
+
+			Arrays.sort(time);
+//			System.out.println(Arrays.toString(time));
+			System.out.print(time[op.length/2]);
 		}
 		Toolkit.getDefaultToolkit().beep();
 	}
@@ -105,15 +120,15 @@ public class TestPriorityQueue {
 		public void run() {
 			try {
 				listen(54321);
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(
-						env, lib, new BoolArray(env, lib));
+						env, lib, logN, new BoolArray(env, lib));
 				PriorityQueue<BoolArray> ostack = new PriorityQueue<BoolArray>(
 						env,
 						lib,
-						new BoolArray(env, lib),
-						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
+						logN, new BoolArray(env, lib),
+						new CircuitOram<GCSignal>(env, 1 << logN, node.numBits()));
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
 					sta.flush();
@@ -144,15 +159,15 @@ public class TestPriorityQueue {
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(
-						env, lib, new BoolArray(env, lib));
+						env, lib, logN, new BoolArray(env, lib));
 				PriorityQueue<BoolArray> ostack = new PriorityQueue<BoolArray>(
 						env,
 						lib,
-						new BoolArray(env, lib),
-						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
+						logN, new BoolArray(env, lib),
+						new CircuitOram<GCSignal>(env, 1 << logN, node.numBits()));
 
 				compute(env, ostack, lib);
 				disconnect();
@@ -165,8 +180,8 @@ public class TestPriorityQueue {
 
 	@Test
 	public void runThreads() throws Exception {
-		getInput(1);
-		m = Mode.COUNT;
+		getInput(100);
+		m = Mode.VERIFY;
 		GenRunnable gen = new GenRunnable(20);
 		EvaRunnable eva = new EvaRunnable(20);
 		Thread tGen = new Thread(gen);
@@ -194,8 +209,8 @@ public class TestPriorityQueue {
 	public static void main(String[] args) throws InterruptedException {
 		int logN = new Integer(args[0]);
 		TestPriorityQueue a = new TestPriorityQueue();
-		a.getInput(1);
-		a.m = Mode.COUNT;
+		a.getInput(10);
+		a.m = Mode.REAL;
 		GenRunnable gen = a.new GenRunnable(logN);
 		EvaRunnable eva = a.new EvaRunnable(logN);
 		Thread tGen = new Thread(gen);

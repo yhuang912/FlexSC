@@ -37,7 +37,9 @@ public class TestSparseMatrix<T> extends TestHarness {
 		int acnt = 0;
 		int bcnt = 0;
 
-		public Helper(double[][] a, double[][] b) {
+		double sparseness;
+		public Helper(double[][] a, double[][] b, double sparseness) {
+			this.sparseness = sparseness;
 			this.a = a;
 			this.b = b;
 
@@ -49,7 +51,7 @@ public class TestSparseMatrix<T> extends TestHarness {
 			vb = new double[M];
 			for (int i = 0; i < a.length; ++i) {
 				for (int j = 0; j < a[0].length; ++j)
-					if (Math.abs(a[i][j] - 1e-6) > 1e-6) {
+					if (rng.nextDouble() < sparseness) {
 						xa[acnt] = i;
 						ya[acnt] = j;
 						va[acnt] = a[i][j];
@@ -60,7 +62,7 @@ public class TestSparseMatrix<T> extends TestHarness {
 
 			for (int i = 0; i < b.length; ++i) {
 				for (int j = 0; j < b[0].length; ++j)
-					if (Math.abs(b[i][j] - 1e-6) > 1e-6) {
+					if (rng.nextDouble() < 1) {
 						xb[bcnt] = i;
 						yb[bcnt] = j;
 						vb[bcnt] = b[i][j];
@@ -76,16 +78,13 @@ public class TestSparseMatrix<T> extends TestHarness {
 		public abstract double[][] plainCompute(double[][] a, double[][] b);
 	}
 
-	static Random rng = new Random(123);
+	static Random rng = new Random(243);
 
-	public double[][] randomMatrix(int n, int m, double sparseness) {
+	public double[][] randomMatrix(int n, int m, double d) {
 		double[][] d1 = new double[n][m];
 		for (int k = 0; k < d1.length; ++k)
 			for (int j = 0; j < d1[0].length; ++j)
-				if (rng.nextDouble() < sparseness)
 					d1[k][j] = rng.nextInt() * 10000 % 1000.0;
-				else
-					d1[k][j] = 0;
 		return d1;
 	}
 
@@ -152,7 +151,7 @@ public class TestSparseMatrix<T> extends TestHarness {
 				z = new double[h.a.length][h.a[0].length];
 				for (int i = 0; i < re.length; ++i) {
 					double[] res = slib.outputToAlice(re[i]);
-					if (res[3] == 1) {
+					if (res[3] == 1 && res[0] != -1) {
 						System.out
 								.println(res[0] + " " + res[1] + " " + res[2]);
 						z[(int) res[0]][(int) res[1]] = res[2];

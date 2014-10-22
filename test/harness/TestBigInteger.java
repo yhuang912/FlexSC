@@ -1,6 +1,7 @@
 package harness;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import org.junit.Assert;
 
@@ -13,7 +14,7 @@ import flexsc.Party;
 
 
 public class TestBigInteger extends TestHarness{
-	public static final int LENGTH = 32;
+	public static final int LENGTH = 1024;
 	final static int RANGE = LENGTH;
 	public static abstract class Helper {
 		BigInteger intA, intB;
@@ -106,13 +107,13 @@ public class TestBigInteger extends TestHarness{
 		tGen.join();
 		if(m == Mode.COUNT)
 			System.out.println(eva.andgates);
-		/*System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
-		h.intA+" "+h.intB+"\n");
-		System.out.println(Arrays.toString(h.a));
-		System.out.println(Arrays.toString(h.b));
+//		System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
+//		h.intA+" "+h.intB+"\n");
+//		System.out.println(Arrays.toString(h.a));
+//		System.out.println(Arrays.toString(h.b));
 		System.out.println(Arrays.toString( Utils.fromBigInteger(h.plainCompute(h.intA, h.intB),gen.z.length)));
 		System.out.println(Arrays.toString(Utils.fromBigInteger(Utils.toBigInteger(gen.z),gen.z.length)));
-		*/
+		
 		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toBigInteger(gen.z));
 	}
 }

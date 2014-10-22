@@ -17,7 +17,7 @@ public class TestSparseMatrixHadamardMultiplication extends
 			double[][] d1 = randomMatrix(500, 500, 0.002);
 			double[][] d2 = randomMatrix(500, 500, 0.002);
 
-			runThreads(new Helper(d1, d2) {
+			runThreads(new Helper(d1, d2, 1) {
 				@Override
 				public MatrixNode<Boolean>[] secureCompute(
 						MatrixNode<Boolean>[] a, MatrixNode<Boolean>[] b,
