@@ -10,7 +10,6 @@ import oram.CircuitOram;
 
 import org.junit.Test;
 
-import sun.misc.Signal;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
@@ -89,7 +88,6 @@ public class TestQueue {
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
-		Signal[] z;
 		long andGate;
 		Statistics sta;
 		int logN;
