@@ -4,7 +4,7 @@ import util.Pair;
 import flexsc.CompEnv;
 
 public class DenseMatrixLib<T> {
-	ArithmeticLib<T> lib;
+	public ArithmeticLib<T> lib;
 	VectorLib<T> veclib;
 	CompEnv<T> env;
 	IntegerLib<T> integerlib;
@@ -34,9 +34,9 @@ public class DenseMatrixLib<T> {
 		T[][][] res = env.newTArray(a.length, b[0].length, 1);
 		for (int i = 0; i < a.length; ++i)
 			for (int j = 0; j < b[0].length; ++j) {
-				res[i][j] = lib.publicValue(0);
-				for (int k = 0; k < a[0].length; ++k)
-					res[i][j] = lib.add(res[i][j],
+				res[i][j] = lib.multiply(a[i][0], b[0][j]);
+				for (int k = 1; k < a[0].length; ++k)
+					res[i][j] = lib.add(res[i][j],	
 							lib.multiply(a[i][k], b[k][j]));
 			}
 		return res;

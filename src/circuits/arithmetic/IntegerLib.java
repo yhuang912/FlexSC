@@ -562,4 +562,18 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 	public int numBits() {
 		return width;
 	}
+	
+//	public T[][] randomPermute(T[][] x, ) {
+//		BigInteger[] res = new BigInteger[x.length];
+//		for(int i = 0; i < x.length; ++i) {
+//			T[] rnd = randBools(x[i].length);
+//			T[] xMrnd = sub(x[i], rnd);
+//			boolean[] alice = env.outputToAlice(rnd);
+//			boolean[] bob = env.outputToBob(xMrnd);
+//			if(env.getParty() == Party.Alice)
+//				res[i] =  Utils.toBigInteger(alice);
+//			else
+//				res[i] = Utils.toBigInteger(bob);
+//		}
+//	}
 }

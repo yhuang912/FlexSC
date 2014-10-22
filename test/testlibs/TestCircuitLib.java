@@ -17,7 +17,7 @@ import circuits.arithmetic.IntegerLib;
 public class TestCircuitLib extends TestHarness {
 	Random rnd = new Random();
 	
-	@Test
+	//@Test
 	public void testHammingDistance() throws Exception {
 		
 		for (int i = 0; i < testCases; i++) {
@@ -40,7 +40,7 @@ public class TestCircuitLib extends TestHarness {
 		}
 	}
 	
-	@Test
+	//@Test
 	public void testRightPublicShift() throws Exception {
 		
 
@@ -60,7 +60,7 @@ public class TestCircuitLib extends TestHarness {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testConditionalLeftPublicShift() throws Exception {
 		
 
@@ -95,7 +95,7 @@ public class TestCircuitLib extends TestHarness {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testConditionalRightPublicShift() throws Exception {
 		
 
@@ -130,7 +130,7 @@ public class TestCircuitLib extends TestHarness {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testLeftPrivateShift() throws Exception {
 		
 
@@ -150,7 +150,7 @@ public class TestCircuitLib extends TestHarness {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testLeftPublicShift() throws Exception {
 		
 
@@ -199,7 +199,7 @@ public class TestCircuitLib extends TestHarness {
 		return res;
 	}
 
-	@Test
+	//@Test
 	public void testLengthOfCommenPrefix() throws Exception {
 		
 
@@ -218,7 +218,7 @@ public class TestCircuitLib extends TestHarness {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testRightPrivateShift() throws Exception {
 		
 
@@ -238,7 +238,7 @@ public class TestCircuitLib extends TestHarness {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testAllCases() throws Exception {
 
 		for (int i = 0; i < 1; i++) {

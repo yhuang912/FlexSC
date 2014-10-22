@@ -1,22 +1,24 @@
 package compiledlib.queue;
 
-//import gc.Boolean;
+//import gc.Signal;
 import static org.junit.Assert.assertEquals;
 
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import oram.CircuitOram;
 
 import org.junit.Test;
 
+import sun.misc.Signal;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
-import compiledlib.BoolArray;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
+import gc.GCSignal;
 
 public class TestQueue {
 	public Mode m;
@@ -40,23 +42,23 @@ public class TestQueue {
 			}
 		}
 	}
+	
+	public void compute(CompEnv<GCSignal> env, Queue<BoolArray> ostack,
+			IntegerLib<GCSignal> lib) throws Exception {
 
-	public void compute(CompEnv<Boolean> env, Queue<BoolArray> ostack,
-			IntegerLib<Boolean> lib) throws Exception {
+		double[] time = new double[op.length];
 
 		for (int i = 0; i < op.length; ++i) {
-			if (op[i] == 1) {
-
+			if (op[i] == 1 && m == Mode.VERIFY) {
 				int res = 0;
 				if (env.getParty() == Party.Alice) {
 					res = cstack.poll();
 				}
-				BoolArray scres = ostack.queue_op(new BoolArray(env, lib),lib.SIGNAL_ONE);
-
+				BoolArray scres = ostack.queue_op(new BoolArray(env, lib), lib.SIGNAL_ONE);
 				int srintres = Utils.toInt(env.outputToAlice(scres.data));
-				if (env.getParty() == Party.Alice && m == Mode.VERIFY) {
+				if (env.getParty() == Party.Alice && m != Mode.COUNT) {
 					System.out.println(env.getParty() + "pop " + res + " "
-							+ srintres);
+							+ srintres);// cstack.size());
 					assertEquals(res, srintres);
 				}
 
@@ -68,14 +70,26 @@ public class TestQueue {
 				}
 				BoolArray tmp = new BoolArray(env, lib);
 				tmp.data = env.inputOfAlice(Utils.fromInt(rand, 32));
-				ostack.queue_op(tmp, lib.SIGNAL_ZERO);
+				if(m == Mode.REAL && env.getParty() == Party.Alice) {
+					System.gc();
+					double a = System.nanoTime();
+					ostack.queue_op(tmp, lib.SIGNAL_ZERO);
+					time[i] = (System.nanoTime()-a)/1000000000.0;
+				} else 
+					ostack.queue_op(tmp, lib.SIGNAL_ZERO);
 			}
 			env.flush();
+		}
+		if(m == Mode.REAL && env.getParty() == Party.Alice) {
+
+			Arrays.sort(time);
+//			System.out.println(Arrays.toString(time));
+			System.out.print(time[op.length/2]);
 		}
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
-		boolean[] z;
+		Signal[] z;
 		long andGate;
 		Statistics sta;
 		int logN;
@@ -87,10 +101,10 @@ public class TestQueue {
 		public void run() {
 			try {
 				listen(54321);
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				Queue<BoolArray> ostack = new Queue<BoolArray>(env, lib,
-						logN, new BoolArray(env, lib), new CircuitOram<Boolean>(env,
+						logN, new BoolArray(env, lib), new CircuitOram<GCSignal>(env,
 								1 << logN, new QueueNode<>(env, lib, logN, new BoolArray(env, lib)).numBits()));
 
 				if (m == Mode.COUNT) {
@@ -120,10 +134,10 @@ public class TestQueue {
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				Queue<BoolArray> ostack = new Queue<BoolArray>(env, lib,
-						logN, new BoolArray(env, lib), new CircuitOram<Boolean>(env,
+						logN, new BoolArray(env, lib), new CircuitOram<GCSignal>(env,
 								1 << logN, new QueueNode<>(env, lib, logN, new BoolArray(env, lib)).numBits()));
 				compute(env, ostack, lib);
 				disconnect();
@@ -136,8 +150,8 @@ public class TestQueue {
 
 	@Test
 	public void runThreads() throws Exception {
-		getInput(1);
-		m = Mode.COUNT;
+		getInput(100);
+		m = Mode.VERIFY;
 		GenRunnable gen = new GenRunnable(20);
 		EvaRunnable eva = new EvaRunnable(20);
 		Thread tGen = new Thread(gen);
@@ -162,12 +176,11 @@ public class TestQueue {
 		return gen.sta;
 	}
 	
-
 	public static void main(String[] args) throws InterruptedException {
 		int logN = new Integer(args[0]);
 		TestQueue a = new TestQueue();
-		a.getInput(1);
-		a.m = Mode.COUNT;
+		a.getInput(20);
+		a.m = Mode.REAL;
 		GenRunnable gen = a.new GenRunnable(logN);
 		EvaRunnable eva = a.new EvaRunnable(logN);
 		Thread tGen = new Thread(gen);

@@ -5,7 +5,7 @@ import subprocess
 for logN in range(5, 30) :
    workingpath = ""
    c = list();
-   c.append("java -cp bin/:lib/* compiledlib.stack.TestStack #;")
+   c.append("java -cp bin/:lib/* compiledlib.queue.TestQueue #;")
 #   c.append("java -cp bin/:lib/* compiledlib.stack.TestOramStack #;")
    print logN, "\t",
    for item in c :

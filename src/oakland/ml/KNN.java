@@ -1,4 +1,4 @@
-package oakland.kNN;
+package oakland.ml;
 
 import circuits.arithmetic.ArithmeticLib;
 import circuits.arithmetic.FloatLib;

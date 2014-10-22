@@ -40,8 +40,16 @@ public abstract class CompEnv<T> {
 			return new CVCompEnv(is, os, p);
 		else if (mode == Mode.COUNT)
 			return new PMCompEnv(is, os, p);
-		else
+		else {
+			try {
+				throw new Exception("not a supported Mode!");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return null;
+		}
+
 	}
 
 	public InputStream is;

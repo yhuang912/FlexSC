@@ -16,6 +16,7 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
+import gc.GCSignal;
 
 public class TestStack {
 
@@ -41,8 +42,8 @@ public class TestStack {
 		}
 	}
 
-	public void compute(CompEnv<Boolean> env, Stack<BoolArray> ostack,
-			IntegerLib<Boolean> lib) throws Exception {
+	public void compute(CompEnv<GCSignal> env, Stack<BoolArray> ostack,
+			IntegerLib<GCSignal> lib) throws Exception {
 
 		double[] time = new double[op.length];
 
@@ -87,7 +88,7 @@ public class TestStack {
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
-		boolean[] z;
+		GCSignal[] z;
 		long andGate;
 		Statistics sta;
 		int logN = -1;
@@ -100,9 +101,9 @@ public class TestStack {
 			try {
 				listen(54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				Stack<BoolArray> ostack = new Stack<BoolArray>(env, lib,
-						logN, new BoolArray(env, lib), new CircuitOram<Boolean>(env,
+						logN, new BoolArray(env, lib), new CircuitOram<GCSignal>(env,
 								1 << logN, 32 + logN));
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
@@ -136,9 +137,9 @@ public class TestStack {
 			try {
 				connect("localhost", 54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Bob, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				Stack<BoolArray> ostack = new Stack<BoolArray>(env, lib,
-						logN, new BoolArray(env, lib), new CircuitOram<Boolean>(env,
+						logN, new BoolArray(env, lib), new CircuitOram<GCSignal>(env,
 								1 << logN, 32 + logN));
 				compute(env, ostack, lib);
 				disconnect();
@@ -151,8 +152,8 @@ public class TestStack {
 
 	@Test
 	public void runThreads() throws Exception {
-		getInput(1);
-		m = Mode.COUNT;
+		getInput(100);
+		m = Mode.VERIFY;
 		GenRunnable gen = new GenRunnable(20);
 		EvaRunnable eva = new EvaRunnable(20);
 		Thread tGen = new Thread(gen);
@@ -180,7 +181,7 @@ public class TestStack {
 	public static void main(String[] args) throws InterruptedException {
 		int logN = new Integer(args[0]);
 		TestStack a = new TestStack();
-		a.getInput(20);
+		a.getInput(40);
 		a.m = Mode.REAL;
 		GenRunnable gen = a.new GenRunnable(logN);
 		EvaRunnable eva = a.new EvaRunnable(logN);
