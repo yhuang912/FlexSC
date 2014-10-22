@@ -79,7 +79,6 @@ public class TestRidgeRegression extends TestHarness {
 				T[][][] fgc2 = gen.newTArray(h.b.length, h.b[0].length, 1);
 				T[][][] re = null;
 				for(int tt = 0; tt < 5; ++tt) {
-					System.gc();
 				for (int i = 0; i < h.a.length; ++i)
 					for (int j = 0; j < h.a[0].length; ++j) 
 							fgc1[i][j] = lib.lib.inputOfAlice(h.a[i][j]);
@@ -138,6 +137,7 @@ public class TestRidgeRegression extends TestHarness {
 				double[] time = new double[5];
 				T[][][] re = null;
 				for(int tt = 0; tt < time.length; ++tt) {
+				System.gc();
 				double d1 = System.nanoTime();
 				for (int i = 0; i < h.a.length; ++i)
 					for (int j = 0; j < h.a[0].length; ++j)
