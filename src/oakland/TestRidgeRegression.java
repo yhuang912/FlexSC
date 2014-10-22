@@ -12,8 +12,8 @@ import java.util.Random;
 import org.junit.Test;
 
 import circuits.arithmetic.DenseMatrixLib;
+import circuits.arithmetic.FixedPointLib;
 import circuits.arithmetic.FloatLib;
-import circuits.arithmetic.IntegerLib;
 
 
 public class TestRidgeRegression extends TestHarness {
@@ -22,6 +22,7 @@ public class TestRidgeRegression extends TestHarness {
 	public static  int VLength = 23;
 	public static  int PLength = 8;
 	public static  boolean testFixedPoint = true;
+	static public int TESTS = 1;
 
 	public static  class Helper {
 		double[][] a, b;
@@ -69,35 +70,45 @@ public class TestRidgeRegression extends TestHarness {
 
 				// PrintMatrix(h.a);
 				if (testFixedPoint)
-					lib = new DenseMatrixLib<T>(gen, new FloatLib<T>(gen,VLength,PLength));//
-//							len, offset));
+					lib = new DenseMatrixLib<T>(gen, new FixedPointLib<T>(gen, len, offset));
 				else
-					lib = new DenseMatrixLib<T>(gen, new IntegerLib<T>(gen,
-							32));
+					lib = new DenseMatrixLib<T>(gen, new FloatLib<T>(gen,VLength,PLength));
 
 				T[][][] fgc1 = gen.newTArray(h.a.length, h.a[0].length, 1);
 				T[][][] fgc2 = gen.newTArray(h.b.length, h.b[0].length, 1);
 				T[][][] re = null;
-				for(int tt = 0; tt < 5; ++tt) {
-				for (int i = 0; i < h.a.length; ++i)
-					for (int j = 0; j < h.a[0].length; ++j) 
+				double[] time = new double[TESTS];
+				for(int tt = 0; tt < TESTS; ++tt) {
+					System.gc();
+					double d1 = System.nanoTime();
+					for (int i = 0; i < h.a.length; ++i)
+						for (int j = 0; j < h.a[0].length; ++j) 
 							fgc1[i][j] = lib.lib.inputOfAlice(h.a[i][j]);
-					
-				for (int i = 0; i < h.b.length; ++i)
-					for (int j = 0; j < h.b[0].length; ++j)
+
+					for (int i = 0; i < h.b.length; ++i)
+						for (int j = 0; j < h.b[0].length; ++j)
 							fgc2[i][j] = lib.lib.inputOfBob(h.b[i][j]);
-					
 
 
-				if(m == Mode.VERIFY)
-					re = lib.rref(fgc1);
-				else  re = lib.rref(lib.xor(fgc1, fgc2));
+
+					if(m == Mode.VERIFY)
+						re = lib.rref(fgc1);
+					else  re = lib.rref(lib.xor(fgc1, fgc2));
+					if(m == Mode.REAL)
+					time[tt] = (System.nanoTime()-d1)/1000000000.0;
+					else if(m == Mode.COUNT)
+						time[tt] = ((PMCompEnv)gen).statistic.andGate;
 				}
-				
+
+				if(m == Mode.REAL || m == Mode.COUNT) {
+					Arrays.sort(time);
+					System.out.println(len+" "+time[time.length/2]);
+				}
+
 				z = new double[re.length][re[0].length];
 				for (int i = 0; i < re.length; ++i)
 					for (int j = 0; j < re[0].length; ++j)
-							z[i][j] = lib.lib.outputToAlice(re[i][j]);
+						z[i][j] = lib.lib.outputToAlice(re[i][j]);
 
 				disconnect();
 			} catch (Exception e) {
@@ -124,47 +135,38 @@ public class TestRidgeRegression extends TestHarness {
 				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
 
 				if (testFixedPoint)
-					lib = new DenseMatrixLib<T>(env, new FloatLib<T>(env,VLength,PLength));////new FixedPointLib<T>(env,
-//							len, offset));
+					lib = new DenseMatrixLib<T>(env, new FixedPointLib<T>(env, len, offset));
 				else
-					lib = new DenseMatrixLib<T>(env, new IntegerLib<T>(env,
-							32));
+					lib = new DenseMatrixLib<T>(env, new FloatLib<T>(env,VLength,PLength));
 
 
 				T[][][] fgc1 = env.newTArray(h.a.length, h.a[0].length, 1);
 				T[][][] fgc2 = env.newTArray(h.b.length, h.b[0].length, 1);
-				
-				double[] time = new double[5];
+
+
 				T[][][] re = null;
-				for(int tt = 0; tt < time.length; ++tt) {
-				System.gc();
-				double d1 = System.nanoTime();
-				for (int i = 0; i < h.a.length; ++i)
-					for (int j = 0; j < h.a[0].length; ++j)
+				for(int tt = 0; tt < TESTS; ++tt) {
+
+					for (int i = 0; i < h.a.length; ++i)
+						for (int j = 0; j < h.a[0].length; ++j)
 							fgc1[i][j] = lib.lib.inputOfAlice(h.a[i][j]);
-					
-				for (int i = 0; i < h.b.length; ++i)
-					for (int j = 0; j < h.b[0].length; ++j)
-						fgc2[i][j] = lib.lib.inputOfBob(h.b[i][j]);
 
-				if (m == Mode.COUNT) {
-					((PMCompEnv) env).statistic.flush();
+					for (int i = 0; i < h.b.length; ++i)
+						for (int j = 0; j < h.b[0].length; ++j)
+							fgc2[i][j] = lib.lib.inputOfBob(h.b[i][j]);
+
+					if (m == Mode.COUNT) {
+						((PMCompEnv) env).statistic.flush();
+					}
+
+
+					if(m == Mode.VERIFY)
+						re = lib.rref(fgc1);
+					else  re = lib.rref(lib.xor(fgc1, fgc2));
+
 				}
 
-				
-				if(m == Mode.VERIFY)
-					re = lib.rref(fgc1);
-				else  re = lib.rref(lib.xor(fgc1, fgc2));
-				
-				time[tt] = (System.nanoTime()-d1)/1000000000.0;
-				}
-				
-				if(m == Mode.REAL) {
-					Arrays.sort(time);
-					System.out.println(len+" "+time[time.length/2]);
-				}
-				
-				
+
 				if (m == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
@@ -198,9 +200,8 @@ public class TestRidgeRegression extends TestHarness {
 
 		// PrintMatrix(result);
 		// PrintMatrix(gen.z);
-		if (m == Mode.COUNT) {
-			System.out.println(env.andgates + " " + env.encs);
-		} else if(m == Mode.VERIFY){
+		
+		if(m == Mode.VERIFY){
 
 			for (int i = 0; i < result.length; ++i)
 				for (int j = 0; j < result[0].length; ++j) {
@@ -214,7 +215,7 @@ public class TestRidgeRegression extends TestHarness {
 					if (error > 1E-3)
 						System.out.print(error + " " + gen.z[i][j] + " "
 								+ result[i][j] + "(" + i + "," + j + ")\n");
-//					Assert.assertTrue(error < 1E-3);
+					//					Assert.assertTrue(error < 1E-3);
 				}
 		}
 	}
@@ -225,7 +226,6 @@ public class TestRidgeRegression extends TestHarness {
 			TestRidgeRegression.len = i;
 			double[][] d1 = TestRidgeRegression.randomMatrix(14, 14);
 			double[][] d2 = TestRidgeRegression.randomMatrix(14, 14);
-
 			TestRidgeRegression.runThreads(new Helper(d1, d2));
 		}
 	}
