@@ -22,7 +22,7 @@ import gc.BadLabelException;
 
 public class MatrixFactorization<T> implements ParallelGadget<T> {
 
-	public static int ITERATIONS = 1;
+	public static int ITERATIONS = 272;
 	public static double GAMMA = 0.0002;
 	public static double LAMBDA = 0.02; 
 	public static double MU = 0.02;
@@ -241,124 +241,125 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
 		T[][] rating = (T[][]) ((Object[]) machine.input)[3];
 		T[][][] userProfile = (T[][][]) ((Object[]) machine.input)[4];
-		T[][][] itemProfile = (T[][][]) ((Object[]) machine.input)[4];
+		T[][][] itemProfile = (T[][][]) ((Object[]) machine.input)[5];
 
 		MFNode<T>[] aa = (MFNode<T>[]) Array.newInstance(MFNode.class, u.length);
 		for (int i = 0; i < aa.length; i++) {
 			aa[i] = new MFNode<T>(u[i], v[i], isVertex[i], rating[i], userProfile[i], itemProfile[i], env);
 		}
 
-		print(machineId, env, aa);
-//		for (int it = 0; it < ITERATIONS; it++) {
-//			// scatter user profiles
-//			new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
-//	
-//				@Override
-//				public void writeToEdge(GraphNode<T> vertexNode,
-//						GraphNode<T> edgeNode, T isVertex) {
-//					MFNode<T> vertex = (MFNode<T>) vertexNode;
-//					MFNode<T> edge = (MFNode<T>) edgeNode;
-//					IntegerLib<T> lib = new IntegerLib<>(env);
-//					edge.userProfile = lib.mux(vertex.userProfile, edge.userProfile, isVertex);
-//				}
-//			}.setInputs(aa).compute();
-//
-//			// scatter item profiles
-//			new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
-//	
-//				@Override
-//				public void writeToEdge(GraphNode<T> vertexNode,
-//						GraphNode<T> edgeNode, T isVertex) {
-//					MFNode<T> vertex = (MFNode<T>) vertexNode;
-//					MFNode<T> edge = (MFNode<T>) edgeNode;
-//					IntegerLib<T> lib = new IntegerLib<>(env);
-//					edge.itemProfile = lib.mux(vertex.itemProfile, edge.itemProfile, isVertex);
-//				}
-//			}.setInputs(aa).compute();
-//
-//			// compute gradient
-//			new ComputeGradient<T>(env, machine)
-//				.setInputs(aa)
-//				.compute();
-//
+//		print(machineId, env, aa);
+		for (int it = 0; it < ITERATIONS; it++) {
+			// scatter user profiles
+			new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
+	
+				@Override
+				public void writeToEdge(GraphNode<T> vertexNode,
+						GraphNode<T> edgeNode, T isVertex) {
+					MFNode<T> vertex = (MFNode<T>) vertexNode;
+					MFNode<T> edge = (MFNode<T>) edgeNode;
+					IntegerLib<T> lib = new IntegerLib<>(env);
+					edge.userProfile = lib.mux(vertex.userProfile, edge.userProfile, isVertex);
+				}
+			}.setInputs(aa).compute();
+
+			// scatter item profiles
+			new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
+	
+				@Override
+				public void writeToEdge(GraphNode<T> vertexNode,
+						GraphNode<T> edgeNode, T isVertex) {
+					MFNode<T> vertex = (MFNode<T>) vertexNode;
+					MFNode<T> edge = (MFNode<T>) edgeNode;
+					IntegerLib<T> lib = new IntegerLib<>(env);
+					edge.itemProfile = lib.mux(vertex.itemProfile, edge.itemProfile, isVertex);
+				}
+			}.setInputs(aa).compute();
+
+			// compute gradient
+			new ComputeGradient<T>(env, machine)
+				.setInputs(aa)
+				.compute();
+
 ////			printResult(machineId, env, aa);
-//			// update item profiles
-//			new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
-//	
-//				@Override
-//				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
-//					MFNode<T> agg = (MFNode<T>) aggNode;
-//					MFNode<T> b = (MFNode<T>) bNode;
-//					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
-//							MFNode.FIX_POINT_WIDTH,
-//							MFNode.OFFSET);
-//					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
-//					for (int i = 0; i < ret.itemProfile.length; i++) {
-//						ret.itemProfile[i] = fixedPointLib.add(agg.itemProfile[i], b.itemProfile[i]);
-////						ret.userProfile[i] = b.userProfile[i];
-//					}
-//					return ret;
-//				}
-//
-//				@Override
-//				public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
-//					MFNode<T> agg = (MFNode<T>) aggNode;
-//					MFNode<T> b = (MFNode<T>) bNode;
-//					IntegerLib<T> lib = new IntegerLib<>(env);
-//					FixedPointLib<T> flib = new FixedPointLib<>(env,
-//							MFNode.FIX_POINT_WIDTH,
-//							MFNode.OFFSET);
-//					for (int i = 0; i < agg.itemProfile.length; i++) {
-//						T[] edgeNodeAgg = flib.add(agg.itemProfile[i], b.itemProfile[i]);
-//						T[] twoGammaLambda = flib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.MU);
-//						T[] reg = flib.multiply(twoGammaLambda, b.itemProfile[i]);
-//						T[] total = flib.add(edgeNodeAgg, reg);
-//						// add 2 gamma lambta s6,k to agg
-//						b.itemProfile[i] = lib.mux(b.itemProfile[i], total, b.isVertex);
-//					}
-//				}
-//			}.setInputs(aa).compute();
-//
-//			// update user profiles
-//			new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
-//	
-//				@Override
-//				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
-//					MFNode<T> agg = (MFNode<T>) aggNode;
-//					MFNode<T> b = (MFNode<T>) bNode;
-//					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
-//							MFNode.FIX_POINT_WIDTH,
-//							MFNode.OFFSET);
-//					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
-//					for (int i = 0; i < ret.userProfile.length; i++) {
-//						ret.userProfile[i] = fixedPointLib.add(agg.userProfile[i], b.userProfile[i]);
-//					}
-//					return ret;
-//				}
-//	
-//				@Override
-//				public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
-//					MFNode<T> agg = (MFNode<T>) aggNode;
-//					MFNode<T> b = (MFNode<T>) bNode;
-//					IntegerLib<T> lib = new IntegerLib<>(env);
-//					FixedPointLib<T> flib = new FixedPointLib<>(env,
-//							MFNode.FIX_POINT_WIDTH,
-//							MFNode.OFFSET);
-//					for (int i = 0; i < agg.userProfile.length; i++) {
-//						T[] edgeNodeAgg = flib.add(agg.userProfile[i], b.userProfile[i]);
-//						T[] twoGammaLambda = flib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.LAMBDA);
-//						T[] reg = flib.multiply(twoGammaLambda, b.userProfile[i]);
-//						T[] total = flib.add(edgeNodeAgg, reg);
-//						b.userProfile[i] = lib.mux(b.userProfile[i], total, b.isVertex);
-//					}
-//				}
-//			}.setInputs(aa).compute();
-//		}
-//
-//		new SortGadget<>(env, machine)
-//			.setInputs(aa, GraphNode.vertexFirstComparator(env))
-//			.compute();
-		printOnlyResult(machineId, env, aa);
+			// update item profiles
+			new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
+	
+				@Override
+				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
+					MFNode<T> agg = (MFNode<T>) aggNode;
+					MFNode<T> b = (MFNode<T>) bNode;
+					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
+							MFNode.FIX_POINT_WIDTH,
+							MFNode.OFFSET);
+					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
+					for (int i = 0; i < ret.itemProfile.length; i++) {
+						ret.itemProfile[i] = fixedPointLib.add(agg.itemProfile[i], b.itemProfile[i]);
+//						ret.userProfile[i] = b.userProfile[i];
+					}
+					return ret;
+				}
+
+				@Override
+				public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
+					MFNode<T> agg = (MFNode<T>) aggNode;
+					MFNode<T> b = (MFNode<T>) bNode;
+					IntegerLib<T> lib = new IntegerLib<>(env);
+					FixedPointLib<T> flib = new FixedPointLib<>(env,
+							MFNode.FIX_POINT_WIDTH,
+							MFNode.OFFSET);
+					for (int i = 0; i < agg.itemProfile.length; i++) {
+						T[] edgeNodeAgg = flib.add(agg.itemProfile[i], b.itemProfile[i]);
+						T[] twoGammaLambda = flib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.MU);
+						T[] reg = flib.multiply(twoGammaLambda, b.itemProfile[i]);
+						T[] total = flib.add(edgeNodeAgg, reg);
+						// add 2 gamma lambta s6,k to agg
+						b.itemProfile[i] = lib.mux(b.itemProfile[i], total, b.isVertex);
+					}
+				}
+			}.setInputs(aa).compute();
+
+			// update user profiles
+			new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
+	
+				@Override
+				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
+					MFNode<T> agg = (MFNode<T>) aggNode;
+					MFNode<T> b = (MFNode<T>) bNode;
+					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
+							MFNode.FIX_POINT_WIDTH,
+							MFNode.OFFSET);
+					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
+					for (int i = 0; i < ret.userProfile.length; i++) {
+						ret.userProfile[i] = fixedPointLib.add(agg.userProfile[i], b.userProfile[i]);
+					}
+					return ret;
+				}
+	
+				@Override
+				public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
+					MFNode<T> agg = (MFNode<T>) aggNode;
+					MFNode<T> b = (MFNode<T>) bNode;
+					IntegerLib<T> lib = new IntegerLib<>(env);
+					FixedPointLib<T> flib = new FixedPointLib<>(env,
+							MFNode.FIX_POINT_WIDTH,
+							MFNode.OFFSET);
+					for (int i = 0; i < agg.userProfile.length; i++) {
+						T[] edgeNodeAgg = flib.add(agg.userProfile[i], b.userProfile[i]);
+						T[] twoGammaLambda = flib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.LAMBDA);
+						T[] reg = flib.multiply(twoGammaLambda, b.userProfile[i]);
+						T[] total = flib.add(edgeNodeAgg, reg);
+						b.userProfile[i] = lib.mux(b.userProfile[i], total, b.isVertex);
+					}
+				}
+			}.setInputs(aa).compute();
+		}
+
+		new SortGadget<>(env, machine)
+			.setInputs(aa, GraphNode.vertexFirstComparator(env))
+			.compute();
+		print(machineId, env, aa);
+//		printOnlyResult(machineId, env, aa);
 	}
 
 	private <T> void printResult(int machineId, final CompEnv<T> env, MFNode<T>[] mfNode) throws IOException, BadLabelException {
@@ -410,7 +411,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			if (Party.Alice.equals(env.party) && e) {
 //				System.out.println(machineId + ": " + a + ", " + b + "\t" + r + "\t" +  c2 + "\t" + d + "\t" + e);
 				System.out.print(machineId + ": " + a + ", " + b + "\t" + r + "\t");
-				if (i < 4) {
+				if (i < 5) {
 					for (int j = 0; j < MFNode.D; j++) {
 						System.out.print(c2[j] + "\t");
 					}
@@ -424,18 +425,25 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 	    }
 	}
 
-	private <T> void print(int machineId, final CompEnv<T> env, MFNode<T>[] mfNode) throws IOException, BadLabelException {
+	private <T> void print(int machineId, final CompEnv<T> env, MFNode<T>[] mfNode) throws IOException, BadLabelException, InterruptedException {
 		FixedPointLib<T> lib = new FixedPointLib<>(env, MFNode.FIX_POINT_WIDTH, MFNode.OFFSET);
+		if (machineId == 1) {
+			Thread.sleep(1000);
+		} else {
+			System.out.println();
+		}
 		for (int i = 0; i < mfNode.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(mfNode[i].u));
 			int b = Utils.toInt(env.outputToAlice(mfNode[i].v));
 			double r = lib.outputToAlice(mfNode[i].rating);
 			double c2 = lib.outputToAlice(mfNode[i].userProfile[0]);//Utils.toFloat(env.outputToAlice(mfNode[i].userProfile[0]), MFNode.FIX_POINT_WIDTH, MFNode.OFFSET);
+			double c3 = lib.outputToAlice(mfNode[i].userProfile[1]);
 			double d = lib.outputToAlice(mfNode[i].itemProfile[0]);//Utils.toFloat(env.outputToAlice(mfNode[i].itemProfile[0]), MFNode.FIX_POINT_WIDTH, MFNode.OFFSET);
-			boolean e = env.outputToAlice(mfNode[i].isVertex);
+			double d2 = lib.outputToAlice(mfNode[i].itemProfile[1]);
 			env.os.flush();
 			if (Party.Alice.equals(env.party)) {
-				System.out.println(machineId + ": " + a + ", " + b + "\t" + r + "\t" +  c2 + "\t" + d + "\t" + e);
+				System.out.format("%d: %d, %d \t %.2f \t %.6f \t %.6f \t %.6f \t %.6f\n", machineId, a, b, r, c2, c3, d, d2);
+//				System.out.println(machineId + ": " + a + ", " + b + "\t" + r + "\t" +  c2 + "\t" + d + "\t" + e);
 			}
 	    }
 	}
