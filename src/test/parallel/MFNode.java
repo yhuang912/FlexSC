@@ -24,17 +24,9 @@ public class MFNode<T> extends GraphNode<T> {
 	FixedPointLib<T> lib;
 	IntegerLib<T> ilib;
 
-//	public MFNode(CompEnv<T> env) {
-//		super(env);
-//		lib = new FixedPointLib<>(env, FIX_POINT_WIDTH, OFFSET);
-//		ilib = new IntegerLib<T>(env);
-//		try {
-//			rating = env.inputOfAlice(Utils.fromFixPoint(0, FIX_POINT_WIDTH, OFFSET));
-//			setProfiles(env);
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
-//	}
+	public MFNode(CompEnv<T> env) {
+		this(env, true /* identity */);
+	}
 
 	public MFNode(CompEnv<T> env, boolean identity) {
 		super(env);
@@ -58,32 +50,41 @@ public class MFNode<T> extends GraphNode<T> {
 			T[] v,
 			T isVertex,
 			T[] rating,
+			T[][] userProfile,
+			T[][] itemProfile,
 			CompEnv<T> env) {
 		super(u, v, isVertex);
 		lib = new FixedPointLib<>(env, FIX_POINT_WIDTH, OFFSET);
 		ilib = new IntegerLib<T>(env);
 		this.rating = rating;
-		try {
-			setProfiles(env);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.userProfile = userProfile;
+		this.itemProfile = itemProfile;
 	}
 
-	private void setProfiles(CompEnv<T> env) throws IOException {
-		userProfile = env.newTArray(D, FIX_POINT_WIDTH);
-		itemProfile = env.newTArray(D, FIX_POINT_WIDTH);
-		for (int i = 0; i < D; ++i) {
-			userProfile[i] = env.inputOfAlice(Utils.fromFixPoint(getRandom(), FIX_POINT_WIDTH, OFFSET));
-			itemProfile[i] = env.inputOfAlice(Utils.fromFixPoint(getRandom(), FIX_POINT_WIDTH, OFFSET));
-		}
-	}
+//	public MFNode(T[] u,
+//			T[] v,
+//			T isVertex,
+//			T[] rating,
+//			CompEnv<T> env) {
+//		super(u, v, isVertex);
+//		lib = new FixedPointLib<>(env, FIX_POINT_WIDTH, OFFSET);
+//		ilib = new IntegerLib<T>(env);
+//		this.rating = rating;
+//		try {
+//			setProfiles(env);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
-	private double getRandom() {
-		double ret = Machine.RAND[Machine.RAND_CNT];
-		Machine.RAND_CNT = (Machine.RAND_CNT + 1) % 10000;
-		return ret;
-	}
+//	private void setProfiles(CompEnv<T> env) throws IOException {
+//		userProfile = env.newTArray(D, FIX_POINT_WIDTH);
+//		itemProfile = env.newTArray(D, FIX_POINT_WIDTH);
+//		for (int i = 0; i < D; ++i) {
+//			userProfile[i] = env.inputOfAlice(Utils.fromFixPoint(getRandom(), FIX_POINT_WIDTH, OFFSET));
+//			itemProfile[i] = env.inputOfAlice(Utils.fromFixPoint(getRandom(), FIX_POINT_WIDTH, OFFSET));
+//		}
+//	}
 
 	// used by sort gadget
 	public MFNode() {
