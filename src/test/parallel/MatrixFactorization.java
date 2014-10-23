@@ -22,12 +22,18 @@ import gc.BadLabelException;
 
 public class MatrixFactorization<T> implements ParallelGadget<T> {
 
-	public static int ITERATIONS = 10;
-	public static double GAMMA = 0.0001;
-	public static double LAMBDA = 0.001; 
-	public static double MU = 0.001;
+	public static int ITERATIONS = 1;
+	public static double GAMMA = 0.0002;
+	public static double LAMBDA = 0.02; 
+	public static double MU = 0.02;
 
 	private Object[] getInput(int inputLength) throws IOException {
+		Machine.RAND = new double[10000];
+		BufferedReader reader = new BufferedReader(new FileReader("rand.out"));
+		for (int i = 0; i < 10000; i++) {
+			Machine.RAND[i] = Double.parseDouble(reader.readLine());
+		}
+		reader.close();
 		int[] u = new int[inputLength];
 		int[] v = new int[inputLength];
 		boolean[] isVertex = new boolean[inputLength];
@@ -162,7 +168,6 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		T[][] rating = (T[][]) ((Object[]) machine.input)[3];
 
 		MFNode<T>[] aa = (MFNode<T>[]) Array.newInstance(MFNode.class, u.length);
-		T[] temp = env.inputOfAlice(Utils.fromFixPoint(1, MFNode.FIX_POINT_WIDTH, MFNode.OFFSET));
 		for (int i = 0; i < aa.length; i++) {
 			aa[i] = new MFNode<T>(u[i], v[i], isVertex[i], rating[i], env);
 		}
@@ -211,7 +216,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
 							MFNode.FIX_POINT_WIDTH,
 							MFNode.OFFSET);
-					MFNode<T> ret = new MFNode<>(env);
+					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
 					for (int i = 0; i < ret.itemProfile.length; i++) {
 						ret.itemProfile[i] = fixedPointLib.add(agg.itemProfile[i], b.itemProfile[i]);
 //						ret.userProfile[i] = b.userProfile[i];
@@ -248,7 +253,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
 							MFNode.FIX_POINT_WIDTH,
 							MFNode.OFFSET);
-					MFNode<T> ret = new MFNode<>(env);
+					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
 					for (int i = 0; i < ret.userProfile.length; i++) {
 						ret.userProfile[i] = fixedPointLib.add(agg.userProfile[i], b.userProfile[i]);
 					}

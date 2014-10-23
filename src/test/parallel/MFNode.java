@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import network.Machine;
 import network.NetworkUtil;
 import test.Utils;
 import circuits.IntegerLib;
@@ -23,17 +24,17 @@ public class MFNode<T> extends GraphNode<T> {
 	FixedPointLib<T> lib;
 	IntegerLib<T> ilib;
 
-	public MFNode(CompEnv<T> env) {
-		super(env);
-		lib = new FixedPointLib<>(env, FIX_POINT_WIDTH, OFFSET);
-		ilib = new IntegerLib<T>(env);
-		try {
-			rating = env.inputOfAlice(Utils.fromFixPoint(0, FIX_POINT_WIDTH, OFFSET));
-			setProfiles(env);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-	}
+//	public MFNode(CompEnv<T> env) {
+//		super(env);
+//		lib = new FixedPointLib<>(env, FIX_POINT_WIDTH, OFFSET);
+//		ilib = new IntegerLib<T>(env);
+//		try {
+//			rating = env.inputOfAlice(Utils.fromFixPoint(0, FIX_POINT_WIDTH, OFFSET));
+//			setProfiles(env);
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
+//	}
 
 	public MFNode(CompEnv<T> env, boolean identity) {
 		super(env);
@@ -73,9 +74,15 @@ public class MFNode<T> extends GraphNode<T> {
 		userProfile = env.newTArray(D, FIX_POINT_WIDTH);
 		itemProfile = env.newTArray(D, FIX_POINT_WIDTH);
 		for (int i = 0; i < D; ++i) {
-			userProfile[i] = env.inputOfAlice(Utils.fromFixPoint(Math.random(), FIX_POINT_WIDTH, OFFSET));
-			itemProfile[i] = env.inputOfAlice(Utils.fromFixPoint(Math.random(), FIX_POINT_WIDTH, OFFSET));
+			userProfile[i] = env.inputOfAlice(Utils.fromFixPoint(getRandom(), FIX_POINT_WIDTH, OFFSET));
+			itemProfile[i] = env.inputOfAlice(Utils.fromFixPoint(getRandom(), FIX_POINT_WIDTH, OFFSET));
 		}
+	}
+
+	private double getRandom() {
+		double ret = Machine.RAND[Machine.RAND_CNT];
+		Machine.RAND_CNT = (Machine.RAND_CNT + 1) % 10000;
+		return ret;
 	}
 
 	// used by sort gadget
@@ -96,11 +103,11 @@ public class MFNode<T> extends GraphNode<T> {
 		scalar = lib.multiply(twoGamma, scalar);
 		T[][] newUserProfile = multiplyToVector(scalar, itemProfile, env);
 
+		T[][] newItemProfile = multiplyToVector(scalar, userProfile, env);
+
 		for (int i = 0; i < userProfile.length; ++i)
 			userProfile[i] = ilib.mux(userProfile[i], newUserProfile[i],
 					ilib.not(isVertex));
-
-		T[][] newItemProfile = multiplyToVector(scalar, userProfile, env);
 
 		for (int i = 0; i < itemProfile.length; ++i)
 			itemProfile[i] = ilib.mux(itemProfile[i], newItemProfile[i],
@@ -226,7 +233,7 @@ public class MFNode<T> extends GraphNode<T> {
 	@Override
 	public GraphNode<T> mux(GraphNode<T> b1, T condition, CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
-		MFNode<T> ret = new MFNode<T>(env);
+		MFNode<T> ret = new MFNode<T>(env, true /* isIdentity */);
 		ret.u = lib.mux(((MFNode<T>) b1).u, this.u, condition);
 		ret.v = lib.mux(((MFNode<T>) b1).v, this.v, condition);
 		ret.isVertex = lib.mux(((MFNode<T>) b1).isVertex, this.isVertex, condition);
@@ -238,7 +245,7 @@ public class MFNode<T> extends GraphNode<T> {
 
 	@Override
 	public GraphNode<T> getCopy(CompEnv<T> env) {
-		MFNode<T> a = new MFNode<>(env);
+		MFNode<T> a = new MFNode<>(env, true /* isIdentity */);
 		a.u = this.u;
 		a.v = this.v;
 		a.isVertex = this.isVertex;
