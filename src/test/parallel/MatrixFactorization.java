@@ -270,6 +270,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			System.out.println("scatter 1 done");
 			// scatter item profiles
 			new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
 	

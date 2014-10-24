@@ -41,6 +41,7 @@ public abstract class ScatterToEdges<T> extends Gadget<T> {
 			.setInputs(nodes, nodes[0].getComparator(env, false /* isVertexLast */))
 			.compute();
 
+		System.out.println("scatter sort done");
 		IntegerLib<T> lib = new IntegerLib<>(env);
 		T _true = env.newT(true);
 
