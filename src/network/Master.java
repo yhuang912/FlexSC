@@ -138,7 +138,7 @@ public class Master {
 		master.isGen = Boolean.parseBoolean(args[3]);
 		int inputLength = Integer.parseInt(args[5]);
 		Party party = master.isGen ? Party.Alice : Party.Bob;
-		Mode mode = Mode.VERIFY;
+		Mode mode = Mode.REAL;
 		InputStream is;
 		OutputStream os;
 		if (master.isGen) {
