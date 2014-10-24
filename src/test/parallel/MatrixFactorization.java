@@ -22,21 +22,22 @@ import gc.BadLabelException;
 
 public class MatrixFactorization<T> implements ParallelGadget<T> {
 
-	public static int ITERATIONS = 272;
+	public static int ITERATIONS = 1;
 	public static double GAMMA = 0.0002;
 	public static double LAMBDA = 0.02; 
 	public static double MU = 0.02;
+	public static int RAND_LIM = 10000000;
 
 	private double getRandom() {
 		double ret = Machine.RAND[Machine.RAND_CNT];
-		Machine.RAND_CNT = (Machine.RAND_CNT + 1) % 10000;
+		Machine.RAND_CNT = (Machine.RAND_CNT + 1) % RAND_LIM;
 		return ret;
 	}
 
 	private Object[] getInput(int inputLength) throws IOException {
-		Machine.RAND = new double[10000];
+		Machine.RAND = new double[RAND_LIM];
 		BufferedReader reader = new BufferedReader(new FileReader("rand.out"));
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < RAND_LIM; i++) {
 			Machine.RAND[i] = Double.parseDouble(reader.readLine());
 		}
 		reader.close();
@@ -46,7 +47,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		double[] rating = new double[inputLength];
 		double[][] userProfile = new double[inputLength][MFNode.D];
 		double[][] itemProfile = new double[inputLength][MFNode.D];
-		BufferedReader br = new BufferedReader(new FileReader("mf.in"));
+		BufferedReader br = new BufferedReader(new FileReader("mf" + inputLength + ".in"));
 		for (int i = 0; i < inputLength; i++) {
 			String readLine = br.readLine();
 			String[] split = readLine.split(" ");
@@ -236,6 +237,9 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+		final FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
+				MFNode.FIX_POINT_WIDTH,
+				MFNode.OFFSET);
 		T[][] u = (T[][]) ((Object[]) machine.input)[0];
 		T[][] v = (T[][]) ((Object[]) machine.input)[1];
 		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
@@ -249,6 +253,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		}
 
 //		print(machineId, env, aa);
+		long startTime = System.nanoTime();
 		for (int it = 0; it < ITERATIONS; it++) {
 			// scatter user profiles
 			new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
@@ -289,9 +294,6 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
 					MFNode<T> agg = (MFNode<T>) aggNode;
 					MFNode<T> b = (MFNode<T>) bNode;
-					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
-							MFNode.FIX_POINT_WIDTH,
-							MFNode.OFFSET);
 					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
 					for (int i = 0; i < ret.itemProfile.length; i++) {
 						ret.itemProfile[i] = fixedPointLib.add(agg.itemProfile[i], b.itemProfile[i]);
@@ -305,14 +307,11 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 					MFNode<T> agg = (MFNode<T>) aggNode;
 					MFNode<T> b = (MFNode<T>) bNode;
 					IntegerLib<T> lib = new IntegerLib<>(env);
-					FixedPointLib<T> flib = new FixedPointLib<>(env,
-							MFNode.FIX_POINT_WIDTH,
-							MFNode.OFFSET);
 					for (int i = 0; i < agg.itemProfile.length; i++) {
-						T[] edgeNodeAgg = flib.add(agg.itemProfile[i], b.itemProfile[i]);
-						T[] twoGammaLambda = flib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.MU);
-						T[] reg = flib.multiply(twoGammaLambda, b.itemProfile[i]);
-						T[] total = flib.add(edgeNodeAgg, reg);
+						T[] edgeNodeAgg = fixedPointLib.add(agg.itemProfile[i], b.itemProfile[i]);
+						T[] twoGammaLambda = fixedPointLib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.MU);
+						T[] reg = fixedPointLib.multiply(twoGammaLambda, b.itemProfile[i]);
+						T[] total = fixedPointLib.add(edgeNodeAgg, reg);
 						// add 2 gamma lambta s6,k to agg
 						b.itemProfile[i] = lib.mux(b.itemProfile[i], total, b.isVertex);
 					}
@@ -358,7 +357,11 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		new SortGadget<>(env, machine)
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
-		print(machineId, env, aa);
+		long endTime = System.nanoTime();
+		if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
+			System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "MatrixFactorization");
+		}
+//		print(machineId, env, aa);
 //		printOnlyResult(machineId, env, aa);
 	}
 

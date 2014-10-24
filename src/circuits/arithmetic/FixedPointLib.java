@@ -1,5 +1,6 @@
 package circuits.arithmetic;
 
+import java.awt.peer.LightweightPeer;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -42,7 +43,25 @@ public class FixedPointLib<T> implements ArithmeticLib<T> {
 
 	public T[] multiply(T[] x, T[] y) {
 		T[] res = lib.multiplyFull(x, y);
-		return Arrays.copyOf(lib.rightPublicShift(res, offset), width);
+		res = Arrays.copyOf(lib.rightPublicShift(res, offset), width);
+//		try {
+//			double d1;
+//			double d = outputToAlice(x);
+//			double dd = outputToAlice(y);
+//			d1 = outputToAlice(res);
+		
+//		if(Math.abs(d1-d*dd) > 10){
+//			System.out.print(Arrays.toString(lib.getEnv().outputToAlice(res)));
+//			System.out.println(d+" "+dd+" "+d1);
+//		}
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (BadLabelException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		return res;
 	}
 
 	public T[] div(T[] x, T[] y) {

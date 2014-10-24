@@ -285,6 +285,5 @@ public class Machine {
 //		if (Party.Alice.equals(machine.env.party)) {
 //			System.out.println("hello " + d);
 //		}
-		
 	}
 }
