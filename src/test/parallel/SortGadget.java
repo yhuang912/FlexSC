@@ -88,7 +88,7 @@ public class SortGadget<T>  extends Gadget<T> {
 		int toTransfer = nodes.length;
 		int i = 0, j = 0;
 		while (toTransfer > 0) {
-			int curTransfer = Math.min(toTransfer, 64);
+			int curTransfer = Math.min(toTransfer, 24);
 			toTransfer -= curTransfer;
 			for (int k = 0; k < curTransfer; k++, i++) {
 				nodes[i].send(os, env);
