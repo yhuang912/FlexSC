@@ -40,6 +40,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		for (int i = 0; i < RAND_LIM; i++) {
 			Machine.RAND[i] = Double.parseDouble(reader.readLine());
 		}
+		System.out.println("Random loaded");
 		reader.close();
 		int[] u = new int[inputLength];
 		int[] v = new int[inputLength];
@@ -254,6 +255,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 
 //		print(machineId, env, aa);
 		long startTime = System.nanoTime();
+		System.out.println("started");
 		for (int it = 0; it < ITERATIONS; it++) {
 			// scatter user profiles
 			new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
@@ -281,6 +283,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			System.out.println("starting gradient");
 			// compute gradient
 			new ComputeGradient<T>(env, machine)
 				.setInputs(aa)
@@ -353,6 +356,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 		}
+		System.out.println("loop done");
 
 		new SortGadget<>(env, machine)
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
