@@ -2,10 +2,8 @@ package harness;
 
 import java.util.Random;
 
-import org.junit.Assert;
-
 import circuits.arithmetic.DenseMatrixLib;
-import circuits.arithmetic.FloatLib;
+import circuits.arithmetic.FixedPointLib;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
@@ -75,8 +73,7 @@ public class TestMatrix extends TestHarness {
 
 				// PrintMatrix(h.a);
 				if (testFixedPoint)
-					lib = new DenseMatrixLib<T>(gen, new FloatLib<T>(gen,VLength,PLength));//
-//							len, offset));
+					lib = new DenseMatrixLib<T>(gen, new FixedPointLib<T>(gen, len, offset));
 				else
 					lib = new DenseMatrixLib<T>(gen, new IntegerLib<T>(gen,
 							32));
@@ -123,8 +120,7 @@ public class TestMatrix extends TestHarness {
 				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
 
 				if (testFixedPoint)
-					lib = new DenseMatrixLib<T>(env, new FloatLib<T>(env,VLength,PLength));////new FixedPointLib<T>(env,
-//							len, offset));
+					lib = new DenseMatrixLib<T>(env, new FixedPointLib<T>(env, len, offset));
 				else
 					lib = new DenseMatrixLib<T>(env, new IntegerLib<T>(env,
 							32));

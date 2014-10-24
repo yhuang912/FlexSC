@@ -9,7 +9,7 @@ import flexsc.PMCompEnv;
 import flexsc.Party;
 
 public class TestFixedPoint extends TestHarness {
-	public static final int width = 32, offset = 16;
+	public static final int width = 40, offset = 20;
 
 	public static abstract class Helper {
 		double a, b;

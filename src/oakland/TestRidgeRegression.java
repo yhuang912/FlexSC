@@ -22,7 +22,7 @@ public class TestRidgeRegression extends TestHarness {
 	public static  int VLength = 23;
 	public static  int PLength = 8;
 	public static  boolean testFixedPoint = true;
-	static public int TESTS = 1;
+	static public int TESTS = 5;
 
 	public static  class Helper {
 		double[][] a, b;
@@ -221,11 +221,11 @@ public class TestRidgeRegression extends TestHarness {
 	}
 	@Test
 	public void testAllCases() throws Exception {
-		TestHarness.m = Mode.REAL;
-		for (int i = 22; i < 40; i++) {
+		TestHarness.m = Mode.COUNT;
+		for (int i = 20; i <= 20; i+=2) {
 			TestRidgeRegression.len = i;
-			double[][] d1 = TestRidgeRegression.randomMatrix(14, 14);
-			double[][] d2 = TestRidgeRegression.randomMatrix(14, 14);
+			double[][] d1 = TestRidgeRegression.randomMatrix(12, 12);
+			double[][] d2 = TestRidgeRegression.randomMatrix(12, 12);
 			TestRidgeRegression.runThreads(new Helper(d1, d2));
 		}
 	}

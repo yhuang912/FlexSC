@@ -13,8 +13,8 @@ public class TestMatrixAdd extends TestHarness {
 	@Test
 	public void testAllCases() throws Exception {
 		for (int i = 0; i < 1; i++) {
-			double[][] d1 = TestMatrix.randomMatrix(500, 500);
-			double[][] d2 = TestMatrix.randomMatrix(500, 500);
+			double[][] d1 = TestMatrix.randomMatrix(100, 100);
+			double[][] d2 = TestMatrix.randomMatrix(100, 100);
 
 			TestMatrix.runThreads(new Helper(d1, d2) {
 				@Override

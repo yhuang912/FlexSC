@@ -153,7 +153,7 @@ public class DenseMatrixLib<T> {
 			e[i] = veclib.normalize(u[i]);
 		}
 		T[][][] r = env.newTArray(matrix.length, matrix[0].length, 1);
-		T[] zero = lib.publicValue(1E-5);// !!
+		T[] zero = lib.publicValue(0);
 		for (int i = 0; i < r.length; ++i) {
 			for (int j = 0; j < r[0].length; ++j) {
 				if (i <= j)

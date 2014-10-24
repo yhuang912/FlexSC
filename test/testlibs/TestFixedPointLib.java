@@ -13,7 +13,7 @@ import flexsc.CompEnv;
 
 public class TestFixedPointLib extends TestFixedPoint {
 
-	@Test
+	//@Test
 	public void testFixPointAdd() throws Exception {
 		Random rng = new Random();
 
@@ -35,7 +35,7 @@ public class TestFixedPointLib extends TestFixedPoint {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testFixPointSub() throws Exception {
 		Random rng = new Random();
 
@@ -61,8 +61,8 @@ public class TestFixedPointLib extends TestFixedPoint {
 		Random rng = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			double d1 = rng.nextInt(1 << 30) % 100.0;
-			double d2 = rng.nextInt(1 << 30) % 100.0;
+			double d1 = 0.00001;//rng.nextInt(1 << 30) % 100.0;
+			double d2 = 100000;//rng.nextInt(1 << 30) % 100.0;
 			TestFixedPoint.runThreads(new Helper(d1, d2) {
 
 				@Override
@@ -80,7 +80,7 @@ public class TestFixedPointLib extends TestFixedPoint {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testFixPointDiv() throws Exception {
 		Random rng = new Random();
 
@@ -106,7 +106,7 @@ public class TestFixedPointLib extends TestFixedPoint {
 		}
 	}
 
-	@Test
+	//@Test
 	public void testFixPointSqaureRoot() throws Exception {
 		Random rng = new Random();
 
