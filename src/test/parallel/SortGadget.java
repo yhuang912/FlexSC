@@ -51,9 +51,7 @@ public class SortGadget<T>  extends Gadget<T> {
 				is = up ? machine.peerIsUp[commMachine] : machine.peerIsDown[commMachine];
 				os = up ? machine.peerOsUp[commMachine] : machine.peerOsDown[commMachine]; 
 
-				System.out.println("Before sendRecv");
 				GraphNode<T>[] receivedNodes = sendReceive(os, is, nodes, nodes.length);
-				System.out.println("After sendRecv");
 				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
 
 				GraphNode<T>[] concatenatedNodes = up ? concatenate(receivedNodes, nodes) : concatenate(nodes, receivedNodes); 
