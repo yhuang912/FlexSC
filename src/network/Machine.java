@@ -246,7 +246,7 @@ public class Machine {
 		int masterPort = Integer.parseInt(args[0]);
 		int machineId = Integer.parseInt(args[1]);
 		int compPoolGenEvaPort = Integer.parseInt(args[2]);
-		Mode mode = Mode.REAL;
+		Mode mode = Mode.COUNT;
 		Machine machine = new Machine(masterPort);
 		machine.isGen = Boolean.parseBoolean(args[3]);
 		machine.inputLength = Integer.parseInt(args[4]);
@@ -274,6 +274,7 @@ public class Machine {
 		machine.disconnect();
 
 		if (machine.machineId == firstPhysicalMachineId) {
+			Thread.sleep(10000);
 			PrintWriter writer = new PrintWriter("mutex.txt");
 			writer.close();
 		}

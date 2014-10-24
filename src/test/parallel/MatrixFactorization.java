@@ -17,7 +17,10 @@ import network.NetworkUtil;
 import circuits.IntegerLib;
 import circuits.arithmetic.FixedPointLib;
 import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.PMCompEnv;
 import flexsc.Party;
+import flexsc.PMCompEnv.Statistics;
 import gc.BadLabelException;
 
 public class MatrixFactorization<T> implements ParallelGadget<T> {
@@ -40,7 +43,6 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		for (int i = 0; i < RAND_LIM; i++) {
 			Machine.RAND[i] = Double.parseDouble(reader.readLine());
 		}
-		System.out.println("Random loaded");
 		reader.close();
 		int[] u = new int[inputLength];
 		int[] v = new int[inputLength];
@@ -359,11 +361,24 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
-		if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
-			System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "MatrixFactorization");
-		}
+		output(machineId, machine, env, startTime, endTime);
 //		print(machineId, env, aa);
 //		printOnlyResult(machineId, env, aa);
+	}
+
+	private <T> void output(int machineId, Machine machine, CompEnv<T> env,
+			long startTime, long endTime) {
+		if (Mode.COUNT.equals(env.getMode())) {
+			Statistics a = ((PMCompEnv) env).statistic;
+			a.finalize();
+			if (Party.Alice.equals(env.party)) {
+				System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+			}
+		} else {
+			if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
+				System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "MatrixFactorization");
+			}
+		}
 	}
 
 	private <T> void printResult(int machineId, final CompEnv<T> env, MFNode<T>[] mfNode) throws IOException, BadLabelException {
