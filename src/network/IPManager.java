@@ -35,7 +35,7 @@ public class IPManager {
 			}
 			return ipManager;
 		} catch(FileNotFoundException e) {
-			System.out.println("File not found");
+			System.out.println("File not found" + e.getMessage());
 		}
 		return null;
 	}
