@@ -26,10 +26,12 @@ public class IPManager {
 			ipManager.gIp = new String[ipManager.machines];
 			ipManager.eIp = new String[ipManager.machines];
 			for (int i = 0; i < ipManager.machines; i++) {
-				ipManager.gIp[i] = br.readLine().split(",")[1];
+//				ipManager.gIp[i] = br.readLine().split(",")[1];
+				ipManager.gIp[i] = br.readLine();
 			}
 			for (int i = 0; i < ipManager.machines; i++) {
-				ipManager.eIp[i] = br.readLine().split(",")[1];
+//				ipManager.eIp[i] = br.readLine().split(",")[1];
+				ipManager.eIp[i] = br.readLine();
 			}
 			return ipManager;
 		} catch(FileNotFoundException e) {
