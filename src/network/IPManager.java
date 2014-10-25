@@ -13,12 +13,13 @@ public class IPManager {
 	String[] eIp;
 	int machines;
 
-	public static IPManager loadIPs(int machines) throws IOException {
+	public static IPManager loadIPs(int machines, String machineConfig) throws IOException {
 		IPManager ipManager = new IPManager();
 		BufferedReader br = null;
 		try {
 			// System.out.println(Constants.MACHINE_IPS);
-			br = new BufferedReader(new FileReader(Constants.MACHINE_IPS + "." + machines));
+//			br = new BufferedReader(new FileReader(Constants.MACHINE_IPS + "." + machines));
+			br = new BufferedReader(new FileReader(machineConfig + "." + machines));
 			ipManager.masterGarblerIp = br.readLine();
 			ipManager.masterEvaluatorIp = br.readLine();
 			ipManager.machines = Integer.parseInt(br.readLine());

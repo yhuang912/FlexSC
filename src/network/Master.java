@@ -130,7 +130,8 @@ public class Master {
 
 	public static void main(String args[]) throws IOException, BadResponseException, InterruptedException, ClassNotFoundException, InstantiationException, IllegalAccessException, IncorrectOtUsageException {
 		int machines = Integer.parseInt(args[4]);
-		IPManager ipManager = IPManager.loadIPs(machines);
+		String machineConfig = args[6];
+		IPManager ipManager = IPManager.loadIPs(machines, machineConfig);
 		Master master = new Master(machines);
 		Master.START_PORT = Integer.parseInt(args[0]);
 		int peerPort = Integer.parseInt(args[1]);
