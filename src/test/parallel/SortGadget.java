@@ -50,9 +50,9 @@ public class SortGadget<T>  extends Gadget<T> {
 				int commMachine = Machine.log2(diff);
 				is = up ? machine.peerIsUp[commMachine] : machine.peerIsDown[commMachine];
 				os = up ? machine.peerOsUp[commMachine] : machine.peerOsDown[commMachine]; 
-System.out.println("before sendRecv");
+//System.out.println("before sendRecv");
 				GraphNode<T>[] receivedNodes = sendReceive(os, is, nodes, nodes.length);
-System.out.println("after sendRecv");
+//System.out.println("after sendRecv");
 				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
 
 				GraphNode<T>[] concatenatedNodes = up ? concatenate(receivedNodes, nodes) : concatenate(nodes, receivedNodes); 
@@ -70,7 +70,7 @@ System.out.println("after sendRecv");
 			}
 			lib.bitonicMerge(nodes, 0, nodes.length, mergeDir);
 		}
-System.out.println("hello");
+//System.out.println("hello");
 		// env.os.flush();
 		long finalTimer = System.nanoTime();
 		compute = finalTimer - initTimer - (communicate + concatenate);

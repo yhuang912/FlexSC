@@ -270,7 +270,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 					edge.userProfile = lib.mux(vertex.userProfile, edge.userProfile, isVertex);
 				}
 			}.setInputs(aa).compute();
-                        System.out.println("Scatter done");
+ //                       System.out.println("Scatter done");
 			// scatter item profiles
 			new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
 	
@@ -288,7 +288,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			new ComputeGradient<T>(env, machine)
 				.setInputs(aa)
 				.compute();
-System.out.println("gradient done");
+//System.out.println("gradient done");
 ////			printResult(machineId, env, aa);
 			// update item profiles
 			new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
@@ -375,8 +375,8 @@ System.out.println("gradient done");
 				System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
 			}
 		} else {
-			if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
-				System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "MatrixFactorization");
+		        if (env.party.equals(Party.Alice)) {
+				System.out.println(machine.machineId + "," + (1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "MatrixFactorization");
 			}
 		}
 	}
