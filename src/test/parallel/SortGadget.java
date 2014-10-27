@@ -69,7 +69,6 @@ public class SortGadget<T>  extends Gadget<T> {
 			}
 			lib.bitonicMerge(nodes, 0, nodes.length, mergeDir);
 		}
-
 		// env.os.flush();
 		long finalTimer = System.nanoTime();
 		compute = finalTimer - initTimer - (communicate + concatenate);
@@ -86,7 +85,7 @@ public class SortGadget<T>  extends Gadget<T> {
 		int toTransfer = nodes.length;
 		int i = 0, j = 0;
 		while (toTransfer > 0) {
-			int curTransfer = Math.min(toTransfer, 24);
+			int curTransfer = Math.min(toTransfer, 8);
 			toTransfer -= curTransfer;
 			for (int k = 0; k < curTransfer; k++, i++) {
 				nodes[i].send(os, env);

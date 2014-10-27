@@ -291,8 +291,12 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			new ComputeGradient<T>(env, machine)
 				.setInputs(aa)
 				.compute();
+<<<<<<< HEAD
 
 			gradient = System.nanoTime();
+=======
+//System.out.println("gradient done");
+>>>>>>> fd73d7031b5595418e1f07592fcd0672fb4b984c
 ////			printResult(machineId, env, aa);
 			// update item profiles
 			communicate += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
@@ -398,8 +402,8 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
 			}
 		} else {
-			if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
-				System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "MatrixFactorization");
+		        if (env.party.equals(Party.Alice)) {
+				System.out.println(machine.machineId + "," + (1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "MatrixFactorization");
 			}
 		}
 	}
