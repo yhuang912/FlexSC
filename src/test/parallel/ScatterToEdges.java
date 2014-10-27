@@ -37,7 +37,7 @@ public abstract class ScatterToEdges<T> extends Gadget<T> {
 			}
 		}
 
-		new SortGadget<T>(env, machine)
+		long communicate = (long) new SortGadget<T>(env, machine)
 			.setInputs(nodes, nodes[0].getComparator(env, false /* isVertexLast */))
 			.compute();
 
@@ -61,15 +61,25 @@ public abstract class ScatterToEdges<T> extends Gadget<T> {
 		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
 		for (int k = 0; k < machine.logMachines; k++) {
 			if (noOfIncomingConnections > 0) {
+				long one = System.nanoTime();
+
 				NetworkUtil.send(machine.peerOsDown[k], foundToSend, env);
 				graphNode.send(machine.peerOsDown[k], env);
 				((BufferedOutputStream) machine.peerOsDown[k]).flush();
 				noOfIncomingConnections--;
+
+				long two = System.nanoTime();
+				communicate += (two - one);
 			}
 			if (noOfOutgoingConnections > 0) {
+				long one = System.nanoTime();
+
 				T foundRead = NetworkUtil.read(machine.peerIsUp[k], env);
 				GraphNode<T> graphNodeRead = (GraphNode<T>) constructor.newInstance(env);
 				graphNodeRead.read(machine.peerIsUp[k], env);
+
+				long two = System.nanoTime();
+				communicate += (two - one);
 
 				// compute the value for the last vertex
 				graphNodeLast = graphNodeLast.mux(graphNodeRead, found, env);
@@ -89,7 +99,7 @@ public abstract class ScatterToEdges<T> extends Gadget<T> {
 				nodes[j].swapEdgeDirections();
 			}
 		}
-		return null;
+		return communicate;
 	}
 
 	public abstract void writeToEdge(GraphNode<T> vertexNode, GraphNode<T> edgeNode, T isVertex);

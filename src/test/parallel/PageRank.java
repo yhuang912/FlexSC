@@ -27,7 +27,7 @@ import gc.BadLabelException;
 public class PageRank<T> implements ParallelGadget<T> {
 	static int UNUSED_FLOAT_V = 20;
 	static int UNUSED_FLOAT_P = 11;
-	static int ITERATIONS = 10;
+	static int ITERATIONS = 1;
 	static int WIDTH = 40;
 	static int OFFSET = 20;
 
@@ -35,7 +35,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 		int[] u = new int[inputLength];
 		int[] v = new int[inputLength];
 		boolean[] isVertex = new boolean[inputLength];
-		BufferedReader br = new BufferedReader(new FileReader("PageRank" + inputLength + ".in"));
+		BufferedReader br = new BufferedReader(new FileReader("in/PageRank" + inputLength + ".in"));
 		for (int i = 0; i < inputLength; i++) {
 			String readLine = br.readLine();
 			String[] split = readLine.split(" ");
@@ -154,6 +154,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 		}
 
 		long startTime = System.nanoTime();
+		long scatter = 0, gather = 0;
+		long communicate = 0;
 		// set initial pagerank
 		new SetInitialPageRankGadget<T>(env, machine)
 				.setInputs(aa)
@@ -182,9 +184,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 			}
 		}.setInputs(aa).compute();
 
+		long bootStrap = System.nanoTime();
 		for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges
-			new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
+			communicate += (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
 
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -210,8 +213,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			scatter = System.nanoTime();
 			// 3. Compute PR based on edges
-			new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new PageRankNode<T>(env)) {
+			communicate += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new PageRankNode<T>(env)) {
 
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -234,52 +238,54 @@ public class PageRank<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			gather = System.nanoTime();
 			// osrting to get output in a nice form
-//			new SortGadget<T>(env, machine)
-//				.setInputs(aa, PageRankNode.vertexFirstComparator(env))
-//				.compute();
-//			output(machineId, env, aa, i /* iterations */);
+			if (Mode.VERIFY.equals(env.getMode())) {
+				new SortGadget<T>(env, machine)
+					.setInputs(aa, PageRankNode.vertexFirstComparator(env))
+					.compute();
+				print(machineId, env, aa, i /* iterations */);
+			}
 		}
-		new SortGadget<T>(env, machine)
+		communicate += (long) new SortGadget<T>(env, machine)
 			.setInputs(aa, PageRankNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
-//		if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
-//			System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "PageRank");
-//		}
-		output(machineId, env, aa, 0 /* iterations */, machine);
-	}
-
-	private <T> void output(int machineId, final CompEnv<T> env,
-			PageRankNode<T>[] aa, int iterations, Machine machine) throws IOException, BadLabelException {
-		if (Mode.COUNT.equals(env.getMode())) {
+		if (Mode.REAL.equals(env.getMode())) {
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootStrap - startTime)/1000000000.0 + "," + "Bootstrap");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter - bootStrap)/1000000000.0 + "," + "Scatter");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - scatter)/1000000000.0 + "," + "Gather");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather)/1000000000.0 + "," + "Final sort");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate)/1000000000.0 + "," + "Communication time");
+		} else if (Mode.COUNT.equals(env.mode)) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
-			if (Party.Alice.equals(env.party)) {
-				System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
-			}
-		} else {
-			print(machineId, env, aa, iterations);
+			Thread.sleep(1000 * machineId);
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
 		}
 	}
+
+//	private <T> void output(int machineId, final CompEnv<T> env,
+//			PageRankNode<T>[] aa, int iterations, Machine machine) throws IOException, BadLabelException {
+//		if (Mode.COUNT.equals(env.getMode())) {
+//			Statistics a = ((PMCompEnv) env).statistic;
+//			a.finalize();
+//			if (Party.Alice.equals(env.party)) {
+//				System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+//			}
+//		} else {
+//			print(machineId, env, aa, iterations);
+//		}
+//	}
 
 	private <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr, int iterations) throws IOException, BadLabelException {
 		final IntegerLib<T> lib = new IntegerLib<>(env);
 //		final FloatLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
 		final FixedPointLib<T> flib = new FixedPointLib<T>(env, 40, 20);
-//		if (machineId == 1) {
-//			try {
-//				Thread.sleep(1000);
-//			} catch (InterruptedException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//		}
 		for (int i = 0; i < pr.length; i++) {
 			int a = Utils.toInt(env.outputToAlice(pr[i].u));
-			int b = Utils.toInt(env.outputToAlice(pr[i].v));
-			double c2 = flib.outputToAlice(pr[i].pr);// Utils.toFloat(env.outputToAlice(pr[i].pr), FLOAT_V, PageRank.FLOAT_P);
-			double d = flib.outputToAlice(pr[i].l);
+			double c2 = flib.outputToAlice(pr[i].pr);
 			boolean e = env.outputToAlice(pr[i].isVertex);
 			env.os.flush();
 			if (Party.Alice.equals(env.party)) {

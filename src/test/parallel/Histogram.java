@@ -158,7 +158,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 		}
 
 		long startTime = System.nanoTime();
-		new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new HistogramNode<>(env)) {
+		long communicate = (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new HistogramNode<>(env)) {
 
 			@Override
 			public GraphNode<T> aggFunc(GraphNode<T> agg, GraphNode<T> b) throws IOException {
@@ -177,47 +177,18 @@ public class Histogram<T> implements ParallelGadget<T> {
 			}
 		}.setInputs(aa).compute();
 
-		new SortGadget<T>(env, machine)
+		long gatherTime = System.nanoTime();
+		communicate += (long) new SortGadget<T>(env, machine)
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
-//		new HistogramMapper<T>(env, machine)
-//				.setInputs(freq)
-//				.compute();
-//
-//		new SortGadget<T>(env, machine)
-////		        .setInputs(input, new TestComparator<T>env, freq)
-//				.setInputs(null /*input, should pass graph nodes*/, new TestComparator<T>(env))
-//				.compute();
-//
-//		new PrefixSumGadget<T>(env, machine)
-//				.setInputs(freq, new IntegerLib<T>(env))
-//				.compute();
-//
-//		T[][] flag = (T[][]) env.newTArray(input.length, input[0].length);
-//		new MarkerWithLastValueGadget<T>(env, machine)
-//				.setInputs(input, flag)
-//				.compute();
-//
-//		T[][] data = (T[][]) Utils.flatten(env, input, freq);
-//		data = (T[][]) new SortGadget<T>(env, machine)
-////				.setInputs(flag, new TestComparator<T>(env), input, freq)
-//				.setInputs(null /* input, should pass graph nodes */, new TestComparator<T>(env))
-//				.compute();
-//		Utils.unflatten(data, input, freq);
-//
-//		new SubtractGadgetForHistogram<T>(env, machine)
-//				.setInputs(freq, new IntegerLib<T>(env))
-//				.compute();
 
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
-			if (Party.Alice.equals(env.party)) {
-				Thread.sleep(1000 * machineId);
-				System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
-			}
-		} else if (machine.machineId == 0) {
+			Thread.sleep(1000 * machineId);
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+		} else if (Mode.REAL.equals(env.getMode())) {
 //			for (int i = 0; i < 4; i++) {
 //				int int2 = Utils.toInt(env.outputToAlice(aa[i].v));
 //				int int3 = Utils.toInt(env.outputToAlice(aa[i].count));
@@ -225,9 +196,10 @@ public class Histogram<T> implements ParallelGadget<T> {
 //					System.out.println(machine.machineId + ": " + int2 + ", " + int3);
 //				}
 //			}
-			if (machine.machineId == 0 && env.party.equals(Party.Alice)) {
-				System.out.println((1 << machine.logMachines) + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Histogram");
-			}
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (gatherTime - startTime)/1000000000.0 + "," + "Gather");
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (endTime - gatherTime)/1000000000.0 + "," + "Final sort");
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time");
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + communicate/1000000000.0 + "," + "Communication time");
 		}
 	}
 }

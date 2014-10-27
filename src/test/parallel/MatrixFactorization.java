@@ -50,7 +50,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		double[] rating = new double[inputLength];
 		double[][] userProfile = new double[inputLength][MFNode.D];
 		double[][] itemProfile = new double[inputLength][MFNode.D];
-		BufferedReader br = new BufferedReader(new FileReader("mf" + inputLength + ".in"));
+		BufferedReader br = new BufferedReader(new FileReader("in/mf" + inputLength + ".in"));
 		for (int i = 0; i < inputLength; i++) {
 			String readLine = br.readLine();
 			String[] split = readLine.split(" ");
@@ -255,11 +255,12 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			aa[i] = new MFNode<T>(u[i], v[i], isVertex[i], rating[i], userProfile[i], itemProfile[i], env);
 		}
 
+		long scatter1 = 0, scatter2 = 0, gradient = 0, gather1 = 0, gather2 = 0, communicate = 0;
 //		print(machineId, env, aa);
 		long startTime = System.nanoTime();
 		for (int it = 0; it < ITERATIONS; it++) {
 			// scatter user profiles
-			new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
+			communicate += (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
 	
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -271,8 +272,9 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			scatter1 = System.nanoTime();
 			// scatter item profiles
-			new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
+			communicate += (long) new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
 	
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -284,14 +286,16 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			scatter2 = System.nanoTime();
 			// compute gradient
 			new ComputeGradient<T>(env, machine)
 				.setInputs(aa)
 				.compute();
 
+			gradient = System.nanoTime();
 ////			printResult(machineId, env, aa);
 			// update item profiles
-			new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
+			communicate += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
 	
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -321,8 +325,9 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			gather1 = System.nanoTime();
 			// update user profiles
-			new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
+			communicate += (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
 	
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -355,13 +360,31 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 					}
 				}
 			}.setInputs(aa).compute();
+			gather2 = System.nanoTime();
 		}
 
-		new SortGadget<>(env, machine)
+		communicate += (long) new SortGadget<>(env, machine)
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
 		output(machineId, machine, env, startTime, endTime);
+
+		
+		if (Mode.REAL.equals(env.getMode())) {
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter1 - startTime)/1000000000.0 + "," + "Scatter 1");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter2 - scatter1)/1000000000.0 + "," + "Scatter 2");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time");
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate)/1000000000.0 + "," + "Communication time");
+		} else if (Mode.COUNT.equals(env.mode)) {
+			Statistics a = ((PMCompEnv) env).statistic;
+			a.finalize();
+			Thread.sleep(1000 * machineId);
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+		}
 //		print(machineId, env, aa);
 //		printOnlyResult(machineId, env, aa);
 	}

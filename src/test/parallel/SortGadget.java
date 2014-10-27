@@ -43,7 +43,6 @@ public class SortGadget<T>  extends Gadget<T> {
 			int diff = (1 << k);
 			T mergeDir = ((machine.machineId / (2 * (1 << k))) % 2 == 0) ? lib.SIGNAL_ONE : lib.SIGNAL_ZERO;
 			while (diff != 0) {
-				long startCommunicate = System.nanoTime();
 				boolean up = (machine.machineId / diff) % 2 == 1 ? true : false;
 				InputStream is;
 				OutputStream os;
@@ -51,6 +50,7 @@ public class SortGadget<T>  extends Gadget<T> {
 				is = up ? machine.peerIsUp[commMachine] : machine.peerIsDown[commMachine];
 				os = up ? machine.peerOsUp[commMachine] : machine.peerOsDown[commMachine]; 
 
+				long startCommunicate = System.nanoTime();
 				GraphNode<T>[] receivedNodes = sendReceive(os, is, nodes, nodes.length);
 				long endCommunicate = System.nanoTime(), startConcatenate = System.nanoTime();
 
@@ -78,7 +78,7 @@ public class SortGadget<T>  extends Gadget<T> {
 			System.out.println((1 << logMachines) + "," + inputLength + "," + concatenate/1000000000.0 + ",Concatenate");
 			System.out.println((1 << logMachines) + "," + inputLength + "," + communicate/1000000000.0 + ",Communicate");
 		}*/
-		return null;
+		return communicate;
 	}
 
 	private GraphNode<T>[] sendReceive(OutputStream os, InputStream is, GraphNode<T>[] nodes, int arrayLength) throws IOException {

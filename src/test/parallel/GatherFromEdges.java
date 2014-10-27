@@ -39,7 +39,7 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 			}
 		}
 
-		new SortGadget<T>(env, machine)
+		long communicate = (long) new SortGadget<T>(env, machine)
 			.setInputs(nodes, nodes[0].getComparator(env, true /* isVertexLast */))
 			.compute();
 
@@ -60,15 +60,26 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
 		for (int k = 0; k < machine.logMachines; k++) {
 			if (noOfIncomingConnections > 0) {
+				long one = System.nanoTime();
+
 				NetworkUtil.send(machine.peerOsDown[k], nodes[nodes.length - 1].u, env);
 				graphNodeVal.send(machine.peerOsDown[k], env);
 				((BufferedOutputStream) machine.peerOsDown[k]).flush();
 				noOfIncomingConnections--;
+
+				long two = System.nanoTime();
+				communicate += (two - one);
 			}
 			if (noOfOutgoingConnections > 0) {
+				long one = System.nanoTime();
+
 				T[] prevU = NetworkUtil.read(machine.peerIsUp[k], nodes[0].u.length, env);
 				GraphNode<T> graphNodeRead = (GraphNode<T>) constructor.newInstance(env);
 				graphNodeRead.read(machine.peerIsUp[k], env);
+
+				long two = System.nanoTime();
+				communicate += (two - one);
+
 				T sameU = lib.eq(prevU, nodes[0].u);
 				GraphNode<T> tempAgg = aggFunc(nodeValForLaterComp, graphNodeRead);
 				nodeValForLaterComp = tempAgg.mux(nodeValForLaterComp, sameU, env);
@@ -88,7 +99,7 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 				nodes[j].swapEdgeDirections();
 			}
 		}
-		return null;
+		return communicate;
 	}
 
 	public abstract GraphNode<T> aggFunc(GraphNode<T> agg, GraphNode<T> b) throws IOException;
