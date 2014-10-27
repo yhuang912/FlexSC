@@ -11,11 +11,11 @@ import org.junit.Test;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
-import gc.GCSignal;
 
 public class TestPriorityQueue {
 
@@ -55,11 +55,12 @@ public class TestPriorityQueue {
 
 	boolean debug = false;
 
-	public void compute(CompEnv<GCSignal> env, PriorityQueue<BoolArray> ostack,
-			IntegerLib<GCSignal> lib) throws Exception {
+	public void compute(CompEnv<Boolean> env, PriorityQueue<BoolArray> ostack,
+			IntegerLib<Boolean> lib) throws Exception {
 		double[] time = new double[op.length];
 
 		for (int i = 0; i < op.length; ++i) {
+
 			if (op[i] == 1 && m == Mode.VERIFY) {
 				int res = 0;
 				if (env.getParty() == Party.Alice) {
@@ -80,7 +81,7 @@ public class TestPriorityQueue {
 			} else {
 				int rand = next[i];// rnd.nextInt(100);
 				BoolArray tmp = new BoolArray(env, lib);
-				GCSignal[] in = env.inputOfAlice(Utils.fromInt(rand, 32));
+				Boolean[] in = env.inputOfAlice(Utils.fromInt(rand, 32));
 				if(m == Mode.REAL && env.getParty() == Party.Alice) {
 					System.gc();
 					double a = System.nanoTime();
@@ -96,6 +97,7 @@ public class TestPriorityQueue {
 							+ i + ", " + cstack.size() + " " + ssize);
 				}
 			}
+
 			env.flush();
 		}
 		if(m == Mode.REAL && env.getParty() == Party.Alice) {
@@ -121,16 +123,15 @@ public class TestPriorityQueue {
 			try {
 				listen(54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(
 						env, lib, logN, new BoolArray(env, lib));
 				PriorityQueue<BoolArray> ostack = new PriorityQueue<BoolArray>(
 						env,
 						lib,
 						logN, new BoolArray(env, lib),
-						new CircuitOram<GCSignal>(env, 1 << logN, node.numBits()));
+						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
 				
-				System.out.println(node.numBits());
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
 					sta.flush();
@@ -140,8 +141,8 @@ public class TestPriorityQueue {
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
 					sta.finalize();
-					System.out.print(sta.andGate + "\t" + sta.NumEncAlice
-							+ "\t");
+//					System.out.print(sta.andGate + "\t" + sta.NumEncAlice
+//							+ "\t");
 				}
 
 			} catch (Exception e) {
@@ -161,15 +162,15 @@ public class TestPriorityQueue {
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Bob, is, os);
-				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(
 						env, lib, logN, new BoolArray(env, lib));
 				PriorityQueue<BoolArray> ostack = new PriorityQueue<BoolArray>(
 						env,
 						lib,
 						logN, new BoolArray(env, lib),
-						new CircuitOram<GCSignal>(env, 1 << logN, node.numBits()));
+						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
 
 				compute(env, ostack, lib);
 				disconnect();

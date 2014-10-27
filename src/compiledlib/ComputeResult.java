@@ -7,7 +7,7 @@ import flexsc.PMCompEnv.Statistics;
 public class ComputeResult {
 
 	static public void main(String args[]) throws InterruptedException {
-		for (int logN = 10; logN <= 10; ++logN) {
+		for (int logN = 10; logN <= 30; logN+=2) {
 			// TestStack t1 = new TestStack();
 			// TestCUMStack t2 = new TestCUMStack();
 			TestPriorityQueue t2 = new TestPriorityQueue();

@@ -1,27 +1,13 @@
 package compiledlib.priority_queue;
-import java.security.SecureRandom;
-import oram.SecureArray;
-import oram.CircuitOram;
-import flexsc.Mode;
-import flexsc.Party;
-import flexsc.CompEnv;
-import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
-import util.Utils;
-import gc.regular.GCEva;
-import gc.regular.GCGen;
-import gc.GCSignal;
-import java.util.Arrays;
-import java.util.Random;
+import flexsc.CompEnv;
 import flexsc.IWritable;
-import flexsc.Comparator;
-import java.lang.reflect.Array;
-public class NoClass implements IWritable<NoClass, GCSignal> {
+public class NoClass implements IWritable<NoClass, Boolean> {
 
-	public static CompEnv<GCSignal> env;
-	public static IntegerLib<GCSignal> lib;
+	public static CompEnv<Boolean> env;
+	public static IntegerLib<Boolean> lib;
 
-	public NoClass(CompEnv<GCSignal> env, IntegerLib<GCSignal> lib) throws Exception {
+	public NoClass(CompEnv<Boolean> env, IntegerLib<Boolean> lib) throws Exception {
 		this.env = env;
 		this.lib = lib;
 	}
@@ -29,22 +15,22 @@ public class NoClass implements IWritable<NoClass, GCSignal> {
 	public int numBits() {
 		return 0;
 	}
-	public GCSignal[] getBits() {
-		GCSignal[] ret = new GCSignal[this.numBits()];
-		GCSignal[] tmp_b;
-		GCSignal tmp;
+	public Boolean[] getBits() {
+		Boolean[] ret = new Boolean[this.numBits()];
+		Boolean[] tmp_b;
+		Boolean tmp;
 		int now = 0;
 		return ret;
 }
 
-	public NoClass newObj(GCSignal[] data) throws Exception {
+	public NoClass newObj(Boolean[] data) throws Exception {
 		if(data == null) {
-			data = new GCSignal[this.numBits()];
+			data = new Boolean[this.numBits()];
 			for(int i=0; i<this.numBits(); ++i) { data[i] = lib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
 		NoClass ret = new NoClass(env, lib);
-		GCSignal[] tmp;
+		Boolean[] tmp;
 		int now = 0;
 		return ret;
 }

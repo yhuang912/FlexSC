@@ -6,6 +6,7 @@ import oram.CircuitOram;
 
 import org.junit.Test;
 
+import util.Utils;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
@@ -72,7 +73,7 @@ public class TestAVL {
 
 		for (int i = 0; i < op.length; ++i) {
 			BoolArray k = new BoolArray(env, lib);
-			k.data = lib.toSignals(10, logN);
+			k.data = lib.toSignals(10, 32);
 			BoolArray v = new BoolArray(env, lib);
 			v.data = lib.toSignals(10, 32);
 			ostack.insert(k, v, new cmpp(env, lib, new BoolArray(env, lib)));
@@ -94,14 +95,16 @@ public class TestAVL {
 				listen(54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				BoolArray ba = new BoolArray(env, lib);
+				ba.data = (Boolean[]) env.inputOfAlice(Utils.fromInt(0, 32));
 				AVLNode<BoolArray,BoolArray> node = new AVLNode<BoolArray,BoolArray>(
-						env, lib, logN, new BoolArray(env, lib), new BoolArray(env, lib));
+						env, lib, logN, ba, ba);
 				IntStackNode intstacknode = new IntStackNode(env, lib, logN); 
 				IntStack intstack = new IntStack(env, lib, logN, new CircuitOram<Boolean>(env, 1 << logN, intstacknode.numBits()));
 				AVLTree<BoolArray, BoolArray> ostack = new AVLTree<BoolArray, BoolArray>(
 						env,
 						lib,
-						logN, new BoolArray(env, lib), new BoolArray(env, lib),
+						logN, ba, ba,
 						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()), intstack);
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
@@ -135,14 +138,16 @@ public class TestAVL {
 				connect("localhost", 54321);
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				BoolArray ba = new BoolArray(env, lib);
+				ba.data = (Boolean[]) env.inputOfAlice(Utils.fromInt(0, 32));
 				AVLNode<BoolArray,BoolArray> node = new AVLNode<BoolArray,BoolArray>(
-						env, lib, logN, new BoolArray(env, lib), new BoolArray(env, lib));
+						env, lib, logN, ba, ba);
 				IntStackNode intstacknode = new IntStackNode(env, lib, logN); 
 				IntStack intstack = new IntStack(env, lib, logN, new CircuitOram<Boolean>(env, 1 << logN, intstacknode.numBits()));
 				AVLTree<BoolArray, BoolArray> ostack = new AVLTree<BoolArray, BoolArray>(
 						env,
 						lib,
-						logN, new BoolArray(env, lib), new BoolArray(env, lib),
+						logN, ba, ba,
 						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()), intstack);
 				
 				compute(env, ostack, lib, logN);

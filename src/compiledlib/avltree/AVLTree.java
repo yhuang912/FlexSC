@@ -105,6 +105,12 @@ public class AVLTree<K extends IWritable<K,Boolean>, V extends IWritable<V,Boole
 		Boolean[] id = env.inputOfAlice(Utils.fromInt(0, m));
 		Boolean[] pos = env.inputOfAlice(Utils.fromInt(0, m));
 		Boolean[] hpos = env.inputOfAlice(Utils.fromInt(0, m));
+//manually added
+		for(int i = 0;  i < keys.length; ++i)
+			keys[i] = factoryK;
+		for(int i = 0;  i < values.length; ++i)
+			values[i] = factoryV;
+
 		K k = factoryK.newObj(null);
 		K kp = factoryK.newObj(null);
 		V v = factoryV.newObj(null);
@@ -254,6 +260,8 @@ public class AVLTree<K extends IWritable<K,Boolean>, V extends IWritable<V,Boole
 			Boolean[] f_tmp_111 = depth[i];
 			Boolean[] __tmp108 = f_tmp_111;
 			Boolean[] f_tmp_113 = env.inputOfAlice(Utils.fromInt(__tmp107, (m)+(1)));
+			System.out.println(Arrays.toString(__tmp108));
+//			System.out.println(Arrays.toString(f_tmp_113));
 			Boolean[] f_tmp_112 = lib.mux(__tmp108, f_tmp_113,__tmp100);
 			Boolean[] __tmp109 = f_tmp_112;
 			depth[i]=__tmp109;

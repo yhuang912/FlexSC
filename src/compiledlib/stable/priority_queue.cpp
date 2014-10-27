@@ -2,7 +2,6 @@
 #define false 1
 #define PUSH 0
 #define POP 1
-#define logN 10
 
 typedef intp_ = public int;
 typedef ints_ = secure int;
