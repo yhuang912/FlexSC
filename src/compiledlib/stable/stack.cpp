@@ -5,7 +5,7 @@ typedef ints_ = secure int;
 typedef intp_ = public int;
 typedef intr_ = rnd;
 typedef NonRecursiveORAM@m<T> = native CircuitOram;
-intr_@m RND(intp_32 m) = native lib.randBools;
+intr_@m RND(intp_32 m) = native intLib.randBools;
 dummy StackNode@m<T> NonRecursiveORAM@m<T>.readAndRemove(int@m id, rnd@m pos) = native conditionalReadAndRemove;
 dummy void NonRecursiveORAM@m<T>.add(int@m id, rnd@m pos, StackNode@m<T> node) = native conditionalPutBack;
 

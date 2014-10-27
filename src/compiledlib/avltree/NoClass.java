@@ -19,11 +19,11 @@ import java.lang.reflect.Array;
 public class NoClass implements IWritable<NoClass, Boolean> {
 
 	public static CompEnv<Boolean> env;
-	public static IntegerLib<Boolean> lib;
+	public static IntegerLib<Boolean> intLib;
 
-	public NoClass(CompEnv<Boolean> env, IntegerLib<Boolean> lib) throws Exception {
+	public NoClass(CompEnv<Boolean> env, IntegerLib<Boolean> intLib) throws Exception {
 		this.env = env;
-		this.lib = lib;
+		this.intLib = intLib;
 	}
 
 	public int numBits() {
@@ -40,10 +40,10 @@ public class NoClass implements IWritable<NoClass, Boolean> {
 	public NoClass newObj(Boolean[] data) throws Exception {
 		if(data == null) {
 			data = new Boolean[this.numBits()];
-			for(int i=0; i<this.numBits(); ++i) { data[i] = lib.SIGNAL_ZERO; }
+			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		NoClass ret = new NoClass(env, lib);
+		NoClass ret = new NoClass(env, intLib);
 		Boolean[] tmp;
 		int now = 0;
 		return ret;

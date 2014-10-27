@@ -18,12 +18,12 @@ import flexsc.Comparator;
 import java.lang.reflect.Array;
 abstract public class FUNC_1_INTsecure_T1_T1<K extends IWritable<K,Boolean>> {
 	CompEnv<Boolean> env;
-	IntegerLib<Boolean> lib;
+	IntegerLib<Boolean> intLib;
 	K factoryK;
 
-	public FUNC_1_INTsecure_T1_T1(CompEnv<Boolean> env, IntegerLib<Boolean> lib, K factoryK) throws Exception {
+	public FUNC_1_INTsecure_T1_T1(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, K factoryK) throws Exception {
 		this.env = env;
-		this.lib = lib;
+		this.intLib = intLib;
 		this.factoryK = factoryK;
 	}
 

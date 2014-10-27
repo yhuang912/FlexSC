@@ -141,9 +141,11 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		return lib.mux(res.data, lib.zeros(lengthOfData), res.isDummy);
 	}
 
+	public int cnttt = 0;
 	public void conditionalPutBack(T[] scIden, T[] scNewPos, T[] scData,
 			T condition) {
-		// Utils.print(env, "pb:iden:", scIden, scNewPos, condition);
+//		 Utils.print(env, "pb:iden:", scIden, scNewPos, condition);
+		cnttt++;
 		env.flush();
 		scIden = Arrays.copyOf(scIden, lengthOfIden);
 

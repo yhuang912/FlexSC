@@ -20,15 +20,15 @@ public class IntStackNode implements IWritable<IntStackNode, Boolean> {
 	public Boolean[] next;
 	public Boolean[] data;
 
-	private CompEnv<Boolean> env;
-	private IntegerLib<Boolean> lib;
+	public CompEnv<Boolean> env;
+	public IntegerLib<Boolean> intLib;
 	private int m;
 
-	public IntStackNode(CompEnv<Boolean> env, IntegerLib<Boolean> lib, int m) throws Exception {
+	public IntStackNode(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m) throws Exception {
 		this.env = env;
-		this.lib = lib;
+		this.intLib = intLib;
 		this.m = m;
-		this.next = env.inputOfAlice(Utils.fromInt(0, m));
+		this.next = intLib.randBools(m);
 		this.data = env.inputOfAlice(Utils.fromInt(0, m));
 	}
 
@@ -52,10 +52,10 @@ public class IntStackNode implements IWritable<IntStackNode, Boolean> {
 	public IntStackNode newObj(Boolean[] data) throws Exception {
 		if(data == null) {
 			data = new Boolean[this.numBits()];
-			for(int i=0; i<this.numBits(); ++i) { data[i] = lib.SIGNAL_ZERO; }
+			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		IntStackNode ret = new IntStackNode(env, lib, m);
+		IntStackNode ret = new IntStackNode(env, intLib, m);
 		Boolean[] tmp;
 		int now = 0;
 		ret.next = new Boolean[m];

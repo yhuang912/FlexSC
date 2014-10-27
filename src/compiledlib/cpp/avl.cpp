@@ -5,7 +5,7 @@ typedef ints_ = secure int;
 typedef intp_ = public int;
 typedef intr_ = rnd;
 typedef PORAM@m = native CircuitOram;
-intr_@m RND(intp_32 m) = native lib.randBools;
+intr_@m RND(intp_32 m) = native intLib.randBools;
 dummy IntStackNode@m PORAM@m@n.poram_retrieve(int@m id, rnd@m pos) = native conditionalReadAndRemove;
 dummy void PORAM@m.poram_write(int@m id, int@m pos, IntStackNode@m node) = native conditionalPutBack;
 
@@ -98,6 +98,8 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 	K k;
 	for(intp_32 i = 0; i<3*m/2; i = i + 1) {
 		ids[i] = ind;
+		public int32 pre = i - 1;
+		if(i==0) pre = 0;
 		if(ind == 0) {
 			id, pos = now;
 			tnodes = this.poram.aoram_retrieve(id, pos);
@@ -112,7 +114,7 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 			ind = 2;
 		} else {
 			depth[i] = 0-1;
-			keys[i] = keys[i-1];
+			keys[i] = keys[pre];
 		}
 		cres[i] = cmp(keys[i], key);
 		if(ind == 0) {
@@ -256,6 +258,8 @@ V AVLTree@m<K, V>.search(K key, V value, int2 cmp(K, K)) {
 	
 	for(intp_32 i = 0; i<3*m/2; i = i + 1) {
 		ids[i] = ind;
+		public int32 pre = i-1;
+		if(i==0) pre = 0;
 		if(ind == 0) {
 			id, pos = now;
 			tnodes = this.poram.aoram_retrieve(id, pos);
@@ -264,7 +268,7 @@ V AVLTree@m<K, V>.search(K key, V value, int2 cmp(K, K)) {
 				tnodes.(key, value, lDepth, rDepth, left, right);
 		} else {
 			depth[i] = 0-1;
-			keys[i] = keys[i-1];
+			keys[i] = keys[pre];
 		}
 		cres[i] = cmp(keys[i], key);
 		if(ind == 0) {

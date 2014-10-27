@@ -19,13 +19,13 @@ import java.lang.reflect.Array;
 public class Int implements IWritable<Int, Boolean> {
 	public Boolean[] val;
 
-	private CompEnv<Boolean> env;
-	private IntegerLib<Boolean> lib;
+	public CompEnv<Boolean> env;
+	public IntegerLib<Boolean> intLib;
 	private int m;
 
-	public Int(CompEnv<Boolean> env, IntegerLib<Boolean> lib, int m) throws Exception {
+	public Int(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m) throws Exception {
 		this.env = env;
-		this.lib = lib;
+		this.intLib = intLib;
 		this.m = m;
 		this.val = env.inputOfAlice(Utils.fromInt(0, m));
 	}
@@ -47,10 +47,10 @@ public class Int implements IWritable<Int, Boolean> {
 	public Int newObj(Boolean[] data) throws Exception {
 		if(data == null) {
 			data = new Boolean[this.numBits()];
-			for(int i=0; i<this.numBits(); ++i) { data[i] = lib.SIGNAL_ZERO; }
+			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		Int ret = new Int(env, lib, m);
+		Int ret = new Int(env, intLib, m);
 		Boolean[] tmp;
 		int now = 0;
 		ret.val = new Boolean[m];

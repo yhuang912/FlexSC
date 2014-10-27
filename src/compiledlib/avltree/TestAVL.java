@@ -63,20 +63,23 @@ public class TestAVL {
 		@Override
 		public java.lang.Boolean[] calc(BoolArray x0, BoolArray x1)
 				throws Exception {
-			Boolean res = lib.leq(x0.data, x1.data);
-			return new Boolean[]{res, lib.SIGNAL_ZERO};
+			Boolean res = intLib.leq(x0.data, x1.data);
+			return new Boolean[]{res, intLib.SIGNAL_ZERO};
 		}
 		
 	}
 	public void compute(CompEnv<Boolean> env, AVLTree<BoolArray, BoolArray> ostack,
 			IntegerLib<Boolean> lib, int logN) throws Exception {
-
+		ostack.init();
+		cmpp com = new cmpp(env, lib, new BoolArray(env, lib));
 		for (int i = 0; i < op.length; ++i) {
 			BoolArray k = new BoolArray(env, lib);
 			k.data = lib.toSignals(10, 32);
 			BoolArray v = new BoolArray(env, lib);
 			v.data = lib.toSignals(10, 32);
-			ostack.insert(k, v, new cmpp(env, lib, new BoolArray(env, lib)));
+			ostack.insert(k, v, com);
+			v = ostack.search(k, v, com);
+			System.out.println(lib.outputToAlice(v.data));
 		}
 	}
 
@@ -161,10 +164,10 @@ public class TestAVL {
 
 	@Test
 	public void runThreads() throws Exception {
-		getInput(100);
+		getInput(10);
 		m = Mode.VERIFY;
-		GenRunnable gen = new GenRunnable(20);
-		EvaRunnable eva = new EvaRunnable(20);
+		GenRunnable gen = new GenRunnable(5);
+		EvaRunnable eva = new EvaRunnable(5);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
 		tGen.start();

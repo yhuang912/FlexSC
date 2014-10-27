@@ -19,12 +19,12 @@ import java.lang.reflect.Array;
 public class BoolArray implements IWritable<BoolArray, Boolean> {
 	public Boolean[] data;
 
-	private CompEnv<Boolean> env;
-	private IntegerLib<Boolean> lib;
+	public CompEnv<Boolean> env;
+	public IntegerLib<Boolean> intLib;
 
-	public BoolArray(CompEnv<Boolean> env, IntegerLib<Boolean> lib) throws Exception {
+	public BoolArray(CompEnv<Boolean> env, IntegerLib<Boolean> intLib) throws Exception {
 		this.env = env;
-		this.lib = lib;
+		this.intLib = intLib;
 		this.data = env.inputOfAlice(Utils.fromInt(0, 32));
 	}
 
@@ -45,10 +45,10 @@ public class BoolArray implements IWritable<BoolArray, Boolean> {
 	public BoolArray newObj(Boolean[] data) throws Exception {
 		if(data == null) {
 			data = new Boolean[this.numBits()];
-			for(int i=0; i<this.numBits(); ++i) { data[i] = lib.SIGNAL_ZERO; }
+			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		BoolArray ret = new BoolArray(env, lib);
+		BoolArray ret = new BoolArray(env, intLib);
 		Boolean[] tmp;
 		int now = 0;
 		ret.data = new Boolean[32];

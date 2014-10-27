@@ -16,7 +16,6 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
-import gc.GCSignal;
 
 public class TestStack {
 
@@ -42,8 +41,8 @@ public class TestStack {
 		}
 	}
 
-	public void compute(CompEnv<GCSignal> env, Stack<BoolArray> ostack,
-			IntegerLib<GCSignal> lib) throws Exception {
+	public void compute(CompEnv<Boolean> env, Stack<BoolArray> ostack,
+			IntegerLib<Boolean> lib) throws Exception {
 
 		double[] time = new double[op.length];
 
@@ -88,7 +87,7 @@ public class TestStack {
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
-		GCSignal[] z;
+		Boolean[] z;
 		long andGate;
 		Statistics sta;
 		int logN = -1;
@@ -101,9 +100,9 @@ public class TestStack {
 			try {
 				listen(54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				Stack<BoolArray> ostack = new Stack<BoolArray>(env, lib,
-						logN, new BoolArray(env, lib), new CircuitOram<GCSignal>(env,
+						logN, new BoolArray(env, lib), new CircuitOram<Boolean>(env,
 								1 << logN, 32 + logN));
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
@@ -137,9 +136,9 @@ public class TestStack {
 			try {
 				connect("localhost", 54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Bob, is, os);
-				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				Stack<BoolArray> ostack = new Stack<BoolArray>(env, lib,
-						logN, new BoolArray(env, lib), new CircuitOram<GCSignal>(env,
+						logN, new BoolArray(env, lib), new CircuitOram<Boolean>(env,
 								1 << logN, 32 + logN));
 				compute(env, ostack, lib);
 				disconnect();
