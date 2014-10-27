@@ -2,9 +2,11 @@ package harness;
 
 import java.util.Random;
 
+import org.junit.Assert;
+
 import circuits.arithmetic.DenseMatrixLib;
 import circuits.arithmetic.FixedPointLib;
-import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
@@ -12,8 +14,8 @@ import flexsc.Party;
 
 
 public class TestMatrix extends TestHarness {
-	public static final int len = 32;
-	public static final int offset = 15;
+	public static final int len = 40;
+	public static final int offset = 20;
 	public static final int VLength = 24;
 	public static final int PLength = 8;
 	public static final boolean testFixedPoint = true;
@@ -32,13 +34,13 @@ public class TestMatrix extends TestHarness {
 		public abstract double[][] plainCompute(double[][] a, double[][] b);
 	}
 
-	static Random rng = new Random(123);
+	static Random rng = new Random();
 
 	public static double[][] randomMatrix(int n, int m, double s) {
 		double[][] d1 = new double[n][m];
 		for (int k = 0; k < d1.length; ++k)
 			for (int j = 0; j < d1[0].length; ++j)
-				d1[k][j] = rng.nextInt(1000) / 100.0;
+				d1[k][j] = rng.nextInt(1000) % 100.0;
 		return d1;
 	}
 	
@@ -46,7 +48,7 @@ public class TestMatrix extends TestHarness {
 		return randomMatrix( n,  m, 1);
 	}
 
-	public void PrintMatrix(double[][] result) {
+	public static void PrintMatrix(double[][] result) {
 		System.out.print("[\n");
 		for (int i = 0; i < result.length; ++i) {
 			for (int j = 0; j < result[0].length; ++j)
@@ -75,8 +77,7 @@ public class TestMatrix extends TestHarness {
 				if (testFixedPoint)
 					lib = new DenseMatrixLib<T>(gen, new FixedPointLib<T>(gen, len, offset));
 				else
-					lib = new DenseMatrixLib<T>(gen, new IntegerLib<T>(gen,
-							32));
+					lib = new DenseMatrixLib<T>(gen, new FloatLib<T>(gen, VLength,PLength));
 
 				T[][][] fgc1 = gen.newTArray(h.a.length, h.a[0].length, 1);
 				T[][][] fgc2 = gen.newTArray(h.b.length, h.b[0].length, 1);
@@ -122,8 +123,8 @@ public class TestMatrix extends TestHarness {
 				if (testFixedPoint)
 					lib = new DenseMatrixLib<T>(env, new FixedPointLib<T>(env, len, offset));
 				else
-					lib = new DenseMatrixLib<T>(env, new IntegerLib<T>(env,
-							32));
+					lib = new DenseMatrixLib<T>(env, new FloatLib<T>(env, VLength,PLength));
+							
 
 
 				T[][][] fgc1 = env.newTArray(h.a.length, h.a[0].length, 1);
@@ -159,7 +160,7 @@ public class TestMatrix extends TestHarness {
 		}
 	}
 
-	public static <T>void runThreads(Helper h) throws Exception {
+	public static <T>void runThreads(Helper h, double errorLim) throws Exception {
 		GenRunnable<T> gen = new GenRunnable<T>(h);
 		EvaRunnable<T> env = new EvaRunnable<T>(h);
 
@@ -172,8 +173,8 @@ public class TestMatrix extends TestHarness {
 
 		double[][] result = h.plainCompute(h.a, h.b);
 
-		// PrintMatrix(result);
-		// PrintMatrix(gen.z);
+		 PrintMatrix(result);
+		 PrintMatrix(gen.z);
 		if (m == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
@@ -181,17 +182,20 @@ public class TestMatrix extends TestHarness {
 			for (int i = 0; i < result.length; ++i)
 				for (int j = 0; j < result[0].length; ++j) {
 					double error = 0;
-					if (gen.z[i][j] != 0)
+					if (Math.abs(result[i][j]) > 0.1)
 						error = Math.abs((result[i][j] - gen.z[i][j])
 								/ gen.z[i][j]);
 					else
 						error = Math.abs((result[i][j] - gen.z[i][j]));
 
-					if (error > 1E-3)
+					if (error > errorLim)
 						System.out.print(error + " " + gen.z[i][j] + " "
 								+ result[i][j] + "(" + i + "," + j + ")\n");
-//					Assert.assertTrue(error < 1E-3);
+					Assert.assertTrue(error < errorLim);
 				}
 		}
+	}
+	public static <T>void runThreads(Helper h) throws Exception {
+		runThreads(h, 0.01);
 	}
 }

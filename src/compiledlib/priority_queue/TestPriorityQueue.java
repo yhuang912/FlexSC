@@ -129,6 +129,8 @@ public class TestPriorityQueue {
 						lib,
 						logN, new BoolArray(env, lib),
 						new CircuitOram<GCSignal>(env, 1 << logN, node.numBits()));
+				
+				System.out.println(node.numBits());
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
 					sta.flush();

@@ -114,7 +114,7 @@ public class TestFixedPoint extends TestHarness {
 	}
 
 	public static void runThreads(Helper h) throws Exception {
-		runThreads(h, 1E-5);
+		runThreads(h, 0.005);
 	}
 
 }

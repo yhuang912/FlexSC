@@ -20,7 +20,7 @@ public class TestFloatLib extends TestHarness {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
-
+			if(i==0)a=0;else if (i==1) b = 0;
 			TestFloat.runThreads(new Helper(a, b) {
 				@Override
 				public double plainCompute(double a, double b) {
@@ -40,7 +40,7 @@ public class TestFloatLib extends TestHarness {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
-
+			if(i==0)a=0;else if (i==1) b = 0;
 			TestFloat.runThreads(new Helper(a, b) {
 				@Override
 				public double plainCompute(double a, double b) {
@@ -77,6 +77,7 @@ public class TestFloatLib extends TestHarness {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
+			if(i==0)a=0;else if (i==1) b = 0;
 			TestFloat.runThreads(new Helper(a, b) {
 				@Override
 				public double plainCompute(double a, double b) {
@@ -135,6 +136,7 @@ public class TestFloatLib extends TestHarness {
 		for (int i = 0; i < testCases; i++) {
 			double a = rng.nextDouble() * (1 << 20) - (1 << 19);
 			double b = rng.nextDouble() * (1 << 20) - (1 << 19);
+			if(i==0)a=0;else if (i==1) b = 0;
 			TestFloat.runThreads(new Helper(a, b) {
 				@Override
 				public double plainCompute(double a, double b) {

@@ -13,13 +13,13 @@ import flexsc.CompEnv;
 
 public class TestFixedPointLib extends TestFixedPoint {
 
-	//@Test
+	@Test
 	public void testFixPointAdd() throws Exception {
 		Random rng = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			double d1 = rng.nextInt(1 << 30) % 10000.0;
-			double d2 = rng.nextInt(1 << 30) % 10000.0;
+			double d1 = rng.nextDouble() * 200.0-100.0;
+			double d2 = rng.nextDouble() * 200.0-100.0;
 			TestFixedPoint.runThreads(new Helper(d1, d2) {
 				@Override
 				public double plainCompute(double a, double b) {
@@ -35,13 +35,13 @@ public class TestFixedPointLib extends TestFixedPoint {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testFixPointSub() throws Exception {
 		Random rng = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			double d1 = rng.nextInt(1 << 30) % 10000.0;
-			double d2 = rng.nextInt(1 << 30) % 10000.0;
+			double d1 = rng.nextDouble() * 200.0-100.0;
+			double d2 = rng.nextDouble() * 200.0-100.0;
 			TestFixedPoint.runThreads(new Helper(d1, d2) {
 				@Override
 				public <T>T[] secureCompute(T[] a, T[] b,
@@ -61,8 +61,8 @@ public class TestFixedPointLib extends TestFixedPoint {
 		Random rng = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			double d1 = 0.00001;//rng.nextInt(1 << 30) % 100.0;
-			double d2 = 100000;//rng.nextInt(1 << 30) % 100.0;
+			double d1 = rng.nextDouble() * 200.0-100.0;
+			double d2 = rng.nextDouble() * 200.0-100.0;
 			TestFixedPoint.runThreads(new Helper(d1, d2) {
 
 				@Override
@@ -74,19 +74,19 @@ public class TestFixedPointLib extends TestFixedPoint {
 
 				@Override
 				public double plainCompute(double a, double b) {
-					return a * b;
+					return a*b;//Math.abs( a * b);
 				}
 			});
 		}
 	}
 
-	//@Test
+	@Test
 	public void testFixPointDiv() throws Exception {
 		Random rng = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			double d1 = rng.nextInt(1 << 30) % 100.0;
-			double d2 = rng.nextInt(1 << 30) % 100.0;
+			double d1 = rng.nextDouble() * 200.0-100.0;
+			double d2 = rng.nextDouble() * 200.0-100.0;
 			if (d2 == 0)
 				++d2;
 			TestFixedPoint.runThreads(new Helper(d1, d2) {
@@ -106,13 +106,13 @@ public class TestFixedPointLib extends TestFixedPoint {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testFixPointSqaureRoot() throws Exception {
 		Random rng = new Random();
 
 		for (int i = 0; i < testCases; i++) {
-			double d1 = rng.nextInt(1 << 30) % 100.0;
-			double d2 = rng.nextInt(1 << 30) % 100.0;
+			double d1 = rng.nextDouble() * 100.0;
+			double d2 = rng.nextDouble() * 100.0;
 			if (d2 == 0)
 				++d2;
 			TestFixedPoint.runThreads(new Helper(d1, d2) {

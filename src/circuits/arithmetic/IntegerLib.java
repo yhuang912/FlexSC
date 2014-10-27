@@ -146,24 +146,24 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 
 	// This multiplication does not truncate the length of x and y
 	public T[] multiplyFull(T[] x, T[] y) {
-		return multiplyInternal(x, y);// res;
+		return multiplyInternal(x, y);
 	}
 
 	private T[] multiplyInternal(T[] x, T[] y) {
-		return karatsubaMultiply(x,y);
-//		assert (x != null && y != null) : "multiply: bad inputs";
-//		T[] res = zeros(x.length + y.length);
-//		T[] zero = zeros(x.length);
-//
-//		T[] toAdd = mux(zero, x, y[0]);
-//		System.arraycopy(toAdd, 0, res, 0, toAdd.length);
-//
-//		for (int i = 1; i < y.length; ++i) {
-//			toAdd = Arrays.copyOfRange(res, i, i + x.length);
-//			toAdd = add(toAdd, mux(zero, x, y[i]), false);
-//			System.arraycopy(toAdd, 0, res, i, toAdd.length);
-//		}
-//		return res;
+//		return karatsubaMultiply(x,y);
+		assert (x != null && y != null) : "multiply: bad inputs";
+		T[] res = zeros(x.length + y.length);
+		T[] zero = zeros(x.length);
+
+		T[] toAdd = mux(zero, x, y[0]);
+		System.arraycopy(toAdd, 0, res, 0, toAdd.length);
+
+		for (int i = 1; i < y.length; ++i) {
+			toAdd = Arrays.copyOfRange(res, i, i + x.length);
+			toAdd = add(toAdd, mux(zero, x, y[i]), false);
+			System.arraycopy(toAdd, 0, res, i, toAdd.length);
+		}
+		return res;
 	}
 
 	public T[] absolute(T[] x) {

@@ -13,8 +13,8 @@ public class TestMatrixRowReducedEchelonForm extends TestHarness {
 	@Test
 	public void testAllCases() throws Exception {
 		for (int i = 0; i < 1; i++) {
-			double[][] d1 = TestMatrix.randomMatrix(100, 100);
-			double[][] d2 = TestMatrix.randomMatrix(100, 100);
+			double[][] d1 = TestMatrix.randomMatrix(5, 5);
+			double[][] d2 = TestMatrix.randomMatrix(5, 5);
 
 			TestMatrix.runThreads(new Helper(d1, d2) {
 
@@ -22,8 +22,7 @@ public class TestMatrixRowReducedEchelonForm extends TestHarness {
 				public <T>T[][][] secureCompute(T[][][] a,
 						T[][][] b, DenseMatrixLib<T> lib)
 						throws Exception {
-					lib.solve(a,b[0]);
-					return  a;
+					return lib.rref(a);
 				}
 
 				@Override

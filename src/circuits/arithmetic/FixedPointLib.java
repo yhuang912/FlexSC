@@ -37,9 +37,11 @@ public class FixedPointLib<T> implements ArithmeticLib<T> {
 		return lib.sub(x, y);
 	}
 
+	//http://dsp.stackexchange.com/questions/7906/fixed-point-multiplication-with-negative-numbers
 	public T[] multiply(T[] x, T[] y) {
-		T[] res = lib.karatsubaMultiply(x, y);
-		return Arrays.copyOf(lib.rightPublicShift(res, offset), width);
+		T[] res = lib.karatsubaMultiply(lib.absolute(x), lib.absolute(y));
+		res = Arrays.copyOfRange(res, offset,offset+ width);
+		return lib.addSign(res, lib.xor(x[x.length-1], y[y.length-1]));
 	}
 
 	public T[] div(T[] x, T[] y) {
