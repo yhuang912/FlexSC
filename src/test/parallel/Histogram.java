@@ -196,10 +196,10 @@ public class Histogram<T> implements ParallelGadget<T> {
 //					System.out.println(machine.machineId + ": " + int2 + ", " + int3);
 //				}
 //			}
-			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (gatherTime - startTime)/1000000000.0 + "," + "Gather");
-			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (endTime - gatherTime)/1000000000.0 + "," + "Final sort");
-			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time");
-			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + communicate/1000000000.0 + "," + "Communication time");
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (gatherTime - startTime)/1000000000.0 + "," + "Gather" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (endTime - gatherTime)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + communicate/1000000000.0 + "," + "Communication time" + "," + env.getParty().name());
 		}
 	}
 }

@@ -19,7 +19,10 @@ import network.NetworkUtil;
 import ot.IncorrectOtUsageException;
 import test.Utils;
 import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.PMCompEnv;
 import flexsc.Party;
+import flexsc.PMCompEnv.Statistics;
 import gc.BadLabelException;
 
 public class Als<T> implements ParallelGadget<T> {
@@ -294,6 +297,7 @@ public class Als<T> implements ParallelGadget<T> {
 		}
 
 //		print(machineId, env, aa);
+		long startTime = System.nanoTime();
 		new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
 
 			@Override
@@ -416,7 +420,16 @@ public class Als<T> implements ParallelGadget<T> {
 			}
 		}
 		new SortGadget<>(env, machine).setInputs(aa, GraphNode.vertexFirstComparator(env)).compute();
-		print(machineId, env, aa);
+		long endTime = System.nanoTime();
+		if (Mode.REAL.equals(env.getMode())) {
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
+		} else if (Mode.COUNT.equals(env.mode)) {
+			Statistics a = ((PMCompEnv) env).statistic;
+			a.finalize();
+			Thread.sleep(1000 * machineId);
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+		}
+//		print(machineId, env, aa);
 	}
 
 	private <T> T[][][] getRowReducedMatrix(CompEnv<T> env, AlsNode<T>[] aa, int i, boolean isItem, ArithmeticLib<T> flib) {
