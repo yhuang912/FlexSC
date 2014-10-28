@@ -143,66 +143,82 @@ public class Als<T> implements ParallelGadget<T> {
 			tIsU = env.inputOfBob(new boolean[tIsVertex.length]);
 			tIsV = env.inputOfBob(new boolean[tIsVertex.length]);
 		} else {
-			Object[] input = getInput(inputLength);
-			boolean[][] u = (boolean[][]) input[0];
-			boolean[][] v = (boolean[][]) input[1];
-			boolean[] isVertex = (boolean[]) input[2];
-			boolean[][] rating = (boolean[][]) input[3];
-			boolean[][][] userProfile = (boolean[][][]) input[4];
-			boolean[][][] itemProfile = (boolean[][][]) input[5];
-			boolean[] isU = (boolean[]) input[6];
-			boolean[] isV = (boolean[]) input[7];
+			Machine.RAND = new double[MatrixFactorization.RAND_LIM];
+			BufferedReader reader = new BufferedReader(new FileReader("rand.out"));
+			for (int i2 = 0; i2 < MatrixFactorization.RAND_LIM; i2++) {
+				Machine.RAND[i2] = Double.parseDouble(reader.readLine());
+			}
+			reader.close();
+			int[] u1 = new int[inputLength];
+			int[] v1 = new int[inputLength];
+			boolean[] isVertex1 = new boolean[inputLength];
+			double[] rating1 = new double[inputLength];
+			double[][] userProfile1 = new double[inputLength][D];
+			double[][] itemProfile1 = new double[inputLength][D];
+			boolean[] isU1 = new boolean[inputLength];
+			boolean[] isV1 = new boolean[inputLength];
+			BufferedReader br = new BufferedReader(new FileReader("in/als" + inputLength + ".in"));
+			USERS = Integer.parseInt(br.readLine());
+			ITEMS = Integer.parseInt(br.readLine());
+			for (int i1 = 0; i1 < inputLength; i1++) {
+				String readLine = br.readLine();
+				String[] split = readLine.split(" ");
+				u1[i1] = Integer.parseInt(split[0]);
+				v1[i1] = Integer.parseInt(split[1]);
+				isVertex1[i1] = (Integer.parseInt(split[2]) == 1);
+				rating1[i1] = Double.parseDouble(split[3]);
+				for (int j1 = 0; j1 < D; j1++) {
+					userProfile1[i1][j1] = MatrixFactorization.getRandom();
+				}
+				for (int j3 = 0; j3 < D; j3++) {
+					itemProfile1[i1][j3] = MatrixFactorization.getRandom();
+				}
+				if (i1 < USERS) {
+					isU1[i1] = true;
+					isV1[i1] = false;
+				} else if (i1 < USERS + ITEMS) {
+					isU1[i1] = false;
+					isV1[i1] = true;
+				} else {
+					isU1[i1] = false;
+					isV1[i1] = false;
+				}
+			}
+			br.close();
 			for (int i = 0; i < tu.length; ++i) {
-				tu[i] = env.inputOfBob((boolean[]) u[i]);
+				tu[i] = env.inputOfBob(Utils.fromInt(u1[i], GraphNode.VERTEX_LEN));
 			}
 			for (int i = 0; i < tv.length; ++i) {
-				tv[i] = env.inputOfBob((boolean[]) v[i]);
+				tv[i] = env.inputOfBob(Utils.fromInt(v1[i], GraphNode.VERTEX_LEN));
 			}
-			tIsVertex = env.inputOfBob(isVertex);
+			tIsVertex = env.inputOfBob(isVertex1);
 			for (int i = 0; i < trating.length; i++) {
-				trating[i] = env.inputOfBob((boolean[]) rating[i]);
+				trating[i] = env.inputOfBob(Utils.fromFixPoint(rating1[i], AlsNode.FIX_POINT_WIDTH, AlsNode.OFFSET));
 			}
 			for(int i = 0; i < tUserProfile.length; ++i) {
 				for (int j = 0; j < D; j++) {
-					tUserProfile[i][j] = env.inputOfBob((boolean[]) userProfile[i][j]);
+					tUserProfile[i][j] = env.inputOfBob(Utils.fromFixPoint(userProfile1[i][j], AlsNode.FIX_POINT_WIDTH, AlsNode.OFFSET));
 				}
 			}
 			for(int i = 0; i < tItemProfile.length; ++i) {
 				for (int j = 0; j < D; j++) {
-					tItemProfile[i][j] = env.inputOfBob((boolean[]) itemProfile[i][j]);
+					tItemProfile[i][j] = env.inputOfBob(Utils.fromFixPoint(itemProfile1[i][j], AlsNode.FIX_POINT_WIDTH, AlsNode.OFFSET));
 				}
 			}
-			tIsU = env.inputOfBob(isU);
-			tIsV = env.inputOfBob(isV);
+			tIsU = env.inputOfBob(isU1);
+			tIsV = env.inputOfBob(isV1);
 		}
-		Object[] inputU = new Object[machines];
-		Object[] inputV = new Object[machines];
-		Object[] inputIsVertex = new Object[machines];
-		Object[] inputRating = new Object[machines];
-		Object[] inputUserProfile = new Object[machines];
-		Object[] inputItemProfile = new Object[machines];
-		Object[] inputIsU = new Object[machines];
-		Object[] inputIsV = new Object[machines];
-
+		Object[][] input = new Object[8][machines];
 		for(int i = 0; i < machines; ++i) {
-			inputU[i] = Arrays.copyOfRange(tu, i * tu.length / machines, (i + 1) * tu.length / machines);
-			inputV[i] = Arrays.copyOfRange(tv, i * tv.length / machines, (i + 1) * tv.length / machines);
-			inputIsVertex[i] = Arrays.copyOfRange(tIsVertex, i * tIsVertex.length / machines, (i + 1) * tIsVertex.length / machines);
-			inputRating[i] = Arrays.copyOfRange(trating, i * trating.length / machines, (i + 1) * trating.length / machines);
-			inputUserProfile[i] = Arrays.copyOfRange(tUserProfile, i * tUserProfile.length / machines, (i + 1) * tUserProfile.length / machines);
-			inputItemProfile[i] = Arrays.copyOfRange(tItemProfile, i * tItemProfile.length / machines, (i + 1) * tItemProfile.length / machines);
-			inputIsU[i] = Arrays.copyOfRange(tIsU, i * tIsU.length / machines, (i + 1) * tIsU.length / machines);
-			inputIsV[i] = Arrays.copyOfRange(tIsV, i * tIsV.length / machines, (i + 1) * tIsV.length / machines);
+			input[0][i] = Arrays.copyOfRange(tu, i * tu.length / machines, (i + 1) * tu.length / machines);
+			input[1][i] = Arrays.copyOfRange(tv, i * tv.length / machines, (i + 1) * tv.length / machines);
+			input[2][i] = Arrays.copyOfRange(tIsVertex, i * tIsVertex.length / machines, (i + 1) * tIsVertex.length / machines);
+			input[3][i] = Arrays.copyOfRange(trating, i * trating.length / machines, (i + 1) * trating.length / machines);
+			input[4][i] = Arrays.copyOfRange(tUserProfile, i * tUserProfile.length / machines, (i + 1) * tUserProfile.length / machines);
+			input[5][i] = Arrays.copyOfRange(tItemProfile, i * tItemProfile.length / machines, (i + 1) * tItemProfile.length / machines);
+			input[6][i] = Arrays.copyOfRange(tIsU, i * tIsU.length / machines, (i + 1) * tIsU.length / machines);
+			input[7][i] = Arrays.copyOfRange(tIsV, i * tIsV.length / machines, (i + 1) * tIsV.length / machines);
 		}
-		Object[] input = new Object[8];
-		input[0] = inputU;
-		input[1] = inputV;
-		input[2] = inputIsVertex;
-		input[3] = inputRating;
-		input[4] = inputUserProfile;
-		input[5] = inputItemProfile;
-		input[6] = inputIsU;
-		input[7] = inputIsV;
 		return input;
 	}
 
@@ -429,7 +445,7 @@ public class Als<T> implements ParallelGadget<T> {
 			Thread.sleep(1000 * machineId);
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
 		}
-//		print(machineId, env, aa);
+		print(machineId, env, aa);
 	}
 
 	private <T> T[][][] getRowReducedMatrix(CompEnv<T> env, AlsNode<T>[] aa, int i, boolean isItem, ArithmeticLib<T> flib) {
