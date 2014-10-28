@@ -342,7 +342,7 @@ public class Als<T> implements ParallelGadget<T> {
 			Thread.sleep(1000 * machineId);
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
 		}
-		print(machineId, env, aa);
+//		print(machineId, env, aa);
 	}
 
 	private <T> T[][][] getRowReducedMatrix(CompEnv<T> env, AlsNode<T>[] aa, int i, boolean isItem, ArithmeticLib<T> flib) {
