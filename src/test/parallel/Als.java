@@ -149,24 +149,109 @@ public class Als<T> implements ParallelGadget<T> {
 	public void sendInputToMachines(int inputLength, int machines,
 			boolean isGen, CompEnv<T> env, OutputStream[] os)
 			throws IOException, IncorrectOtUsageException {
-		Object[] input = performOTAndReturnMachineInputs(inputLength, machines, isGen, env);
-		Object[] inputU = (Object[]) input[0];
-		Object[] inputV = (Object[]) input[1];
-		Object[] inputIsVertex = (Object[]) input[2];
-		Object[] inputRating = (Object[]) input[3];
-		Object[] inputUserProfile = (Object[]) input[4];
-		Object[] inputItemProfile = (Object[]) input[5];
-		Object[] inputIsU = (Object[]) input[6];
-		Object[] inputIsV = (Object[]) input[7];
-		for (int i = 0; i < machines; i++) {
-			T[][] gcInputU = (T[][]) inputU[i];
-			T[][] gcInputV = (T[][]) inputV[i];
-			T[] gcInputIsVertex = (T[]) inputIsVertex[i];
-			T[][] gcInputRating = (T[][]) inputRating[i];
-			T[][][] gcInputUserProfile = (T[][][]) inputUserProfile[i];
-			T[][][] gcInputItemProfile = (T[][][]) inputItemProfile[i];
-			T[] gcInputIsU = (T[]) inputIsU[i];
-			T[] gcInputIsV = (T[]) inputIsV[i];
+		T[][] tu = env.newTArray(inputLength, 0);
+		T[][] tv = env.newTArray(inputLength, 0);
+		T[] tIsVertex = env.newTArray(inputLength);
+		T[][] trating = env.newTArray(inputLength, 0);
+		T[][][] tUserProfile = env.newTArray(inputLength, D, 0);
+		T[][][] tItemProfile = env.newTArray(inputLength, D, 0);
+		T[] tIsU = env.newTArray(inputLength);
+		T[] tIsV = env.newTArray(inputLength);
+		if (isGen) {
+			for(int i2 = 0; i2 < tu.length; ++i2)
+				tu[i2] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
+			for(int i3 = 0; i3 < tv.length; ++i3)
+				tv[i3] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
+			tIsVertex = env.inputOfBob(new boolean[tIsVertex.length]);
+			for(int i8 = 0; i8 < trating.length; ++i8)
+				trating[i8] = env.inputOfBob(new boolean[AlsNode.FIX_POINT_WIDTH]);
+			for(int i9 = 0; i9 < tUserProfile.length; ++i9) {
+				for (int j3 = 0; j3 < D; j3++) {
+					tUserProfile[i9][j3] = env.inputOfBob(new boolean[AlsNode.FIX_POINT_WIDTH]);
+				}
+			}
+			for(int i1 = 0; i1 < tItemProfile.length; ++i1) {
+				for (int j2 = 0; j2 < D; j2++) {
+					tItemProfile[i1][j2] = env.inputOfBob(new boolean[AlsNode.FIX_POINT_WIDTH]);
+				}
+			}
+			tIsU = env.inputOfBob(new boolean[tIsVertex.length]);
+			tIsV = env.inputOfBob(new boolean[tIsVertex.length]);
+		} else {
+			Machine.RAND = new double[MatrixFactorization.RAND_LIM];
+			BufferedReader reader = new BufferedReader(new FileReader("rand.out"));
+			for (int i21 = 0; i21 < MatrixFactorization.RAND_LIM; i21++) {
+				Machine.RAND[i21] = Double.parseDouble(reader.readLine());
+			}
+			reader.close();
+			int[] u1 = new int[inputLength];
+			int[] v1 = new int[inputLength];
+			boolean[] isVertex1 = new boolean[inputLength];
+			double[] rating1 = new double[inputLength];
+			double[][] userProfile1 = new double[inputLength][D];
+			double[][] itemProfile1 = new double[inputLength][D];
+			boolean[] isU1 = new boolean[inputLength];
+			boolean[] isV1 = new boolean[inputLength];
+			BufferedReader br = new BufferedReader(new FileReader("in/als" + inputLength + ".in"));
+			USERS = Integer.parseInt(br.readLine());
+			ITEMS = Integer.parseInt(br.readLine());
+			for (int i11 = 0; i11 < inputLength; i11++) {
+				String readLine = br.readLine();
+				String[] split = readLine.split(" ");
+				u1[i11] = Integer.parseInt(split[0]);
+				v1[i11] = Integer.parseInt(split[1]);
+				isVertex1[i11] = (Integer.parseInt(split[2]) == 1);
+				rating1[i11] = Double.parseDouble(split[3]);
+				for (int j11 = 0; j11 < D; j11++) {
+					userProfile1[i11][j11] = MatrixFactorization.getRandom();
+				}
+				for (int j31 = 0; j31 < D; j31++) {
+					itemProfile1[i11][j31] = MatrixFactorization.getRandom();
+				}
+				if (i11 < USERS) {
+					isU1[i11] = true;
+					isV1[i11] = false;
+				} else if (i11 < USERS + ITEMS) {
+					isU1[i11] = false;
+					isV1[i11] = true;
+				} else {
+					isU1[i11] = false;
+					isV1[i11] = false;
+				}
+			}
+			br.close();
+			for (int i6 = 0; i6 < tu.length; ++i6) {
+				tu[i6] = env.inputOfBob(Utils.fromInt(u1[i6], GraphNode.VERTEX_LEN));
+			}
+			for (int i7 = 0; i7 < tv.length; ++i7) {
+				tv[i7] = env.inputOfBob(Utils.fromInt(v1[i7], GraphNode.VERTEX_LEN));
+			}
+			tIsVertex = env.inputOfBob(isVertex1);
+			for (int i12 = 0; i12 < trating.length; i12++) {
+				trating[i12] = env.inputOfBob(Utils.fromFixPoint(rating1[i12], AlsNode.FIX_POINT_WIDTH, AlsNode.OFFSET));
+			}
+			for(int i = 0; i < tUserProfile.length; ++i) {
+				for (int j1 = 0; j1 < D; j1++) {
+					tUserProfile[i][j1] = env.inputOfBob(Utils.fromFixPoint(userProfile1[i][j1], AlsNode.FIX_POINT_WIDTH, AlsNode.OFFSET));
+				}
+			}
+			for(int i = 0; i < tItemProfile.length; ++i) {
+				for (int j4 = 0; j4 < D; j4++) {
+					tItemProfile[i][j4] = env.inputOfBob(Utils.fromFixPoint(itemProfile1[i][j4], AlsNode.FIX_POINT_WIDTH, AlsNode.OFFSET));
+				}
+			}
+			tIsU = env.inputOfBob(isU1);
+			tIsV = env.inputOfBob(isV1);
+		}
+		for(int i = 0; i < machines; ++i) {
+			T[][] gcInputU = Arrays.copyOfRange(tu, i * tu.length / machines, (i + 1) * tu.length / machines);
+			T[][] gcInputV = Arrays.copyOfRange(tv, i * tv.length / machines, (i + 1) * tv.length / machines);
+			T[] gcInputIsVertex = Arrays.copyOfRange(tIsVertex, i * tIsVertex.length / machines, (i + 1) * tIsVertex.length / machines);
+			T[][] gcInputRating = Arrays.copyOfRange(trating, i * trating.length / machines, (i + 1) * trating.length / machines);
+			T[][][] gcInputUserProfile = Arrays.copyOfRange(tUserProfile, i * tUserProfile.length / machines, (i + 1) * tUserProfile.length / machines);
+			T[][][] gcInputItemProfile = Arrays.copyOfRange(tItemProfile, i * tItemProfile.length / machines, (i + 1) * tItemProfile.length / machines);
+			T[] gcInputIsU = Arrays.copyOfRange(tIsU, i * tIsU.length / machines, (i + 1) * tIsU.length / machines);
+			T[] gcInputIsV = Arrays.copyOfRange(tIsV, i * tIsV.length / machines, (i + 1) * tIsV.length / machines);
 			NetworkUtil.writeInt(os[i], gcInputU.length);
 			NetworkUtil.send(os[i], gcInputU, env);
 			NetworkUtil.send(os[i], gcInputV, env);
