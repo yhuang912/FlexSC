@@ -104,5 +104,5 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 
 	public abstract GraphNode<T> aggFunc(GraphNode<T> agg, GraphNode<T> b) throws IOException;
 
-	public abstract void writeToVertex(GraphNode<T> agg, GraphNode<T> b);
+	public abstract void writeToVertex(GraphNode<T> agg, GraphNode<T> vertex);
 }

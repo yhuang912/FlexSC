@@ -41,28 +41,34 @@ public class FixedPointLib<T> implements ArithmeticLib<T> {
 		return lib.sub(x, y);
 	}
 
+	//http://dsp.stackexchange.com/questions/7906/fixed-point-multiplication-with-negative-numbers
 	public T[] multiply(T[] x, T[] y) {
-		T[] res = lib.multiplyFull(x, y);
-		res = Arrays.copyOf(lib.rightPublicShift(res, offset), width);
-//		try {
-//			double d1;
-//			double d = outputToAlice(x);
-//			double dd = outputToAlice(y);
-//			d1 = outputToAlice(res);
-		
-//		if(Math.abs(d1-d*dd) > 10){
-//			System.out.print(Arrays.toString(lib.getEnv().outputToAlice(res)));
-//			System.out.println(d+" "+dd+" "+d1);
-//		}
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (BadLabelException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		return res;
+		T[] res = lib.karatsubaMultiply(lib.absolute(x), lib.absolute(y));
+		res = Arrays.copyOfRange(res, offset,offset+ width);
+		return lib.addSign(res, lib.xor(x[x.length-1], y[y.length-1]));
 	}
+//	public T[] multiply(T[] x, T[] y) {
+//		T[] res = lib.multiplyFull(x, y);
+//		res = Arrays.copyOf(lib.rightPublicShift(res, offset), width);
+////		try {
+////			double d1;
+////			double d = outputToAlice(x);
+////			double dd = outputToAlice(y);
+////			d1 = outputToAlice(res);
+//		
+////		if(Math.abs(d1-d*dd) > 10){
+////			System.out.print(Arrays.toString(lib.getEnv().outputToAlice(res)));
+////			System.out.println(d+" "+dd+" "+d1);
+////		}
+////		} catch (IOException e) {
+////			// TODO Auto-generated catch block
+////			e.printStackTrace();
+////		} catch (BadLabelException e) {
+////			// TODO Auto-generated catch block
+////			e.printStackTrace();
+////		}
+//		return res;
+//	}
 
 	public T[] div(T[] x, T[] y) {
 		T[] padX = lib.padSignedSignal(x, x.length + offset);

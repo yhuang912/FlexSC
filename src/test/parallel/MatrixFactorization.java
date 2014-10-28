@@ -9,18 +9,19 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import ot.IncorrectOtUsageException;
-import test.Utils;
 import network.BadCommandException;
 import network.Machine;
 import network.NetworkUtil;
+import ot.IncorrectOtUsageException;
+import test.Utils;
 import circuits.IntegerLib;
 import circuits.arithmetic.FixedPointLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
-import flexsc.Party;
 import flexsc.PMCompEnv.Statistics;
+import flexsc.Party;
 import gc.BadLabelException;
 
 public class MatrixFactorization<T> implements ParallelGadget<T> {
@@ -31,7 +32,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 	public static double MU = 0.02;
 	public static int RAND_LIM = 10000000;
 
-	private double getRandom() {
+	public static double getRandom() {
 		double ret = Machine.RAND[Machine.RAND_CNT];
 		Machine.RAND_CNT = (Machine.RAND_CNT + 1) % RAND_LIM;
 		return ret;
@@ -295,13 +296,13 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			gradient = System.nanoTime();
 ////			printResult(machineId, env, aa);
 			// update item profiles
-			communicate += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
+			communicate += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env)) {
 	
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
 					MFNode<T> agg = (MFNode<T>) aggNode;
 					MFNode<T> b = (MFNode<T>) bNode;
-					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
+					MFNode<T> ret = new MFNode<>(env);
 					for (int i = 0; i < ret.itemProfile.length; i++) {
 						ret.itemProfile[i] = fixedPointLib.add(agg.itemProfile[i], b.itemProfile[i]);
 //						ret.userProfile[i] = b.userProfile[i];
@@ -327,7 +328,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 
 			gather1 = System.nanoTime();
 			// update user profiles
-			communicate += (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env, true /* identity */)) {
+			communicate += (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env)) {
 	
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -336,7 +337,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
 							MFNode.FIX_POINT_WIDTH,
 							MFNode.OFFSET);
-					MFNode<T> ret = new MFNode<>(env, true /* isIdentity */);
+					MFNode<T> ret = new MFNode<>(env);
 					for (int i = 0; i < ret.userProfile.length; i++) {
 						ret.userProfile[i] = fixedPointLib.add(agg.userProfile[i], b.userProfile[i]);
 					}
@@ -367,25 +368,25 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
-		output(machineId, machine, env, startTime, endTime);
+//		output(machineId, machine, env, startTime, endTime);
 
 		
-		if (Mode.REAL.equals(env.getMode())) {
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter1 - startTime)/1000000000.0 + "," + "Scatter 1");
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter2 - scatter1)/1000000000.0 + "," + "Scatter 2");
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient");
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1");
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2");
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort");
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time");
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate)/1000000000.0 + "," + "Communication time");
-		} else if (Mode.COUNT.equals(env.mode)) {
-			Statistics a = ((PMCompEnv) env).statistic;
-			a.finalize();
-			Thread.sleep(1000 * machineId);
-			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
-		}
-//		print(machineId, env, aa);
+//		if (Mode.REAL.equals(env.getMode())) {
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter1 - startTime)/1000000000.0 + "," + "Scatter 1");
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter2 - scatter1)/1000000000.0 + "," + "Scatter 2");
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient");
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1");
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2");
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort");
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time");
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate)/1000000000.0 + "," + "Communication time");
+//		} else if (Mode.COUNT.equals(env.mode)) {
+//			Statistics a = ((PMCompEnv) env).statistic;
+//			a.finalize();
+//			Thread.sleep(1000 * machineId);
+//			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+//		}
+		print(machineId, env, aa);
 //		printOnlyResult(machineId, env, aa);
 	}
 

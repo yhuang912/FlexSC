@@ -70,6 +70,12 @@ public class NetworkUtil {
 		return sock;
 	}
 
+	public static <T> void send(OutputStream os, T[][][] data, CompEnv<T> env) throws IOException {
+		for (int i = 0; i < data.length; i++) {
+			send(os, data[i], env);
+		}
+	}
+
 	public static <T> void send(OutputStream os, T[][] data, CompEnv<T> env) throws IOException {
 		for (int i = 0; i < data.length; i++) {
 			send(os, data[i], env);
@@ -80,6 +86,14 @@ public class NetworkUtil {
 		T[][] ret = env.newTArray(length1, 1);
 		for (int i = 0; i < length1; i++) {
 			ret[i] = read(is, length2, env);
+		}
+		return ret;
+	}
+
+	public static <T> T[][][] read(InputStream is, int length1, int length2, int length3, CompEnv<T> env) throws IOException {
+		T[][][] ret = env.newTArray(length1, 1, 1);
+		for (int i = 0; i < length1; i++) {
+			ret[i] = read(is, length2, length3, env);
 		}
 		return ret;
 	}

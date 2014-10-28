@@ -25,10 +25,6 @@ public class MFNode<T> extends GraphNode<T> {
 	IntegerLib<T> ilib;
 
 	public MFNode(CompEnv<T> env) {
-		this(env, true /* identity */);
-	}
-
-	public MFNode(CompEnv<T> env, boolean identity) {
 		super(env);
 		lib = new FixedPointLib<>(env, FIX_POINT_WIDTH, OFFSET);
 		ilib = new IntegerLib<T>(env);
@@ -45,6 +41,24 @@ public class MFNode<T> extends GraphNode<T> {
 			e1.printStackTrace();
 		}
 	}
+
+//	public MFNode(CompEnv<T> env, boolean identity) {
+//		super(env);
+//		lib = new FixedPointLib<>(env, FIX_POINT_WIDTH, OFFSET);
+//		ilib = new IntegerLib<T>(env);
+//		// initialize all to 0
+//		try {
+//			rating = env.inputOfAlice(Utils.fromFixPoint(0, FIX_POINT_WIDTH, OFFSET));
+//			userProfile = env.newTArray(D, FIX_POINT_WIDTH);
+//			itemProfile = env.newTArray(D, FIX_POINT_WIDTH);
+//			for (int i = 0; i < D; ++i) {
+//				userProfile[i] = env.inputOfAlice(Utils.fromFixPoint(0, FIX_POINT_WIDTH, OFFSET));
+//				itemProfile[i] = env.inputOfAlice(Utils.fromFixPoint(0, FIX_POINT_WIDTH, OFFSET));
+//			}
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//		}
+//	}
 
 	public MFNode(T[] u,
 			T[] v,
@@ -234,7 +248,7 @@ public class MFNode<T> extends GraphNode<T> {
 	@Override
 	public GraphNode<T> mux(GraphNode<T> b1, T condition, CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
-		MFNode<T> ret = new MFNode<T>(env, true /* isIdentity */);
+		MFNode<T> ret = new MFNode<T>(env);
 		ret.u = lib.mux(((MFNode<T>) b1).u, this.u, condition);
 		ret.v = lib.mux(((MFNode<T>) b1).v, this.v, condition);
 		ret.isVertex = lib.mux(((MFNode<T>) b1).isVertex, this.isVertex, condition);
@@ -246,7 +260,7 @@ public class MFNode<T> extends GraphNode<T> {
 
 	@Override
 	public GraphNode<T> getCopy(CompEnv<T> env) {
-		MFNode<T> a = new MFNode<>(env, true /* isIdentity */);
+		MFNode<T> a = new MFNode<>(env);
 		a.u = this.u;
 		a.v = this.v;
 		a.isVertex = this.isVertex;
