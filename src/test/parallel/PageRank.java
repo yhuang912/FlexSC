@@ -36,6 +36,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 		int[] v = new int[inputLength];
 		boolean[] isVertex = new boolean[inputLength];
 		BufferedReader br = new BufferedReader(new FileReader("in/PageRank" + inputLength + ".in"));
+		
 		for (int i = 0; i < inputLength; i++) {
 			String readLine = br.readLine();
 			String[] split = readLine.split(" ");
@@ -234,6 +235,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 					PageRankNode<T> agg = (PageRankNode<T>) aggNode;
 					PageRankNode<T> b = (PageRankNode<T>) bNode;
 //					IntegerLib<T> lib = new IntegerLib<>(env);
+//					T[] val = flib.add(flib.publicValue(0.15),//flib.div(flib.publicValue(0.15), vertices),
+//							flib.multiply(agg.pr, flib.publicValue(0.85)));
 					b.pr = lib.mux(b.pr, agg.pr, b.isVertex);
 				}
 			}.setInputs(aa).compute();
@@ -246,6 +249,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 					.compute();
 				print(machineId, env, aa, i /* iterations */);
 			}
+			new SortGadget<T>(env, machine)
+				.setInputs(aa, PageRankNode.vertexFirstComparator(env))
+				.compute();
+			print(machineId, env, aa, i);
 		}
 		communicate += (long) new SortGadget<T>(env, machine)
 			.setInputs(aa, PageRankNode.vertexFirstComparator(env))
@@ -289,10 +296,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 			boolean e = env.outputToAlice(pr[i].isVertex);
 			env.os.flush();
 			if (Party.Alice.equals(env.party)) {
-				PrintStream out = new PrintStream(System.out, false /* autoFlush */);
 				if (e) {
-//					out.println(machineId + ": " + a + ", " + b + "\t" + c2 + "\t" + d + "\t" + e);
-					out.println(iterations + "," + a + "," + c2);
+					System.out.format("%d, %d, %.3f\n", iterations, a, c2);
+//					out.println(iterations + "," + a + "," + c2);
 				}
 			}
 	    }
