@@ -380,6 +380,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate)/1000000000.0 + "," + "Communication time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - startTime)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
 		} else if (Mode.COUNT.equals(env.mode)) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();

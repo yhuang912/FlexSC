@@ -209,9 +209,12 @@ public class Als<T> implements ParallelGadget<T> {
 			aa[i] = new AlsNode<T>(u[i], v[i], isVertex[i], rating[i], userProfile[i], itemProfile[i], isU[i], isV[i], env);
 		}
 
+		long scatterVp = 0, solveU = 0, gatherUp = 0, pAUp = 0,
+				scatterUp = 0, solveV = 0, gatherVp = 0, pAVp = 0, communicate = 0;
+		
 //		print(machineId, env, aa);
 		long startTime = System.nanoTime();
-		new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
+		communicate += (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
 
 			@Override
 			public void writeToEdge(GraphNode<T> vertexNode,
@@ -222,8 +225,9 @@ public class Als<T> implements ParallelGadget<T> {
 			}
 		}.setInputs(aa).compute();
 
+		long bootstrap = System.nanoTime();
 		for (int it = 0; it < ITERATIONS; it++) {
-			new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
+			communicate += (long) new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
 
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -234,13 +238,15 @@ public class Als<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			scatterVp = System.nanoTime();
 			// compute values for up assuming vp; edge values
 			for (int i = 0; i < aa.length; i++) {
 				aa[i].solveU(env);
 			}
 
+			solveU = System.nanoTime();
 			// gather values for user profiles
-			new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new AlsNode<>(env)) {
+			communicate += (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new AlsNode<>(env)) {
 
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode)
@@ -269,6 +275,7 @@ public class Als<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			gatherUp = System.nanoTime();
 			// compute P-1 A
 			for (int i = 0; i < aa.length; i++) {
 				T[][][] rref = getRowReducedMatrix(env, aa, i, true /* isItem */, flib);
@@ -277,8 +284,9 @@ public class Als<T> implements ParallelGadget<T> {
 				}
 			}
 
+			pAUp = System.nanoTime();
 			// scatter user profiles
-			new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
+			communicate += (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
 
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -288,14 +296,16 @@ public class Als<T> implements ParallelGadget<T> {
 					edge.up = lib.mux(vertex.up, edge.up, isVertex);
 				}
 			}.setInputs(aa).compute();
-			
+
+			scatterUp = System.nanoTime();
 			// compute values for vp assuming up; edge values
 			for (int i = 0; i < aa.length; i++) {
 				aa[i].solveV(env);
 			}
 
+			solveV = System.nanoTime();
 			// gather values for item profiles
-			new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new AlsNode<>(env)) {
+			communicate += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new AlsNode<>(env)) {
 
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode)
@@ -324,6 +334,7 @@ public class Als<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
+			gatherVp = System.nanoTime();
 			// compute P-1 A for items
 			for (int i = 0; i < aa.length; i++) {
 				T[][][] rref = getRowReducedMatrix(env, aa, i, false /* isItem */, flib);
@@ -331,11 +342,23 @@ public class Als<T> implements ParallelGadget<T> {
 					aa[i].vp[j] = lib.mux(aa[i].vp[j], rref[j][D], aa[i].isV);
 				}
 			}
+			pAVp = System.nanoTime();
 		}
-		new SortGadget<>(env, machine).setInputs(aa, GraphNode.vertexFirstComparator(env)).compute();
+		communicate += (long) new SortGadget<>(env, machine).setInputs(aa, GraphNode.vertexFirstComparator(env)).compute();
 		long endTime = System.nanoTime();
 		if (Mode.REAL.equals(env.getMode())) {
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + communicate/1000000000.0 + "," + "Communicate" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootstrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatterVp - bootstrap)/1000000000.0 + "," + "Scatter Item Profile" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (solveU - scatterVp)/1000000000.0 + "," + "Apply for solving Up" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gatherUp - solveU)/1000000000.0 + "," + "Gather for user profile" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (pAUp - gatherUp)/1000000000.0 + "," + "P-1A user profile" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatterUp - pAUp)/1000000000.0 + "," + "Scatter User Profile" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (solveV - scatterUp)/1000000000.0 + "," + "Apply for item profile" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gatherVp - solveV)/1000000000.0 + "," + "Gather for item profile" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (pAVp - gatherVp)/1000000000.0 + "," + "P-1A item profile" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gatherVp - bootstrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
 		} else if (Mode.COUNT.equals(env.mode)) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
