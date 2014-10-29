@@ -32,7 +32,7 @@ public class Als<T> implements ParallelGadget<T> {
 	public static double MU = 0.02;
 	public static int USERS = 0;
 	public static int ITEMS = 0;
-	public static final int D = 2;
+	public static final int D = 10;
 
 	@Override
 	public void sendInputToMachines(int inputLength, int machines,
