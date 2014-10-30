@@ -28,8 +28,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 	static int UNUSED_FLOAT_V = 20;
 	static int UNUSED_FLOAT_P = 11;
 	static int ITERATIONS = 50;
-	static int WIDTH = 40;
-	static int OFFSET = 20;
+	static int WIDTH = 44;
+	static int OFFSET = 24;
 
 	private Object[] getInput(int inputLength) throws IOException {
 		int[] u = new int[inputLength];
