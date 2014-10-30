@@ -256,12 +256,13 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			aa[i] = new MFNode<T>(u[i], v[i], isVertex[i], rating[i], userProfile[i], itemProfile[i], env);
 		}
 
-		long scatter1 = 0, scatter2 = 0, gradient = 0, gather1 = 0, gather2 = 0, communicate = 0;
+		long scatter1 = 0, scatter2 = 0, gradient = 0, gather1 = 0, gather2 = 0, communicateS1 = 0;
+		long communicateS2 = 0, communicateG1 = 0, communicateG2 = 0, communicateSort = 0;
 //		print(machineId, env, aa);
 		long startTime = System.nanoTime();
 		for (int it = 0; it < ITERATIONS; it++) {
 			// scatter user profiles
-			communicate += (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
+			communicateS1 += (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
 	
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -275,7 +276,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 
 			scatter1 = System.nanoTime();
 			// scatter item profiles
-			communicate += (long) new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
+			communicateS2 += (long) new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
 	
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -296,7 +297,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			gradient = System.nanoTime();
 ////			printResult(machineId, env, aa);
 			// update item profiles
-			communicate += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env)) {
+			communicateG1 += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env)) {
 	
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -328,7 +329,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 
 			gather1 = System.nanoTime();
 			// update user profiles
-			communicate += (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env)) {
+			communicateG2 += (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env)) {
 	
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -364,7 +365,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			gather2 = System.nanoTime();
 		}
 
-		communicate += (long) new SortGadget<>(env, machine)
+		communicateSort += (long) new SortGadget<>(env, machine)
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
@@ -379,7 +380,11 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate)/1000000000.0 + "," + "Communication time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS1)/1000000000.0 + "," + "Communication time S1" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS2)/1000000000.0 + "," + "Communication time S2" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG1)/1000000000.0 + "," + "Communication time G1" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG2)/1000000000.0 + "," + "Communication time G2" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication time sort" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - startTime)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
 		} else if (Mode.COUNT.equals(env.mode)) {
 			Statistics a = ((PMCompEnv) env).statistic;
