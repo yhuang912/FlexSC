@@ -389,7 +389,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		} else if (Mode.COUNT.equals(env.mode)) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
-			Thread.sleep(1000 * machineId);
+			// Thread.sleep(1000 * machineId);
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
 		}
 //		print(machineId, env, aa);

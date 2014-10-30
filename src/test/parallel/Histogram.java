@@ -186,7 +186,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 		if (Mode.COUNT.equals(env.getMode())) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
-			Thread.sleep(1000 * machineId);
+			// Thread.sleep(1000 * machineId);
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
 		} else if (Mode.REAL.equals(env.getMode())) {
 //			for (int i = 0; i < 4; i++) {
