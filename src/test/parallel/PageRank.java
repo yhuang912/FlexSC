@@ -27,7 +27,7 @@ import gc.BadLabelException;
 public class PageRank<T> implements ParallelGadget<T> {
 	static int UNUSED_FLOAT_V = 20;
 	static int UNUSED_FLOAT_P = 11;
-	static int ITERATIONS = 50;
+	static int ITERATIONS = 1;
 	static int WIDTH = 40;
 	static int OFFSET = 20;
 
