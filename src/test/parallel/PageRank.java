@@ -266,7 +266,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - bootStrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate)/1000000000.0 + "," + "Communication time" + "," + env.getParty().name());
-		} else if (Mode.COUNT.equals(env.mode)) {
+		} else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
 			// Thread.sleep(1000 * machineId);
