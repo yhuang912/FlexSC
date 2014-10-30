@@ -29,7 +29,7 @@ public class SwapNonVertexEdges<T> extends Gadget<T> {
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
 		IntegerLib<T> lib = new IntegerLib<>(env);
-		T[] floatZero = env.inputOfAlice(Utils.fromFloat(0, PageRank.UNUSED_FLOAT_P, PageRank.UNUSED_FLOAT_V));
+		T[] floatZero = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_P, PageRank.FLOAT_V));
 		for (int i = 0; i < prNodes.length; i++) {
 			T[] u1 = prNodes[i].u;
 			T[] v1 = prNodes[i].v;

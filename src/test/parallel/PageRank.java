@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -15,8 +14,10 @@ import network.Machine;
 import network.NetworkUtil;
 import ot.IncorrectOtUsageException;
 import test.Utils;
+import circuits.ArithmeticLib;
 import circuits.IntegerLib;
 import circuits.arithmetic.FixedPointLib;
+import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
@@ -25,11 +26,12 @@ import flexsc.Party;
 import gc.BadLabelException;
 
 public class PageRank<T> implements ParallelGadget<T> {
-	static int UNUSED_FLOAT_V = 20;
-	static int UNUSED_FLOAT_P = 11;
+	static int FLOAT_V = 20;
+	static int FLOAT_P = 11;
 	static int ITERATIONS = 50;
-	static int WIDTH = 44;
-	static int OFFSET = 24;
+	static int FLOAT_WIDTH = FLOAT_P + FLOAT_V + 1;
+//	static int WIDTH = 40;
+//	static int OFFSET = 20;
 
 	private Object[] getInput(int inputLength) throws IOException {
 		int[] u = new int[inputLength];
@@ -147,7 +149,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
 		final IntegerLib<T> lib = new IntegerLib<>(env);
 //		final FloatLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
-		final FixedPointLib<T> flib = new FixedPointLib<T>(env, WIDTH, OFFSET);
+//		final ArithmeticLib<T> flib = new FixedPointLib<T>(env, WIDTH, OFFSET);
+		final ArithmeticLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
 
 		PageRankNode<T>[] aa = (PageRankNode<T>[]) Array.newInstance(PageRankNode.class, u.length);
 		for (int i = 0; i < aa.length; i++) {
@@ -247,7 +250,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 				new SortGadget<T>(env, machine)
 					.setInputs(aa, PageRankNode.vertexFirstComparator(env))
 					.compute();
-				print(machineId, env, aa, i /* iterations */);
+				print(machineId, env, aa, i /* iterations */, flib);
 			}
 //			new SortGadget<T>(env, machine)
 //				.setInputs(aa, PageRankNode.vertexFirstComparator(env))
@@ -287,10 +290,10 @@ public class PageRank<T> implements ParallelGadget<T> {
 //		}
 //	}
 
-	private <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr, int iterations) throws IOException, BadLabelException {
+	private <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr, int iterations, ArithmeticLib<T> flib) throws IOException, BadLabelException {
 		final IntegerLib<T> lib = new IntegerLib<>(env);
 //		final FloatLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
-		final FixedPointLib<T> flib = new FixedPointLib<T>(env, WIDTH, OFFSET);
+//		final FixedPointLib<T> flib = new FixedPointLib<T>(env, WIDTH, OFFSET);
 		for (int i = 0; i < pr.length; i++) {
 			int u = Utils.toInt(env.outputToAlice(pr[i].u));
 			double pageRank = flib.outputToAlice(pr[i].pr);
@@ -298,7 +301,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 			env.os.flush();
 			if (Party.Alice.equals(env.party)) {
 				if (e) {
-					System.out.format("%d,%d,%d,%f\n", OFFSET, iterations, u, pageRank);
+//					System.out.format("%d,%d,%d,%f\n", OFFSET, iterations, u, pageRank);
+					System.out.format("%d,%d,%d,%f,%d,%d\n", FLOAT_WIDTH, iterations, u, pageRank, FLOAT_V, FLOAT_P);
 //					out.println(iterations + "," + a + "," + c2);
 				}
 			}

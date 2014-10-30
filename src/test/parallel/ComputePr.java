@@ -29,9 +29,9 @@ public class ComputePr<T> extends Gadget<T> {
 	@Override
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
-		FloatLib<T> lib = new FloatLib<T>(env, PageRank.UNUSED_FLOAT_V, PageRank.UNUSED_FLOAT_P);
+		FloatLib<T> lib = new FloatLib<T>(env, PageRank.FLOAT_V, PageRank.FLOAT_P);
 		IntegerLib<T> intLib = new IntegerLib<>(env);
-		T[] zero = env.inputOfAlice(Utils.fromFloat(0, PageRank.UNUSED_FLOAT_V, PageRank.UNUSED_FLOAT_P));
+		T[] zero = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
 		T[] val = zero;
 
 		for (int i = 0; i < prNodes.length; i++) {
