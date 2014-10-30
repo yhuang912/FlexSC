@@ -31,8 +31,8 @@ public class SetInitialPageRankGadget<T> extends Gadget<T> {
 //		T[] one = env.inputOfAlice(Utils.fromFloat(1, PageRank.FLOAT_V, PageRank.FLOAT_P));
 //		T[] zero = env.inputOfAlice(Utils.fromFloat(0.000001, PageRank.FLOAT_V, PageRank.FLOAT_P));
 
-		T[] one = env.inputOfAlice(Utils.fromFixPoint(1, 40, 20));
-		T[] zero = env.inputOfAlice(Utils.fromFixPoint(0.000001, 40, 20));
+		T[] one = env.inputOfAlice(Utils.fromFixPoint(1, PageRank.WIDTH, PageRank.OFFSET));
+		T[] zero = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
 //		T[] intOne = env.inputOfAlice(Utils.fromInt(1, PageRank.INT_LEN));
 //		T[] intZero = env.inputOfAlice(Utils.fromInt(0, PageRank.INT_LEN));
 		for (int i = 0; i < prNodes.length; i++) {
