@@ -290,15 +290,15 @@ public class PageRank<T> implements ParallelGadget<T> {
 	private <T> void print(int machineId, final CompEnv<T> env, PageRankNode<T>[] pr, int iterations) throws IOException, BadLabelException {
 		final IntegerLib<T> lib = new IntegerLib<>(env);
 //		final FloatLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
-		final FixedPointLib<T> flib = new FixedPointLib<T>(env, 40, 20);
+		final FixedPointLib<T> flib = new FixedPointLib<T>(env, WIDTH, OFFSET);
 		for (int i = 0; i < pr.length; i++) {
-			int a = Utils.toInt(env.outputToAlice(pr[i].u));
-			double c2 = flib.outputToAlice(pr[i].pr);
+			int u = Utils.toInt(env.outputToAlice(pr[i].u));
+			double pageRank = flib.outputToAlice(pr[i].pr);
 			boolean e = env.outputToAlice(pr[i].isVertex);
 			env.os.flush();
 			if (Party.Alice.equals(env.party)) {
 				if (e) {
-					System.out.format("%d, %d, %.3f\n", iterations, a, c2);
+					System.out.format("%d,%d,%d,%f\n", OFFSET, iterations, u, pageRank);
 //					out.println(iterations + "," + a + "," + c2);
 				}
 			}
