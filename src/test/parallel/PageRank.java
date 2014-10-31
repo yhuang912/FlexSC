@@ -159,14 +159,14 @@ public class PageRank<T> implements ParallelGadget<T> {
 
 		long startTime = System.nanoTime();
 		long scatter = 0, gather = 0;
-		long communicate = 0;
+		long communicateBootstrap = 0, communicate1 = 0, communicate2 = 0, communicateSort = 0;
 		// set initial pagerank
 		new SetInitialPageRankGadget<T>(env, machine)
 				.setInputs(aa)
 				.compute();
 
 		// 1. Compute number of neighbors for each vertex
-		new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new PageRankNode<T>(env)) {
+		communicateBootstrap = (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new PageRankNode<T>(env)) {
 
 			@Override
 			public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -191,7 +191,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 		long bootStrap = System.nanoTime();
 		for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges
-			communicate += (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
+			communicate1 = (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
 
 				@Override
 				public void writeToEdge(GraphNode<T> vertexNode,
@@ -219,7 +219,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 
 			scatter = System.nanoTime();
 			// 3. Compute PR based on edges
-			communicate += (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new PageRankNode<T>(env)) {
+			communicate2 = (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new PageRankNode<T>(env)) {
 
 				@Override
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
@@ -245,7 +245,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 			}.setInputs(aa).compute();
 
 			gather = System.nanoTime();
-			// osrting to get output in a nice form
+			// sorting to get output in a nice form
 			if (Mode.VERIFY.equals(env.getMode())) {
 				new SortGadget<T>(env, machine)
 					.setInputs(aa, PageRankNode.vertexFirstComparator(env))
@@ -257,7 +257,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 //				.compute();
 //			print(machineId, env, aa, i);
 		}
-		communicate += (long) new SortGadget<T>(env, machine)
+		communicateSort = (long) new SortGadget<T>(env, machine)
 			.setInputs(aa, PageRankNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
@@ -268,9 +268,13 @@ public class PageRank<T> implements ParallelGadget<T> {
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - bootStrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate)/1000000000.0 + "," + "Communication time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap)/1000000000.0 + "," + "Communication bootstrap time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate1)/1000000000.0 + "," + "Communication scatter time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate2)/1000000000.0 + "," + "Communication gather time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication sort time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap + communicate1 + communicate2 + communicateSort)/1000000000.0 + "," + "Communication total time" + "," + env.getParty().name());
 		} else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
-			Thread.sleep(10000);
+			// Thread.sleep(10000);
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
 			// Thread.sleep(1000 * machineId);
