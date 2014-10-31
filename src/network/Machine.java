@@ -275,7 +275,7 @@ public class Machine {
 		machine.disconnect();
 
 		if (machine.machineId == firstPhysicalMachineId && (Mode.REAL.equals(machine.env.getMode()) || Party.Alice.equals(machine.env.party))) {
-			Thread.sleep(60000);
+			// Thread.sleep(60000);
 			PrintWriter writer = new PrintWriter("mutex.txt");
 			writer.close();
 		}
