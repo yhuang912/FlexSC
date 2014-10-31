@@ -7,6 +7,7 @@ import flexsc.Party;
 import flexsc.CompEnv;
 import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
@@ -22,11 +23,13 @@ public class IntStackNode implements IWritable<IntStackNode, Boolean> {
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private int m;
 
-	public IntStackNode(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m) throws Exception {
+	public IntStackNode(CompEnv<Boolean> env, int m) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.next = intLib.randBools(m);
 		this.data = env.inputOfAlice(Utils.fromInt(0, m));
@@ -55,7 +58,7 @@ public class IntStackNode implements IWritable<IntStackNode, Boolean> {
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		IntStackNode ret = new IntStackNode(env, intLib, m);
+		IntStackNode ret = new IntStackNode(env, m);
 		Boolean[] tmp;
 		int now = 0;
 		ret.next = new Boolean[m];

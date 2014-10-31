@@ -7,6 +7,7 @@ import flexsc.Party;
 import flexsc.CompEnv;
 import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
@@ -21,10 +22,12 @@ public class BoolArray implements IWritable<BoolArray, Boolean> {
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 
-	public BoolArray(CompEnv<Boolean> env, IntegerLib<Boolean> intLib) throws Exception {
+	public BoolArray(CompEnv<Boolean> env) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.data = env.inputOfAlice(Utils.fromInt(0, 32));
 	}
 
@@ -48,7 +51,7 @@ public class BoolArray implements IWritable<BoolArray, Boolean> {
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		BoolArray ret = new BoolArray(env, intLib);
+		BoolArray ret = new BoolArray(env);
 		Boolean[] tmp;
 		int now = 0;
 		ret.data = new Boolean[32];

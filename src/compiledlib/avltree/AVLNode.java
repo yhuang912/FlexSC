@@ -7,6 +7,7 @@ import flexsc.Party;
 import flexsc.CompEnv;
 import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
@@ -26,19 +27,21 @@ public class AVLNode<K extends IWritable<K,Boolean>, V extends IWritable<V,Boole
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private K factoryK;
 	private V factoryV;
 	private int m;
 
-	public AVLNode(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m, K factoryK, V factoryV) throws Exception {
+	public AVLNode(CompEnv<Boolean> env, int m, K factoryK, V factoryV) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.factoryK = factoryK;
 		this.factoryV = factoryV;
-		this.left = new AVLId(env, intLib, m);
+		this.left = new AVLId(env, m);
 		this.rDepth = env.inputOfAlice(Utils.fromInt(0, (m)+(1)));
-		this.right = new AVLId(env, intLib, m);
+		this.right = new AVLId(env, m);
 		this.value = factoryV.newObj(null);
 		this.key = factoryK.newObj(null);
 		this.lDepth = env.inputOfAlice(Utils.fromInt(0, (m)+(1)));
@@ -87,10 +90,10 @@ public class AVLNode<K extends IWritable<K,Boolean>, V extends IWritable<V,Boole
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		AVLNode<K, V> ret = new AVLNode<K, V>(env, intLib, m, factoryK, factoryV);
+		AVLNode<K, V> ret = new AVLNode<K, V>(env, m, factoryK, factoryV);
 		Boolean[] tmp;
 		int now = 0;
-		ret.left = new AVLId(env, intLib, m);
+		ret.left = new AVLId(env, m);
 		tmp = new Boolean[this.left.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;
@@ -98,7 +101,7 @@ public class AVLNode<K extends IWritable<K,Boolean>, V extends IWritable<V,Boole
 		ret.rDepth = new Boolean[(m)+(1)];
 		System.arraycopy(data, now, ret.rDepth, 0, (m)+(1));
 		now += (m)+(1);
-		ret.right = new AVLId(env, intLib, m);
+		ret.right = new AVLId(env, m);
 		tmp = new Boolean[this.right.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;

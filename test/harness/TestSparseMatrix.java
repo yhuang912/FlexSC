@@ -20,10 +20,10 @@ public class TestSparseMatrix<T> extends TestHarness {
 	public final int VLength = 24;
 	public final int PLength = 8;
 	public final boolean testFixedPoint = false;
-	public static int xlimit = 50;
-	public static int ylimit = 50;
+	public static int xlimit = 500;
+	public static int ylimit = 500;
 
-	public static int M = 50;
+	public static int M = 500;
 
 	public abstract class Helper {
 		int xa[];

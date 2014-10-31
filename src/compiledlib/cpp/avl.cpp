@@ -21,14 +21,21 @@ struct IntStack@m {
    PORAM@m poram;
 };
 
+int@2 cmp(BoolArray x, BoolArray y) {
+	int2 r = 0-1;
+	if(x.data == y.data) r=0;
+	else if(x.data > y.data) r=1;
+	return r; 
+}
+
 dummy int@m IntStack@m.stack_op(int@m operand, int1 op, int1 dum) {
    int@m ret;
-   if (op == POP && dum == 0) { // extract root
+   if (op == POP && dum == 1) { // extract root
       IntStackNode@m r = this.poram.poram_retrieve(this.size, this.root);
       this.root = r.next;
       this.size = this.size - 1;
       ret = r.data;
-   } else if (dum == 0) { // push operand onto the stack
+   } else if (dum == 1) { // push operand onto the stack
       IntStackNode@m node = 
          IntStackNode@m ( next = this.root,
                data = operand);
@@ -83,16 +90,16 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 	int@(m+1)[public 3*m/2] depth;
 	int2[public 3*m/2] ids, cres;
 	int2 ind = 0;
-	int@m id;
+	int@m id, oid;
 	rnd@m pos;
 	int@m hpos;
 		
 	K k, kp; V v, vp;
-	int@(m+1) dl, dr;
+	//int@(m+1) dl, dr;
 	AVLId@m lf, rf;
 	
 	id, pos = now;
-	if(id == 0) ind = 0;
+	if(id == 0) ind = 1;
 	now = AVLId@m(id = id, pos = pos);
 	
 	K k;
@@ -119,11 +126,11 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 		cres[i] = cmp(keys[i], key);
 		if(ind == 0) {
 			if(cres[i] > 0) {
-				depth[i] = dr;
+				depth[i] = rd;
 				go = lf;
 				left[i] = rf;
 			} else {
-				depth[i] = dl;
+				depth[i] = ld;
 				go = rf;
 				left[i] = lf;
 			}
@@ -138,12 +145,12 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 	int@(m+1) ld, rd, dc, dap, dbp;
 	AVLId@m nid = AVLId@m(id = 0, pos = RND(m)), next, ll, rr, l;
 	for(i = 3*m/2 - 1; i>=0; i = i - 1) {
-		if(ids[i] == 0) {
+		if(ids[i] != 2) {
 			id = this.IDs.stack_op(0, POP);
 			pos = RND(m);
 			int@m hpos = pos;
 			next = AVLId@m(id = id, pos = pos);
-			if(cres[i] >= 0) {
+			if(cres[i] > 0) {
 				ld = nowDepth;
 				rd = depth[i];
 				ll = nid;
@@ -164,19 +171,19 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 			}
 			nowDepth = nowDepth + 1;
 			if(rd - ld >= 2) {
-				id, pos = nid;
-				tnodes = this.poram.aoram_retrieve(id, pos);
-				this.IDs.stack_op(id, PUSH);
+				oid, pos = nid;
+				tnodes = this.poram.aoram_retrieve(oid, pos);
+				//this.IDs.stack_op(id, PUSH);
 				k, v, dc, c, l = 
 					tnodes.(key, value, lDepth, left, right);
 					
 				id, pos = l;
 				p = this.poram.aoram_retrieve(id, pos);
-				this.IDs.stack_op(id, PUSH);
+				//this.IDs.stack_op(id, PUSH);
 				kp, vp, dap, dbp, a, b = 
 					p.(key, value, lDepth, rDepth, left, right);
 
-				id = this.IDs.stack_op(0, POP);
+				//id = this.IDs.stack_op(0, POP);
 				pos = RND(m);
 				int@m hpos = pos;
 				this.poram.aoram_write(id, pos,
@@ -188,19 +195,19 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 				dp = dp + 1;
 				next = AVLId@m(id = id, pos = pos);
 				
-				id = this.IDs.stack_op(0, POP);
+				//id = this.IDs.stack_op(0, POP);
 				pos = RND(m);
 				int@m hpos = pos;
-				this.poram.aoram_write(id, pos,
+				this.poram.aoram_write(oid, pos,
 					AVLNode@m{K, V}(key = kp, value = vp,
 						left = next, right = b,
 						lDepth = dp, rDepth = dbp));
-				nid = AVLId@m(id = id, id = pos);
+				nid = AVLId@m(id = oid, pos = pos);
 				nowDepth = dp;
 			} else if (ld - rd >= 2) {
-				id, pos = nid;
-				tnodes = this.poram.aoram_retrieve(id, pos);
-				this.IDs.stack_op(id, PUSH);
+				oid, pos = nid;
+				tnodes = this.poram.aoram_retrieve(oid, pos);
+				//this.IDs.stack_op(id, PUSH);
 				k, v, dc, c, l = 
 					tnodes.(key, value, rDepth, right, left);
 					
@@ -222,14 +229,14 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 				dp = dp + 1;
 				next = AVLId@m(id = id, pos = pos);
 				
-				id = this.IDs.stack_op(0, POP);
+				//id = this.IDs.stack_op(0, POP);
 				pos = RND(m);
 				int@m hpos = pos;
-				this.poram.aoram_write(id, pos,
+				this.poram.aoram_write(oid, pos,
 					AVLNode@m{K, V}(key = kp, value = vp,
 						left = a, right = next,
 						lDepth = dap, rDepth = dp));
-				nid = AVLId@m(id = id, pos = pos);
+				nid = AVLId@m(id = oid, pos = pos);
 				nowDepth = dp;
 			}
 		}
@@ -238,7 +245,7 @@ void AVLTree@m<K, V>.insert(K key, V value, int2 cmp(K, K)) {
 }
 
 
-V AVLTree@m<K, V>.search(K key, V value, int2 cmp(K, K)) {
+V AVLTree@m<K, V>.search(K key, int2 cmp(K, K)) {
 	AVLNode@m<K, V> tnodes, p;
 	AVLId@m now = this.root, go, a, b, c;
 	AVLId@m[public 3*m/2] left;
@@ -251,7 +258,7 @@ V AVLTree@m<K, V>.search(K key, V value, int2 cmp(K, K)) {
 	rnd@m pos;
 	
 	K k, kp; V v, vp;
-	int@(m+1) dl, dr;
+	//int@(m+1) dl, dr;
 	AVLId@m lf, rf, go;
 	
 	V ret;
@@ -273,16 +280,16 @@ V AVLTree@m<K, V>.search(K key, V value, int2 cmp(K, K)) {
 		cres[i] = cmp(keys[i], key);
 		if(ind == 0) {
 			if(cres[i] > 0) {
-				depth[i] = dr;
+				depth[i] = rd;
 				go = lf;
 				left[i] = rf;
 			} else {
-				depth[i] = dl;
+				depth[i] = ld;
 				go = rf;
 				left[i] = lf;
 			}
 			if(cres[i] == 0) {
-				ret = value;
+				ret = values[i];
 				ind = 1;
 			}
 			now = go;
@@ -300,7 +307,7 @@ V AVLTree@m<K, V>.search(K key, V value, int2 cmp(K, K)) {
 			pos = RND(m);
 			int@m hpos = pos;
 			next = AVLId@m(id = id, pos = pos);
-			if(cres[i] >= 0) {
+			if(cres[i] > 0) {
 				ld = nowDepth;
 				rd = depth[i];
 				ll = nid;

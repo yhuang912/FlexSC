@@ -11,7 +11,6 @@ import org.junit.Test;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
-import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
@@ -23,6 +22,7 @@ public class TestPriorityQueue {
 	java.util.PriorityQueue<Integer> cstack = new java.util.PriorityQueue<Integer>();
 	// SecureRandom rnd = new SecureRandom();
 	Random rnd = new Random(12345);
+//	Random rnd = new Random();
 	int[] op;
 	int[] next;
 
@@ -31,7 +31,7 @@ public class TestPriorityQueue {
 		for (int i = 0; i < op.length; ++i)
 			op[i] = rnd.nextInt(2);
 		int size = 0;
-		for (int i = 0; i < length; ++i) {
+		for (int i = 0; i < length/2; ++i) {
 			if (size == 0) {
 				op[i] = 0;
 			}
@@ -41,6 +41,14 @@ public class TestPriorityQueue {
 				size--;
 			}
 		}
+		//
+		for (int i = 0; i < length/2; ++i) {
+				op[i] = 0;
+		}
+		for (int i = 0; i < length/2; ++i) {
+			op[length/2+i] = 1;
+		}
+		
 		next = new int[length];
 		for (int i = 0; i < next.length; ++i)
 			next[i] = i + 1;
@@ -51,6 +59,9 @@ public class TestPriorityQueue {
 			next[a] = next[b];
 			next[b] = tmp;
 		}
+//		next[0] = 3;
+//		next[1] = 0;
+//		op[0] = 1;
 	}
 
 	boolean debug = false;
@@ -58,43 +69,51 @@ public class TestPriorityQueue {
 	public void compute(CompEnv<Boolean> env, PriorityQueue<BoolArray> ostack,
 			IntegerLib<Boolean> lib) throws Exception {
 		double[] time = new double[op.length];
+		BoolArray tmp1 = new BoolArray(env, lib);
+		tmp1.data = env.inputOfAlice(Utils.fromInt(15, 32));
+		ostack.init();
+		ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(15, 32)), 
+				tmp1, lib.SIGNAL_ZERO);
+		ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(15, 32)), 
+				tmp1, lib.SIGNAL_ONE);
 
+		
 		for (int i = 0; i < op.length; ++i) {
 
 			if (op[i] == 1 && m == Mode.VERIFY) {
 				int res = 0;
 				if (env.getParty() == Party.Alice) {
-					res = cstack.poll();
+//					res = cstack.poll();
 				}
 				BoolArray tmp = new BoolArray(env, lib);
-				KeyValue<BoolArray> scres = ostack.pqueue_op(
-						env.inputOfAlice(Utils.fromInt(0, 32)), tmp,
-						lib.toSignals(1, 2));
+				KeyValue<BoolArray> scres = ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(0, 32)), tmp,lib.SIGNAL_ONE);
+//				KeyValue<BoolArray> scres = ostack.pop(lib.SIGNAL_ONE);
+				
 				int srintres = Utils.toInt(env.outputToAlice(scres.key));
 				int ssize = Utils.toInt(env.outputToAlice(ostack.size));
 				if (env.getParty() == Party.Alice && m == Mode.VERIFY) {
 					System.out.println(env.getParty() + "pop " + (100 - res)
-							+ " " + srintres + " " + i + ", " + cstack.size()
-							+ " " + ssize);// cstack.size());
+							+ " " + srintres);
 					// Assert.assertEquals(100-res, srintres);
 				}
 			} else {
-				int rand = next[i];// rnd.nextInt(100);
+				int rand = next[i];
 				BoolArray tmp = new BoolArray(env, lib);
 				Boolean[] in = env.inputOfAlice(Utils.fromInt(rand, 32));
 				if(m == Mode.REAL && env.getParty() == Party.Alice) {
 					System.gc();
 					double a = System.nanoTime();
-					ostack.pqueue_op(in, tmp, lib.toSignals(0, 2));
+					ostack.pqueue_op(in, tmp, lib.SIGNAL_ZERO);
+//					ostack.push(in, tmp, lib.SIGNAL_ONE);
 					time[i] = (System.nanoTime()-a)/1000000000.0;
 				} else 
-					ostack.pqueue_op(in, tmp, lib.toSignals(0, 2));
+					ostack.pqueue_op(in, tmp, lib.SIGNAL_ZERO);
+//					ostack.push(in, tmp, lib.SIGNAL_ONE);
 				
 				int ssize = Utils.toInt(env.outputToAlice(ostack.size));
 				if (env.getParty() == Party.Alice && m == Mode.VERIFY) {
 					cstack.add(100 - rand);
-					System.out.println(env.getParty() + "push " + rand + "    "
-							+ i + ", " + cstack.size() + " " + ssize);
+					System.out.println(env.getParty() + "push " + rand);
 				}
 			}
 
@@ -183,10 +202,10 @@ public class TestPriorityQueue {
 
 	@Test
 	public void runThreads() throws Exception {
-		getInput(100);
+		getInput(11);
 		m = Mode.VERIFY;
-		GenRunnable gen = new GenRunnable(20);
-		EvaRunnable eva = new EvaRunnable(20);
+		GenRunnable gen = new GenRunnable(10);
+		EvaRunnable eva = new EvaRunnable(10);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
 		tGen.start();

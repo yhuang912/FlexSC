@@ -13,12 +13,12 @@ public class TestSparseMatrixAb extends TestSparseMatrix<Boolean> {
 	@Test
 	public void testAllCases() throws Exception {
 		for (int i = 0; i < 1; i++) {
-			double[][] d1 = randomMatrix(5, 5, 0.5);
-			double[][] d2 = randomMatrix(5, 1, 1);
+			double[][] d1 = randomMatrix(50, 50, 0.001);
+			double[][] d2 = randomMatrix(50, 1, 0.01);
 			for (int k = 0; k < 5; ++k)
 				d2[k][0] = k+1;
 
-			runThreads(new Helper(d1, d2, 0.5) {
+			runThreads(new Helper(d1, d2, 0.001) {
 				@Override
 				public MatrixNode<Boolean>[] secureCompute(
 						MatrixNode<Boolean>[] a, MatrixNode<Boolean>[] b,

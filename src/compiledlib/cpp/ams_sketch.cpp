@@ -1,18 +1,18 @@
-#define delta 10
-#define width 1000
+#define delta 5
+#define width 5000
 
 typedef intp_ = public int;
 typedef ints_ = secure int;
 
-ints_64 RND(intp_32 bit) = native lib.randBools;
+ints_64 RND(intp_32 bit) = native intLib.randBools;
 
 struct ams_sketch{
-   ints_64[public 10][public 6] hash_seed; 
-   ints_64[public 10][1000]sketch;
+   ints_64[public delta][public 6] hash_seed; 
+   ints_64[public delta][width]sketch;
 };
 
 void ams_sketch.init() {
-   for(intp_32 i = 0; i < 10; i = i + 1)
+   for(intp_32 i = 0; i < delta; i = i + 1)
       for(intp_32 j = 0; j < 6; j = j + 1) 
          this.hash_seed[i][j] = RND(64);
 }
@@ -24,7 +24,7 @@ ints_64 ams_sketch.fast_mod(ints_64 v) {
 
 ints_64 ams_sketch.hash2(intp_32 row_number, ints_64 element) {
    ints_64 h = this.hash_seed[0][0]+this.hash_seed[row_number][1];
-   return this.fast_mod(h) % 1000;
+   return this.fast_mod(h) % width;
 }
 
 ints_64 ams_sketch.hash4(intp_32 row_number, ints_64 element) {
@@ -36,7 +36,7 @@ ints_64 ams_sketch.hash4(intp_32 row_number, ints_64 element) {
 }
 
 void ams_sketch.insert(ints_64 element, ints_64 frequency) {
-   for(intp_32 i = 0; i < 10; i = i + 1) {
+   for(intp_32 i = 0; i < delta; i = i + 1) {
       ints_64 pos = this.hash2(i, element);
       ints_64 h4 = this.hash4(i, element);
       if(h4 == 0)
@@ -47,16 +47,16 @@ void ams_sketch.insert(ints_64 element, ints_64 frequency) {
 }
 
 ints_64 ams_sketch.query(ints_64 element) {
-   int64[public 10] res;
-   for(intp_32 i = 0; i < 10; i = i + 1) {
+   int64[public delta] res;
+   for(intp_32 i = 0; i < delta; i = i + 1) {
       res[i] = 0;
-      for(intp_32 j = 0; j < 1000; j = j + 1) {
+      for(intp_32 j = 0; j < width; j = j + 1) {
          res[i] = res[i] + this.sketch[i][j]*this.sketch[i][j];
       }
    }
 
-   for(i = 0; i < 10; i = i + 1) {
-      for(j = 0; j < 10; j = j + 1) {
+   for(i = 0; i < delta; i = i + 1) {
+      for(j = 0; j < delta; j = j + 1) {
          if(res[i] < res[j]) {
             res[i] = res[i] ^ res[j];
             res[j] = res[i] ^ res[j];
@@ -64,5 +64,5 @@ ints_64 ams_sketch.query(ints_64 element) {
          }
       }
    }
-   return res[5];
+   return res[delta/2];
 }

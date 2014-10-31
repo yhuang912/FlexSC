@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/wangxiao/git/FlexSC_rc/src/compiledlib/cpp/prim.cpp
+queue
+-
+iostream
+-
+algorithm
+-
+vector
+-
+

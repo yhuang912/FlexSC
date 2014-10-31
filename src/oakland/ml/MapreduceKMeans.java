@@ -127,8 +127,8 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 	}
 
 	static public void main(String args[]) throws InterruptedException {
-		for(int i = 1024; i <= 1024; i*=2) {
-			for(int l = 1024; l <= 1024; l*=2){
+		for(int i = 10; i <= 1024; i*=2) {
+			for(int l = 4096; l <= 4096; l*=2){
 			k = i;
 			genreateData(l);
 			m = Mode.COUNT;

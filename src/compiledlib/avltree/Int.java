@@ -7,6 +7,7 @@ import flexsc.Party;
 import flexsc.CompEnv;
 import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
@@ -21,11 +22,13 @@ public class Int implements IWritable<Int, Boolean> {
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private int m;
 
-	public Int(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m) throws Exception {
+	public Int(CompEnv<Boolean> env, int m) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.val = env.inputOfAlice(Utils.fromInt(0, m));
 	}
@@ -50,7 +53,7 @@ public class Int implements IWritable<Int, Boolean> {
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		Int ret = new Int(env, intLib, m);
+		Int ret = new Int(env, m);
 		Boolean[] tmp;
 		int now = 0;
 		ret.val = new Boolean[m];

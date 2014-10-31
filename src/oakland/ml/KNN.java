@@ -30,7 +30,7 @@ public class KNN {
 		return res;
 	}
 
-	public static int k = 5;
+	public static int k = 10;
 	static public double[][] clearcor;
 	static public double[] clearlabel;
 	static public double[] clearcen;
@@ -171,10 +171,10 @@ public class KNN {
 
 	static public void main(String args[]) throws InterruptedException {
 		m = Mode.COUNT;
-		for(int dim = 1; dim <= 4; ++dim) {
-			for(int i =  3; i <= 18; i+=3) {
+		for(int dim = 2; dim <= 2; ++dim) {
+			for(int i =  10; i <= 10; i+=3) {
 				KNN.k = i;
-				preareData(3000, dim);
+				preareData(4096, dim);
 				GenRunnable gen = new GenRunnable();
 				EvaRunnable eva = new EvaRunnable();
 				Thread tGen = new Thread(gen);

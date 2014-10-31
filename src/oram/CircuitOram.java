@@ -66,6 +66,10 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		putPath(blocks, pos);
 	}
 
+	int initalValue = 0;
+	public void setInitialValue(int intial) {
+		initalValue = intial;
+	}
 	public T[] readAndRemove(T[] scIden, boolean[] pos,
 			boolean RandomWhenNotFound) {
 		PlainBlock[][] blocks = getPath(pos);
@@ -85,7 +89,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 
 			return finalRes.data;
 		} else {
-			return lib.mux(res.data, lib.zeros(res.data.length), res.isDummy);
+			return lib.mux(res.data, lib.toSignals(initalValue, res.data.length), res.isDummy);
 		}
 	}
 
@@ -138,7 +142,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		blocks = preparePlainPath(scPath);
 		putPath(blocks, path);
 		env.flush();
-		return lib.mux(res.data, lib.zeros(lengthOfData), res.isDummy);
+		return lib.mux(res.data, lib.toSignals(initalValue, res.data.length), res.isDummy);
 	}
 
 	public int cnttt = 0;
@@ -154,5 +158,4 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		env.flush();
 		ControlEviction();
 	}
-
 }

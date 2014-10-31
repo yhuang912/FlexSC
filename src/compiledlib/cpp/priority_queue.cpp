@@ -6,7 +6,7 @@
 
 typedef intp_ = public int;
 typedef ints_ = secure int;
-typedef intr_ = affine int;
+typedef intr_ = random int;
 typedef key_t = ints_32;
 typedef PORAM<T> = native CircuitOram;
 

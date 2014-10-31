@@ -7,6 +7,7 @@ import flexsc.Party;
 import flexsc.CompEnv;
 import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
@@ -22,18 +23,20 @@ public class AVLId implements IWritable<AVLId, Boolean> {
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private int m;
 
-	public AVLId(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m) throws Exception {
+	public AVLId(CompEnv<Boolean> env, int m) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.pos = intLib.randBools(m);
-		this.id = env.inputOfAlice(Utils.fromInt(0, m));
+		this.id = env.inputOfAlice(Utils.fromInt(0, 32));
 	}
 
 	public int numBits() {
-		return ((0)+(m))+(m);
+		return ((0)+(m))+(32);
 	}
 	public Boolean[] getBits() {
 		Boolean[] ret = new Boolean[this.numBits()];
@@ -55,15 +58,15 @@ public class AVLId implements IWritable<AVLId, Boolean> {
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		AVLId ret = new AVLId(env, intLib, m);
+		AVLId ret = new AVLId(env, m);
 		Boolean[] tmp;
 		int now = 0;
 		ret.pos = new Boolean[m];
 		System.arraycopy(data, now, ret.pos, 0, m);
 		now += m;
-		ret.id = new Boolean[m];
-		System.arraycopy(data, now, ret.id, 0, m);
-		now += m;
+		ret.id = new Boolean[32];
+		System.arraycopy(data, now, ret.id, 0, 32);
+		now += 32;
 		return ret;
 }
 

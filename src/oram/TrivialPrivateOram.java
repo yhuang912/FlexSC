@@ -22,6 +22,10 @@ public class TrivialPrivateOram<T> extends OramParty<T> {
 		result = prepareBlocks(bucket, bucket);
 	}
 
+	int InitialValue = 0;
+	public void setInitialValue(int initial) {
+		InitialValue = initial;
+	}
 	public void add(T[] iden, T[] data) {
 		T[] pos = env.newTArray(1);
 		pos[0] = lib.SIGNAL_ONE;
@@ -34,6 +38,7 @@ public class TrivialPrivateOram<T> extends OramParty<T> {
 	}
 
 	public T[] readAndRemove(T[] scIden, boolean randomWhennotFound) {
+		scIden = lib.padSignal(scIden, lengthOfIden);
 		Block<T> res = lib.readAndRemove(result, scIden);
 		T[] finalRes;
 		if (randomWhennotFound) {
@@ -41,7 +46,7 @@ public class TrivialPrivateOram<T> extends OramParty<T> {
 			Block<T> scb1 = inputBlockOfClient(b1);
 			finalRes = lib.mux(res.data, scb1.data, res.isDummy);
 		} else {
-			finalRes = lib.mux(res.data, lib.zeros(res.data.length),
+			finalRes = lib.mux(res.data, lib.toSignals(InitialValue, res.data.length),
 					res.isDummy);
 		}
 

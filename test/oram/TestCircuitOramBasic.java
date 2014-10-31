@@ -68,6 +68,7 @@ public class TestCircuitOramBasic {
 					client.write(client.lib.toSignals(element),
 							Utils.fromInt(oldValue, client.lengthOfPos),
 							scNewValue, scData);
+					System.out.println(client.toString());
 
 					os.write(0);
 					posMap[element] = newValue;
@@ -173,6 +174,7 @@ public class TestCircuitOramBasic {
 					server.write(server.lib.toSignals(element),
 							Utils.fromInt(oldValue, server.lengthOfPos),
 							scNewValue, scData);
+					server.toString();
 
 					// server.access(oldValue);
 					is.read();

@@ -1,12 +1,12 @@
-#define delta 10
-#define width 1000
+#define delta 5
+#define width 100
 typedef intp_ = public int;
 typedef ints_ = secure int;
-ints_64 RND(intp_32 bit) = native lib.randBools;
+ints_64 RND(intp_32 bit) = native intLib.randBools;
 
 struct count_min_sketch {
-   ints_64[public 10][public 2] hash_seed; 
-   ints_64[public 10][1000]sketch;
+   ints_64[public delta][public 2] hash_seed; 
+   ints_64[public delta][width]sketch;
 };
 
 void count_min_sketch.init() {

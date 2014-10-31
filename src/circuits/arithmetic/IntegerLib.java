@@ -208,7 +208,7 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 		T[] absoluteY = absolute(y);
 		T[] PA = divInternal(absoluteX, absoluteY);
 		T[] res = Arrays.copyOfRange(PA, y.length, PA.length);
-		return mux(res, sub(toSignals(0), res), Xneg);
+		return mux(res, sub(toSignals(0, res.length), res), Xneg);
 	}
 
 	public T[] addSign(T[] x, T sign) {

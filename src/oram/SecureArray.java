@@ -21,6 +21,13 @@ public class SecureArray<T> {
 		}
 	}
 
+	public void setInitialValue(int inital) {
+		if (useTrivialOram)
+			trivialOram.setInitialValue(inital);
+		else
+			 circuitOram.setInitialValue(inital);
+		
+	}
 	public T[] read(T[] iden) {
 		if (useTrivialOram)
 			return trivialOram.read(iden);
@@ -33,5 +40,17 @@ public class SecureArray<T> {
 			trivialOram.write(iden, data);
 		else
 			circuitOram.write(iden, data);
+	}
+	
+	public void conditionalWrite(T[] iden, T[]data, T condition) {
+		if(useTrivialOram) {
+		T[] readData = trivialOram.readAndRemove(iden);
+		T[] toAdd = trivialOram.lib.mux(readData, data, condition);
+		trivialOram.putBack(iden, toAdd);
+		}
+		else {
+			//op == 1 means write, 0 means read
+			circuitOram.access(iden, data, condition);
+		}
 	}
 }

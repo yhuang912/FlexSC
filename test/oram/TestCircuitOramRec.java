@@ -11,6 +11,21 @@ import gc.GCSignal;
 
 public class TestCircuitOramRec {
 
+	public  static void main(String args[]) throws Exception {
+		for(int i = 9; i <=16 ; i++) {
+			TestCircuitOramRec t = new TestCircuitOramRec();
+			GenRunnable gen = t.new GenRunnable(12345, i+1, 3, 16, 8, 6);
+			EvaRunnable eva = t.new EvaRunnable("localhost", 12345);
+			Thread tGen = new Thread(gen);
+			Thread tEva = new Thread(eva);
+			tGen.start();
+			Thread.sleep(10);
+			tEva.start();
+			tGen.join();
+			Flag.sw.print();
+			System.out.print("\n");
+		}
+	}
 	@Test
 	public void runThreads() throws Exception {
 		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 8, 6);
@@ -25,8 +40,8 @@ public class TestCircuitOramRec {
 		System.out.print("\n");
 	}
 
-	final static int writeCount = 1 << 7;
-	final static int readCount = (1 << 7);
+	final static int writeCount = 1;//1 << 7;
+	final static int readCount = 0;//(1 << 7);
 
 	public TestCircuitOramRec() {
 	}

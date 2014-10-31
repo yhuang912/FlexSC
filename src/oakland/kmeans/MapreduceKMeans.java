@@ -30,7 +30,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 
 	static int offset = 20;
 	static int fixPointLength = 32;
-	static final int k = 5;
+	static final int k = 10;
 	static final int lengthK = 5;
 	static int numEntries;
 	T[][] clusters;
@@ -128,9 +128,9 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 	}
 
 	static public void main(String args[]) throws InterruptedException {
-		genreateData(100);
+		genreateData(4096);
 
-		m = Mode.REAL;
+		m = Mode.COUNT;
 		GenRunnable env = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
 		Thread tGen = new Thread(env);

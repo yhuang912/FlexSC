@@ -54,32 +54,46 @@ public class TestAVL {
 
 	public class cmpp extends FUNC_1_INTsecure_T1_T1<BoolArray> {
 
+		FUNC_0_INTsecure_RECORDBoolArray_RECORDBoolArrayImpl cmp;
+		
 		public cmpp(CompEnv<java.lang.Boolean> env,
-				IntegerLib<java.lang.Boolean> lib, BoolArray factoryK)
+				BoolArray factoryK, 
+				FUNC_0_INTsecure_RECORDBoolArray_RECORDBoolArrayImpl cmp)
 				throws Exception {
-			super(env, lib, factoryK);
+			super(env, factoryK);
+			this.cmp = cmp;
 		}
 
 		@Override
 		public java.lang.Boolean[] calc(BoolArray x0, BoolArray x1)
 				throws Exception {
-			Boolean res = intLib.leq(x0.data, x1.data);
-			return new Boolean[]{res, intLib.SIGNAL_ZERO};
+			return cmp.calc(x0, x1);
 		}
 		
 	}
+	
 	public void compute(CompEnv<Boolean> env, AVLTree<BoolArray, BoolArray> ostack,
-			IntegerLib<Boolean> lib, int logN) throws Exception {
+			int logN) throws Exception {
 		ostack.init();
-		cmpp com = new cmpp(env, lib, new BoolArray(env, lib));
+//		System.out.println("initialization finished.");
+		
+		cmpp cmp = new cmpp(env, new BoolArray(env),
+				new FUNC_0_INTsecure_RECORDBoolArray_RECORDBoolArrayImpl(env)
+				);
+		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+		if(m == Mode.COUNT) {
+			((PMCompEnv) (env)).statistic.flush();
+		}
 		for (int i = 0; i < op.length; ++i) {
-			BoolArray k = new BoolArray(env, lib);
-			k.data = lib.toSignals(10, 32);
-			BoolArray v = new BoolArray(env, lib);
-			v.data = lib.toSignals(10, 32);
-			ostack.insert(k, v, com);
-			v = ostack.search(k, v, com);
-			System.out.println(lib.outputToAlice(v.data));
+			BoolArray k = new BoolArray(env);
+			k.data = lib.toSignals(i, 32);
+			BoolArray v = new BoolArray(env);
+			v.data = lib.toSignals(i, 32);
+//			System.out.println("inserting "+Utils.toInt(env.outputToAlice(k.data))+"\t"+Utils.toInt(env.outputToAlice(v.data)));
+			ostack.insert(k, v, cmp);
+			k.data = lib.toSignals(i-2, 32);
+//			BoolArray ret = ostack.search(k, cmp);
+//			System.out.println(Utils.toInt(env.outputToAlice(ret.data)));
 		}
 	}
 
@@ -96,30 +110,30 @@ public class TestAVL {
 		public void run() {
 			try {
 				listen(54321);
-				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-				BoolArray ba = new BoolArray(env, lib);
+				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
+//				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				BoolArray ba = new BoolArray(env);
 				ba.data = (Boolean[]) env.inputOfAlice(Utils.fromInt(0, 32));
 				AVLNode<BoolArray,BoolArray> node = new AVLNode<BoolArray,BoolArray>(
-						env, lib, logN, ba, ba);
-				IntStackNode intstacknode = new IntStackNode(env, lib, logN); 
-				IntStack intstack = new IntStack(env, lib, logN, new CircuitOram<Boolean>(env, 1 << logN, intstacknode.numBits()));
+						env, logN, ba, ba);
+				IntStackNode intstacknode = new IntStackNode(env, logN); 
+				IntStack intstack = new IntStack(env, logN, new CircuitOram<Boolean>(env, 1 << logN, intstacknode.numBits()));
 				AVLTree<BoolArray, BoolArray> ostack = new AVLTree<BoolArray, BoolArray>(
 						env,
-						lib,
+//						lib,
 						logN, ba, ba,
-						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()), intstack);
+						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
 					sta.flush();
 				}
-				compute(env, ostack, lib, logN);
+				compute(env, ostack, logN);
 				disconnect();
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
 					sta.finalize();
-					System.out.print(sta.andGate + "\t" + sta.NumEncAlice
-							+ "\t");
+//					System.out.print(sta.andGate + "\t" + sta.NumEncAlice
+//							+ "\t");
 				}
 
 			} catch (Exception e) {
@@ -141,19 +155,19 @@ public class TestAVL {
 				connect("localhost", 54321);
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-				BoolArray ba = new BoolArray(env, lib);
+				BoolArray ba = new BoolArray(env);
 				ba.data = (Boolean[]) env.inputOfAlice(Utils.fromInt(0, 32));
 				AVLNode<BoolArray,BoolArray> node = new AVLNode<BoolArray,BoolArray>(
-						env, lib, logN, ba, ba);
-				IntStackNode intstacknode = new IntStackNode(env, lib, logN); 
-				IntStack intstack = new IntStack(env, lib, logN, new CircuitOram<Boolean>(env, 1 << logN, intstacknode.numBits()));
+						env, logN, ba, ba);
+				IntStackNode intstacknode = new IntStackNode(env, logN); 
+				IntStack intstack = new IntStack(env, logN, new CircuitOram<Boolean>(env, 1 << logN, intstacknode.numBits()));
 				AVLTree<BoolArray, BoolArray> ostack = new AVLTree<BoolArray, BoolArray>(
 						env,
-						lib,
+//						lib,
 						logN, ba, ba,
-						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()), intstack);
+						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
 				
-				compute(env, ostack, lib, logN);
+				compute(env, ostack, logN);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -164,7 +178,7 @@ public class TestAVL {
 
 	@Test
 	public void runThreads() throws Exception {
-		getInput(10);
+		getInput(100);
 		m = Mode.VERIFY;
 		GenRunnable gen = new GenRunnable(5);
 		EvaRunnable eva = new EvaRunnable(5);
@@ -190,18 +204,19 @@ public class TestAVL {
 		return gen.sta;
 	}
 
-	public static void main(String[] args) throws InterruptedException {
-		int logN = new Integer(args[0]);
-		TestAVL a = new TestAVL();
-		a.getInput(10);
-		a.m = Mode.REAL;
-		GenRunnable gen = a.new GenRunnable(logN);
-		EvaRunnable eva = a.new EvaRunnable(logN);
-		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start();
-		Thread.sleep(5);
-		tEva.start();
-		tGen.join();
+	public static void main(String[] args) throws Exception {
+		new TestAVL().runThreads();
+//		int logN = 5;
+//		TestAVL a = new TestAVL();
+//		a.getInput(10);
+//		a.m = Mode.REAL;
+//		GenRunnable gen = a.new GenRunnable(logN);
+//		EvaRunnable eva = a.new EvaRunnable(logN);
+//		Thread tGen = new Thread(gen);
+//		Thread tEva = new Thread(eva);
+//		tGen.start();
+//		Thread.sleep(5);
+//		tEva.start();
+//		tGen.join();
 	}
 }

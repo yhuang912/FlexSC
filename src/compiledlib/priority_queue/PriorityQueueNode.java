@@ -1,25 +1,40 @@
 package compiledlib.priority_queue;
-import circuits.arithmetic.IntegerLib;
+import java.security.SecureRandom;
+import oram.SecureArray;
+import oram.CircuitOram;
+import flexsc.Mode;
+import flexsc.Party;
 import flexsc.CompEnv;
+import java.util.BitSet;
+import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
+import util.Utils;
+import gc.regular.GCEva;
+import gc.regular.GCGen;
+import gc.GCSignal;
+import java.util.Arrays;
+import java.util.Random;
 import flexsc.IWritable;
+import flexsc.Comparator;
+import java.lang.reflect.Array;
 public class PriorityQueueNode<T extends IWritable<T,Boolean>> implements IWritable<PriorityQueueNode<T>, Boolean> {
 	public NodeId left;
 	public KeyValue<T> keyvalue;
 	public NodeId right;
 
-	private CompEnv<Boolean> env;
-	private IntegerLib<Boolean> lib;
+	public CompEnv<Boolean> env;
+	public IntegerLib<Boolean> intLib;
 	private T factoryT;
 	private int m;
 
-	public PriorityQueueNode(CompEnv<Boolean> env, IntegerLib<Boolean> lib, int m, T factoryT) throws Exception {
+	public PriorityQueueNode(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m, T factoryT) throws Exception {
 		this.env = env;
-		this.lib = lib;
+		this.intLib = intLib;
 		this.m = m;
 		this.factoryT = factoryT;
-		this.left = new NodeId(env, lib, m);
-		this.keyvalue = new KeyValue<T>(env, lib, m, factoryT);
-		this.right = new NodeId(env, lib, m);
+		this.left = new NodeId(env, intLib, m);
+		this.keyvalue = new KeyValue<T>(env, intLib, m, factoryT);
+		this.right = new NodeId(env, intLib, m);
 	}
 
 	public int numBits() {
@@ -50,23 +65,23 @@ public class PriorityQueueNode<T extends IWritable<T,Boolean>> implements IWrita
 	public PriorityQueueNode<T> newObj(Boolean[] data) throws Exception {
 		if(data == null) {
 			data = new Boolean[this.numBits()];
-			for(int i=0; i<this.numBits(); ++i) { data[i] = lib.SIGNAL_ZERO; }
+			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		PriorityQueueNode<T> ret = new PriorityQueueNode<T>(env, lib, m, factoryT);
+		PriorityQueueNode<T> ret = new PriorityQueueNode<T>(env, intLib, m, factoryT);
 		Boolean[] tmp;
 		int now = 0;
-		ret.left = new NodeId(env, lib, m);
+		ret.left = new NodeId(env, intLib, m);
 		tmp = new Boolean[this.left.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;
 		ret.left = ret.left.newObj(tmp);
-		ret.keyvalue = new KeyValue<T>(env, lib, m, factoryT);
+		ret.keyvalue = new KeyValue<T>(env, intLib, m, factoryT);
 		tmp = new Boolean[this.keyvalue.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;
 		ret.keyvalue = ret.keyvalue.newObj(tmp);
-		ret.right = new NodeId(env, lib, m);
+		ret.right = new NodeId(env, intLib, m);
 		tmp = new Boolean[this.right.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;

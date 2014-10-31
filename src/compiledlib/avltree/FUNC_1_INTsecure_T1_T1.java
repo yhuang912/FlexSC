@@ -7,6 +7,7 @@ import flexsc.Party;
 import flexsc.CompEnv;
 import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
@@ -19,11 +20,13 @@ import java.lang.reflect.Array;
 abstract public class FUNC_1_INTsecure_T1_T1<K extends IWritable<K,Boolean>> {
 	CompEnv<Boolean> env;
 	IntegerLib<Boolean> intLib;
+	FloatLib<Boolean> floatLib;
 	K factoryK;
 
-	public FUNC_1_INTsecure_T1_T1(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, K factoryK) throws Exception {
+	public FUNC_1_INTsecure_T1_T1(CompEnv<Boolean> env, K factoryK) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.factoryK = factoryK;
 	}
 
