@@ -12,7 +12,7 @@ import flexsc.CompEnv;
 
 public abstract class GraphNode<T> {
 
-	static int VERTEX_LEN = 14;
+	static int VERTEX_LEN = 16;
 
 	public T[] u;
 	public T[] v;
