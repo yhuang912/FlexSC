@@ -256,6 +256,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			aa[i] = new MFNode<T>(u[i], v[i], isVertex[i], rating[i], userProfile[i], itemProfile[i], env);
 		}
 
+		System.out.println("Started");
 		long scatter1 = 0, scatter2 = 0, gradient = 0, gather1 = 0, gather2 = 0, communicateS1 = 0;
 		long communicateS2 = 0, communicateG1 = 0, communicateG2 = 0, communicateSort = 0;
 //		print(machineId, env, aa);
@@ -264,6 +265,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		new SortGadget<T>(env, machine)
 				.setInputs(aa, aa[0].getComparator(env, true /* isVertexLast */))
 				.compute();
+		System.out.println("Sort complete");
 		long bootstrap = System.nanoTime();
 		for (int it = 0; it < ITERATIONS; it++) {
 			// scatter user profiles
