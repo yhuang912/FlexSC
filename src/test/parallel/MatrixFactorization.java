@@ -267,6 +267,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				.compute();
 		System.out.println("Sort complete");
 		long bootstrap = System.nanoTime();
+		System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootstrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
 		for (int it = 0; it < ITERATIONS; it++) {
 			// scatter user profiles
 			communicateS1 += (long) new ScatterToEdgesRight<T>(env, machine, false /* isEdgeIncoming */) {
@@ -282,6 +283,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			}.setInputs(aa).compute();
 
 			scatter1 = System.nanoTime();
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter1 - bootstrap)/1000000000.0 + "," + "Scatter 1" + "," + env.getParty().name());
 			// scatter item profiles
 			communicateS2 += (long) new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
 	
@@ -296,12 +298,14 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			}.setInputs(aa).compute();
 
 			scatter2 = System.nanoTime();
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter2 - scatter1)/1000000000.0 + "," + "Scatter 2" + "," + env.getParty().name());
 			// compute gradient
 			new ComputeGradient<T>(env, machine)
 				.setInputs(aa)
 				.compute();
 
 			gradient = System.nanoTime();
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient" + "," + env.getParty().name());
 ////			printResult(machineId, env, aa);
 			// update item profiles
 			communicateG1 += (long) new GatherFromEdgesRight<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env)) {
@@ -335,6 +339,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			}.setInputs(aa).compute();
 
 			gather1 = System.nanoTime();
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1" + "," + env.getParty().name());
 			// update user profiles
 			communicateG2 += (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env)) {
 	
@@ -370,23 +375,23 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 			gather2 = System.nanoTime();
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2" + "," + env.getParty().name());
 		}
 
 		communicateSort += (long) new SortGadget<>(env, machine)
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
 		long endTime = System.nanoTime();
+		System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
 //		output(machineId, machine, env, startTime, endTime);
 
 		
 		if (Mode.REAL.equals(env.getMode())) {
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootstrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter1 - bootstrap)/1000000000.0 + "," + "Scatter 1" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter2 - scatter1)/1000000000.0 + "," + "Scatter 2" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
+			
+			
+			
+			
+			
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS1)/1000000000.0 + "," + "Communication time S1" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS2)/1000000000.0 + "," + "Communication time S2" + "," + env.getParty().name());
@@ -394,6 +399,21 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG2)/1000000000.0 + "," + "Communication time G2" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication time sort" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - bootstrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
+
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootstrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter1 - bootstrap)/1000000000.0 + "," + "Scatter 1" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter2 - scatter1)/1000000000.0 + "," + "Scatter 2" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS1)/1000000000.0 + "," + "Communication time S1" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS2)/1000000000.0 + "," + "Communication time S2" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG1)/1000000000.0 + "," + "Communication time G1" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG2)/1000000000.0 + "," + "Communication time G2" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication time sort" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - bootstrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
 		} else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
