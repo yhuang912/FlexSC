@@ -17,7 +17,7 @@ import circuits.arithmetic.IntegerLib;
 public class TestCircuitLib extends TestHarness {
 	Random rnd = new Random();
 	
-	//@Test
+	@Test
 	public void testHammingDistance() throws Exception {
 		
 		for (int i = 0; i < testCases; i++) {
