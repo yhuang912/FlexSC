@@ -244,6 +244,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		final FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
 				MFNode.FIX_POINT_WIDTH,
 				MFNode.OFFSET);
+		final IntegerLib<T> lib = new IntegerLib<>(env);
 		T[][] u = (T[][]) ((Object[]) machine.input)[0];
 		T[][] v = (T[][]) ((Object[]) machine.input)[1];
 		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
@@ -255,6 +256,8 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		for (int i = 0; i < aa.length; i++) {
 			aa[i] = new MFNode<T>(u[i], v[i], isVertex[i], rating[i], userProfile[i], itemProfile[i], env);
 		}
+
+		final T[] twoGammaLambda = fixedPointLib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.LAMBDA);
 
 		System.out.println("Started");
 		long scatter1 = 0, scatter2 = 0, gradient = 0, gather1 = 0, gather2 = 0, communicateS1 = 0;
@@ -277,7 +280,6 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 						GraphNode<T> edgeNode, T isVertex) {
 					MFNode<T> vertex = (MFNode<T>) vertexNode;
 					MFNode<T> edge = (MFNode<T>) edgeNode;
-					IntegerLib<T> lib = new IntegerLib<>(env);
 					edge.userProfile = lib.mux(vertex.userProfile, edge.userProfile, isVertex);
 				}
 			}.setInputs(aa).compute();
@@ -292,7 +294,6 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 						GraphNode<T> edgeNode, T isVertex) {
 					MFNode<T> vertex = (MFNode<T>) vertexNode;
 					MFNode<T> edge = (MFNode<T>) edgeNode;
-					IntegerLib<T> lib = new IntegerLib<>(env);
 					edge.itemProfile = lib.mux(vertex.itemProfile, edge.itemProfile, isVertex);
 				}
 			}.setInputs(aa).compute();
@@ -326,10 +327,8 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
 					MFNode<T> agg = (MFNode<T>) aggNode;
 					MFNode<T> b = (MFNode<T>) bNode;
-					IntegerLib<T> lib = new IntegerLib<>(env);
 					for (int i = 0; i < agg.itemProfile.length; i++) {
 						T[] edgeNodeAgg = fixedPointLib.add(agg.itemProfile[i], b.itemProfile[i]);
-						T[] twoGammaLambda = fixedPointLib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.MU);
 						T[] reg = fixedPointLib.multiply(twoGammaLambda, b.itemProfile[i]);
 						T[] total = fixedPointLib.add(edgeNodeAgg, reg);
 						// add 2 gamma lambta s6,k to agg
@@ -347,9 +346,6 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				public GraphNode<T> aggFunc(GraphNode<T> aggNode, GraphNode<T> bNode) {
 					MFNode<T> agg = (MFNode<T>) aggNode;
 					MFNode<T> b = (MFNode<T>) bNode;
-					FixedPointLib<T> fixedPointLib = new FixedPointLib<T>(env,
-							MFNode.FIX_POINT_WIDTH,
-							MFNode.OFFSET);
 					MFNode<T> ret = new MFNode<>(env);
 					for (int i = 0; i < ret.userProfile.length; i++) {
 						ret.userProfile[i] = fixedPointLib.add(agg.userProfile[i], b.userProfile[i]);
@@ -361,15 +357,10 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 				public void writeToVertex(GraphNode<T> aggNode, GraphNode<T> bNode) {
 					MFNode<T> agg = (MFNode<T>) aggNode;
 					MFNode<T> b = (MFNode<T>) bNode;
-					IntegerLib<T> lib = new IntegerLib<>(env);
-					FixedPointLib<T> flib = new FixedPointLib<>(env,
-							MFNode.FIX_POINT_WIDTH,
-							MFNode.OFFSET);
 					for (int i = 0; i < agg.userProfile.length; i++) {
-						T[] edgeNodeAgg = flib.add(agg.userProfile[i], b.userProfile[i]);
-						T[] twoGammaLambda = flib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.LAMBDA);
-						T[] reg = flib.multiply(twoGammaLambda, b.userProfile[i]);
-						T[] total = flib.add(edgeNodeAgg, reg);
+						T[] edgeNodeAgg = fixedPointLib.add(agg.userProfile[i], b.userProfile[i]);
+						T[] reg = fixedPointLib.multiply(twoGammaLambda, b.userProfile[i]);
+						T[] total = fixedPointLib.add(edgeNodeAgg, reg);
 						b.userProfile[i] = lib.mux(b.userProfile[i], total, b.isVertex);
 					}
 				}
