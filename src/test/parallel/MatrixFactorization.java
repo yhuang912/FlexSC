@@ -307,6 +307,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 
 			gradient = System.nanoTime();
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient" + "," + env.getParty().name());
+			System.gc();
 ////			printResult(machineId, env, aa);
 			// update item profiles
 			communicateG1 += (long) new GatherFromEdgesRight<T>(env, machine, true /* isEdgeIncoming */, new MFNode<>(env)) {
@@ -339,6 +340,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 
 			gather1 = System.nanoTime();
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1" + "," + env.getParty().name());
+			System.gc();
 			// update user profiles
 			communicateG2 += (long) new GatherFromEdges<T>(env, machine, false /* isEdgeIncoming */, new MFNode<>(env)) {
 	
