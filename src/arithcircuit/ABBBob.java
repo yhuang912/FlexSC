@@ -5,22 +5,23 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 
 import network.RWBigInteger;
-import util.paillier.Paillier;
+import paillier.PublicKey;
 import flexsc.CompEnv;
 import flexsc.Party;
 
 public class ABBBob extends ABBParty{
 
-	Paillier paillier = new Paillier();
+	public PublicKey pk = new PublicKey();
 	public ABBBob(InputStream is, OutputStream os) {
 		super(is, os, Party.Bob);
-		paillier.n = RWBigInteger.readBI(is);
-		paillier.nsquare = paillier.n.multiply(paillier.n);
+		pk.n = RWBigInteger.readBI(is);
+		pk.modulous = RWBigInteger.readBI(is);
+		pk.k1 = ABBAlice.securityParameter;
 	}
 
 	@Override
 	public BigInteger inputOfBob(BigInteger a) {
-		BigInteger rand = new BigInteger(paillier.bitLength, CompEnv.rnd);
+		BigInteger rand = new BigInteger(ABBAlice.securityParameter, CompEnv.rnd);
 		RWBigInteger.writeBI(os, rand);
 		flush();
 		return a.subtract(rand);
@@ -33,35 +34,34 @@ public class ABBBob extends ABBParty{
 
 	@Override
 	public BigInteger add(BigInteger a, BigInteger b) {
-		return a.add(b).mod(paillier.n);
+		return a.add(b).mod(pk.n);
 	}
 
 	@Override
 	public BigInteger multiply(BigInteger a, BigInteger b) {
-		BigInteger r1 = new BigInteger(paillier.bitLength, CompEnv.rnd);
-		BigInteger r2 = new BigInteger(paillier.bitLength, CompEnv.rnd);
+		BigInteger r1 = new BigInteger(pk.k1, CompEnv.rnd);
+		BigInteger r2 = new BigInteger(pk.k1, CompEnv.rnd);
 		RWBigInteger.writeBI(os, r1.add(a));
 		RWBigInteger.writeBI(os, r2.add(b));
 		flush();
 
-		BigInteger encA2 = paillier.Encryption(a);
-		BigInteger encB2 = paillier.Encryption(b);
-		
-		
+		BigInteger encA2 = paillier.Paillier.encrypt(a, pk);
+		BigInteger encB2 = paillier.Paillier.encrypt(b, pk);
 		BigInteger encA1 = RWBigInteger.readBI(is);
-		BigInteger encA = paillier.multiply(paillier.add(encA2, encA1), r2.negate());
+		BigInteger encA = paillier.Paillier.multiply(
+				paillier.Paillier.add(encA2, encA1, pk), r2.negate(), pk);
 		BigInteger encB1 = RWBigInteger.readBI(is);
-		BigInteger encB = paillier.multiply(paillier.add(encB2, encB1), r1.negate());
-		
-
+		BigInteger encB = paillier.Paillier.multiply(
+				paillier.Paillier.add(encB2, encB1, pk), r1.negate(), pk);
+	
 		BigInteger paddedmul = RWBigInteger.readBI(is);
-		BigInteger res = paillier.add(paddedmul, encB);
-		res = paillier.add(res, encA);
+		BigInteger res = paillier.Paillier.add(paddedmul, encB, pk);
+		res = paillier.Paillier.add(res, encA, pk);
 
 		RWBigInteger.writeBI(os, res);
 		flush();
 		
-		return r1.multiply(r2).negate().mod(paillier.n);
+		return r1.multiply(r2).negate().mod(pk.n);
 	}
 
 	@Override

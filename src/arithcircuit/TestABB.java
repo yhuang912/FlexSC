@@ -11,6 +11,7 @@ import flexsc.CompEnv;
 
 public class TestABB  {
 
+	static int bitlength = 512;
 	static BigInteger v1 = null;
 	static BigInteger v2 = null;
 
@@ -21,8 +22,8 @@ public class TestABB  {
 	}
 	
 	public void testACase() throws InterruptedException {
-		v1 = new BigInteger(1024, CompEnv.rnd);
-		v2 = new BigInteger(1024, CompEnv.rnd);
+		v1 = new BigInteger(bitlength, CompEnv.rnd);
+		v2 = new BigInteger(bitlength, CompEnv.rnd);
 		GenRunnable gen = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
 
@@ -36,7 +37,7 @@ public class TestABB  {
 		public void run() {
 			try {
 				listen(54321);
-				ABBAlice alice = new ABBAlice(is, os, 1024);
+				ABBAlice alice = new ABBAlice(is, os, bitlength);
 
 				BigInteger	a = alice.inputOfAlice(v1);
 				BigInteger b = alice.inputOfBob(BigInteger.ZERO);
@@ -44,8 +45,8 @@ public class TestABB  {
 				BigInteger c = alice.multiply(a, b);
 				System.out.println((System.nanoTime()-d1)/1000000000);
 				BigInteger rr = alice.outputToAlice(c);
-//				System.out.println("!");
-				Assert.assertTrue((rr.equals(v1.multiply(v2).mod(alice.paillier.n))));
+//				System.out.println(rr);
+				Assert.assertTrue((rr.equals(v1.multiply(v2).mod(alice.pk.n))));
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();

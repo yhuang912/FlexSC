@@ -5,24 +5,27 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 
 import network.RWBigInteger;
-import util.paillier.Paillier;
+import paillier.PrivateKey;
+import paillier.PublicKey;
 import flexsc.CompEnv;
 import flexsc.Party;
 
 public class ABBAlice extends ABBParty{
 
-	static final int securityParameter = 80;
-	public Paillier paillier ;
+	static final int securityParameter = 512;
+	public PublicKey pk = new PublicKey();
+	public PrivateKey sk = new PrivateKey(securityParameter);
 	public ABBAlice(InputStream is, OutputStream os, int bitlength) {
 		super(is, os, Party.Alice);
-		paillier = new Paillier(bitlength, securityParameter);
-		RWBigInteger.writeBI(os, paillier.n);
+		paillier.Paillier.keyGen(sk,pk);
+		RWBigInteger.writeBI(os, pk.n);
+		RWBigInteger.writeBI(os, pk.modulous);
 		flush();
 	}
 
 	@Override
 	public BigInteger inputOfAlice(BigInteger a) {
-		BigInteger rand = new BigInteger(paillier.bitLength, CompEnv.rnd);
+		BigInteger rand = new BigInteger(securityParameter, CompEnv.rnd);
 		RWBigInteger.writeBI(os, rand);
 		flush();
 		return a.subtract(rand);
@@ -35,13 +38,13 @@ public class ABBAlice extends ABBParty{
 
 	@Override
 	public BigInteger add(BigInteger a, BigInteger b) {
-		return a.add(b).mod(paillier.n);
+		return a.add(b).mod(pk.n);
 	}
 
 	@Override
 	public BigInteger multiply(BigInteger a, BigInteger b) {
-		BigInteger encA = paillier.Encryption(a);
-		BigInteger encB = paillier.Encryption(b);
+		BigInteger encA = paillier.Paillier.encrypt(a, pk);
+		BigInteger encB = paillier.Paillier.encrypt(b, pk);
 		RWBigInteger.writeBI(os, encA);
 		RWBigInteger.writeBI(os, encB);
 		flush();
@@ -51,16 +54,16 @@ public class ABBAlice extends ABBParty{
 		BigInteger paddedB2 = RWBigInteger.readBI(is);
 		BigInteger paddedsumB2 = paddedB2.add(b);
 		
-		BigInteger paddedmul = paillier.Encryption(paddedsumA2.multiply(paddedsumB2));
+		BigInteger paddedmul = paillier.Paillier.encrypt(paddedsumA2.multiply(paddedsumB2), pk);
 		RWBigInteger.writeBI(os, paddedmul);
 		flush();
 		
-		return paillier.Decryption(RWBigInteger.readBI(is));
+		return paillier.Paillier.decrypt(RWBigInteger.readBI(is), sk);
 	}
 
 	@Override
 	public BigInteger outputToAlice(BigInteger a) {
-		return a.add(RWBigInteger.readBI(is)).mod(paillier.n);
+		return a.add(RWBigInteger.readBI(is)).mod(pk.n);
 	}
 
 }
