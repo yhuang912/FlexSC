@@ -16,6 +16,7 @@ public class ABBBob extends ABBParty{
 		super(is, os, Party.Bob);
 		pk.n = RWBigInteger.readBI(is);
 		pk.modulous = RWBigInteger.readBI(is);
+		pk.k1 = ABBAlice.securityParameter;
 	}
 
 	@Override
@@ -46,8 +47,6 @@ public class ABBBob extends ABBParty{
 
 		BigInteger encA2 = paillier.Paillier.encrypt(a, pk);
 		BigInteger encB2 = paillier.Paillier.encrypt(b, pk);
-		
-		
 		BigInteger encA1 = RWBigInteger.readBI(is);
 		BigInteger encA = paillier.Paillier.multiply(
 				paillier.Paillier.add(encA2, encA1, pk), r2.negate(), pk);
@@ -55,7 +54,6 @@ public class ABBBob extends ABBParty{
 		BigInteger encB = paillier.Paillier.multiply(
 				paillier.Paillier.add(encB2, encB1, pk), r1.negate(), pk);
 	
-
 		BigInteger paddedmul = RWBigInteger.readBI(is);
 		BigInteger res = paillier.Paillier.add(paddedmul, encB, pk);
 		res = paillier.Paillier.add(res, encA, pk);

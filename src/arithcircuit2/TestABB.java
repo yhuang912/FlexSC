@@ -11,6 +11,7 @@ import flexsc.CompEnv;
 
 public class TestABB  {
 
+	static int bitlength = 512;
 	static BigInteger v1 = null;
 	static BigInteger v2 = null;
 
@@ -21,9 +22,8 @@ public class TestABB  {
 	}
 	
 	public void testACase() throws InterruptedException {
-		v1 = new BigInteger(512, CompEnv.rnd);
-		v2 = new BigInteger(512, CompEnv.rnd);
-//		v2=v1 = BigInteger.valueOf(12);
+		v1 = new BigInteger(bitlength, CompEnv.rnd);
+		v2 = new BigInteger(bitlength, CompEnv.rnd);
 		GenRunnable gen = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
 
@@ -37,7 +37,7 @@ public class TestABB  {
 		public void run() {
 			try {
 				listen(54321);
-				ABBAlice alice = new ABBAlice(is, os, 512);
+				ABBAlice alice = new ABBAlice(is, os, bitlength);
 
 				BigInteger	a = alice.inputOfAlice(v1);
 				BigInteger b = alice.inputOfBob(BigInteger.ZERO);
