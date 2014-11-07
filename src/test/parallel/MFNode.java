@@ -15,7 +15,7 @@ public class MFNode<T> extends GraphNode<T> {
 	public static final int FIX_POINT_WIDTH = 40;
 	public static final int OFFSET = 20;
 
-	public static final int D = 8;
+	public static final int D = 10;
 
 	public T[] rating;// s4
 	public T[][] userProfile;// s5
