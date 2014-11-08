@@ -29,7 +29,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 		boolean[][] a = new boolean[u.length][];
 		boolean[][] b = new boolean[v.length][];
 		boolean[] c = new boolean[isVertex.length];
-		int limit = 20;
+		int limit = 129;
 		for (int i = 0; i < limit; i++) {
 			u[i] = i + 1;
 			v[i] = i + 1;
@@ -58,6 +58,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 		}
 //		System.out.println("Frequencies");
 //		for (int i = 0; i < limit + 1; i++)
+//		for (int i = 0; i < 20; i++)
 //			System.out.println(i + ": " + freq[i]);
 		Object[] ret = new Object[3];
 		ret[0] = a;
@@ -165,7 +166,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 //				T[] one = lib.publicValue(1);
 				T[] one = env.inputOfAlice(Utils.fromInt(1, HistogramNode.LEN));
 				HistogramNode<T> ret = new HistogramNode<T>(env);
-				ret.count = lib.add(((HistogramNode<T>) agg).count, one);
+				ret.count = lib.add(((HistogramNode<T>) agg).count, ((HistogramNode<T>) b).count);
 				return ret;
 			}
 
@@ -189,10 +190,10 @@ public class Histogram<T> implements ParallelGadget<T> {
 			// Thread.sleep(1000 * machineId);
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
 		} else if (Mode.REAL.equals(env.getMode())) {
-//			for (int i = 0; i < 4; i++) {
+//			for (int i = 0; i < 20; i++) {
 //				int int2 = Utils.toInt(env.outputToAlice(aa[i].v));
 //				int int3 = Utils.toInt(env.outputToAlice(aa[i].count));
-//				if (Party.Alice.equals(env.party)) {
+//				if (Party.Alice.equals(env.party) && machine.machineId == 0) {
 //					System.out.println(machine.machineId + ": " + int2 + ", " + int3);
 //				}
 //			}

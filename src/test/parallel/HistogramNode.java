@@ -18,7 +18,11 @@ public class HistogramNode<T> extends GraphNode<T> {
 	public HistogramNode(T[] u, T[] v, T isVertex, CompEnv<T> env) {
 		super(u, v, isVertex);
 		try {
-			this.count = env.inputOfAlice(Utils.fromInt(0, LEN));
+			IntegerLib<T> lib = new IntegerLib<>(env);
+			T[] one = env.inputOfAlice(Utils.fromInt(1, HistogramNode.LEN));
+			T[] zero = env.inputOfAlice(Utils.fromInt(0, HistogramNode.LEN));
+			this.count = lib.mux(one, zero, isVertex);
+//			this.count = env.inputOfAlice(Utils.fromInt(1, LEN));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -27,6 +31,10 @@ public class HistogramNode<T> extends GraphNode<T> {
 	public HistogramNode(CompEnv<T> env) {
 		super(env);
 		try {
+//			IntegerLib<T> lib = new IntegerLib<>(env);
+//			T[] one = env.inputOfAlice(Utils.fromInt(1, HistogramNode.LEN));
+//			T[] zero = env.inputOfAlice(Utils.fromInt(0, HistogramNode.LEN));
+//			this.count = lib.mux(one, zero, isVertex);
 			this.count = env.inputOfAlice(Utils.fromInt(0, LEN));
 		} catch(IOException e) {
 			e.printStackTrace();

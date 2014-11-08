@@ -39,12 +39,10 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 			}
 		}
 
-		System.out.println("gather starts");
 		long communicate = (long) new SortGadget<T>(env, machine)
 			.setInputs(nodes, nodes[0].getComparator(env, true /* isVertexLast */))
 			.compute();
 
-		System.out.println("gather sort done");
 		IntegerLib<T> lib = new IntegerLib<>(env);
 
 		Constructor<?> constructor = nodes.getClass().getComponentType().getConstructor(new Class[]{CompEnv.class});
@@ -60,7 +58,6 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 
 		int noOfIncomingConnections = machine.numberOfIncomingConnections;
 		int noOfOutgoingConnections = machine.numberOfOutgoingConnections;
-		System.out.println("gather comm starting");
 		for (int k = 0; k < machine.logMachines; k++) {
 			if (noOfIncomingConnections > 0) {
 				long one = System.nanoTime();
@@ -90,14 +87,12 @@ public abstract class GatherFromEdges<T> extends Gadget<T> {
 			}
 		}
 
-		System.out.println("gather comm ended");
 		for (int i = 0; i < nodes.length; i++) {
 			GraphNode<T> tempAgg = aggFunc(nodeValForLaterComp, nodes[i]);
 			writeToVertex(nodeValForLaterComp, nodes[i]);
 			nodeValForLaterComp = zeroNode.mux(tempAgg, nodes[i].isVertex, env);
 		}
 
-		System.out.println("gather almost ended");
 		if (isEdgeIncoming) {
 			for (int j = 0; j < nodes.length; j++) {
 				nodes[j].swapEdgeDirections();
