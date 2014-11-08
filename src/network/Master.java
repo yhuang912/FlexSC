@@ -11,6 +11,7 @@ import java.net.Socket;
 import ot.IncorrectOtUsageException;
 import test.parallel.ParallelGadget;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.GCGen;
@@ -88,7 +89,12 @@ public class Master {
 			os[i].flush();
 			// oos.flush();
 		}
+		long otStart = System.nanoTime();
 		parallelGadget.sendInputToMachines(inputLength, machines, isGen, env, os);
+		long otEnd = System.nanoTime();
+		if (!Flag.FakeOT) {
+			System.out.println("OT," + (otEnd - otStart)/1000000000.0);
+		}
 		// System.out.println("OT done");
 
 		// Ask all machines except for the last to listen

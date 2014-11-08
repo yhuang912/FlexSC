@@ -4,7 +4,7 @@ import test.StopWatch;
 
 public class Flag {
 	public static StopWatch sw = new StopWatch();
-	public static boolean countIO = false;
+	public static boolean countIO = true;
 	public static boolean FakeOT = true;
 	public static boolean CountTime = false;
 	public Flag() {

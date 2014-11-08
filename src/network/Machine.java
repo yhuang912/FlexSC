@@ -321,9 +321,9 @@ public class Machine {
 				inCountDown += machine.cisDown[i].getByteCount();
 			}
 			if (!machine.isGen) {
-				System.out.println(machine.machineId + "," + machine.inputLength + ",out," + ((outCountUp + outCountDown)/1024.0));
-				System.out.println(machine.machineId + "," + machine.inputLength + ",in," + ((inCountUp + inCountDown)/1024.0));
-				System.out.println(machine.machineId + "," + machine.inputLength + ",GE," + machine.cisOther.getByteCount()/1024.0);
+				System.out.println(machine.machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + getMega(outCountUp + outCountDown) + ",out" );
+				System.out.println(machine.machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + getMega(inCountUp + inCountDown) + ",in" );
+				System.out.println(machine.machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + getMega(machine.cisOther.getByteCount()) + ",GE" );
 			}	
 		}
 		machine.disconnect();
@@ -341,5 +341,9 @@ public class Machine {
 //		if (Party.Alice.equals(machine.env.party)) {
 //			System.out.println("hello " + d);
 //		}
+	}
+
+	private static double getMega(double bytes) {
+		return bytes/(1024.0 * 1024);
 	}
 }

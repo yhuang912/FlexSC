@@ -17,7 +17,6 @@ import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
-import flexsc.Party;
 import gc.BadLabelException;
 
 public class Histogram<T> implements ParallelGadget<T> {
