@@ -10,8 +10,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.io.output.CountingOutputStream;
+
 import test.parallel.ParallelGadget;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.Party;
 import gc.BadLabelException;
@@ -43,8 +47,15 @@ public class Machine {
 	public int numberOfIncomingConnections;
 	public int numberOfOutgoingConnections;
 	ParallelGadget parallelGadget;
+	public CountingInputStream[] cisUp;
+	public CountingInputStream[] cisDown;
+	public CountingOutputStream[] cosUp;
+	public CountingOutputStream[] cosDown;
 
 	public CompEnv env;
+
+	public CountingOutputStream cosOther;
+	public CountingInputStream cisOther;
 
 	public static double RAND[];
 
@@ -79,6 +90,12 @@ public class Machine {
 									 peerOsUp = new BufferedOutputStream[logMachines];
 									 peerIsDown = new BufferedInputStream[logMachines];
 									 peerOsDown = new BufferedOutputStream[logMachines];
+
+									 cisUp = new CountingInputStream[logMachines];
+									 cisDown = new CountingInputStream[logMachines];
+									 cosUp = new CountingOutputStream[logMachines];
+									 cosDown = new CountingOutputStream[logMachines];
+
 									 upSocket = new Socket[logMachines];
 									 downSocket = new Socket[logMachines];
 									 break;
@@ -117,14 +134,25 @@ public class Machine {
 				clientSock = serverSocket.accept();
 				InputStream is;
 				OutputStream os;
-				os = new BufferedOutputStream(clientSock.getOutputStream(), Constants.BUFFER_SIZE);
-				is = new BufferedInputStream(clientSock.getInputStream(), Constants.BUFFER_SIZE);
+				CountingOutputStream cos = null;
+				CountingInputStream cis = null;
+				if (Flag.countIO) {
+					cos = new CountingOutputStream(clientSock.getOutputStream());
+					cis = new CountingInputStream(clientSock.getInputStream());
+					os = new BufferedOutputStream(cos, Constants.BUFFER_SIZE);
+					is = new BufferedInputStream(cis, Constants.BUFFER_SIZE);
+				} else {
+					os = new BufferedOutputStream(clientSock.getOutputStream(), Constants.BUFFER_SIZE);
+					is = new BufferedInputStream(clientSock.getInputStream(), Constants.BUFFER_SIZE);
+				}
 				int id = NetworkUtil.readInt(is);
 				int index = log2(id - machineId);
 				debug("Accepted a connection from " + id + ". Stored at index " + index);
 				downSocket[index] = clientSock;
 				peerIsDown[index] = is;
 				peerOsDown[index] = os;
+				cisDown[index] = cis;
+				cosDown[index] = cos;
 				debug(id + " peerIsDown " + peerIsDown[index].hashCode());
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -145,8 +173,15 @@ public class Machine {
 			Socket peerSocket = NetworkUtil.connect(peerIp, peerPort + machineId - (1 << i));
 			try {
 				upSocket[i] = peerSocket;
-				peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Constants.BUFFER_SIZE);
-				peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Constants.BUFFER_SIZE);
+				if (Flag.countIO) {
+					cosUp[i] = new CountingOutputStream(peerSocket.getOutputStream());
+					cisUp[i] = new CountingInputStream(peerSocket.getInputStream());
+					peerOsUp[i] = new BufferedOutputStream(cosUp[i], Constants.BUFFER_SIZE);
+					peerIsUp[i] = new BufferedInputStream(cisUp[i], Constants.BUFFER_SIZE);
+				} else {
+					peerOsUp[i] = new BufferedOutputStream(peerSocket.getOutputStream(), Constants.BUFFER_SIZE);
+					peerIsUp[i] = new BufferedInputStream(peerSocket.getInputStream(), Constants.BUFFER_SIZE);
+				}
 				NetworkUtil.writeInt(peerOsUp[i], machineId);
 				peerOsUp[i].flush();
 				debug((machineId - (1 << i)) + "peerOsUp " + peerOsUp[i].hashCode());
@@ -236,6 +271,8 @@ public class Machine {
 			client.connect(ipManager.gIp[machineId], compPoolGenEvaPort);
 			is = client.is;
 			os = client.os;
+			cisOther = client.cis;
+			cosOther = client.cos;
 		}
 		return CompEnv.getEnv(mode, party, is, os);
 	}
@@ -272,6 +309,23 @@ public class Machine {
 		/*Statistics a = ((PMCompEnv) env).statistic;
 		a.finalize();
 		System.out.println(machineId + ": " + a.andGate + " " + a.NumEncAlice);*/
+		if (Flag.countIO) {
+			long outCountUp = 0, inCountUp = 0;
+			for (int i = 0; i < machine.numberOfOutgoingConnections; i++) {
+				outCountUp += machine.cosUp[i].getByteCount();
+				inCountUp += machine.cisUp[i].getByteCount();
+			}
+			long outCountDown = 0, inCountDown = 0;
+			for (int i = 0; i < machine.numberOfIncomingConnections; i++) {
+				outCountDown += machine.cosDown[i].getByteCount();
+				inCountDown += machine.cisDown[i].getByteCount();
+			}
+			if (!machine.isGen) {
+				System.out.println(machine.machineId + "," + machine.inputLength + ",out," + ((outCountUp + outCountDown)/1024.0));
+				System.out.println(machine.machineId + "," + machine.inputLength + ",in," + ((inCountUp + inCountDown)/1024.0));
+				System.out.println(machine.machineId + "," + machine.inputLength + ",GE," + machine.cisOther.getByteCount()/1024.0);
+			}	
+		}
 		machine.disconnect();
 
 		if (machine.machineId == firstPhysicalMachineId && (Mode.REAL.equals(machine.env.getMode()) || Party.Alice.equals(machine.env.party))) {

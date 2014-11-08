@@ -29,7 +29,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 		boolean[][] a = new boolean[u.length][];
 		boolean[][] b = new boolean[v.length][];
 		boolean[] c = new boolean[isVertex.length];
-		int limit = 129;
+		int limit = 5;
 		for (int i = 0; i < limit; i++) {
 			u[i] = i + 1;
 			v[i] = i + 1;
@@ -197,6 +197,9 @@ public class Histogram<T> implements ParallelGadget<T> {
 //					System.out.println(machine.machineId + ": " + int2 + ", " + int3);
 //				}
 //			}
+
+
+			
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (gatherTime - startTime)/1000000000.0 + "," + "Gather" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (endTime - gatherTime)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
