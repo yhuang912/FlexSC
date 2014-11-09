@@ -23,17 +23,19 @@ public class StopWatch {
     double startTimeGCIO = 0;
     double stopTimeGCIO = 0;
     double elapsedTimeGCIO = 0;
-    boolean countTime = Flag.CountTime;
-long counter = 0;
+    boolean countTime = true;//Flag.CountTime;
+    public long counter = 0;
     public void startOT() {
-    	if(countTime)
-        startTimeOT = System.nanoTime();
+    	if(countTime) {
+    		startTimeOT = System.nanoTime();
+    	}
     }
     
     public void stopOT() {
-    	if(countTime)
-         stopTimeOT = System.nanoTime();
-         elapsedTimeOT += stopTimeOT - startTimeOT;
+    	if(countTime) {
+	         stopTimeOT = System.nanoTime();
+	         elapsedTimeOT += (stopTimeOT - startTimeOT);
+    	}
    }
     public void startOTIO() {
     	if(countTime)
@@ -41,9 +43,10 @@ long counter = 0;
     }
     
     public void stopOTIO() {
-    	if(countTime)
-         stopTimeOTIO = System.nanoTime();
-         elapsedTimeOTIO += stopTimeOTIO - startTimeOTIO;
+    	if(countTime) {
+	         stopTimeOTIO = System.nanoTime();
+	         elapsedTimeOTIO += (stopTimeOTIO - startTimeOTIO);
+    	}
    }
     public void startGC() {
     	if(countTime)
@@ -51,9 +54,10 @@ long counter = 0;
     }
     
     public void stopGC() {
-    	if(countTime)
+    	if(countTime) {
          stopTimeGC = System.nanoTime();
-         elapsedTimeGC += stopTimeGC - startTimeGC;
+         elapsedTimeGC += (stopTimeGC - startTimeGC);
+    	}
    }
 
     public void startGCIO() {
@@ -62,9 +66,10 @@ long counter = 0;
     }
     
     public void stopGCIO() {
-    	if(countTime)
+    	if(countTime) {
          stopTimeGCIO = System.nanoTime();
-         elapsedTimeGCIO += stopTimeGCIO - startTimeGCIO;
+         elapsedTimeGCIO += (stopTimeGCIO - startTimeGCIO);
+    	}
    }
     public void startTotal() {
 
@@ -108,10 +113,10 @@ long counter = 0;
     
     public void print(){
     	System.out.println("Total Time \t GC CPU Time\t GCIO Time\t OTCPU Time\t OTIO Time\n");
-    	System.out.println(elapsedTimeTotal/1000000000.0/counter+"\t"+
-    (elapsedTimeGC-elapsedTimeGCIO)/1000000000.0/counter+"\t"+
-    elapsedTimeGCIO/1000000000.0/counter+" "+
-    (elapsedTimeOT-elapsedTimeOTIO)/1000000000.0/counter+"\t"+
-    elapsedTimeOTIO/1000000000.0/counter+"\n");
+    	System.out.println(elapsedTimeTotal/1000000000.0+"\t"+
+    (elapsedTimeGC-elapsedTimeGCIO)/1000000000.0+"\t"+
+    elapsedTimeGCIO/1000000000.0+" "+
+    (elapsedTimeOT-elapsedTimeOTIO)/1000000000.0+"\t"+
+    elapsedTimeOTIO/1000000000.0+"\n");
     }
 }
