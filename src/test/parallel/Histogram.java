@@ -28,7 +28,7 @@ public class Histogram<T> implements ParallelGadget<T> {
 		boolean[][] a = new boolean[u.length][];
 		boolean[][] b = new boolean[v.length][];
 		boolean[] c = new boolean[isVertex.length];
-		int limit = 5;
+		int limit = 20;
 		for (int i = 0; i < limit; i++) {
 			u[i] = i + 1;
 			v[i] = i + 1;
