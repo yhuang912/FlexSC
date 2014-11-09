@@ -328,7 +328,8 @@ public class Machine {
 		}
 		machine.disconnect();
 
-		if (machine.machineId == firstPhysicalMachineId && (Mode.REAL.equals(machine.env.getMode()) || Party.Alice.equals(machine.env.party))) {
+//		if (machine.machineId == firstPhysicalMachineId && (Mode.REAL.equals(machine.env.getMode()) || Party.Alice.equals(machine.env.party))) {
+		if (machine.machineId == firstPhysicalMachineId) {
 			// Thread.sleep(60000);
 			PrintWriter writer = new PrintWriter("mutex.txt");
 			writer.close();
