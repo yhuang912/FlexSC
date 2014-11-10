@@ -17,8 +17,8 @@ import test.Utils;
 import circuits.ArithmeticLib;
 import circuits.IntegerLib;
 import circuits.arithmetic.FixedPointLib;
-import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
@@ -65,24 +65,42 @@ public class PageRank<T> implements ParallelGadget<T> {
 	private Object[] performOTAndReturnMachineInputs(int inputLength,
 			int machines, boolean isGen, CompEnv<T> env)
 			throws IOException, IncorrectOtUsageException {
-		T[][] tu = env.newTArray(inputLength /* number of entries in the input */, 0);
-		T[][] tv = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[][] tu = env.newTArray(inputLength /* number of entries in the input */, GraphNode.VERTEX_LEN);
+		T[][] tv = env.newTArray(inputLength /* number of entries in the input */, GraphNode.VERTEX_LEN);
 		T[] tIsV = env.newTArray(inputLength /* number of entries in the input */);
 		if (isGen) {
-			for(int i = 0; i < tu.length; ++i)
-				tu[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
-			for(int i = 0; i < tv.length; ++i)
-				tv[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
+//			for(int i = 0; i < tu.length; ++i)
+//				tu[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
+//			for(int i = 0; i < tv.length; ++i)
+//				tv[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
+			boolean[][] u = new boolean[inputLength][GraphNode.VERTEX_LEN];
+			boolean[][] v = new boolean[inputLength][GraphNode.VERTEX_LEN];
+			boolean[] flattenU = Utils.flatten(u);
+			T[] tuTemp = env.inputOfBob(flattenU);
+			Utils.unflatten(tuTemp, tu);
+
+			boolean[] flattenV = Utils.flatten(v);
+			T[] tvTemp = env.inputOfBob(flattenV);
+			Utils.unflatten(tvTemp, tv);
+
 			tIsV = env.inputOfBob(new boolean[tIsV.length]);
 		} else {
 			Object[] input = getInput(inputLength);
 			boolean[][] u = (boolean[][]) input[0];
 			boolean[][] v = (boolean[][]) input[1];
 			boolean[] isV = (boolean[]) input[2];
-			for(int i = 0; i < tu.length; ++i)
-				tu[i] = env.inputOfBob((boolean[]) u[i]);
-			for(int i = 0; i < tv.length; ++i)
-				tv[i] = env.inputOfBob((boolean[]) v[i]);
+//			for(int i = 0; i < tu.length; ++i)
+//				tu[i] = env.inputOfBob((boolean[]) u[i]);
+//			for(int i = 0; i < tv.length; ++i)
+//				tv[i] = env.inputOfBob((boolean[]) v[i]);
+			boolean[] flattenU = Utils.flatten(u);
+			T[] tuTemp = env.inputOfBob(flattenU);
+			Utils.unflatten(tuTemp, tu);
+
+			boolean[] flattenV = Utils.flatten(v);
+			T[] tvTemp = env.inputOfBob(flattenV);
+			Utils.unflatten(tvTemp, tv);
+
 			tIsV = env.inputOfBob(isV);
 		}
 		Object[] inputU = new Object[machines];
@@ -262,17 +280,19 @@ public class PageRank<T> implements ParallelGadget<T> {
 			.compute();
 		long endTime = System.nanoTime();
 		if (Mode.REAL.equals(env.getMode())) {
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootStrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter - bootStrap)/1000000000.0 + "," + "Scatter" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - scatter)/1000000000.0 + "," + "Gather" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
+			long communicate = communicate1 + communicate2 + communicateBootstrap + communicateSort;
+			Flag.sw.printGC(machine.machineId, machine.totalMachines, machine.inputLength, communicate, env.getParty());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootStrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter - bootStrap)/1000000000.0 + "," + "Scatter" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - scatter)/1000000000.0 + "," + "Gather" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - bootStrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap)/1000000000.0 + "," + "Communication bootstrap time" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate1)/1000000000.0 + "," + "Communication scatter time" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate2)/1000000000.0 + "," + "Communication gather time" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication sort time" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap + communicate1 + communicate2 + communicateSort)/1000000000.0 + "," + "Communication total time" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap)/1000000000.0 + "," + "Communication bootstrap time" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate1)/1000000000.0 + "," + "Communication scatter time" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate2)/1000000000.0 + "," + "Communication gather time" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication sort time" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap + communicate1 + communicate2 + communicateSort)/1000000000.0 + "," + "Communication total time" + "," + env.getParty().name());
 		} else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
 			// Thread.sleep(10000);
 			Statistics a = ((PMCompEnv) env).statistic;

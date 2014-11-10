@@ -281,6 +281,7 @@ public class Utils {
 		for (int i = 0; i < x.length; i++) {
 			for(int j = 0; j < x[0].length; j++) {
 				System.arraycopy(flat, pos, x[i][j], 0, x[i][j].length);
+				pos += x[i][j].length;
 			}
 		}
 	}
