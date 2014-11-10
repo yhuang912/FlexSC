@@ -1,6 +1,6 @@
 package test;
 
-import flexsc.Flag;
+import flexsc.Party;
 
 public class StopWatch {
     public long ands = 0;
@@ -27,52 +27,58 @@ public class StopWatch {
     public long counter = 0;
     public void startOT() {
     	if(countTime) {
+//    		System.out.println("startOT");
     		startTimeOT = System.nanoTime();
     	}
     }
     
     public void stopOT() {
     	if(countTime) {
+//    		System.out.println("stopOT");
 	         stopTimeOT = System.nanoTime();
 	         elapsedTimeOT += (stopTimeOT - startTimeOT);
     	}
    }
     public void startOTIO() {
-    	if(countTime)
-        startTimeOTIO = System.nanoTime();
+    	if(countTime) {
+//    		System.out.println("startOTIO");
+    		startTimeOTIO = System.nanoTime();
+    	}
     }
     
     public void stopOTIO() {
     	if(countTime) {
+//    		System.out.println("stopOTIO");
 	         stopTimeOTIO = System.nanoTime();
 	         elapsedTimeOTIO += (stopTimeOTIO - startTimeOTIO);
     	}
    }
     public void startGC() {
-    	if(countTime)
-        startTimeGC = System.nanoTime();
+    	if(countTime) {
+    		startTimeGC = System.nanoTime();
+    	}
     }
     
     public void stopGC() {
     	if(countTime) {
-         stopTimeGC = System.nanoTime();
-         elapsedTimeGC += (stopTimeGC - startTimeGC);
+	         stopTimeGC = System.nanoTime();
+	         elapsedTimeGC += (stopTimeGC - startTimeGC);
     	}
    }
 
     public void startGCIO() {
-    	if(countTime)
-        startTimeGCIO = System.nanoTime();
+    	if(countTime) {
+    		startTimeGCIO = System.nanoTime();
+    	}
     }
     
     public void stopGCIO() {
     	if(countTime) {
-         stopTimeGCIO = System.nanoTime();
-         elapsedTimeGCIO += (stopTimeGCIO - startTimeGCIO);
+	         stopTimeGCIO = System.nanoTime();
+	         elapsedTimeGCIO += (stopTimeGCIO - startTimeGCIO);
     	}
    }
     public void startTotal() {
-
         startTimeTotal = System.nanoTime();
     }
     
@@ -118,5 +124,16 @@ public class StopWatch {
     elapsedTimeGCIO/1000000000.0+" "+
     (elapsedTimeOT-elapsedTimeOTIO)/1000000000.0+"\t"+
     elapsedTimeOTIO/1000000000.0+"\n");
+    }
+
+    public void printGC(int machineId, int totalMachines, int inputLength, long commTime, Party party) {
+    	System.out.println(machineId + "," + totalMachines + ","  + inputLength + "," + (elapsedTimeGC-elapsedTimeGCIO)/1000000000.0 + ",GC CPU," + party);
+    	System.out.println(machineId + "," + totalMachines + ","  + inputLength + "," + elapsedTimeGCIO/1000000000.0 + ",GE IO," + party);
+    	System.out.println(machineId + "," + totalMachines + ","  + inputLength + "," + commTime/1000000000.0 + ",GG IO," + party);
+    }
+
+    public void printOT(int machineId, int totalMachines, int inputLength, Party party) {
+    	System.out.println(machineId + "," + totalMachines + ","  + inputLength + "," + (elapsedTimeOT-elapsedTimeOTIO)/1000000000.0 + ",OT CPU," + party);
+    	System.out.println(machineId + "," + totalMachines + ","  + inputLength + "," + elapsedTimeOTIO/1000000000.0 + ",OT IO," + party);
     }
 }

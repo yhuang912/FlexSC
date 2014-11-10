@@ -327,7 +327,6 @@ public class Machine {
 			}	
 		}
 		machine.disconnect();
-		Flag.sw.print();
 
 //		if (machine.machineId == firstPhysicalMachineId && (Mode.REAL.equals(machine.env.getMode()) || Party.Alice.equals(machine.env.party))) {
 		if (machine.machineId == firstPhysicalMachineId) {

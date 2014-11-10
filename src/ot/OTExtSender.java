@@ -42,8 +42,9 @@ public class OTExtSender extends OTSender {
     	super(msgBitLength, in, out);
     	
     	cipher = new Cipher();
-    	
+    	Flag.sw.startOT();
     	initialize();
+    	Flag.sw.stopOT();
     }
 
     int poolIndex = 0;

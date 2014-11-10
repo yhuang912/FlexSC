@@ -42,8 +42,9 @@ public class OTExtReceiver extends OTReceiver {
 		super(in, out);
 
     	cipher = new Cipher();
-    	
+    	Flag.sw.startOT();
 		initialize();
+		Flag.sw.stopOT();
 	}
 
 	boolean[] s = new boolean[SecurityParameter.k1];

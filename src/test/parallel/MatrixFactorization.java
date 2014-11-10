@@ -95,33 +95,69 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		return ret;
 	}
 
+//	private T[] flatten(T[][] a) {
+//		T[] ret = new boolean[a.length * a[0].length];
+//		int ind = 0;
+//		for (int i = 0; i < a.length; i++) {
+//			for (int j = 0; j < a[0].length; j++) {
+//				ret[ind++] = a[i][j];
+//			}
+//		}
+//		return ret;
+//	}
 	private Object[] performOTAndReturnMachineInputs(int inputLength,
 			int machines, boolean isGen, CompEnv<T> env)
 			throws IOException, IncorrectOtUsageException {
-		T[][] tu = env.newTArray(inputLength /* number of entries in the input */, 0);
-		T[][] tv = env.newTArray(inputLength /* number of entries in the input */, 0);
+		T[][] tu = env.newTArray(inputLength /* number of entries in the input */, GraphNode.VERTEX_LEN);
+		T[][] tv = env.newTArray(inputLength /* number of entries in the input */, GraphNode.VERTEX_LEN);
 		T[] tIsV = env.newTArray(inputLength /* number of entries in the input */);
-		T[][] trating = env.newTArray(inputLength /* number of entries in the input */, 0);
-		T[][][] tUserProfile = env.newTArray(inputLength /* number of entries in the input */, MFNode.D, 0);
-		T[][][] tItemProfile = env.newTArray(inputLength /* number of entries in the input */, MFNode.D, 0);
+		T[][] trating = env.newTArray(inputLength /* number of entries in the input */, MFNode.FIX_POINT_WIDTH);
+		T[][][] tUserProfile = env.newTArray(inputLength /* number of entries in the input */, MFNode.D, MFNode.FIX_POINT_WIDTH);
+		T[][][] tItemProfile = env.newTArray(inputLength /* number of entries in the input */, MFNode.D, MFNode.FIX_POINT_WIDTH);
 		if (isGen) {
-			for(int i = 0; i < tu.length; ++i)
-				tu[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
-			for(int i = 0; i < tv.length; ++i)
-				tv[i] = env.inputOfBob(new boolean[GraphNode.VERTEX_LEN]);
+			boolean[][] u = new boolean[inputLength][GraphNode.VERTEX_LEN];
+			boolean[][] v = new boolean[inputLength][GraphNode.VERTEX_LEN];
+			boolean[][] rating = new boolean[inputLength][MFNode.FIX_POINT_WIDTH];
+			boolean[][][] userProfile = new boolean[inputLength][MFNode.D][MFNode.FIX_POINT_WIDTH];
+			boolean[][][] itemProfile = new boolean[inputLength][MFNode.D][MFNode.FIX_POINT_WIDTH];
+
+			boolean[] flattenU = Utils.flatten(u);
+			T[] tuTemp = env.inputOfBob(flattenU);
+			Utils.unflatten(tuTemp, tu);
+
+			boolean[] flattenV = Utils.flatten(v);
+			T[] tvTemp = env.inputOfBob(flattenV);
+			Utils.unflatten(tvTemp, tv);
+//			for(int i = 0; i < tu.length; ++i)
+//				tu[i] = env.inputOfBob(u);
+			
+//			for(int i = 0; i < tv.length; ++i)
+//				tv[i] = env.inputOfBob(u);
 			tIsV = env.inputOfBob(new boolean[tIsV.length]);
-			for(int i = 0; i < trating.length; ++i)
-				trating[i] = env.inputOfBob(new boolean[MFNode.FIX_POINT_WIDTH]);
-			for(int i = 0; i < tUserProfile.length; ++i) {
-				for (int j = 0; j < MFNode.D; j++) {
-					tUserProfile[i][j] = env.inputOfBob(new boolean[MFNode.FIX_POINT_WIDTH]);
-				}
-			}
-			for(int i = 0; i < tItemProfile.length; ++i) {
-				for (int j = 0; j < MFNode.D; j++) {
-					tItemProfile[i][j] = env.inputOfBob(new boolean[MFNode.FIX_POINT_WIDTH]);
-				}
-			}
+//			for(int i = 0; i < trating.length; ++i)
+//				trating[i] = env.inputOfBob(new boolean[MFNode.FIX_POINT_WIDTH]);
+			boolean[] flattenRating = Utils.flatten(rating);
+			T[] tratingTemp = env.inputOfBob(flattenRating);
+			Utils.unflatten(tratingTemp, trating);
+
+			boolean[] flattenUserProfile = Utils.flatten(userProfile);
+			T[] tuserProfileTemp = env.inputOfBob(flattenUserProfile);
+			Utils.unflatten(tuserProfileTemp, tUserProfile);
+
+//			for(int i = 0; i < tUserProfile.length; ++i) {
+//				for (int j = 0; j < MFNode.D; j++) {
+//					tUserProfile[i][j] = env.inputOfBob(new boolean[MFNode.FIX_POINT_WIDTH]);
+//				}
+//			}
+
+			boolean[] flattenItemProfile = Utils.flatten(itemProfile);
+			T[] titemProfileTemp = env.inputOfBob(flattenItemProfile);
+			Utils.unflatten(titemProfileTemp, tItemProfile);
+//			for(int i = 0; i < tItemProfile.length; ++i) {
+//				for (int j = 0; j < MFNode.D; j++) {
+//					tItemProfile[i][j] = env.inputOfBob(new boolean[MFNode.FIX_POINT_WIDTH]);
+//				}
+//			}
 		} else {
 			Object[] input = getInput(inputLength);
 			boolean[][] u = (boolean[][]) input[0];
@@ -130,26 +166,45 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			boolean[][] rating = (boolean[][]) input[3];
 			boolean[][][] userProfile = (boolean[][][]) input[4];
 			boolean[][][] itemProfile = (boolean[][][]) input[5];
-			for (int i = 0; i < tu.length; ++i) {
-				tu[i] = env.inputOfBob((boolean[]) u[i]);
-			}
-			for (int i = 0; i < tv.length; ++i) {
-				tv[i] = env.inputOfBob((boolean[]) v[i]);
-			}
+			boolean[] flattenU = Utils.flatten(u);
+//			for (int i = 0; i < tu.length; ++i) {
+//				tu[i] = env.inputOfBob((boolean[]) u[i]);
+//			}
+//			for (int i = 0; i < tv.length; ++i) {
+//				tv[i] = env.inputOfBob((boolean[]) v[i]);
+//			}
+			T[] tuTemp = env.inputOfBob(flattenU);
+			Utils.unflatten(tuTemp, tu);
+
+			boolean[] flattenV = Utils.flatten(v);
+			T[] tvTemp = env.inputOfBob(flattenV);
+			Utils.unflatten(tvTemp, tv);
+
 			tIsV = env.inputOfBob(isV);
-			for (int i = 0; i < trating.length; i++) {
-				trating[i] = env.inputOfBob((boolean[]) rating[i]);
-			}
-			for(int i = 0; i < tUserProfile.length; ++i) {
-				for (int j = 0; j < MFNode.D; j++) {
-					tUserProfile[i][j] = env.inputOfBob((boolean[]) userProfile[i][j]);
-				}
-			}
-			for(int i = 0; i < tItemProfile.length; ++i) {
-				for (int j = 0; j < MFNode.D; j++) {
-					tItemProfile[i][j] = env.inputOfBob((boolean[]) itemProfile[i][j]);
-				}
-			}
+
+			boolean[] flattenRating = Utils.flatten(rating);
+			T[] ratingTemp = env.inputOfBob(flattenRating);
+			Utils.unflatten(ratingTemp, trating);
+//			for (int i = 0; i < trating.length; i++) {
+//				trating[i] = env.inputOfBob((boolean[]) rating[i]);
+//			}
+
+			boolean[] flattenUserProfile = Utils.flatten(userProfile);
+			T[] upTemp = env.inputOfBob(flattenUserProfile);
+			Utils.unflatten(upTemp, tUserProfile);
+//			for(int i = 0; i < tUserProfile.length; ++i) {
+//				for (int j = 0; j < MFNode.D; j++) {
+//					tUserProfile[i][j] = env.inputOfBob((boolean[]) userProfile[i][j]);
+//				}
+//			}
+			boolean[] flattenItemProfile = Utils.flatten(itemProfile);
+			T[] ipTemp = env.inputOfBob(flattenItemProfile);
+			Utils.unflatten(ipTemp, tItemProfile);
+//			for(int i = 0; i < tItemProfile.length; ++i) {
+//				for (int j = 0; j < MFNode.D; j++) {
+//					tItemProfile[i][j] = env.inputOfBob((boolean[]) itemProfile[i][j]);
+//				}
+//			}
 		}
 		Object[] inputU = new Object[machines];
 		Object[] inputV = new Object[machines];
@@ -380,19 +435,21 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 
 		
 		if (Mode.REAL.equals(env.getMode()) && !Flag.countIO) {
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootstrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter1 - bootstrap)/1000000000.0 + "," + "Scatter 1" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter2 - scatter1)/1000000000.0 + "," + "Scatter 2" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS1)/1000000000.0 + "," + "Communication time S1" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS2)/1000000000.0 + "," + "Communication time S2" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG1)/1000000000.0 + "," + "Communication time G1" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG2)/1000000000.0 + "," + "Communication time G2" + "," + env.getParty().name());
-			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication time sort" + "," + env.getParty().name());
+			long communicate = communicateS1 + communicateS2 + communicateG1 + communicateG2 + communicateSort;
+			Flag.sw.printGC(machine.machineId, machine.totalMachines, machine.inputLength, communicate, env.getParty());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootstrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter1 - bootstrap)/1000000000.0 + "," + "Scatter 1" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter2 - scatter1)/1000000000.0 + "," + "Scatter 2" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gradient - scatter2)/1000000000.0 + "," + "Gradient" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather1 - gradient)/1000000000.0 + "," + "Gather 1" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather2)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS1)/1000000000.0 + "," + "Communication time S1" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateS2)/1000000000.0 + "," + "Communication time S2" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG1)/1000000000.0 + "," + "Communication time G1" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG2)/1000000000.0 + "," + "Communication time G2" + "," + env.getParty().name());
+//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication time sort" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - bootstrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name());
 		} else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
 			Statistics a = ((PMCompEnv) env).statistic;

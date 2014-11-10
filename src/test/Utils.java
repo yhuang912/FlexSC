@@ -196,6 +196,38 @@ public class Utils {
 		return a;
 	}
 
+	public static boolean[] flatten(boolean[][] data) {
+		int length = 0;
+		for (int i = 0; i < data.length; i++) {
+			length += data[i].length;
+		}
+		boolean[] ret = new boolean[length];
+		int pos = 0;
+		for (int i = 0; i < data.length; i++) {
+			System.arraycopy(data[i], 0, ret, pos, data[i].length);
+			pos += data[i].length;
+		}
+		return ret;
+	}
+
+	public static boolean[] flatten(boolean[][][] data) {
+		int length = 0;
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				length += data[i][j].length;
+			}
+		}
+		boolean[] ret = new boolean[length];
+		int pos = 0;
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
+				System.arraycopy(data[i][j], 0, ret, pos, data[i][j].length);
+				pos += data[i][j].length;
+			}
+		}
+		return ret;
+	}
+
 	public static <T> T[] flatten(CompEnv<T> env, T[] ... data) {
 		int length = 0;
 		for (int i = 0; i < data.length; i++) {
@@ -241,6 +273,15 @@ public class Utils {
 		for (int i = 0; i < x.length; i++) {
 			System.arraycopy(flat, pos, x[i], 0, x[i].length);
 			pos += x[i].length;
+		}
+	}
+
+	public static <T> void unflatten(T[] flat, T[][][] x) {
+		int pos = 0;
+		for (int i = 0; i < x.length; i++) {
+			for(int j = 0; j < x[0].length; j++) {
+				System.arraycopy(flat, pos, x[i][j], 0, x[i][j].length);
+			}
 		}
 	}
 }
