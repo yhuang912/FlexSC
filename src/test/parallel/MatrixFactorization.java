@@ -324,7 +324,7 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		new SortGadget<T>(env, machine)
 				.setInputs(aa, aa[0].getComparator(env, true /* isVertexLast */))
 				.compute();
-//		System.out.println("Sort complete");
+		System.out.println("Sort complete");
 		long bootstrap = System.nanoTime();
 //		System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootstrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
 		for (int it = 0; it < ITERATIONS; it++) {
