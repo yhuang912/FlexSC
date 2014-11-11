@@ -23,7 +23,7 @@ public class StopWatch {
     double startTimeGCIO = 0;
     double stopTimeGCIO = 0;
     double elapsedTimeGCIO = 0;
-    boolean countTime = true;//Flag.CountTime;
+    boolean countTime = false;//Flag.CountTime;
     public long counter = 0;
     public void startOT() {
     	if(countTime) {

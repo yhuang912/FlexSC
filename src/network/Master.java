@@ -172,7 +172,9 @@ public class Master {
 		// System.out.println("Connected to master");
 		// master tells the machines what their ports are for peer connections
 		master.setUp(peerPort, inputLength, env);
-		Flag.sw.printOT(0 /* machineId */, machines, inputLength, party);
+		if (!Flag.FakeOT) {
+			Flag.sw.printOT(0 /* machineId */, machines, inputLength, party);
+		}
 		// System.out.println("Connections successful");
 	}
 }
