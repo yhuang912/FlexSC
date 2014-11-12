@@ -22,7 +22,7 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 		lib = new IntegerLib<T>(env);
 	}
 
-	static final int logDomain = 16;
+	static final int logDomain = 24;
 	static int numEntries;
 
 	@Override

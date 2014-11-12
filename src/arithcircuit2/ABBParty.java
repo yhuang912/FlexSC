@@ -1,10 +1,11 @@
-package arithcircuit;
+package arithcircuit2;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 
+import flexsc.CompEnv;
 import flexsc.Party;
 
 public abstract class ABBParty {
@@ -21,6 +22,7 @@ public abstract class ABBParty {
 	abstract public BigInteger add(BigInteger a, BigInteger b);
 	abstract public BigInteger multiply(BigInteger a, BigInteger b);
 	abstract public BigInteger outputToAlice(BigInteger a);
+	abstract public <T>BigInteger inputFromGC(T[] number, CompEnv<T> gen);
 	
 	public void flush() {
 		try {

@@ -40,7 +40,7 @@ public class TestOramStack {
 				if (env.getParty() == Party.Alice) {
 					res = cstack.pop();
 				}
-				BoolArray scres = ostack.stack_op(new BoolArray(env, lib), lib.SIGNAL_ONE);
+				BoolArray scres = ostack.stack_op(new BoolArray(env), lib.SIGNAL_ONE);
 				int srintres = Utils.toInt(env.outputToAlice(scres.data));
 				if (env.getParty() == Party.Alice && m != Mode.COUNT) {
 					System.out.println(env.getParty() + "pop " + res + " "
@@ -54,7 +54,7 @@ public class TestOramStack {
 					cstack.push(rand);
 					System.out.println(env.getParty() + "push " + rand);
 				}
-				BoolArray tmp = new BoolArray(env, lib);
+				BoolArray tmp = new BoolArray(env);
 				tmp.data = env.inputOfAlice(Utils.fromInt(rand, 32));
 				if(m == Mode.REAL && env.getParty() == Party.Alice) {
 					System.gc();
@@ -90,7 +90,7 @@ public class TestOramStack {
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				OramStack<BoolArray> ostack = new OramStack<BoolArray>(env,
-						lib, new BoolArray(env, lib),
+						lib, new BoolArray(env),
 						new SecureArray<Boolean>(env, 1 << logN, 32));
 				if (m == Mode.COUNT) {
 				sta = ((PMCompEnv) (env)).statistic;
@@ -125,7 +125,7 @@ public class TestOramStack {
 				CompEnv env = CompEnv.getEnv(m, Party.Bob, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				OramStack<BoolArray> ostack = new OramStack<BoolArray>(env,
-						lib, new BoolArray(env, lib),
+						lib, new BoolArray(env),
 						new SecureArray<Boolean>(env, 1 << logN, 32));
 				compute(env, ostack, lib);
 				disconnect();

@@ -7,6 +7,7 @@ import flexsc.Party;
 import flexsc.CompEnv;
 import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
@@ -23,12 +24,14 @@ public class Stack<T extends IWritable<T,Boolean>> {
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private T factoryT;
 	private int m;
 
-	public Stack(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m, T factoryT, CircuitOram<Boolean> oram) throws Exception {
+	public Stack(CompEnv<Boolean> env, int m, T factoryT, CircuitOram<Boolean> oram) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.factoryT = factoryT;
 		this.size = env.inputOfAlice(Utils.fromInt(0, m));
@@ -38,8 +41,8 @@ public class Stack<T extends IWritable<T,Boolean>> {
 
 	public T stack_op(T operand, Boolean op) throws Exception {
 		T ret = factoryT.newObj(null);
-		StackNode<T> r = new StackNode<T>(env, intLib, m, factoryT);
-		StackNode<T> node = new StackNode<T>(env, intLib, m, factoryT);
+		StackNode<T> r = new StackNode<T>(env, m, factoryT);
+		StackNode<T> node = new StackNode<T>(env, m, factoryT);
 		boolean f_tmp_0 = true;
 		boolean __tmp0 = f_tmp_0;
 		Boolean f_tmp_2 = env.inputOfAlice(__tmp0);
@@ -51,9 +54,9 @@ public class Stack<T extends IWritable<T,Boolean>> {
 		Boolean[] __tmp3 = f_tmp_4;
 		CircuitOram<Boolean> f_tmp_5 = this.oram;
 		CircuitOram<Boolean> __tmp4 = f_tmp_5;
-		StackNode<T> f_tmp_6 = new StackNode<T>(env, intLib, m, factoryT).newObj(__tmp4.conditionalReadAndRemove(__tmp2, __tmp3, __tmp1));
+		StackNode<T> f_tmp_6 = new StackNode<T>(env, m, factoryT).newObj(__tmp4.conditionalReadAndRemove(__tmp2, __tmp3, __tmp1));
 		StackNode<T> __tmp5 = f_tmp_6;
-		StackNode<T> f_tmp_7 = new StackNode<T>(env, intLib, m, factoryT).newObj(intLib.mux(r.getBits(), __tmp5.getBits(),__tmp1));
+		StackNode<T> f_tmp_7 = new StackNode<T>(env, m, factoryT).newObj(intLib.mux(r.getBits(), __tmp5.getBits(),__tmp1));
 		StackNode<T> __tmp6 = f_tmp_7;
 		r = __tmp6;
 		Boolean[] f_tmp_8 = r.next;
@@ -84,11 +87,11 @@ public class Stack<T extends IWritable<T,Boolean>> {
 		Boolean __tmp17 = f_tmp_19;
 		Boolean[] f_tmp_20 = this.root;
 		Boolean[] __tmp18 = f_tmp_20;
-		StackNode<T> f_tmp_21 = new StackNode<T>(env, intLib, m, factoryT);
+		StackNode<T> f_tmp_21 = new StackNode<T>(env, m, factoryT);
 		f_tmp_21.next = __tmp18;
 		f_tmp_21.data = operand;
 		StackNode<T> __tmp19 = f_tmp_21;
-		StackNode<T> f_tmp_22 = new StackNode<T>(env, intLib, m, factoryT).newObj(intLib.mux(node.getBits(), __tmp19.getBits(),__tmp17));
+		StackNode<T> f_tmp_22 = new StackNode<T>(env, m, factoryT).newObj(intLib.mux(node.getBits(), __tmp19.getBits(),__tmp17));
 		StackNode<T> __tmp20 = f_tmp_22;
 		node = __tmp20;
 		Boolean[] f_tmp_23 = intLib.randBools(m);
@@ -117,6 +120,99 @@ public class Stack<T extends IWritable<T,Boolean>> {
 		CircuitOram<Boolean> f_tmp_34 = this.oram;
 		CircuitOram<Boolean> __tmp31 = f_tmp_34;
 		__tmp31.conditionalPutBack(__tmp29, __tmp30, node.getBits(), __tmp17);
+		return ret;
+	}
+	public void push(T operand, Boolean op) throws Exception {
+		StackNode<T> node = new StackNode<T>(env, m, factoryT);
+		boolean f_tmp_36 = true;
+		boolean __tmp33 = f_tmp_36;
+		Boolean f_tmp_38 = env.inputOfAlice(__tmp33);
+		Boolean f_tmp_37 = intLib.eq(op, f_tmp_38);
+		Boolean __tmp34 = f_tmp_37;
+		Boolean[] f_tmp_39 = this.root;
+		Boolean[] __tmp35 = f_tmp_39;
+		StackNode<T> f_tmp_40 = new StackNode<T>(env, m, factoryT);
+		f_tmp_40.next = __tmp35;
+		f_tmp_40.data = operand;
+		StackNode<T> __tmp36 = f_tmp_40;
+		StackNode<T> f_tmp_41 = new StackNode<T>(env, m, factoryT).newObj(intLib.mux(node.getBits(), __tmp36.getBits(),__tmp34));
+		StackNode<T> __tmp37 = f_tmp_41;
+		node = __tmp37;
+		Boolean[] f_tmp_42 = intLib.randBools(m);
+		Boolean[] __tmp38 = f_tmp_42;
+		Boolean[] f_tmp_43 = this.root;
+		Boolean[] __tmp39 = f_tmp_43;
+		Boolean[] f_tmp_44 = intLib.mux(__tmp39, __tmp38,__tmp34);
+		Boolean[] __tmp40 = f_tmp_44;
+		this.root = __tmp40;
+		Boolean[] f_tmp_45 = this.size;
+		Boolean[] __tmp41 = f_tmp_45;
+		int f_tmp_46 = 1;
+		int __tmp42 = f_tmp_46;
+		Boolean[] f_tmp_48 = env.inputOfAlice(Utils.fromInt(__tmp42, m));
+		Boolean[] f_tmp_47 = intLib.add(__tmp41,f_tmp_48);
+		Boolean[] __tmp43 = f_tmp_47;
+		Boolean[] f_tmp_49 = this.size;
+		Boolean[] __tmp44 = f_tmp_49;
+		Boolean[] f_tmp_50 = intLib.mux(__tmp44, __tmp43,__tmp34);
+		Boolean[] __tmp45 = f_tmp_50;
+		this.size = __tmp45;
+		Boolean[] f_tmp_51 = this.size;
+		Boolean[] __tmp46 = f_tmp_51;
+		Boolean[] f_tmp_52 = this.root;
+		Boolean[] __tmp47 = f_tmp_52;
+		CircuitOram<Boolean> f_tmp_53 = this.oram;
+		CircuitOram<Boolean> __tmp48 = f_tmp_53;
+		__tmp48.conditionalPutBack(__tmp46, __tmp47, node.getBits(), __tmp34);
+		Boolean f_tmp_55 = intLib.not(__tmp34);
+		Boolean __tmp50 = f_tmp_55;
+
+	}
+	public T pop(Boolean op) throws Exception {
+		T ret = factoryT.newObj(null);
+		StackNode<T> r = new StackNode<T>(env, m, factoryT);
+		boolean f_tmp_56 = true;
+		boolean __tmp51 = f_tmp_56;
+		Boolean f_tmp_58 = env.inputOfAlice(__tmp51);
+		Boolean f_tmp_57 = intLib.eq(op, f_tmp_58);
+		Boolean __tmp52 = f_tmp_57;
+		Boolean[] f_tmp_59 = this.size;
+		Boolean[] __tmp53 = f_tmp_59;
+		Boolean[] f_tmp_60 = this.root;
+		Boolean[] __tmp54 = f_tmp_60;
+		CircuitOram<Boolean> f_tmp_61 = this.oram;
+		CircuitOram<Boolean> __tmp55 = f_tmp_61;
+		StackNode<T> f_tmp_62 = new StackNode<T>(env, m, factoryT).newObj(__tmp55.conditionalReadAndRemove(__tmp53, __tmp54, __tmp52));
+		StackNode<T> __tmp56 = f_tmp_62;
+		StackNode<T> f_tmp_63 = new StackNode<T>(env, m, factoryT).newObj(intLib.mux(r.getBits(), __tmp56.getBits(),__tmp52));
+		StackNode<T> __tmp57 = f_tmp_63;
+		r = __tmp57;
+		Boolean[] f_tmp_64 = r.next;
+		Boolean[] __tmp58 = f_tmp_64;
+		Boolean[] f_tmp_65 = this.root;
+		Boolean[] __tmp59 = f_tmp_65;
+		Boolean[] f_tmp_66 = intLib.mux(__tmp59, __tmp58,__tmp52);
+		Boolean[] __tmp60 = f_tmp_66;
+		this.root = __tmp60;
+		Boolean[] f_tmp_67 = this.size;
+		Boolean[] __tmp61 = f_tmp_67;
+		int f_tmp_68 = 1;
+		int __tmp62 = f_tmp_68;
+		Boolean[] f_tmp_70 = env.inputOfAlice(Utils.fromInt(__tmp62, m));
+		Boolean[] f_tmp_69 = intLib.sub(__tmp61,f_tmp_70);
+		Boolean[] __tmp63 = f_tmp_69;
+		Boolean[] f_tmp_71 = this.size;
+		Boolean[] __tmp64 = f_tmp_71;
+		Boolean[] f_tmp_72 = intLib.mux(__tmp64, __tmp63,__tmp52);
+		Boolean[] __tmp65 = f_tmp_72;
+		this.size = __tmp65;
+		T f_tmp_73 = r.data;
+		T __tmp66 = f_tmp_73;
+		T f_tmp_74 = this.factoryT.newObj(intLib.mux(ret.getBits(), __tmp66.getBits(),__tmp52));
+		T __tmp67 = f_tmp_74;
+		ret = __tmp67;
+		Boolean f_tmp_75 = intLib.not(__tmp52);
+		Boolean __tmp68 = f_tmp_75;
 		return ret;
 	}
 }

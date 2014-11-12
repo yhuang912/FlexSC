@@ -23,16 +23,18 @@ public class KeyValue<T extends IWritable<T,Boolean>> implements IWritable<KeyVa
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private T factoryT;
 	private int m;
 
-	public KeyValue(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m, T factoryT) throws Exception {
+	public KeyValue(CompEnv<Boolean> env, int m, T factoryT) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.factoryT = factoryT;
 		this.value = factoryT.newObj(null);
-		this.key = env.inputOfAlice(Utils.fromInt(0, 16));
+		this.key = env.inputOfAlice(Utils.fromInt(0, 32));
 	}
 
 	public int numBits() {
@@ -62,16 +64,16 @@ public class KeyValue<T extends IWritable<T,Boolean>> implements IWritable<KeyVa
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		KeyValue<T> ret = new KeyValue<T>(env, intLib, m, factoryT);
+		KeyValue<T> ret = new KeyValue<T>(env, m, factoryT);
 		Boolean[] tmp;
 		int now = 0;
 		tmp = new Boolean[this.factoryT.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;
 		ret.value = ret.factoryT.newObj(tmp);
-		ret.key = new Boolean[16];
-		System.arraycopy(data, now, ret.key, 0, 16);
-		now += 16;
+		ret.key = new Boolean[32];
+		System.arraycopy(data, now, ret.key, 0, 32);
+		now += 32;
 		return ret;
 }
 

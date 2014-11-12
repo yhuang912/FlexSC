@@ -22,15 +22,17 @@ public class BoolArray implements IWritable<BoolArray, Boolean> {
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 
-	public BoolArray(CompEnv<Boolean> env, IntegerLib<Boolean> intLib) throws Exception {
+	public BoolArray(CompEnv<Boolean> env) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
-		this.data = env.inputOfAlice(Utils.fromInt(0, 16));
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
+		this.data = env.inputOfAlice(Utils.fromInt(0, 32));
 	}
 
 	public int numBits() {
-		return (0)+(16);
+		return (0)+(32);
 	}
 	public Boolean[] getBits() {
 		Boolean[] ret = new Boolean[this.numBits()];
@@ -49,12 +51,12 @@ public class BoolArray implements IWritable<BoolArray, Boolean> {
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		BoolArray ret = new BoolArray(env, intLib);
+		BoolArray ret = new BoolArray(env);
 		Boolean[] tmp;
 		int now = 0;
-		ret.data = new Boolean[16];
-		System.arraycopy(data, now, ret.data, 0, 16);
-		now += 16;
+		ret.data = new Boolean[32];
+		System.arraycopy(data, now, ret.data, 0, 32);
+		now += 32;
 		return ret;
 }
 

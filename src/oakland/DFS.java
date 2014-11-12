@@ -14,15 +14,14 @@ import oram.SecureArray;
 
 import org.junit.Test;
 
-import util.Utils;
 import circuits.arithmetic.IntegerLib;
 
-import compiledlib.priority_queue.BoolArray;
-import compiledlib.priority_queue.PriorityQueue;
-import compiledlib.priority_queue.PriorityQueueNode;
+import compiledlib.stack.BoolArray;
+import compiledlib.stack.Stack;
+import compiledlib.stack.StackNode;
 
 
-public class Dijkstra extends TestHarness {
+public class DFS extends TestHarness {
 
 	static double[][] a;
 	static int finalRes = 0;
@@ -31,7 +30,7 @@ public class Dijkstra extends TestHarness {
 	static int v = 5;
 	static int e = 8;
 	static int bitLength = 16;
-	static int logoramsize = (int) (Math.log((v+e))/Math.log(2));
+	static int logoramsize = 16;//(int) (Math.log((v+e))/Math.log(2));
 
 	public static void insertEdge(SecureArray<Boolean> graph, IntegerLib<Boolean> lib, int index, int a, int b, int c) throws Exception {
 		Boolean[] aa = lib.publicValue(a);
@@ -61,69 +60,44 @@ public class Dijkstra extends TestHarness {
 
 	public static void secureCompute(IntegerLib<Boolean> lib) throws Exception {
 		SecureArray<Boolean> graph = makegraph(lib);
-		SecureArray<Boolean> dis = new SecureArray<Boolean>(lib.getEnv(), v, bitLength);
-		dis.write(lib.publicValue(0), lib.publicValue(0));
-		dis.setInitialValue(2000);
+		SecureArray<Boolean> dis = new SecureArray<Boolean>(lib.getEnv(), v, 1);
+		dis.setInitialValue(0);
 
 		BoolArray ba = new BoolArray(lib.getEnv());
-		PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(lib.getEnv(), logoramsize, ba);
-		CircuitOram<Boolean> oram = new CircuitOram<Boolean>(lib.getEnv(), v+e, node.numBits());
-//System.out.println(node.keyvalue.value.numBits());
-		PriorityQueue<BoolArray> pq = new PriorityQueue<BoolArray>(lib.getEnv(), logoramsize, 
+		StackNode<BoolArray> node = new StackNode<BoolArray>(lib.getEnv(), logoramsize, ba);
+		CircuitOram<Boolean> oram = new CircuitOram<Boolean>(lib.getEnv(), logoramsize, node.numBits());
+		Stack<BoolArray> stack = new Stack<BoolArray>(lib.getEnv(), logoramsize, 
 				new BoolArray(lib.getEnv()), oram);
-
-		BoolArray tmp1 = new BoolArray(lib.getEnv());
-		pq.pqueue_op(lib.getEnv().inputOfAlice(Utils.fromInt(15, bitLength)), 
-				tmp1, lib.SIGNAL_ZERO);
-		pq.pqueue_op(lib.getEnv().inputOfAlice(Utils.fromInt(15, bitLength)), 
-				tmp1, lib.SIGNAL_ONE);
 		BoolArray tmp = new BoolArray(lib.getEnv());tmp.data = lib.toSignals(0, bitLength);
-		pq.push(lib.toSignals(1000, bitLength), tmp, lib.SIGNAL_ONE);
-
+		stack.push(tmp, lib.SIGNAL_ONE);
 		if(m == Mode.COUNT) {
 			((PMCompEnv) lib.getEnv()).statistic.flush();
 		}
 		Boolean traversingNode = lib.SIGNAL_ZERO;
 		Boolean[] next = lib.toSignals(0, bitLength);
-		Boolean[] currentV = lib.toSignals(0, bitLength);
-		for(int i = 0; i < 1; ++i) {
+		for(int i = 0; i < 2*v+e; ++i) {
 			Boolean traNd = traversingNode;
-			Boolean NtraNd = lib.not(traversingNode);
-			compiledlib.priority_queue.KeyValue<BoolArray> t = pq.pop(NtraNd);
-			t.key = lib.sub(lib.toSignals(1000, bitLength), t.key);
-			Boolean[] disvalue = dis.read(t.value.data);
-			Boolean newNode = lib.geq(disvalue, t.key);
-			Boolean nested = lib.and(newNode, NtraNd);
-			traversingNode = lib.mux(traversingNode, lib.SIGNAL_ONE, nested);
-			next = lib.mux(next, t.value.data, nested);
-			dis.write(t.value.data, lib.mux(disvalue,t.key,nested));
-			currentV = lib.mux(currentV	, t.key, nested);
-			Boolean[][]e = nextEdge(next, graph);
-			next = lib.mux(next, e[1], traNd);
-			Boolean nodeEnds = lib.eq(e[1], lib.toSignals(-1, e[1].length));
-			traversingNode = lib.mux(traversingNode, lib.SIGNAL_ZERO,lib.and(traNd, nodeEnds));
-			Boolean secondNest = lib.and(traNd, lib.not(nodeEnds));
+			Boolean ntvrsing = lib.not(traNd);
+			BoolArray t = stack.pop(ntvrsing);
+			Boolean[] res = dis.read(t.data);
+			Boolean explored = res[0];
+//			System.out.println(Utils.toInt(lib.getEnv().outputToAlice(t.data))+" "+lib.getEnv().outputToAlice(explored));
+			Boolean firstguard = lib.and(ntvrsing, lib.not(explored));
+			dis.write(t.data, lib.mux(res, lib.toSignals(1, 1), firstguard));
+			traversingNode = lib.mux(traNd, lib.SIGNAL_ONE, firstguard);
+			next = lib.mux(next, t.data, firstguard);
 			
-			Boolean[] dist = lib.add(currentV, e[2]);
+			Boolean[][] e = nextEdge(next, graph);
+			next = lib.mux(next, e[1], traNd);
+			Boolean terminate = lib.eq(lib.toSignals(-1, next.length), next);
+			traversingNode = lib.mux(traversingNode, lib.SIGNAL_ZERO, lib.and(terminate, traNd));
 			BoolArray tmp2 = new BoolArray(lib.getEnv());tmp2.data = e[0];
-			pq.push(lib.sub(lib.toSignals(1000, bitLength), dist), tmp2, secondNest);	
+			
+			stack.push(tmp2, lib.and(traNd,lib.not(terminate)));
 		}
-		if(m != Mode.COUNT){
-			if(lib.getEnv().getParty() == Party.Alice) {
-				for(int l = 0; l < v; ++l)
-					System.out.print(Utils.toInt(lib.getEnv().outputToAlice(dis.read(lib.publicValue(l)))) + "\t");
-				System.out.print("\n");
-			}
-			else {
-				for(int l = 0; l < v; ++l)
-					lib.outputToAlice(dis.read(lib.publicValue(l)));
-			}
-		}
-		else  if (m == Mode.COUNT) {
-			((PMCompEnv) lib.getEnv()).statistic.andGate *= (v+e);
-		}
-
 	}
+	
+	
 
 	public static Boolean[][]nextEdge (Boolean[] next, SecureArray<Boolean> graph) {
 		Boolean[] res = graph.read(next);
@@ -195,7 +169,7 @@ public class Dijkstra extends TestHarness {
 	public void runThreads() throws Exception {
 		GenRunnable gen = new GenRunnable();
 		EvaRunnable env = new EvaRunnable();
-		m = Mode.COUNT;
+		m = Mode.VERIFY;
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
 		tGen.start();
@@ -211,12 +185,12 @@ public class Dijkstra extends TestHarness {
 
 	public  static void main(String args[]) throws Exception {
 		for(int i = 7; i <=20; i++) {
-			Dijkstra.v = 1<<i;
-			Dijkstra.e = 4*v;
+			DFS.v = 1<<i;
+			DFS.e = 4*v;
 
-			Dijkstra.logoramsize = (int) (Math.log((v+e))/Math.log(2));
+			DFS.logoramsize = (int) (Math.log((v+e))/Math.log(2));
 			
-			new Dijkstra().runThreads();
+			new DFS().runThreads();
 		}
 	}
 }

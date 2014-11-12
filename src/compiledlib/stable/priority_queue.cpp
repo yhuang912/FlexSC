@@ -11,14 +11,14 @@ typedef PORAM<T> = native CircuitOram;
 intr_@m RND(intp_@m bit) = native intLib.randBools;
 dummy PriorityQueueNode@m<T> PORAM<T>.poram_retrieve(ints_@m id, intr_@m pos) = native conditionalReadAndRemove;
 dummy void PORAM<T>.poram_write(ints_@m id, intr_@m pos, PriorityQueueNode@m<T> node) = native conditionalPutBack;
-struct BoolArray{ints_16 data;};
+struct BoolArray{ints_32 data;};
 struct NodeId@m {
    ints_@m id;
    intr_@m pos;
 };
 
 struct KeyValue@m<T> {
-   ints_16 key;
+   ints_32 key;
    T value;
 };
 
@@ -39,7 +39,7 @@ void PriorityQueue@m<T>.init(){
    this.size = 0;
    this.root.id = 0;
 }
-KeyValue@m<T> PriorityQueue@m<T>.pqueue_op(ints_16 key, T operand, ints_1 op) {
+KeyValue@m<T> PriorityQueue@m<T>.pqueue_op(ints_32 key, T operand, ints_1 op) {
    KeyValue@m<T> ret;
    KeyValue@m<T> d = KeyValue@m{T}(key = key, value = operand);
    if(op == POP){
@@ -54,7 +54,7 @@ KeyValue@m<T> PriorityQueue@m<T>.pqueue_op(ints_16 key, T operand, ints_1 op) {
    this.insert(d, insert_dummy_bit);
    return ret;
 }
-void PriorityQueue@m<T>.push(ints_16 key, T operand, ints_1 dummy_bit) {
+void PriorityQueue@m<T>.push(ints_32 key, T operand, ints_1 dummy_bit) {
    KeyValue@m<T> d = KeyValue@m{T}(key = key, value = operand);
    this.insert(d, dummy_bit);
 }
@@ -127,7 +127,7 @@ KeyValue@m<T> PriorityQueue@m<T>.extractMax(ints_1 dummy_bit) {
       }
       else {
          ret = last_node.keyvalue;
-         this.root.pos = RND(30);
+         this.root.pos = RND(m);
       }
    }
    return ret;
@@ -179,19 +179,19 @@ intr_@m PriorityQueue@m<T>.heapify(ints_@m top_id, PriorityQueueNode@m<T> top_no
             node_to_use = left_node;
             if(go_left == true) {
                top_node.left.pos = child_iter;
-               top_node.right.pos = RND(30);
+               top_node.right.pos = RND(m);
                id_to_use = top_node.right.id;
                pos_to_use = top_node.right.pos;
                node_to_use = right_node;
             } else {
                top_node.right.pos = child_iter;
-               top_node.left.pos = RND(30);
+               top_node.left.pos = RND(m);
                pos_to_use = top_node.left.pos;
             }
             this.poram.poram_write(id_to_use, pos_to_use, node_to_use);
          }
          if(top_id <= this.size) {
-            ret = RND(30);
+            ret = RND(m);
             this.poram.poram_write(top_id, ret, top_node);
          }
       }
@@ -222,7 +222,7 @@ PriorityQueueNode@m<T> PriorityQueue@m<T>.get_last(NodeId@m top, intp_@m level, 
             child = this.get_last(next, level+1, newdummy_bit);
             if(go_left == true) node.left.pos = child.left.pos;
             else node.right.pos = child.left.pos;
-            top.pos = RND(30);
+            top.pos = RND(m);
             this.poram.poram_write(top.id, top.pos, node);
             child.left.pos = top.pos;
             ret = child;
@@ -276,7 +276,7 @@ intr_@m PriorityQueue@m<T>.insert_internal(KeyValue@m<T> kv, KeyValue@m<T> paren
          }
          node.left.id = iter_id<<1;
          node.right.id = node.left.id +1;
-         ret = RND(30);
+         ret = RND(m);
          this.poram.poram_write(iter_id, ret, node);
       }
    }

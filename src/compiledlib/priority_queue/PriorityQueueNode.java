@@ -24,17 +24,19 @@ public class PriorityQueueNode<T extends IWritable<T,Boolean>> implements IWrita
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private T factoryT;
 	private int m;
 
-	public PriorityQueueNode(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m, T factoryT) throws Exception {
+	public PriorityQueueNode(CompEnv<Boolean> env, int m, T factoryT) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.factoryT = factoryT;
-		this.left = new NodeId(env, intLib, m);
-		this.keyvalue = new KeyValue<T>(env, intLib, m, factoryT);
-		this.right = new NodeId(env, intLib, m);
+		this.left = new NodeId(env, m);
+		this.keyvalue = new KeyValue<T>(env, m, factoryT);
+		this.right = new NodeId(env, m);
 	}
 
 	public int numBits() {
@@ -68,20 +70,20 @@ public class PriorityQueueNode<T extends IWritable<T,Boolean>> implements IWrita
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		PriorityQueueNode<T> ret = new PriorityQueueNode<T>(env, intLib, m, factoryT);
+		PriorityQueueNode<T> ret = new PriorityQueueNode<T>(env, m, factoryT);
 		Boolean[] tmp;
 		int now = 0;
-		ret.left = new NodeId(env, intLib, m);
+		ret.left = new NodeId(env, m);
 		tmp = new Boolean[this.left.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;
 		ret.left = ret.left.newObj(tmp);
-		ret.keyvalue = new KeyValue<T>(env, intLib, m, factoryT);
+		ret.keyvalue = new KeyValue<T>(env, m, factoryT);
 		tmp = new Boolean[this.keyvalue.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;
 		ret.keyvalue = ret.keyvalue.newObj(tmp);
-		ret.right = new NodeId(env, intLib, m);
+		ret.right = new NodeId(env, m);
 		tmp = new Boolean[this.right.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;

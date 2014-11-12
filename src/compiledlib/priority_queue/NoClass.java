@@ -21,10 +21,12 @@ public class NoClass implements IWritable<NoClass, Boolean> {
 
 	public static CompEnv<Boolean> env;
 	public static IntegerLib<Boolean> intLib;
+	public static FloatLib<Boolean> floatLib;
 
-	public NoClass(CompEnv<Boolean> env, IntegerLib<Boolean> intLib) throws Exception {
+	public NoClass(CompEnv<Boolean> env) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 	}
 
 	public int numBits() {
@@ -44,7 +46,7 @@ public class NoClass implements IWritable<NoClass, Boolean> {
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		NoClass ret = new NoClass(env, intLib);
+		NoClass ret = new NoClass(env);
 		Boolean[] tmp;
 		int now = 0;
 		return ret;

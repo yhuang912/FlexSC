@@ -1,52 +1,85 @@
 package arithcircuit;
 
-import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Arrays;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import arithcircuit.TestBigInteger.EvaRunnable;
+import arithcircuit.TestBigInteger.GenRunnable;
+import compiledlib.tmp.FUNC_0_Native__Native__Native__Native_Impl;
 import flexsc.CompEnv;
+import flexsc.Mode;
+import flexsc.Party;
 
 
 
 public class TestABB  {
 
-	static int bitlength = 512;
-	static BigInteger v1 = null;
-	static BigInteger v2 = null;
+	public static Mode m = Mode.COUNT;
+final public static int times = 10;
+//	static int bitlength = 512;
+	long v1 = 0;
+	long v2 = 0;
+	long v3 = 0;
 
+	SecureRandom rnd;
+	
+	public static void main(String[] args) throws Exception {
+		new TestABB().testCases();
+	}
+	
 	@Test
 	public void testCases () throws InterruptedException {
-		for(int i = 0; i < 100; ++i)
+		rnd = new SecureRandom();
 			testACase();
 	}
 	
 	public void testACase() throws InterruptedException {
-		v1 = new BigInteger(bitlength, CompEnv.rnd);
-		v2 = new BigInteger(bitlength, CompEnv.rnd);
-		GenRunnable gen = new GenRunnable();
-		EvaRunnable eva = new EvaRunnable();
+		
+		for(int i = 1; i <= 10; ++i) {
+			v1 = rnd.nextInt(1 << 30);
+			GenRunnable gen = new GenRunnable();
+			EvaRunnable eva = new EvaRunnable();
 
-		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start(); Thread.sleep(5);
-		tEva.start();
-		tGen.join();
+			Thread tGen = new Thread(gen);
+			Thread tEva = new Thread(eva);
+			tGen.start(); Thread.sleep(5);
+			tEva.start();
+			tGen.join();
+		}
+		
 	}
-	public static class GenRunnable extends network.Server implements Runnable {
+	
+	public void secureCompute(FHEInteger a, int dim) {
+//		a = a.add(a);
+		a.multiply(a);
+	}
+	
+	public class GenRunnable extends network.Server implements Runnable {
+		
+		FUNC_0_Native__Native__Native__Native_Impl func;
+
 		public void run() {
 			try {
 				listen(54321);
-				ABBAlice alice = new ABBAlice(is, os, bitlength);
+				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
+				func = new FUNC_0_Native__Native__Native__Native_Impl(env);
 
-				BigInteger	a = alice.inputOfAlice(v1);
-				BigInteger b = alice.inputOfBob(BigInteger.ZERO);
-				double d1 = System.nanoTime();
-				BigInteger c = alice.multiply(a, b);
-				System.out.println((System.nanoTime()-d1)/1000000000);
-				BigInteger rr = alice.outputToAlice(c);
-//				System.out.println(rr);
-				Assert.assertTrue((rr.equals(v1.multiply(v2).mod(alice.pk.n))));
+				FHEInteger alice = FHEInteger.newInstance(env, is, os);
+				alice.setup();				
+				FHEInteger a = alice.input(Party.Alice, v1);
+				
+				double[] t1 = new double[times];
+				for(int i = 0; i < t1.length; ++i) {
+					t1[i] = System.nanoTime();
+					secureCompute(a, 1);
+					t1[i] = System.nanoTime() - t1[i];
+				}
+				Arrays.sort(t1);
+//				System.out.println(Arrays.toString(t1));
+				System.out.println(t1[t1.length/2]/1000000000.0);
+				
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -55,34 +88,29 @@ public class TestABB  {
 		}
 	}
 
-	public static class EvaRunnable extends network.Client implements Runnable {
+	public class EvaRunnable extends network.Client implements Runnable {
+		
+		FUNC_0_Native__Native__Native__Native_Impl func;
+
 		public void run() {
 			try {
 				connect("localhost", 54321);				
-				ABBBob bob = new ABBBob(is, os);
-
-				BigInteger a = bob.inputOfAlice(BigInteger.ZERO);
-				BigInteger b = bob.inputOfBob(v2);
-				BigInteger c = bob.multiply(a, b);
-				bob.outputToAlice(c);
-				os.flush();
+				CompEnv env = CompEnv.getEnv(m, Party.Bob, is, os);
+				func = new FUNC_0_Native__Native__Native__Native_Impl(env);
+				
+				FHEInteger alice = FHEInteger.newInstance(env, is, os);
+				alice.setup();
+				
+				
+				FHEInteger a = alice.input(Party.Alice, 0);
+				for(int i = 0; i < times; ++i) 
+					secureCompute(a, 5);
 				disconnect();
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.exit(1);
 			}
 		}
-	}
-
-	//	@Test
-	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable();
-		EvaRunnable eva = new EvaRunnable();
-
-		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start(); Thread.sleep(5);
-		tEva.start();
-		tGen.join();
 	}
 }

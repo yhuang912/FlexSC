@@ -4,6 +4,7 @@ package oram;
 import java.util.Arrays;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Party;
 
 public class CircuitOram<T> extends TreeBasedOramParty<T> {
@@ -148,8 +149,10 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 	public int cnttt = 0;
 	public void conditionalPutBack(T[] scIden, T[] scNewPos, T[] scData,
 			T condition) {
+		
 //		 Utils.print(env, "pb:iden:", scIden, scNewPos, condition);
 		cnttt++;
+//		System.out.println(cnttt);
 		env.flush();
 		scIden = Arrays.copyOf(scIden, lengthOfIden);
 

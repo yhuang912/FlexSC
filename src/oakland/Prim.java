@@ -66,19 +66,19 @@ public class Prim extends TestHarness {
 		SecureArray<Boolean> dis = new SecureArray<Boolean>(lib.getEnv(), v, 2);
 		dis.setInitialValue(0);
 
-		BoolArray ba = new BoolArray(lib.getEnv(), lib);
-		PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(lib.getEnv(), lib, logoramsize, ba);
+		BoolArray ba = new BoolArray(lib.getEnv());
+		PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(lib.getEnv(), logoramsize, ba);
 		CircuitOram<Boolean> oram = new CircuitOram<Boolean>(lib.getEnv(), v+e, node.numBits());
 //System.out.println(node.keyvalue.value.numBits());
-		PriorityQueue<BoolArray> pq = new PriorityQueue<BoolArray>(lib.getEnv(), lib, logoramsize, 
-				new BoolArray(lib.getEnv(),lib), oram);
+		PriorityQueue<BoolArray> pq = new PriorityQueue<BoolArray>(lib.getEnv(), logoramsize, 
+				new BoolArray(lib.getEnv()), oram);
 
-		BoolArray tmp1 = new BoolArray(lib.getEnv(), lib);
+		BoolArray tmp1 = new BoolArray(lib.getEnv());
 		pq.pqueue_op(lib.getEnv().inputOfAlice(Utils.fromInt(15, bitLength)), 
 				tmp1, lib.SIGNAL_ZERO);
 		pq.pqueue_op(lib.getEnv().inputOfAlice(Utils.fromInt(15, bitLength)), 
 				tmp1, lib.SIGNAL_ONE);
-		BoolArray tmp = new BoolArray(lib.getEnv(), lib);tmp.data = lib.toSignals(0, bitLength);
+		BoolArray tmp = new BoolArray(lib.getEnv());tmp.data = lib.toSignals(0, bitLength);
 		pq.push(lib.toSignals(1000, bitLength), tmp, lib.SIGNAL_ONE);
 
 		if(m == Mode.COUNT) {
@@ -106,7 +106,7 @@ public class Prim extends TestHarness {
 			Boolean secondNest = lib.and(traNd, lib.not(nodeEnds));
 			
 //			Boolean[] dist = lib.add(currentV, e[2]);
-			BoolArray tmp2 = new BoolArray(lib.getEnv(), lib);tmp2.data = e[0];
+			BoolArray tmp2 = new BoolArray(lib.getEnv());tmp2.data = e[0];
 			pq.push(lib.sub(lib.toSignals(1000, bitLength), e[2]), tmp2, secondNest);	
 		}
 		if(m != Mode.COUNT){

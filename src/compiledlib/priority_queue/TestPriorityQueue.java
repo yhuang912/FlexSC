@@ -69,23 +69,22 @@ public class TestPriorityQueue {
 	public void compute(CompEnv<Boolean> env, PriorityQueue<BoolArray> ostack,
 			IntegerLib<Boolean> lib) throws Exception {
 		double[] time = new double[op.length];
-		BoolArray tmp1 = new BoolArray(env, lib);
+		BoolArray tmp1 = new BoolArray(env);
 		tmp1.data = env.inputOfAlice(Utils.fromInt(15, 32));
 		ostack.init();
-		ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(15, 32)), 
-				tmp1, lib.SIGNAL_ZERO);
-		ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(15, 32)), 
-				tmp1, lib.SIGNAL_ONE);
+//		ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(15, 32)), 
+//				tmp1, lib.SIGNAL_ZERO);
+//		ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(15, 32)), 
+//				tmp1, lib.SIGNAL_ONE);
 
 		
 		for (int i = 0; i < op.length; ++i) {
-
 			if (op[i] == 1 && m == Mode.VERIFY) {
 				int res = 0;
 				if (env.getParty() == Party.Alice) {
 //					res = cstack.poll();
 				}
-				BoolArray tmp = new BoolArray(env, lib);
+				BoolArray tmp = new BoolArray(env);
 				KeyValue<BoolArray> scres = ostack.pqueue_op(env.inputOfAlice(Utils.fromInt(0, 32)), tmp,lib.SIGNAL_ONE);
 //				KeyValue<BoolArray> scres = ostack.pop(lib.SIGNAL_ONE);
 				
@@ -98,8 +97,9 @@ public class TestPriorityQueue {
 				}
 			} else {
 				int rand = next[i];
-				BoolArray tmp = new BoolArray(env, lib);
+				BoolArray tmp = new BoolArray(env);
 				Boolean[] in = env.inputOfAlice(Utils.fromInt(rand, 32));
+				
 				if(m == Mode.REAL && env.getParty() == Party.Alice) {
 					System.gc();
 					double a = System.nanoTime();
@@ -109,7 +109,6 @@ public class TestPriorityQueue {
 				} else 
 					ostack.pqueue_op(in, tmp, lib.SIGNAL_ZERO);
 //					ostack.push(in, tmp, lib.SIGNAL_ONE);
-				
 				int ssize = Utils.toInt(env.outputToAlice(ostack.size));
 				if (env.getParty() == Party.Alice && m == Mode.VERIFY) {
 					cstack.add(100 - rand);
@@ -144,11 +143,10 @@ public class TestPriorityQueue {
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(
-						env, lib, logN, new BoolArray(env, lib));
+						env, logN, new BoolArray(env));
 				PriorityQueue<BoolArray> ostack = new PriorityQueue<BoolArray>(
 						env,
-						lib,
-						logN, new BoolArray(env, lib),
+						logN, new BoolArray(env),
 						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
 				
 				if (m == Mode.COUNT) {
@@ -184,11 +182,10 @@ public class TestPriorityQueue {
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(
-						env, lib, logN, new BoolArray(env, lib));
+						env, logN, new BoolArray(env));
 				PriorityQueue<BoolArray> ostack = new PriorityQueue<BoolArray>(
 						env,
-						lib,
-						logN, new BoolArray(env, lib),
+						logN, new BoolArray(env),
 						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
 
 				compute(env, ostack, lib);

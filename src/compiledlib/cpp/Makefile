@@ -103,6 +103,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named dfs
+
+# Build rule for target.
+dfs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dfs
+.PHONY : dfs
+
+# fast build rule for target.
+dfs/fast:
+	$(MAKE) -f CMakeFiles/dfs.dir/build.make CMakeFiles/dfs.dir/build
+.PHONY : dfs/fast
+
+#=============================================================================
 # Target rules for targets named prim
 
 # Build rule for target.
@@ -127,6 +140,30 @@ ssp: cmake_check_build_system
 ssp/fast:
 	$(MAKE) -f CMakeFiles/ssp.dir/build.make CMakeFiles/ssp.dir/build
 .PHONY : ssp/fast
+
+dfs.o: dfs.cpp.o
+.PHONY : dfs.o
+
+# target to build an object file
+dfs.cpp.o:
+	$(MAKE) -f CMakeFiles/dfs.dir/build.make CMakeFiles/dfs.dir/dfs.cpp.o
+.PHONY : dfs.cpp.o
+
+dfs.i: dfs.cpp.i
+.PHONY : dfs.i
+
+# target to preprocess a source file
+dfs.cpp.i:
+	$(MAKE) -f CMakeFiles/dfs.dir/build.make CMakeFiles/dfs.dir/dfs.cpp.i
+.PHONY : dfs.cpp.i
+
+dfs.s: dfs.cpp.s
+.PHONY : dfs.s
+
+# target to generate assembly for a file
+dfs.cpp.s:
+	$(MAKE) -f CMakeFiles/dfs.dir/build.make CMakeFiles/dfs.dir/dfs.cpp.s
+.PHONY : dfs.cpp.s
 
 dijkstra.o: dijkstra.cpp.o
 .PHONY : dijkstra.o
@@ -182,10 +219,14 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... dfs"
 	@echo "... edit_cache"
 	@echo "... prim"
 	@echo "... rebuild_cache"
 	@echo "... ssp"
+	@echo "... dfs.o"
+	@echo "... dfs.i"
+	@echo "... dfs.s"
 	@echo "... dijkstra.o"
 	@echo "... dijkstra.i"
 	@echo "... dijkstra.s"

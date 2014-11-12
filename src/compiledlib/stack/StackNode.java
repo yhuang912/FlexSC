@@ -7,6 +7,7 @@ import flexsc.Party;
 import flexsc.CompEnv;
 import java.util.BitSet;
 import circuits.arithmetic.IntegerLib;
+import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
@@ -22,12 +23,14 @@ public class StackNode<T extends IWritable<T,Boolean>> implements IWritable<Stac
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private T factoryT;
 	private int m;
 
-	public StackNode(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m, T factoryT) throws Exception {
+	public StackNode(CompEnv<Boolean> env, int m, T factoryT) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.factoryT = factoryT;
 		this.next = intLib.randBools(m);
@@ -61,7 +64,7 @@ public class StackNode<T extends IWritable<T,Boolean>> implements IWritable<Stac
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		StackNode<T> ret = new StackNode<T>(env, intLib, m, factoryT);
+		StackNode<T> ret = new StackNode<T>(env, m, factoryT);
 		Boolean[] tmp;
 		int now = 0;
 		ret.next = new Boolean[m];

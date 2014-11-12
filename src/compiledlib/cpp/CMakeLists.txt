@@ -15,3 +15,7 @@ add_executable(ssp
 add_executable(prim
    prim.cpp
 )
+
+add_executable(dfs
+   dfs.cpp
+)

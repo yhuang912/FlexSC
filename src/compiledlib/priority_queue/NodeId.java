@@ -23,11 +23,13 @@ public class NodeId implements IWritable<NodeId, Boolean> {
 
 	public CompEnv<Boolean> env;
 	public IntegerLib<Boolean> intLib;
+	public FloatLib<Boolean> floatLib;
 	private int m;
 
-	public NodeId(CompEnv<Boolean> env, IntegerLib<Boolean> intLib, int m) throws Exception {
+	public NodeId(CompEnv<Boolean> env, int m) throws Exception {
 		this.env = env;
-		this.intLib = intLib;
+		this.intLib = new IntegerLib<Boolean>(env);
+		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
 		this.m = m;
 		this.pos = intLib.randBools(m);
 		this.id = env.inputOfAlice(Utils.fromInt(0, m));
@@ -56,7 +58,7 @@ public class NodeId implements IWritable<NodeId, Boolean> {
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		NodeId ret = new NodeId(env, intLib, m);
+		NodeId ret = new NodeId(env, m);
 		Boolean[] tmp;
 		int now = 0;
 		ret.pos = new Boolean[m];

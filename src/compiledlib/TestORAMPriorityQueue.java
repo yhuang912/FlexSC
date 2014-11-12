@@ -94,10 +94,12 @@ public class TestORAMPriorityQueue {
 
 	public static void main(String[] args) throws Exception {
 		// args = new String[1];
-		// args[0] = "10";
-		TestORAMPriorityQueue c = new TestORAMPriorityQueue(
-				new Integer(args[0]), 32);
-		c.count();
-		System.out.print(c.ands + "\t" + c.encs);
+//		 args[0] = "10";
+		 for(int i = 10; i <= 30; i+=2) {
+			 TestORAMPriorityQueue c = new TestORAMPriorityQueue(i, 32);
+//				new Integer(i, 32);
+				c.count();
+				System.out.println(i+"\t"+c.ands + "\t" + c.encs);
+		}
 	}
 }

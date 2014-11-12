@@ -12,10 +12,9 @@ import gc.GCSignal;
 public class TestCircuitOramRec {
 
 	public  static void main(String args[]) throws Exception {
-		for(int i = 9; i <=16 ; i++) {
-			TestCircuitOramRec t = new TestCircuitOramRec();
-			GenRunnable gen = t.new GenRunnable(12345, i+1, 3, 16, 8, 6);
-			EvaRunnable eva = t.new EvaRunnable("localhost", 12345);
+		for(int i = 20; i <=20 ; i++) {
+			GenRunnable gen = new GenRunnable(12345, i, 3, 32, 8, 6);
+			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
 			tGen.start();
@@ -40,13 +39,13 @@ public class TestCircuitOramRec {
 		System.out.print("\n");
 	}
 
-	final static int writeCount = 1;//1 << 7;
+	final static int writeCount = 10;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
 	public TestCircuitOramRec() {
 	}
 
-	class GenRunnable extends network.Server implements Runnable {
+	public static class GenRunnable extends network.Server implements Runnable {
 		int port;
 		int logN;
 		int N;
@@ -79,8 +78,7 @@ public class TestCircuitOramRec {
 				os.write(dataSize);
 				os.flush();
 
-				System.out
-						.println("\nlogN recurFactor  cutoff capacity dataSize");
+				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN + " " + recurFactor + " " + cutoff
 						+ " " + capacity + " " + dataSize);
 
@@ -93,20 +91,21 @@ public class TestCircuitOramRec {
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
 
-					Flag.sw.startTotal();
+
 					Flag.sw.ands = 0;
 					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils
 							.fromInt(element, dataSize));
 					os.flush();
+					Flag.sw.startTotal();
 					client.write(client.baseOram.lib.toSignals(element), scData);
 					double t = Flag.sw.stopTotal();
-					System.out.println(Flag.sw.ands + " " + t / 1000000000.0
-							+ " " + Flag.sw.ands / t * 1000);
+//					System.out.println(Flag.sw.ands + " " + t / 1000000000.0
+//							+ " " + Flag.sw.ands / t * 1000);
 					Flag.sw.addCounter();
 
 					Runtime rt = Runtime.getRuntime();
 					double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
-					System.out.println("mem: " + usedMB);
+//					System.out.println("mem: " + usedMB);
 				}
 
 				for (int i = 0; i < readCount; ++i) {
@@ -131,7 +130,7 @@ public class TestCircuitOramRec {
 		}
 	}
 
-	class EvaRunnable extends network.Client implements Runnable {
+	public static class EvaRunnable extends network.Client implements Runnable {
 
 		String host;
 		int port;
@@ -164,14 +163,14 @@ public class TestCircuitOramRec {
 				RecursiveCircuitOram<GCSignal> server = new RecursiveCircuitOram<GCSignal>(
 						env, N, dataSize, cutoff, recurFactor, capacity, 80);
 				for (int i = 0; i < writeCount; ++i) {
-					// Flag.sw.startTotal();
 					int element = i % N;
 					GCSignal[] scData = server.baseOram.env
 							.inputOfAlice(new boolean[dataSize]);
+					Flag.sw.startTotal();
 					server.write(server.baseOram.lib.toSignals(element), scData);
-					// Flag.sw.stopTotal();
-					// Flag.sw.addCounter();
-					printStatistic();
+					 Flag.sw.stopTotal();
+					 Flag.sw.addCounter();
+//					printStatistic();
 				}
 
 				int cnt = 0;
