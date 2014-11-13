@@ -17,19 +17,19 @@ public class PageRankNode<T> extends GraphNode<T> {
 
 	public PageRankNode(T[] u, T[] v, T isVertex, CompEnv<T> env) {
 		super(u, v, isVertex);
-		this.pr = env.newTArray(PageRank.WIDTH);
-		this.l = env.newTArray(PageRank.WIDTH);
-//		this.pr = env.newTArray(PageRank.FLOAT_WIDTH);
-//		this.l = env.newTArray(PageRank.FLOAT_WIDTH);
+//		this.pr = env.newTArray(PageRank.WIDTH);
+//		this.l = env.newTArray(PageRank.WIDTH);
+		this.pr = env.newTArray(PageRank.FLOAT_WIDTH);
+		this.l = env.newTArray(PageRank.FLOAT_WIDTH);
 	}
 
 	public PageRankNode(CompEnv<T> env) {
 		super(env);
 		try {
-//			this.pr = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
-//			this.l = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
-			this.pr = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
-			this.l = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
+			this.pr = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
+			this.l = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
+//			this.pr = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
+//			this.l = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
 		} catch (IOException e) {
 			e.printStackTrace();
 		};
@@ -49,10 +49,10 @@ public class PageRankNode<T> extends GraphNode<T> {
 	@Override
 	public void read(InputStream is, CompEnv<T> env) throws IOException {
 		super.read(is, env);
-//		this.pr = NetworkUtil.read(is, PageRank.FLOAT_WIDTH, env);
-//		this.l = NetworkUtil.read(is, PageRank.FLOAT_WIDTH, env);
-		this.pr = NetworkUtil.read(is, PageRank.WIDTH, env);
-		this.l = NetworkUtil.read(is, PageRank.WIDTH, env);
+		this.pr = NetworkUtil.read(is, PageRank.FLOAT_WIDTH, env);
+		this.l = NetworkUtil.read(is, PageRank.FLOAT_WIDTH, env);
+//		this.pr = NetworkUtil.read(is, PageRank.WIDTH, env);
+//		this.l = NetworkUtil.read(is, PageRank.WIDTH, env);
 	}
 
 	@Override

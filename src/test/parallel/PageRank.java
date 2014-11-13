@@ -16,7 +16,7 @@ import ot.IncorrectOtUsageException;
 import test.Utils;
 import circuits.ArithmeticLib;
 import circuits.IntegerLib;
-import circuits.arithmetic.FixedPointLib;
+import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
@@ -26,12 +26,12 @@ import flexsc.Party;
 import gc.BadLabelException;
 
 public class PageRank<T> implements ParallelGadget<T> {
-//	static int FLOAT_V = 20;
-//	static int FLOAT_P = 11;
-	static int ITERATIONS = 1;
-//	static int FLOAT_WIDTH = FLOAT_P + FLOAT_V + 1;
-	static int WIDTH = 40;
-	static int OFFSET = 20;
+	static int FLOAT_V = 28;
+	static int FLOAT_P = 11;
+	static int ITERATIONS = 50;
+	static int FLOAT_WIDTH = FLOAT_P + FLOAT_V + 1;
+//	static int WIDTH = 40;
+//	static int OFFSET = 20;
 
 	private Object[] getInput(int inputLength) throws IOException {
 		int[] u = new int[inputLength];
@@ -167,8 +167,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
 		final IntegerLib<T> lib = new IntegerLib<>(env);
 //		final FloatLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
-		final ArithmeticLib<T> flib = new FixedPointLib<T>(env, WIDTH, OFFSET);
-//		final ArithmeticLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
+//		final ArithmeticLib<T> flib = new FixedPointLib<T>(env, WIDTH, OFFSET);
+		final ArithmeticLib<T> flib = new FloatLib<T>(env, FLOAT_V, FLOAT_P);
 
 		PageRankNode<T>[] aa = (PageRankNode<T>[]) Array.newInstance(PageRankNode.class, u.length);
 		for (int i = 0; i < aa.length; i++) {
@@ -326,8 +326,8 @@ public class PageRank<T> implements ParallelGadget<T> {
 			env.os.flush();
 			if (Party.Alice.equals(env.party)) {
 				if (e) {
-					System.out.format("%d,%d,%d,%f\n", OFFSET, iterations, u, pageRank);
-//					System.out.format("%d,%d,%d,%f,%d,%d\n", FLOAT_WIDTH, iterations, u, pageRank, FLOAT_V, FLOAT_P);
+//					System.out.format("%d,%d,%d,%f\n", OFFSET, iterations, u, pageRank);
+					System.out.format("%d,%d,%d,%f,%d,%d\n", FLOAT_WIDTH, iterations, u, pageRank, FLOAT_V, FLOAT_P);
 //					out.println(iterations + "," + a + "," + c2);
 				}
 			}
