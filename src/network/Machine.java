@@ -25,6 +25,7 @@ import gc.GCSignal;
 public class Machine {
 	public static boolean DEBUG = false;
 	public static int BW = 0;
+	public static int ITERATION = -1;
 
 	private InputStream masterIs;
 	private OutputStream masterOs;
@@ -280,6 +281,7 @@ public class Machine {
 
 	public static <T> void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
 //		BW = Integer.parseInt(args[10]);
+		ITERATION = Integer.parseInt(args[11]);
 		int machines = Integer.parseInt(args[7]);
 		String machineConfig = args[8];
 		IPManager ipManager = IPManager.loadIPs(machines, machineConfig);

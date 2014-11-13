@@ -28,11 +28,11 @@ public class SetInitialPageRankGadget<T> extends Gadget<T> {
 	public Object secureCompute() throws InterruptedException, IOException,
 			BadCommandException, BadLabelException {
 		IntegerLib<T> intLib = new IntegerLib<T>(env);
-		T[] one = env.inputOfAlice(Utils.fromFloat(1, PageRank.FLOAT_V, PageRank.FLOAT_P));
-		T[] zero = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
+//		T[] one = env.inputOfAlice(Utils.fromFloat(1, PageRank.FLOAT_V, PageRank.FLOAT_P));
+//		T[] zero = env.inputOfAlice(Utils.fromFloat(0, PageRank.FLOAT_V, PageRank.FLOAT_P));
 
-//		T[] one = env.inputOfAlice(Utils.fromFixPoint(1, PageRank.WIDTH, PageRank.OFFSET));
-//		T[] zero = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
+		T[] one = env.inputOfAlice(Utils.fromFixPoint(1, PageRank.WIDTH, PageRank.OFFSET));
+		T[] zero = env.inputOfAlice(Utils.fromFixPoint(0, PageRank.WIDTH, PageRank.OFFSET));
 		for (int i = 0; i < prNodes.length; i++) {
 			prNodes[i].pr = intLib.mux(zero, one, prNodes[i].isVertex);
 			prNodes[i].l = intLib.mux(one, zero, prNodes[i].isVertex);
