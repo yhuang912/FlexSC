@@ -138,6 +138,7 @@ public class TestCPU {
 				for (int i = 0; i < inst.getDataLength(); ++i) {
 					Boolean[] instruction = instructionBank.read(lib.toSignals(i, WORD_SIZE));
 					pc = cpu.function(reg, instruction, pc);
+					
 				}
 
 				//Xiao's reading of register value after computation. 
