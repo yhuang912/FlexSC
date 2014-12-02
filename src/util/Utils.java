@@ -166,5 +166,20 @@ public class Utils {
 		a /= Math.pow(2, offset);
 		return a;
 	}
+	
+	public static void printBooleanArray(Boolean[] array){
+		String output = "";
+		for (int i = 0 ; i < array.length;  i++){
+			output += array[i] ? "1" : "0"; 
+		}
+		System.out.println(output);
+	}
 
+	public static void printBooleanArray(boolean[] array){
+		String output = "";
+		for (int i = array.length-1; i >= 0;  i--){
+			output += array[i] ? "1" : "0"; 
+		}
+		System.out.println(output);
+	}
 }

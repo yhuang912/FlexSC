@@ -157,7 +157,8 @@ public class TestCPU {
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				CPU cpu = new CPU(env, lib);
 				MEM mem = new MEM(env, lib);
-				//TestCPU cpu = new TestCPU(config);
+				SecureArray<Boolean> reg = getRegister(env);
+				printRegisters(reg, lib);
 				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
 				SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
@@ -170,26 +171,27 @@ public class TestCPU {
 				int dataOffset = (int) rdr.getDataAddress();
 				
 				//Xiao's two lines
-				SecureArray<Boolean> reg = getRegister(env);
+				
 				//SecureArray<Boolean> memory = getMemory(env);
 				
 				//could this cast cause problems when msb is 1?
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
-				Boolean[] newInst = new Boolean[WORD_SIZE];                           
+				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
+				
 				for (int i = 0; i < inst.getDataLength(); ++i) {
 					//change instructionBank to memBank once we separate 
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
-					//Boolean[] instruction = instructionBank.read(lib.toSignals(i, WORD_SIZE));
 					pc = cpu.function(reg, newInst, pc);
-					System.out.println(Utils.toInt(env.outputToAlice(pc)));
+					Utils.printBooleanArray(newInst);
+					printRegisters(reg, lib);
+					Utils.printBooleanArray(pc);
 				}
 
 				//Xiao's reading of register value after computation. 
 				//Boolean[] reg2 = reg.read(lib.toSignals(2, reg.lengthOfIden));
-				os.flush();
+				//os.flush();
 				//System.out.println(Utils.toInt(env.outputToAlice(reg2)));
-				os.flush();
-
+				
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -211,7 +213,7 @@ public class TestCPU {
 				CPU cpu = new CPU(env, lib);
 				MEM mem = new MEM(env, lib);
 
-				
+				SecureArray<Boolean> reg = getRegister(env);
 				//might be better to have bob send the number of instructions to alice.  That's the only reason 
 				//we currently read the file at all. 
 				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
@@ -225,9 +227,8 @@ public class TestCPU {
 				//instantiate new secure array for memory once we separate instructions from memory.
 				instructionBank = getMemoryEva(env, instructionBank, numInst, dataLen);
 				
-				SecureArray<Boolean> reg = getRegister(env);
 				//SecureArray<Boolean> memory = getMemory(env);
-				Boolean[] newInst = new Boolean[WORD_SIZE];                           
+				Boolean[] newInst = lib.toSignals(0,WORD_SIZE);                           
 				Boolean[] pc = lib.toSignals(0, WORD_SIZE);
 
 				if (m == Mode.COUNT) {
@@ -238,12 +239,10 @@ public class TestCPU {
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
 					//Boolean[] instruction = instructionBank.read(lib.toSignals(i, WORD_SIZE));
 					pc = cpu.function(reg, newInst, pc);
+					//env.outputToAlice(newInst);
 					
 				}
-				Boolean[] reg2 = reg.read(lib.toSignals(2, reg.lengthOfIden));
-				os.flush();
-
-				System.out.println(Utils.toInt(env.outputToAlice(reg2)));
+				
 				if (m == Mode.COUNT) {
 					Statistics sta = ((PMCompEnv) env).statistic;
 					sta.finalize();
@@ -284,6 +283,22 @@ public class TestCPU {
 			config.setBinaryFileName(rest[0]);
 		}
 	}
+	
+	private static void printRegisters(SecureArray<Boolean> reg, IntegerLib<Boolean> lib){
+		String output = "";
+		Boolean[] temp; 
+		for (int i = 0 ; i < 32; i++){
+			output += "|reg" + i + ": ";
+			temp = reg.read(lib.toSignals(i, reg.lengthOfIden));
+			for (int j = 31 ; j >= 0 ; j--){
+				output += temp[j] ? "1" : "0";
+			}	
+			if (i % 3 == 0)
+				output += "\n";
+		}	
+		System.out.println(output);
+	}
+	
 	private static void printUsage() {
 		System.out.println("Usage: java RunACSEmulatorServer [binary file]");
 	}
