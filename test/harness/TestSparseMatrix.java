@@ -45,31 +45,31 @@ public class TestSparseMatrix<T> extends TestHarness {
 
 			xa = new int[M];
 			ya = new int[M];
-			xb = new int[M];
-			yb = new int[M];
+			xb = new int[M/3];
+			yb = new int[M/3];
 			va = new double[M];
-			vb = new double[M];
-			for (int i = 0; i < a.length; ++i) {
-				for (int j = 0; j < a[0].length; ++j)
-					if (rng.nextDouble() < sparseness) {
-						xa[acnt] = i;
-						ya[acnt] = j;
-						va[acnt] = a[i][j];
-						acnt++;
-					} else
-						va[acnt] = 0;
-			}
-
-			for (int i = 0; i < b.length; ++i) {
-				for (int j = 0; j < b[0].length; ++j)
-					if (rng.nextDouble() < 1) {
-						xb[bcnt] = i;
-						yb[bcnt] = j;
-						vb[bcnt] = b[i][j];
-						bcnt++;
-					} else
-						vb[bcnt] = 0;
-			}
+			vb = new double[M/3];
+//			for (int i = 0; i < a.length; ++i) {
+//				for (int j = 0; j < a[0].length; ++j)
+//					if (rng.nextDouble() < sparseness) {
+//						xa[acnt] = i;
+//						ya[acnt] = j;
+//						va[acnt] = a[i][j];
+//						acnt++;
+//					} else
+//						va[acnt] = 0;
+//			}
+//
+//			for (int i = 0; i < b.length; ++i) {
+//				for (int j = 0; j < b[0].length; ++j)
+//					if (rng.nextDouble() < 1) {
+//						xb[bcnt] = i;
+//						yb[bcnt] = j;
+//						vb[bcnt] = b[i][j];
+//						bcnt++;
+//					} else
+//						vb[bcnt] = 0;
+//			}
 		}
 
 		public abstract MatrixNode<T>[] secureCompute(MatrixNode<T>[] a,
@@ -89,13 +89,13 @@ public class TestSparseMatrix<T> extends TestHarness {
 	}
 
 	public void PrintMatrix(double[][] result) {
-		System.out.print("[\n");
-		for (int i = 0; i < result.length; ++i) {
-			for (int j = 0; j < result[0].length; ++j)
-				System.out.print(result[i][j] + " ");
-			System.out.print(";\n");
-		}
-		System.out.print("]\n");
+//		System.out.print("[\n");
+//		for (int i = 0; i < result.length; ++i) {
+//			for (int j = 0; j < result[0].length; ++j)
+//				System.out.print(result[i][j] + " ");
+//			System.out.print(";\n");
+//		}
+//		System.out.print("]\n");
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
@@ -148,16 +148,16 @@ public class TestSparseMatrix<T> extends TestHarness {
 				// h.acnt), Arrays.copyOf(fgc2, h.bcnt), slib);
 				MatrixNode<T>[] re = h.secureCompute(fgc1, fgc2, slib);
 				// System.out.println(re.length);
-				z = new double[h.a.length][h.a[0].length];
-				for (int i = 0; i < re.length; ++i) {
-					double[] res = slib.outputToAlice(re[i]);
-					if (res[3] == 1 && res[0] != -1) {
-						System.out
-								.println(res[0] + " " + res[1] + " " + res[2]);
-						z[(int) res[0]][(int) res[1]] = res[2];
-					}
-					// else res[3] = 0;
-				}
+//				z = new double[h.a.length][h.a[0].length];
+//				for (int i = 0; i < re.length; ++i) {
+//					double[] res = slib.outputToAlice(re[i]);
+//					if (res[3] == 1 && res[0] != -1) {
+//						System.out
+//								.println(res[0] + " " + res[1] + " " + res[2]);
+//						z[(int) res[0]][(int) res[1]] = res[2];
+//					}
+//					// else res[3] = 0;
+//				}
 
 				disconnect();
 			} catch (Exception e) {
@@ -253,7 +253,7 @@ public class TestSparseMatrix<T> extends TestHarness {
 		PrintMatrix(h.a);
 		PrintMatrix(gen.z);
 		if (m == Mode.COUNT) {
-			System.out.println(env.andgates + " " + env.encs);
+			System.out.println(env.andgates + "\t" + env.encs);
 		} else {
 
 			for (int i = 0; i < result.length; ++i)

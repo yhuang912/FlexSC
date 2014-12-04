@@ -5,9 +5,6 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import arithcircuit.TestBigInteger.EvaRunnable;
-import arithcircuit.TestBigInteger.GenRunnable;
-import compiledlib.tmp.FUNC_0_Native__Native__Native__Native_Impl;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
@@ -58,13 +55,13 @@ final public static int times = 10;
 	
 	public class GenRunnable extends network.Server implements Runnable {
 		
-		FUNC_0_Native__Native__Native__Native_Impl func;
+//		FUNC_0_Native__Native__Native__Native_Impl func;
 
 		public void run() {
 			try {
 				listen(54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
-				func = new FUNC_0_Native__Native__Native__Native_Impl(env);
+//				func = new FUNC_0_Native__Native__Native__Native_Impl(env);
 
 				FHEInteger alice = FHEInteger.newInstance(env, is, os);
 				alice.setup();				
@@ -90,13 +87,13 @@ final public static int times = 10;
 
 	public class EvaRunnable extends network.Client implements Runnable {
 		
-		FUNC_0_Native__Native__Native__Native_Impl func;
+//		FUNC_0_Native__Native__Native__Native_Impl func;
 
 		public void run() {
 			try {
 				connect("localhost", 54321);				
 				CompEnv env = CompEnv.getEnv(m, Party.Bob, is, os);
-				func = new FUNC_0_Native__Native__Native__Native_Impl(env);
+//				func = new FUNC_0_Native__Native__Native__Native_Impl(env);
 				
 				FHEInteger alice = FHEInteger.newInstance(env, is, os);
 				alice.setup();

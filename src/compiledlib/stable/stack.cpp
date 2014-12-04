@@ -9,7 +9,7 @@ intr_@m RND(intp_32 m) = native intLib.randBools;
 dummy StackNode@m<T> NonRecursiveORAM@m<T>.readAndRemove(int@m id, rnd@m pos) = native conditionalReadAndRemove;
 dummy void NonRecursiveORAM@m<T>.add(int@m id, rnd@m pos, StackNode@m<T> node) = native conditionalPutBack;
 
-struct BoolArray{ints_16 data;};
+struct BoolArray{ints_32 data;};
 
 struct StackNode@m<T> {
    intr_@m next;

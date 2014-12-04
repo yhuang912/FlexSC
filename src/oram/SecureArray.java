@@ -1,6 +1,8 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package oram;
 
+import java.util.Arrays;
+
 import flexsc.CompEnv;
 
 public class SecureArray<T> {
@@ -21,6 +23,10 @@ public class SecureArray<T> {
 		}
 	}
 
+	public T[] readAndRemove(T[] iden) {
+		return circuitOram.clients.get(0).readAndRemove(iden, 
+				Arrays.copyOfRange(circuitOram.clients.get(0).lib.declassifyToBoth(iden), 0, circuitOram.clients.get(0).lengthOfPos), false);
+	}
 	public void setInitialValue(int inital) {
 		if (useTrivialOram)
 			trivialOram.setInitialValue(inital);

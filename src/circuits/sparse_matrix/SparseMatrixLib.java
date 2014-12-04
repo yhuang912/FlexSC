@@ -135,6 +135,10 @@ public class SparseMatrixLib<T> {
 			value = integerlib.mux(value, merged[i].value, integerlib.and(isNode, integerlib.not(merged[i].isDummy)));
 			merged[i].isDummy = integerlib.or(isNode, merged[i].isDummy);
 		}
+		integerlib.sort(merged, integerlib.SIGNAL_ZERO, 
+				new ComparatorTransformer<MatrixNode<T>, T>(m[0], 
+						new SortByDummyThenYThenX()).toComparator());
+
 		return merged;
 	}
 	

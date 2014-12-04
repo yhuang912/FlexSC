@@ -17,20 +17,20 @@ import java.util.Random;
 import flexsc.IWritable;
 import flexsc.Comparator;
 import java.lang.reflect.Array;
-public class StackNode<T extends IWritable<T,Boolean>> implements IWritable<StackNode<T>, Boolean> {
-	public Boolean[] next;
+public class StackNode<T extends IWritable<T,GCSignal>> implements IWritable<StackNode<T>, GCSignal> {
+	public GCSignal[] next;
 	public T data;
 
-	public CompEnv<Boolean> env;
-	public IntegerLib<Boolean> intLib;
-	public FloatLib<Boolean> floatLib;
+	public CompEnv<GCSignal> env;
+	public IntegerLib<GCSignal> intLib;
+	public FloatLib<GCSignal> floatLib;
 	private T factoryT;
 	private int m;
 
-	public StackNode(CompEnv<Boolean> env, int m, T factoryT) throws Exception {
+	public StackNode(CompEnv<GCSignal> env, int m, T factoryT) throws Exception {
 		this.env = env;
-		this.intLib = new IntegerLib<Boolean>(env);
-		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
+		this.intLib = new IntegerLib<GCSignal>(env);
+		this.floatLib = new FloatLib<GCSignal>(env, 24, 8);
 		this.m = m;
 		this.factoryT = factoryT;
 		this.next = intLib.randBools(m);
@@ -44,10 +44,10 @@ public class StackNode<T extends IWritable<T,Boolean>> implements IWritable<Stac
 		return sum;
 	}
 
-	public Boolean[] getBits() {
-		Boolean[] ret = new Boolean[this.numBits()];
-		Boolean[] tmp_b;
-		Boolean tmp;
+	public GCSignal[] getBits() {
+		GCSignal[] ret = new GCSignal[this.numBits()];
+		GCSignal[] tmp_b;
+		GCSignal tmp;
 		int now = 0;
 		tmp_b = next;
 		System.arraycopy(tmp_b, 0, ret, now, tmp_b.length);
@@ -58,19 +58,19 @@ public class StackNode<T extends IWritable<T,Boolean>> implements IWritable<Stac
 		return ret;
 }
 
-	public StackNode<T> newObj(Boolean[] data) throws Exception {
+	public StackNode<T> newObj(GCSignal[] data) throws Exception {
 		if(data == null) {
-			data = new Boolean[this.numBits()];
+			data = new GCSignal[this.numBits()];
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
 		StackNode<T> ret = new StackNode<T>(env, m, factoryT);
-		Boolean[] tmp;
+		GCSignal[] tmp;
 		int now = 0;
-		ret.next = new Boolean[m];
+		ret.next = new GCSignal[m];
 		System.arraycopy(data, now, ret.next, 0, m);
 		now += m;
-		tmp = new Boolean[this.factoryT.numBits()];
+		tmp = new GCSignal[this.factoryT.numBits()];
 		System.arraycopy(data, now, tmp, 0, tmp.length);
 		now += tmp.length;
 		ret.data = ret.factoryT.newObj(tmp);

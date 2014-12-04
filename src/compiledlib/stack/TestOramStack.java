@@ -16,6 +16,7 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
+import gc.GCSignal;
 
 public class TestOramStack {
 
@@ -30,8 +31,8 @@ public class TestOramStack {
 			op[i] = rnd.nextInt(2);
 	}
 
-	public void compute(CompEnv<Boolean> env, OramStack<BoolArray> ostack,
-			IntegerLib<Boolean> lib) throws Exception {
+	public void compute(CompEnv<GCSignal> env, OramStack<BoolArray> ostack,
+			IntegerLib<GCSignal> lib) throws Exception {
 		double[] time = new double[op.length];
 
 		for (int i = 0; i < op.length; ++i) {
@@ -75,7 +76,7 @@ public class TestOramStack {
 	}
 
 	class GenRunnable extends network.Server implements Runnable {
-		Boolean[] z;
+		GCSignal[] z;
 		long andGate;
 		Statistics sta;
 		int logN = -1;
@@ -88,10 +89,10 @@ public class TestOramStack {
 			try {
 				listen(54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				OramStack<BoolArray> ostack = new OramStack<BoolArray>(env,
-						lib, new BoolArray(env),
-						new SecureArray<Boolean>(env, 1 << logN, 32));
+						new BoolArray(env),
+						new SecureArray<GCSignal>(env, 1 << logN, 32));
 				if (m == Mode.COUNT) {
 				sta = ((PMCompEnv) (env)).statistic;
 				sta.flush();
@@ -123,10 +124,10 @@ public class TestOramStack {
 			try {
 				connect("localhost", 54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Bob, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				OramStack<BoolArray> ostack = new OramStack<BoolArray>(env,
-						lib, new BoolArray(env),
-						new SecureArray<Boolean>(env, 1 << logN, 32));
+						new BoolArray(env),
+						new SecureArray<GCSignal>(env, 1 << logN, 32));
 				compute(env, ostack, lib);
 				disconnect();
 			} catch (Exception e) {

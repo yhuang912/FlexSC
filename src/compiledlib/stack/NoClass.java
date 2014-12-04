@@ -17,37 +17,37 @@ import java.util.Random;
 import flexsc.IWritable;
 import flexsc.Comparator;
 import java.lang.reflect.Array;
-public class NoClass implements IWritable<NoClass, Boolean> {
+public class NoClass implements IWritable<NoClass, GCSignal> {
 
-	public static CompEnv<Boolean> env;
-	public static IntegerLib<Boolean> intLib;
-	public static FloatLib<Boolean> floatLib;
+	public static CompEnv<GCSignal> env;
+	public static IntegerLib<GCSignal> intLib;
+	public static FloatLib<GCSignal> floatLib;
 
-	public NoClass(CompEnv<Boolean> env) throws Exception {
+	public NoClass(CompEnv<GCSignal> env) throws Exception {
 		this.env = env;
-		this.intLib = new IntegerLib<Boolean>(env);
-		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
+		this.intLib = new IntegerLib<GCSignal>(env);
+		this.floatLib = new FloatLib<GCSignal>(env, 24, 8);
 	}
 
 	public int numBits() {
 		return 0;
 	}
-	public Boolean[] getBits() {
-		Boolean[] ret = new Boolean[this.numBits()];
-		Boolean[] tmp_b;
-		Boolean tmp;
+	public GCSignal[] getBits() {
+		GCSignal[] ret = new GCSignal[this.numBits()];
+		GCSignal[] tmp_b;
+		GCSignal tmp;
 		int now = 0;
 		return ret;
 }
 
-	public NoClass newObj(Boolean[] data) throws Exception {
+	public NoClass newObj(GCSignal[] data) throws Exception {
 		if(data == null) {
-			data = new Boolean[this.numBits()];
+			data = new GCSignal[this.numBits()];
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
 		NoClass ret = new NoClass(env);
-		Boolean[] tmp;
+		GCSignal[] tmp;
 		int now = 0;
 		return ret;
 }

@@ -17,27 +17,27 @@ import java.util.Random;
 import flexsc.IWritable;
 import flexsc.Comparator;
 import java.lang.reflect.Array;
-public class BoolArray implements IWritable<BoolArray, Boolean> {
-	public Boolean[] data;
+public class BoolArray implements IWritable<BoolArray, GCSignal> {
+	public GCSignal[] data;
 
-	public CompEnv<Boolean> env;
-	public IntegerLib<Boolean> intLib;
-	public FloatLib<Boolean> floatLib;
+	public CompEnv<GCSignal> env;
+	public IntegerLib<GCSignal> intLib;
+	public FloatLib<GCSignal> floatLib;
 
-	public BoolArray(CompEnv<Boolean> env) throws Exception {
+	public BoolArray(CompEnv<GCSignal> env) throws Exception {
 		this.env = env;
-		this.intLib = new IntegerLib<Boolean>(env);
-		this.floatLib = new FloatLib<Boolean>(env, 24, 8);
-		this.data = env.inputOfAlice(Utils.fromInt(0, 16));
+		this.intLib = new IntegerLib<GCSignal>(env);
+		this.floatLib = new FloatLib<GCSignal>(env, 24, 8);
+		this.data = env.inputOfAlice(Utils.fromInt(0, 32));
 	}
 
 	public int numBits() {
-		return (0)+(16);
+		return (0)+(32);
 	}
-	public Boolean[] getBits() {
-		Boolean[] ret = new Boolean[this.numBits()];
-		Boolean[] tmp_b;
-		Boolean tmp;
+	public GCSignal[] getBits() {
+		GCSignal[] ret = new GCSignal[this.numBits()];
+		GCSignal[] tmp_b;
+		GCSignal tmp;
 		int now = 0;
 		tmp_b = data;
 		System.arraycopy(tmp_b, 0, ret, now, tmp_b.length);
@@ -45,18 +45,18 @@ public class BoolArray implements IWritable<BoolArray, Boolean> {
 		return ret;
 }
 
-	public BoolArray newObj(Boolean[] data) throws Exception {
+	public BoolArray newObj(GCSignal[] data) throws Exception {
 		if(data == null) {
-			data = new Boolean[this.numBits()];
+			data = new GCSignal[this.numBits()];
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
 		BoolArray ret = new BoolArray(env);
-		Boolean[] tmp;
+		GCSignal[] tmp;
 		int now = 0;
-		ret.data = new Boolean[16];
-		System.arraycopy(data, now, ret.data, 0, 16);
-		now += 16;
+		ret.data = new GCSignal[32];
+		System.arraycopy(data, now, ret.data, 0, 32);
+		now += 32;
 		return ret;
 }
 

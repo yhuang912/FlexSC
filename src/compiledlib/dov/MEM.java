@@ -47,7 +47,7 @@ public class MEM implements IWritable<MEM, Boolean> {
 		Boolean[] tmp;
 		int now = 0;
 		return ret;
-}
+	}
 
 	public Boolean[] func(SecureArray<Boolean> reg, SecureArray<Boolean> mem, Boolean[] pc, Boolean[] inst, int pcOffset, int dataOffset) throws Exception {
 		Boolean[] index = env.inputOfAlice(Utils.fromInt(0, 32));

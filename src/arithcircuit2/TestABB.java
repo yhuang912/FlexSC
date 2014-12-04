@@ -6,10 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import flexsc.CompEnv;
-import flexsc.Mode;
-import flexsc.Party;
-import gc.GCSignal;
-import gc.regular.GCGen;
 
 
 

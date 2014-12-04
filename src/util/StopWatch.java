@@ -125,4 +125,12 @@ public class StopWatch {
 				+ (elapsedTimeOT - elapsedTimeOTIO) / 1000000000.0 / counter
 				+ "\t" + elapsedTimeOTIO / 1000000000.0 / counter + "\n");
 	}
+
+	public void print(int i) {
+		System.out.println("timer:\t"+i+" \t"+elapsedTimeTotal / 1000000000.0 / counter + "\t"
+		+ (elapsedTimeGC - elapsedTimeGCIO) / 1000000000.0 / counter
+		+ "\t" + elapsedTimeGCIO / 1000000000.0 / counter + " "
+		+ (elapsedTimeOT - elapsedTimeOTIO) / 1000000000.0 / counter
+		+ "\t" + elapsedTimeOTIO / 1000000000.0 / counter + "\n");
+	}
 }

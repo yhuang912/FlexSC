@@ -95,4 +95,94 @@ public class BitonicSortLib<T> extends IntegerLib<T> {
 			k = k << 1;
 		return k >> 1;
 	}
+	
+	public void sortWithPayload(T[] a, T[][] data, T isAscending) {
+		bitonicSortWithPayload(a, data, 0, a.length, isAscending);
+	}
+
+	private void bitonicSortWithPayload(T[] key, T[][] data, int lo, int n,
+			T dir) {
+		if (n > 1) {
+			int m = n / 2;
+			bitonicSortWithPayload(key, data, lo, m, not(dir));
+			bitonicSortWithPayload(key, data, lo + m, n - m, dir);
+			bitonicMergeWithPayload(key, data, lo, n, dir);
+		}
+	}
+
+	private void bitonicMergeWithPayload(T[] key, T[][] data, int lo, int n,
+			T dir) {
+		if (n > 1) {
+			int m = greatestPowerOfTwoLessThan(n);
+			for (int i = lo; i < lo + n - m; i++)
+				compareWithPayload(key, data, i, i + m, dir);
+			bitonicMergeWithPayload(key, data, lo, m, dir);
+			bitonicMergeWithPayload(key, data, lo + m, n - m, dir);
+		}
+	}
+
+	private void compareWithPayload(T[] key, T[][] data, int i, int j, T dir) {
+		T greater = and(key[i], not(key[j]));
+		T swap = eq(greater, dir);
+		T s = mux(key[j], key[i], swap);
+		s = xor(s, key[i]);
+		T ki = xor(key[j], s);
+		T kj = xor(key[i], s);
+		key[i] = ki;
+		key[j] = kj;
+
+		T[] s2 = mux(data[j], data[i], swap);
+		s2 = xor(s2, data[i]);
+//		System.out.println("!!"+data[j].length+" " +s2.length);
+		T[] di = xor(data[j], s2);
+		T[] dj = xor(data[i], s2);
+		data[i] = di;
+		data[j] = dj;
+	}
+	
+	public void sortWithPayload(T[][] a, T[] data, T isAscending) {
+		bitonicSortWithPayload(a, data, 0, a.length, isAscending);
+	}
+
+	private void bitonicSortWithPayload(T[][] key, T[] data, int lo, int n,
+			T dir) {
+		if (n > 1) {
+			int m = n / 2;
+			bitonicSortWithPayload(key, data, lo, m, not(dir));
+			bitonicSortWithPayload(key, data, lo + m, n - m, dir);
+			bitonicMergeWithPayload(key, data, lo, n, dir);
+		}
+	}
+
+	private void bitonicMergeWithPayload(T[][] key, T[] data, int lo, int n,
+			T dir) {
+		if (n > 1) {
+			int m = greatestPowerOfTwoLessThan(n);
+			for (int i = lo; i < lo + n - m; i++)
+				compareWithPayload(key, data, i, i + m, dir);
+			bitonicMergeWithPayload(key, data, lo, m, dir);
+			bitonicMergeWithPayload(key, data, lo + m, n - m, dir);
+		}
+	}
+
+	private void compareWithPayload(T[][] key, T[] data, int i, int j, T dir) {
+		T greater = not(leq(key[i], key[j]));
+		T swap = eq(greater, dir);
+		T[] s = mux(key[j], key[i], swap);
+		s = xor(s, key[i]);
+		T[] ki = xor(key[j], s);
+		T[] kj = xor(key[i], s);
+		key[i] = ki;
+		key[j] = kj;
+
+		T s2 = mux(data[j], data[i], swap);
+		s2 = xor(s2, data[i]);
+//		System.out.println("!!"+data[j].length+" " +s2.length);
+		T di = xor(data[j], s2);
+		T dj = xor(data[i], s2);
+		data[i] = di;
+		data[j] = dj;
+	}
+	
+
 }
