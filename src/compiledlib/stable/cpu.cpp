@@ -1,3 +1,5 @@
+//#include <cbmc-gc.h>
+
 #define PRINT 0
 #define OP_ADDIU 9
 #define OP_JAL 3
@@ -13,9 +15,7 @@
 #define OP_SUBU 35
 
 struct CPU{};
-
 int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
-	int32 i = 0;
 	int32 op = inst >> 26;
 	int32 rt = ((inst << 11)>>27);
 	int32 rs = ((inst << 6) >> 27);
@@ -24,9 +24,6 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
 	int32 zeroExt = unsignExt;
 	int32 funct = 0;
 
-//   secure int32[secure 64] b;
-//   for(public int32 k = 0; k < 32; k = k + 1)
-//      b[k] = reg[k];
 	if (unsignExt >> 15 != 0)
 		unsignExt = unsignExt + 0xffff0000;
 
