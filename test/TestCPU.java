@@ -24,8 +24,8 @@ import java.math.BigInteger;
 
 public class TestCPU {
 
-	static final int REGISTER_SIZE = 64;
-	static final int MEM_SIZE = 2048;// 2K words
+	static final int REGISTER_SIZE = 32;
+	static final int MEM_SIZE = 72;// 2K words
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
@@ -181,10 +181,17 @@ public class TestCPU {
 				for (int i = 0; i < inst.getDataLength(); ++i) {
 					//change instructionBank to memBank once we separate 
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
+					printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
-					Utils.printBooleanArray(newInst);
+					//lib.leftPublicShift(x, s)
+					
+					///=Xiao's code====
+					//Boolean res = lib.eq(pc, lib.toSignals(100, pc.length));
+					//boolean resb = env.outputToAlice(res);
+					//====
+					
 					printRegisters(reg, lib);
-					Utils.printBooleanArray(pc);
+					//printBooleanArray(pc, lib);
 				}
 
 				//Xiao's reading of register value after computation. 
@@ -237,8 +244,11 @@ public class TestCPU {
 				}
 				for (int i = 0; i < numInst; ++i) {
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
-					//Boolean[] instruction = instructionBank.read(lib.toSignals(i, WORD_SIZE));
+					printBooleanArray(newInst, lib);
+					
 					pc = cpu.function(reg, newInst, pc);
+					
+					printRegisters(reg, lib);
 					//env.outputToAlice(newInst);
 					
 				}
@@ -284,19 +294,32 @@ public class TestCPU {
 		}
 	}
 	
+	private static void printBooleanArray(Boolean[] array, IntegerLib<Boolean> lib){
+		String output = "";
+		
+		for (int i = 0 ; i < array.length;  i++){
+			boolean[] temp = lib.getEnv().outputToAlice(array);
+					output += temp[i] ? "1" : "0"; 
+		}
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println(output);
+		
+	}
 	private static void printRegisters(SecureArray<Boolean> reg, IntegerLib<Boolean> lib){
 		String output = "";
 		Boolean[] temp; 
 		for (int i = 0 ; i < 32; i++){
 			output += "|reg" + i + ": ";
 			temp = reg.read(lib.toSignals(i, reg.lengthOfIden));
+			boolean[] tmp = lib.getEnv().outputToAlice(temp);
 			for (int j = 31 ; j >= 0 ; j--){
-				output += temp[j] ? "1" : "0";
+				output += tmp[j] ? "1" : "0";
 			}	
 			if (i % 3 == 0)
 				output += "\n";
-		}	
-		System.out.println(output);
+		}
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println(output);
 	}
 	
 	private static void printUsage() {
