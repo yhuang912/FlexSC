@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import flexsc.Party;
+
 public class Utils {
 	public static Boolean[] toBooleanArray(boolean[] a) {
 		Boolean[] res = new Boolean[a.length];
@@ -167,19 +169,5 @@ public class Utils {
 		return a;
 	}
 	
-	public static void printBooleanArray(Boolean[] array){
-		String output = "";
-		for (int i = 0 ; i < array.length;  i++){
-			output += array[i] ? "1" : "0"; 
-		}
-		System.out.println(output);
-	}
-
-	public static void printBooleanArray(boolean[] array){
-		String output = "";
-		for (int i = array.length-1; i >= 0;  i--){
-			output += array[i] ? "1" : "0"; 
-		}
-		System.out.println(output);
-	}
+	
 }
