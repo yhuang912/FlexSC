@@ -155,8 +155,8 @@ public class TestCPU {
 				@SuppressWarnings("unchecked")
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-				CPU cpu = new CPU(env, lib);
-				MEM mem = new MEM(env, lib);
+				CPU cpu = new CPU(env);
+				MEM mem = new MEM(env);
 				SecureArray<Boolean> reg = getRegister(env);
 				printRegisters(reg, lib);
 				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
@@ -168,6 +168,7 @@ public class TestCPU {
 				instructionBank = getMemoryGen(env, memData, instructionBank, inst.getDataLength() );
 				// is this cast ok?  Or should we modify the mem circuit? 
 				int pcOffset = (int) ent.getAddress();
+				System.out.println("pcoffset: " + pcOffset);
 				int dataOffset = (int) rdr.getDataAddress();
 				
 				//Xiao's two lines
@@ -177,12 +178,17 @@ public class TestCPU {
 				//could this cast cause problems when msb is 1?
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
-				
+				System.out.println("pc");
+				printBooleanArray(pc, lib);
 				for (int i = 0; i < inst.getDataLength(); ++i) {
 					//change instructionBank to memBank once we separate 
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
+					System.out.println("newInst");
 					printBooleanArray(newInst, lib);
+					newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
 					pc = cpu.function(reg, newInst, pc);
+					Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
+				    System.out.println(Utils.toInt(env.outputToAlice(reg2)));
 					//lib.leftPublicShift(x, s)
 					
 					///=Xiao's code====
@@ -217,8 +223,8 @@ public class TestCPU {
 				@SuppressWarnings("unchecked")
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-				CPU cpu = new CPU(env, lib);
-				MEM mem = new MEM(env, lib);
+				CPU cpu = new CPU(env);
+				MEM mem = new MEM(env);
 
 				SecureArray<Boolean> reg = getRegister(env);
 				//might be better to have bob send the number of instructions to alice.  That's the only reason 
@@ -242,12 +248,15 @@ public class TestCPU {
 					Statistics sta = ((PMCompEnv) env).statistic;
 					sta.flush();
 				}
+				
+				printBooleanArray(pc, lib);
 				for (int i = 0; i < numInst; ++i) {
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
 					printBooleanArray(newInst, lib);
-					
+					newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
 					pc = cpu.function(reg, newInst, pc);
-					
+					Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
+				    System.out.println(Utils.toInt(env.outputToAlice(reg2)));
 					printRegisters(reg, lib);
 					//env.outputToAlice(newInst);
 					
@@ -312,8 +321,10 @@ public class TestCPU {
 			output += "|reg" + i + ": ";
 			temp = reg.read(lib.toSignals(i, reg.lengthOfIden));
 			boolean[] tmp = lib.getEnv().outputToAlice(temp);
+			//if (lib.getEnv().getParty() == Party.Alice)
+				//System.out.println(Utils.toInt(tmp));
 			for (int j = 31 ; j >= 0 ; j--){
-				output += tmp[j] ? "1" : "0";
+				output += (tmp[j] ? "1" : "0");
 			}	
 			if (i % 3 == 0)
 				output += "\n";
