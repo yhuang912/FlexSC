@@ -20,12 +20,13 @@ import jargs.gnu.CmdLineParser;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Arrays;
 //import gc.Boolean;
 
 public class TestCPU {
 
-	static final int REGISTER_SIZE = 64;
-	static final int MEM_SIZE = 2048;// 2K words
+	static final int REGISTER_SIZE = 32;
+	static final int MEM_SIZE = 72;// 2K words
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
@@ -52,9 +53,9 @@ public class TestCPU {
 		// for testing purpose.
 		// reg[4]=5 reg[5] = 6;
 		oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-				env.inputOfAlice(Utils.fromInt(5, WORD_SIZE)));
+				env.inputOfAlice(Utils.fromInt(15, WORD_SIZE)));
 		oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-				env.inputOfAlice(Utils.fromInt(6, WORD_SIZE)));
+				env.inputOfAlice(Utils.fromInt(-6, WORD_SIZE)));
 		env.flush();
 		return oram;
 	}
@@ -93,6 +94,7 @@ public class TestCPU {
 		Boolean[] index;
 
 		for (int i = 0; i < numInst; i++){
+			System.out.println(Arrays.toString(instructions[i]));
 			index = lib.toSignals(i, inst.lengthOfIden);
 			data = env.inputOfAlice(instructions[i]);
 			inst.write(index, data);
@@ -155,8 +157,8 @@ public class TestCPU {
 				@SuppressWarnings("unchecked")
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-				CPU cpu = new CPU(env, lib);
-				MEM mem = new MEM(env, lib);
+				CPU cpu = new CPU(env);
+				MEM mem = new MEM(env);
 				SecureArray<Boolean> reg = getRegister(env);
 				printRegisters(reg, lib);
 				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
@@ -168,6 +170,7 @@ public class TestCPU {
 				instructionBank = getMemoryGen(env, memData, instructionBank, inst.getDataLength() );
 				// is this cast ok?  Or should we modify the mem circuit? 
 				int pcOffset = (int) ent.getAddress();
+				System.out.println("pcoffset: " + pcOffset);
 				int dataOffset = (int) rdr.getDataAddress();
 				
 				//Xiao's two lines
@@ -177,14 +180,27 @@ public class TestCPU {
 				//could this cast cause problems when msb is 1?
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
-				
+				System.out.println("pc");
+				printBooleanArray(pc, lib);
 				for (int i = 0; i < inst.getDataLength(); ++i) {
 					//change instructionBank to memBank once we separate 
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
+					System.out.println("newInst");
+					printBooleanArray(newInst, lib);
+					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					//printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
-					Utils.printBooleanArray(newInst);
+					Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
+				    System.out.println(Utils.toInt(env.outputToAlice(reg2)));
+					//lib.leftPublicShift(x, s)
+					
+					///=Xiao's code====
+					//Boolean res = lib.eq(pc, lib.toSignals(100, pc.length));
+					//boolean resb = env.outputToAlice(res);
+					//====
+					
 					printRegisters(reg, lib);
-					Utils.printBooleanArray(pc);
+					//printBooleanArray(pc, lib);
 				}
 
 				//Xiao's reading of register value after computation. 
@@ -210,8 +226,8 @@ public class TestCPU {
 				@SuppressWarnings("unchecked")
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-				CPU cpu = new CPU(env, lib);
-				MEM mem = new MEM(env, lib);
+				CPU cpu = new CPU(env);
+				MEM mem = new MEM(env);
 
 				SecureArray<Boolean> reg = getRegister(env);
 				//might be better to have bob send the number of instructions to alice.  That's the only reason 
@@ -235,10 +251,17 @@ public class TestCPU {
 					Statistics sta = ((PMCompEnv) env).statistic;
 					sta.flush();
 				}
+				
+				printBooleanArray(pc, lib);
 				for (int i = 0; i < numInst; ++i) {
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
-					//Boolean[] instruction = instructionBank.read(lib.toSignals(i, WORD_SIZE));
+					printBooleanArray(newInst, lib);
+					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					//printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
+					Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
+				    System.out.println(Utils.toInt(env.outputToAlice(reg2)));
+					printRegisters(reg, lib);
 					//env.outputToAlice(newInst);
 					
 				}
@@ -284,19 +307,35 @@ public class TestCPU {
 		}
 	}
 	
+	private static void printBooleanArray(Boolean[] array, IntegerLib<Boolean> lib){
+		String output = "";
+		
+		for (int i = 0 ; i < array.length;  i++){
+			boolean[] temp = lib.getEnv().outputToAlice(array);
+					output += temp[i] ? "1" : "0"; 
+		}
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println(output);
+		
+	}
 	private static void printRegisters(SecureArray<Boolean> reg, IntegerLib<Boolean> lib){
 		String output = "";
 		Boolean[] temp; 
+
 		for (int i = 0 ; i < 32; i++){
 			output += "|reg" + i + ": ";
 			temp = reg.read(lib.toSignals(i, reg.lengthOfIden));
+			boolean[] tmp = lib.getEnv().outputToAlice(temp);
+			//if (lib.getEnv().getParty() == Party.Alice)
+				//System.out.println(Utils.toInt(tmp));
 			for (int j = 31 ; j >= 0 ; j--){
-				output += temp[j] ? "1" : "0";
+				output += (tmp[j] ? "1" : "0");
 			}	
 			if (i % 3 == 0)
 				output += "\n";
-		}	
-		System.out.println(output);
+		}
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println(output);
 	}
 	
 	private static void printUsage() {

@@ -25,7 +25,8 @@ public class OldTestCPU {
 		mem = new int[MEM_SIZE];
 		// http://www.mrc.uidaho.edu/mrc/people/jff/digital/MIPSir.html
 		// 001001ssssstttttddddd00000100001 for ADDU s t -> d
-		mem[0] = 0b00000000001000000001000000100001;
+//		mem[0] = 0b00000000001000000001000000100001;
+		mem[0] = 0b00100111100111000000000000000001;
 	}
 
 	public SecureArray<Boolean> getRegister(CompEnv<Boolean> env)
@@ -83,7 +84,7 @@ public class OldTestCPU {
 					pc = cpu.function(reg, inst, pc);
 				}
 
-				Boolean[] reg2 = reg.read(lib.toSignals(2, reg.lengthOfIden));
+				Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
 				os.flush();
 				System.out.println(Utils.toInt(env.outputToAlice(reg2)));
 				os.flush();
@@ -118,7 +119,7 @@ public class OldTestCPU {
 					Boolean[] inst = memory.read(pc);
 					pc = cpu.function(reg, inst, pc);
 				}
-				Boolean[] reg2 = reg.read(lib.toSignals(2, reg.lengthOfIden));
+				Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
 				os.flush();
 
 				System.out.println(Utils.toInt(env.outputToAlice(reg2)));
