@@ -20,6 +20,7 @@ import jargs.gnu.CmdLineParser;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Arrays;
 //import gc.Boolean;
 
 public class TestCPU {
@@ -52,9 +53,9 @@ public class TestCPU {
 		// for testing purpose.
 		// reg[4]=5 reg[5] = 6;
 		oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-				env.inputOfAlice(Utils.fromInt(5, WORD_SIZE)));
+				env.inputOfAlice(Utils.fromInt(15, WORD_SIZE)));
 		oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-				env.inputOfAlice(Utils.fromInt(6, WORD_SIZE)));
+				env.inputOfAlice(Utils.fromInt(-6, WORD_SIZE)));
 		env.flush();
 		return oram;
 	}
@@ -93,6 +94,7 @@ public class TestCPU {
 		Boolean[] index;
 
 		for (int i = 0; i < numInst; i++){
+			System.out.println(Arrays.toString(instructions[i]));
 			index = lib.toSignals(i, inst.lengthOfIden);
 			data = env.inputOfAlice(instructions[i]);
 			inst.write(index, data);
@@ -185,7 +187,8 @@ public class TestCPU {
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
 					System.out.println("newInst");
 					printBooleanArray(newInst, lib);
-					newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					//printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
 					Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
 				    System.out.println(Utils.toInt(env.outputToAlice(reg2)));
@@ -253,7 +256,8 @@ public class TestCPU {
 				for (int i = 0; i < numInst; ++i) {
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
 					printBooleanArray(newInst, lib);
-					newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					//printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
 					Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
 				    System.out.println(Utils.toInt(env.outputToAlice(reg2)));
@@ -317,6 +321,7 @@ public class TestCPU {
 	private static void printRegisters(SecureArray<Boolean> reg, IntegerLib<Boolean> lib){
 		String output = "";
 		Boolean[] temp; 
+
 		for (int i = 0 ; i < 32; i++){
 			output += "|reg" + i + ": ";
 			temp = reg.read(lib.toSignals(i, reg.lengthOfIden));
