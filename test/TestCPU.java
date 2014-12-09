@@ -94,7 +94,6 @@ public class TestCPU {
 		Boolean[] index;
 
 		for (int i = 0; i < numInst; i++){
-			System.out.println(Arrays.toString(instructions[i]));
 			index = lib.toSignals(i, inst.lengthOfIden);
 			data = env.inputOfAlice(instructions[i]);
 			inst.write(index, data);
@@ -170,7 +169,6 @@ public class TestCPU {
 				instructionBank = getMemoryGen(env, memData, instructionBank, inst.getDataLength() );
 				// is this cast ok?  Or should we modify the mem circuit? 
 				int pcOffset = (int) ent.getAddress();
-				System.out.println("pcoffset: " + pcOffset);
 				int dataOffset = (int) rdr.getDataAddress();
 				
 				//Xiao's two lines
@@ -180,27 +178,35 @@ public class TestCPU {
 				//could this cast cause problems when msb is 1?
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
-				System.out.println("pc");
-				printBooleanArray(pc, lib);
-				for (int i = 0; i < inst.getDataLength(); ++i) {
+				Boolean halt; 
+				int count = 0; 
+				while (true) {
 					//change instructionBank to memBank once we separate 
+					 
+					System.out.println("count: " + count);
+					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
+					halt = cpu.checkTerminate(newInst);
+					if (env.outputToAlice(halt)){
+						env.outputToBob(halt);
+						System.out.println("got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						break;
+					}
+					env.outputToBob(halt);
+					if (count ==16){
+						System.out.println("Too far :(");
+						break;
+					}
 					System.out.println("newInst");
 					printBooleanArray(newInst, lib);
-					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
-					//printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
-					Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
-				    System.out.println(Utils.toInt(env.outputToAlice(reg2)));
-					//lib.leftPublicShift(x, s)
+					printRegisters(reg, lib);
 					
+					//lib.leftPublicShift(x, s)
 					///=Xiao's code====
 					//Boolean res = lib.eq(pc, lib.toSignals(100, pc.length));
 					//boolean resb = env.outputToAlice(res);
 					//====
-					
-					printRegisters(reg, lib);
-					//printBooleanArray(pc, lib);
 				}
 
 				//Xiao's reading of register value after computation. 
@@ -246,21 +252,26 @@ public class TestCPU {
 				//SecureArray<Boolean> memory = getMemory(env);
 				Boolean[] newInst = lib.toSignals(0,WORD_SIZE);                           
 				Boolean[] pc = lib.toSignals(0, WORD_SIZE);
-
+				Boolean halt;
+				
 				if (m == Mode.COUNT) {
 					Statistics sta = ((PMCompEnv) env).statistic;
 					sta.flush();
 				}
-				
+				int count = 0;
 				printBooleanArray(pc, lib);
-				for (int i = 0; i < numInst; ++i) {
+				while (true){
+					System.out.println("count Bob: " + count);
+					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
+					halt = cpu.checkTerminate(newInst);
+					env.outputToAlice(halt);
+					if (env.outputToBob(halt))
+						break; 
 					printBooleanArray(newInst, lib);
 					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
 					//printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
-					Boolean[] reg2 = reg.read(lib.toSignals(28, reg.lengthOfIden));
-				    System.out.println(Utils.toInt(env.outputToAlice(reg2)));
 					printRegisters(reg, lib);
 					//env.outputToAlice(newInst);
 					
@@ -310,7 +321,7 @@ public class TestCPU {
 	private static void printBooleanArray(Boolean[] array, IntegerLib<Boolean> lib){
 		String output = "";
 		
-		for (int i = 0 ; i < array.length;  i++){
+		for (int i = array.length -1 ; i >= 0;  i--){
 			boolean[] temp = lib.getEnv().outputToAlice(array);
 					output += temp[i] ? "1" : "0"; 
 		}
