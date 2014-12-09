@@ -264,7 +264,6 @@ public class TestCPU {
 					sta.flush();
 				}
 				int count = 0;
-				printBooleanArray(pc, lib);
 				while (true){
 					System.out.println("count Bob: " + count);
 					count++;
