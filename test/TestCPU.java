@@ -240,10 +240,11 @@ public class TestCPU {
 				MEM mem = new MEM(env);
 
 				SecureArray<Boolean> reg = getRegister(env);
-				//might be better to have bob send the number of instructions to alice.  That's the only reason 
+				printRegisters(reg, lib);
+//might be better to have bob send the number of instructions to alice.  That's the only reason 
 				//we currently read the file at all. 
 				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
-				SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
+				//SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
 				int numInst = inst.getDataLength();
 				DataSegment memData = rdr.getData();
@@ -275,9 +276,9 @@ public class TestCPU {
 					os.flush();
 					if (testHalt)
 						break; 
-					printBooleanArray(newInst, lib);
-					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
 					//printBooleanArray(newInst, lib);
+					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
 					printRegisters(reg, lib);
 					//env.outputToAlice(newInst);
