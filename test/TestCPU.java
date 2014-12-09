@@ -178,7 +178,8 @@ public class TestCPU {
 				//could this cast cause problems when msb is 1?
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
-				Boolean halt; 
+				Boolean halt;
+				boolean testHalt;
 				int count = 0; 
 				while (true) {
 					//change instructionBank to memBank once we separate 
@@ -187,12 +188,15 @@ public class TestCPU {
 					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
 					halt = cpu.checkTerminate(newInst);
-					if (env.outputToAlice(halt)){
-						env.outputToBob(halt);
-						System.out.println("got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					testHalt = env.outputToAlice(halt);
+					os.flush();
+					env.outputToBob(halt);
+					os.flush();
+					if (testHalt){
+					System.out.println("got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 						break;
 					}
-					env.outputToBob(halt);
+					
 					if (count ==16){
 						System.out.println("Too far :(");
 						break;
@@ -253,6 +257,7 @@ public class TestCPU {
 				Boolean[] newInst = lib.toSignals(0,WORD_SIZE);                           
 				Boolean[] pc = lib.toSignals(0, WORD_SIZE);
 				Boolean halt;
+				boolean testHalt;
 				
 				if (m == Mode.COUNT) {
 					Statistics sta = ((PMCompEnv) env).statistic;
@@ -266,7 +271,10 @@ public class TestCPU {
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
 					halt = cpu.checkTerminate(newInst);
 					env.outputToAlice(halt);
-					if (env.outputToBob(halt))
+					os.flush();
+					testHalt = env.outputToBob(halt);
+					os.flush();
+					if (testHalt)
 						break; 
 					printBooleanArray(newInst, lib);
 					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
