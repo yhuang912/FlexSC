@@ -18,7 +18,7 @@
 struct CPU{};
 int1 CPU.checkTerminate(secure int32 inst) {
    secure int1 res = false;
-   if(inst == 0xffffffff)
+   if(inst == 0x100007C0)
       res = true;
    return res;
 }
