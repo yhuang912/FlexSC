@@ -188,12 +188,11 @@ public class TestCPU {
 					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
 					halt = cpu.checkTerminate(newInst);
-					testHalt = env.outputToAlice(halt);
-					os.flush();
-					env.outputToBob(halt);
-					os.flush();
+					boolean[] resHalt = lib.declassifyToBoth(new Boolean[]{halt});
+					testHalt = resHalt[0];
+					System.out.println("Alice:"+count+" "+testHalt);
 					if (testHalt){
-					System.out.println("got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						System.out.println("got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 						break;
 					}
 					
@@ -270,9 +269,11 @@ public class TestCPU {
 					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
 					halt = cpu.checkTerminate(newInst);
-					env.outputToAlice(halt);
-					os.flush();
-					testHalt = env.outputToBob(halt);
+					boolean[] resHalt = lib.declassifyToBoth(new Boolean[]{halt});
+					testHalt = resHalt[0];
+
+					System.out.println("Bob:"+count+" "+testHalt);
+
 					os.flush();
 					if (testHalt)
 						break; 
@@ -361,6 +362,8 @@ public class TestCPU {
 		System.out.println("Usage: java RunACSEmulatorServer [binary file]");
 	}
 	static public void main(String args[]) throws Exception {
+		args = new String[1];
+		args[0] = "/home/wangxiao/FlexSC/test/add";
 		Configuration config = new Configuration();
 		TestCPU test = new TestCPU(config);
 		process_cmdline_args(args, config);
