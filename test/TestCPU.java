@@ -185,7 +185,8 @@ public class TestCPU {
 				//could this cast cause problems when msb is 1?
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
-				Boolean halt; 
+				Boolean halt;
+				boolean testHalt;
 				int count = 0; 
 				while (true) {
 					//change instructionBank to memBank once we separate 
@@ -194,12 +195,14 @@ public class TestCPU {
 					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
 					halt = cpu.checkTerminate(newInst);
-					if (env.outputToAlice(halt)){
-						env.outputToBob(halt);
+					boolean[] resHalt = lib.declassifyToBoth(new Boolean[]{halt});
+					testHalt = resHalt[0];
+					System.out.println("Alice:"+count+" "+testHalt);
+					if (testHalt){
 						System.out.println("got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 						break;
 					}
-					env.outputToBob(halt);
+					
 					if (count ==16){
 						System.out.println("Too far :(");
 						break;
@@ -243,10 +246,11 @@ public class TestCPU {
 				MEM mem = new MEM(env);
 
 				SecureArray<Boolean> reg = getRegister(env);
-				//might be better to have bob send the number of instructions to alice.  That's the only reason 
+				printRegisters(reg, lib);
+//might be better to have bob send the number of instructions to alice.  That's the only reason 
 				//we currently read the file at all. 
 				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
-				SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
+				//SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
 				int numInst = inst.getDataLength();
 				DataSegment memData = rdr.getData();
@@ -260,24 +264,29 @@ public class TestCPU {
 				Boolean[] newInst = lib.toSignals(0,WORD_SIZE);                           
 				Boolean[] pc = lib.toSignals(0, WORD_SIZE);
 				Boolean halt;
+				boolean testHalt;
 				
 				if (m == Mode.COUNT) {
 					Statistics sta = ((PMCompEnv) env).statistic;
 					sta.flush();
 				}
 				int count = 0;
-				printBooleanArray(pc, lib);
 				while (true){
 					System.out.println("count Bob: " + count);
 					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
 					halt = cpu.checkTerminate(newInst);
-					env.outputToAlice(halt);
-					if (env.outputToBob(halt))
+					boolean[] resHalt = lib.declassifyToBoth(new Boolean[]{halt});
+					testHalt = resHalt[0];
+
+					System.out.println("Bob:"+count+" "+testHalt);
+
+					os.flush();
+					if (testHalt)
 						break; 
-					printBooleanArray(newInst, lib);
-					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
 					//printBooleanArray(newInst, lib);
+					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
 					printRegisters(reg, lib);
 					//env.outputToAlice(newInst);
@@ -360,6 +369,8 @@ public class TestCPU {
 		System.out.println("Usage: java RunACSEmulatorServer [binary file]");
 	}
 	static public void main(String args[]) throws Exception {
+//		args = new String[1];
+//		args[0] = "/home/wangxiao/FlexSC/test/add";
 		Configuration config = new Configuration();
 		TestCPU test = new TestCPU(config);
 		process_cmdline_args(args, config);

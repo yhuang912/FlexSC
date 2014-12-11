@@ -57,7 +57,8 @@ public class CPU implements IWritable<CPU, Boolean> {
 		boolean f_tmp_0 = false;
 		boolean __tmp0 = f_tmp_0;
 		res = env.inputOfAlice(__tmp0);
-		int f_tmp_1 = -1;
+		int f_tmp_1 = 0x100007C0;
+//		f_tmp_1 = 0b00100000000000000111110111110101;
 		int __tmp1 = f_tmp_1;
 		Boolean[] f_tmp_3 = env.inputOfAlice(Utils.fromInt(__tmp1, 32));
 		Boolean f_tmp_2 = intLib.eq(inst, f_tmp_3);
