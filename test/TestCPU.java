@@ -30,6 +30,8 @@ public class TestCPU {
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
+	static final int Alice_input = 10;
+	static final int Bob_input = 3;
 	int[] mem;
 	Configuration config;
 	 
@@ -45,7 +47,7 @@ public class TestCPU {
 
 	
 	public boolean testTerminate(SecureArray<Boolean> reg, Boolean[] ins, IntegerLib<Boolean> lib) {
-		Boolean eq = lib.eq(ins, lib.toSignals(0, 32));
+		Boolean eq = lib.eq(ins, lib.toSignals(0b00000011111000000000000000001000, 32));
 		Boolean eq2 = lib.eq(reg.trivialOram.read(31), lib.toSignals(0, 32));
 		eq = lib.and(eq, eq2);
 		return lib.declassifyToBoth(new Boolean[]{eq})[0]; 
@@ -60,9 +62,9 @@ public class TestCPU {
 		// for testing purpose.
 		// reg[4]=5 reg[5] = 6;
 		oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-				env.inputOfAlice(Utils.fromInt(15, WORD_SIZE)));
+				env.inputOfAlice(Utils.fromInt(Alice_input, WORD_SIZE)));
 		oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-				env.inputOfAlice(Utils.fromInt(-6, WORD_SIZE)));
+				env.inputOfAlice(Utils.fromInt(Bob_input, WORD_SIZE)));
 		env.flush();
 		return oram;
 	}
@@ -166,7 +168,6 @@ public class TestCPU {
 				CPU cpu = new CPU(env);
 				MEM mem = new MEM(env);
 				SecureArray<Boolean> reg = getRegister(env);
-				printRegisters(reg, lib);
 				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
 				SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
@@ -176,6 +177,7 @@ public class TestCPU {
 				instructionBank = getMemoryGen(env, memData, instructionBank, inst.getDataLength() );
 				// is this cast ok?  Or should we modify the mem circuit? 
 				int pcOffset = (int) ent.getAddress();
+				System.out.println("pcoffset: " + pcOffset);
 				int dataOffset = (int) rdr.getDataAddress();
 				
 				//Xiao's two lines
@@ -187,6 +189,7 @@ public class TestCPU {
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
 				boolean testHalt;
 				int count = 0; 
+				printOramBank(instructionBank, lib, 60);
 				while (true) {
 					//change instructionBank to memBank once we separate 
 					 
@@ -195,21 +198,20 @@ public class TestCPU {
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
 					testHalt = testTerminate(reg, newInst, lib);
 					
-					System.out.println("Alice:"+count+" "+testHalt);
-					if (testHalt){
-						System.out.println("got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					//System.out.println("Alice:"+count+" "+testHalt);
+					if (testHalt)
 						break;
-					}
-					
-					if (count ==16) {
+										
+					/*if (count ==16) {
 						System.out.println("Too far :(");
 						break;
-					}
+					}*/
 					System.out.println("newInst");
 					printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
 					printRegisters(reg, lib);
-					
+					System.out.println("PC: ");
+					printBooleanArray(pc, lib);
 					//lib.leftPublicShift(x, s)
 					///=Xiao's code====
 					//Boolean res = lib.eq(pc, lib.toSignals(100, pc.length));
@@ -244,7 +246,6 @@ public class TestCPU {
 				MEM mem = new MEM(env);
 
 				SecureArray<Boolean> reg = getRegister(env);
-				printRegisters(reg, lib);
 //might be better to have bob send the number of instructions to alice.  That's the only reason 
 				//we currently read the file at all. 
 				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
@@ -263,6 +264,7 @@ public class TestCPU {
 				Boolean[] pc = lib.toSignals(0, WORD_SIZE);
 				Boolean halt;
 				boolean testHalt;
+				printOramBank(instructionBank, lib, 60);
 				
 				if (m == Mode.COUNT) {
 					Statistics sta = ((PMCompEnv) env).statistic;
@@ -270,24 +272,17 @@ public class TestCPU {
 				}
 				int count = 0;
 				while (true){
-					System.out.println("count Bob: " + count);
-					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
-					
 					testHalt = testTerminate(reg, newInst, lib);
-
-					System.out.println("Bob:"+count+" "+testHalt);
 
 					os.flush();
 					if (testHalt)
 						break; 
-					//printBooleanArray(newInst, lib);
-					//newInst = lib.toSignals(0b00100111100111001000100110000000, 32);
+					
 					printBooleanArray(newInst, lib);
 					pc = cpu.function(reg, newInst, pc);
 					printRegisters(reg, lib);
-					//env.outputToAlice(newInst);
-					
+					printBooleanArray(pc, lib);
 				}
 				
 				if (m == Mode.COUNT) {
@@ -357,6 +352,25 @@ public class TestCPU {
 			}	
 			if (i % 3 == 0)
 				output += "\n";
+		}
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println(output);
+	}
+	
+	private static void printOramBank(SecureArray<Boolean> oramBank, IntegerLib<Boolean> lib, int numItems){
+		String output = "";
+		Boolean[] temp; 
+
+		for (int i = 0 ; i < numItems; i++){
+			output += "item number " + String.valueOf(i) +": ";
+			temp = oramBank.read(lib.toSignals(i, oramBank.lengthOfIden));
+			boolean[] tmp = lib.getEnv().outputToAlice(temp);
+			//if (lib.getEnv().getParty() == Party.Alice)
+				//System.out.println(Utils.toInt(tmp));
+			for (int j = tmp.length-1 ; j >= 0 ; j--){
+				output += (tmp[j] ? "1" : "0");
+			}	
+			output += "\n";
 		}
 		if(lib.getEnv().getParty() == Party.Alice)
 			System.out.println(output);
