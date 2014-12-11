@@ -43,6 +43,13 @@ public class TestCPU {
 		mem[0] = 0b00000000001000000001000000100001;
 	}
 
+	
+	public boolean testTerminate(SecureArray<Boolean> reg, Boolean[] ins, IntegerLib<Boolean> lib) {
+		Boolean eq = lib.eq(ins, lib.toSignals(1, 32));
+		Boolean eq2 = lib.eq(reg.trivialOram.read(32), lib.toSignals(0, 32));
+		eq = lib.and(eq, eq2);
+		return 
+	}
 	public SecureArray<Boolean> getRegister(CompEnv<Boolean> env)
 			throws Exception {
 
