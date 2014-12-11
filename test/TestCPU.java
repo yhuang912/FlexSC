@@ -45,8 +45,8 @@ public class TestCPU {
 
 	
 	public boolean testTerminate(SecureArray<Boolean> reg, Boolean[] ins, IntegerLib<Boolean> lib) {
-		Boolean eq = lib.eq(ins, lib.toSignals(1, 32));
-		Boolean eq2 = lib.eq(reg.trivialOram.read(32), lib.toSignals(0, 32));
+		Boolean eq = lib.eq(ins, lib.toSignals(0, 32));
+		Boolean eq2 = lib.eq(reg.trivialOram.read(31), lib.toSignals(0, 32));
 		eq = lib.and(eq, eq2);
 		return lib.declassifyToBoth(new Boolean[]{eq})[0]; 
 	}
@@ -366,8 +366,8 @@ public class TestCPU {
 		System.out.println("Usage: java RunACSEmulatorServer [binary file]");
 	}
 	static public void main(String args[]) throws Exception {
-//		args = new String[1];
-//		args[0] = "/home/wangxiao/FlexSC/test/add";
+	//	args = new String[1];
+	//	args[0] = "/home/wangxiao/FlexSC/test/add";
 		Configuration config = new Configuration();
 		TestCPU test = new TestCPU(config);
 		process_cmdline_args(args, config);
