@@ -48,7 +48,7 @@ public class TestCPU {
 		Boolean eq = lib.eq(ins, lib.toSignals(1, 32));
 		Boolean eq2 = lib.eq(reg.trivialOram.read(32), lib.toSignals(0, 32));
 		eq = lib.and(eq, eq2);
-		return 
+		return lib.declassifyToBoth(new Boolean[]{eq})[0]; 
 	}
 	public SecureArray<Boolean> getRegister(CompEnv<Boolean> env)
 			throws Exception {
@@ -185,7 +185,6 @@ public class TestCPU {
 				//could this cast cause problems when msb is 1?
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
-				Boolean halt;
 				boolean testHalt;
 				int count = 0; 
 				while (true) {
@@ -194,16 +193,15 @@ public class TestCPU {
 					System.out.println("count: " + count);
 					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
-					halt = cpu.checkTerminate(newInst);
-					boolean[] resHalt = lib.declassifyToBoth(new Boolean[]{halt});
-					testHalt = resHalt[0];
+					testHalt = testTerminate(reg, newInst, lib);
+					
 					System.out.println("Alice:"+count+" "+testHalt);
 					if (testHalt){
 						System.out.println("got here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 						break;
 					}
 					
-					if (count ==16){
+					if (count ==16) {
 						System.out.println("Too far :(");
 						break;
 					}
@@ -275,9 +273,8 @@ public class TestCPU {
 					System.out.println("count Bob: " + count);
 					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
-					halt = cpu.checkTerminate(newInst);
-					boolean[] resHalt = lib.declassifyToBoth(new Boolean[]{halt});
-					testHalt = resHalt[0];
+					
+					testHalt = testTerminate(reg, newInst, lib);
 
 					System.out.println("Bob:"+count+" "+testHalt);
 
