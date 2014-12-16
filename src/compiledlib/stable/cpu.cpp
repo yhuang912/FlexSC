@@ -45,7 +45,8 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
 	   reg[31] = pc+ 8;
 	   if (reg[rt] >= 0)
 	   	    pc = pc + (unsignExt << 2);
-	   	  pc = pc + 4;
+	   // Dnote: I think we don't want this line?  Is this an unconditional branch?
+	   //pc = pc + 4;
    } else if (op == OP_ANDI) {
       reg[rt] = reg[rs] & zeroExt;
    } else if (op == 0) {
