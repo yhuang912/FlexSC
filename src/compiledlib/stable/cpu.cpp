@@ -38,8 +38,14 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
 
    if (op == OP_ADDIU) {
       reg[rt] = reg[rs] + (unsignExt);
-   } else if (op == OP_JAL || op == OP_BAL) {
+   } else if (op == OP_JAL ){
       reg[31] = pc + 8;
+	  pc = ((inst << 6) >> 6);
+   } else if ( op == OP_BAL) {
+	   reg[31] = pc+ 8;
+	   if (reg[rt] >= 0)
+	   	    pc = pc + (unsignExt << 2);
+	   	  pc = pc + 4;
    } else if (op == OP_ANDI) {
       reg[rt] = reg[rs] & zeroExt;
    } else if (op == 0) {

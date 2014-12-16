@@ -1,1 +1,1 @@
-java -cp ~/Documents/SCVM2/bin/ backend.flexsc.CommandTool $1 $2 $3
+java -cp /home/notroot/FlexSC/branches/rc/SCVM2/bin/ backend.flexsc.CommandTool $1 $2 $3
