@@ -65,11 +65,11 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
 
    // then process pc
 
-   if (op == OP_JR) {
+   if (op == 0 && funct == OP_JR) {
       pc = reg[rs];
    } else if (op == 3) { // OP_JAL
       pc = (inst << 6) >> 6;
-   } else if ((op == 5 && reg[rs] != reg[rt]) || (op == 4 && reg[rs] == reg[rt])) {
+   } else if ((op == 5 && reg[rs] != reg[rt]) || (op == 4 && reg[rs] == reg[rt])) { //OP_BNE and OP_BEQ
       pc = pc + (unsignExt << 2);
    } else
       pc = pc + 4;
