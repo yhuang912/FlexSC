@@ -30,8 +30,8 @@ public class TestCPU {
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
-	static final int Alice_input = 10;
-	static final int Bob_input = 3;
+	static final int Alice_input = 7;
+	static final int Bob_input = 13;
 	int[] mem;
 	Configuration config;
 	 
