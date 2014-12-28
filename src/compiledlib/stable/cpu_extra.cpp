@@ -70,7 +70,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
    // then process pc
 
    reg_rs = reg[rs];
-   res_rt = reg[rt];
+   reg_rt = reg[rt];
    if (op == 0 && funct == OP_JR) {
       pc = reg_rs;
    } else if (op == 3) { // OP_JAL
