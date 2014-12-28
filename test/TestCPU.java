@@ -283,7 +283,7 @@ public class TestCPU {
 					printBooleanArray(newInst, lib);
 					int andCount = ((CVCompEnv)env).numOfAnds;
 					pc = cpu.function(reg, newInst, pc);
-					System.out.println( "CPU circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
+					//System.out.println( "CPU circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
 					printRegisters(reg, lib);
 					printBooleanArray(pc, lib);
 				}
