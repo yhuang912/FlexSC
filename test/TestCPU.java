@@ -10,6 +10,7 @@ import com.appcomsci.mips.binary.Reader;
 import com.appcomsci.mips.binary.SymbolTableEntry;
 import com.appcomsci.sfe.common.Configuration;
 
+import flexsc.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
@@ -280,7 +281,9 @@ public class TestCPU {
 						break; 
 					
 					printBooleanArray(newInst, lib);
+					int andCount = ((CVCompEnv)env).numOfAnds;
 					pc = cpu.function(reg, newInst, pc);
+					System.out.println( "CPU circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
 					printRegisters(reg, lib);
 					printBooleanArray(pc, lib);
 				}
