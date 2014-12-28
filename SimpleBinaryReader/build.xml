@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<project name="SimpleBinaryReader" default="dist">
+
+  <target name="init" >
+    <mkdir dir="build/classes" />
+    <mkdir dir="dist" />
+  </target>
+
+  <target name="compile" depends="init" >
+    <javac includeantruntime="false" srcdir="src" destdir="build/classes">
+      <classpath>
+        <pathelement location="../../cbmc-gc-v0.9.2/src/fastgc/extlibs/jargs.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="clean" depends="init" >
+    <delete dir="build" />
+    <delete dir="dist" />
+  </target>
+
+  <target name="dist" depends="compile">
+    <copy todir="build/classes">
+      <fileset dir="src">
+        <include name="**/*.properties" />
+      </fileset>
+    </copy>
+    <jar destfile="dist/SimpleBinaryReader.jar">
+      <fileset dir="build/classes"/>
+    </jar>
+  </target>
+</project>

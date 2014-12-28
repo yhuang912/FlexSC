@@ -1,0 +1,8 @@
+B=/opt/mipsel/usr/bin
+S=$B/mipsel-linux-gnu
+
+# Uncomment to recompile binary
+# $S-clang -O0 -o data2-clang data2.c
+# $S-llvm-objdump -disassemble -t -r -s -section-headers data2-clang > data2.txt
+
+java -cp ../bin com.appcomsci.mips.binary.TestReaderMain data2-clang sfe_main
