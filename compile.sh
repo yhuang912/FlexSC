@@ -1,3 +1,9 @@
+cd SimpleBinaryReader
+ant dist || exit 1
+cd ..
+
+CP="bin:lib/*:SimpleBinaryReader/dist/*"
+
 mkdir -p bin
-find . -name "*.java" > source.txt;
-javac -cp bin/:lib/* -d bin @source.txt;
+find . -name "*.java" | grep -v SimpleBinaryReader > source.txt;
+javac -cp "$CP" -d bin @source.txt;
