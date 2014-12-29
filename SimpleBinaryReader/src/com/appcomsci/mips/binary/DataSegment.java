@@ -68,61 +68,25 @@ public class DataSegment {
 		return rslt;
 	}
 	
+	/** Contents of this chunk of memory as booleans.  Little endian.
+	 * 
+	 * @return An array of arrays of booleans
+	 */
 	public boolean[][] getDataAsBoolean() {
 		if(data == null)
 			return null;
 		boolean rslt[][] = new boolean[data.length][32];
 		for(int i = 0; i < data.length; i++) {
 			long x = data[i];
-			byte t[] = new byte[4];
-			t[3] = (byte) (x & 0xff); x >>= 8;
-			t[2] = (byte) (x & 0xff); x >>= 8;
-			t[1] = (byte) (x & 0xff); x >>= 8;
-			t[0] = (byte) x;
-			
-			rslt[i][7] = ((t[3] & 0x80) == 0) ? false : true;
-			rslt[i][15] = ((t[2] & 0x80) == 0) ? false : true;
-			rslt[i][23] = ((t[1] & 0x80) == 0) ? false : true;
-			rslt[i][31] = ((t[0] & 0x80) == 0) ? false : true;
-			
-			rslt[i][6] = ((t[3] & 0x40) == 0) ? false : true;
-			rslt[i][14] = ((t[2] & 0x40) == 0) ? false : true;
-			rslt[i][22] = ((t[1] & 0x40) == 0) ? false : true;
-			rslt[i][30] = ((t[0] & 0x40) == 0) ? false : true;
-			
-			rslt[i][5] = ((t[3] & 0x20) == 0) ? false : true;
-			rslt[i][13] = ((t[2] & 0x20) == 0) ? false : true;
-			rslt[i][21] = ((t[1] & 0x20) == 0) ? false : true;
-			rslt[i][29] = ((t[0] & 0x20) == 0) ? false : true;
-			
-			rslt[i][4] = ((t[3] & 0x10) == 0) ? false : true;
-			rslt[i][12] = ((t[2] & 0x10) == 0) ? false : true;
-			rslt[i][20] = ((t[1] & 0x10) == 0) ? false : true;
-			rslt[i][28] = ((t[0] & 0x10) == 0) ? false : true;
-			
-			rslt[i][3] = ((t[3] & 0x08) == 0) ? false : true;
-			rslt[i][11] = ((t[2] & 0x08) == 0) ? false : true;
-			rslt[i][19] = ((t[1] & 0x08) == 0) ? false : true;
-			rslt[i][27] = ((t[0] & 0x08) == 0) ? false : true;
-			
-			rslt[i][2] = ((t[3] & 0x04) == 0) ? false : true;
-			rslt[i][10] = ((t[2] & 0x04) == 0) ? false : true;
-			rslt[i][18] = ((t[1] & 0x04) == 0) ? false : true;
-			rslt[i][26] = ((t[0] & 0x04) == 0) ? false : true;
-			
-			rslt[i][1] = ((t[3] & 0x02) == 0) ? false : true;
-			rslt[i][9] = ((t[2] & 0x02) == 0) ? false : true;
-			rslt[i][17] = ((t[1] & 0x02) == 0) ? false : true;
-			rslt[i][25] = ((t[0] & 0x02) == 0) ? false : true;
-			
-			rslt[i][0] = ((t[3] & 0x01) == 0) ? false : true;
-			rslt[i][8] = ((t[2] & 0x01) == 0) ? false : true;
-			rslt[i][16] = ((t[1] & 0x01) == 0) ? false : true;
-			rslt[i][24] = ((t[0] & 0x01) == 0) ? false : true;
-						
+			long mask = 0x00000001;
+			boolean t[] = rslt[i];
+			// Let compiler decide how much to unroll this loop
+			for(int j = 0; j < 32; j++) {
+				t[j] = (x&mask) != 0;
+				mask <<= 1;
+			}
 		}
 		return rslt;
-	
 	}
 	/*
 	public void addInstructions(SectionData sec) {
