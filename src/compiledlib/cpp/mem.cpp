@@ -1,5 +1,6 @@
 #define OP_LW 35
 #define OP_SW 43
+#define OP_LB 32
 
 struct MEM{};
 
@@ -18,11 +19,24 @@ int32 MEM.func(int32[32]reg,
       unsignExt = unsignExt + 0xffff0000;
    int32 op = (inst >> 26);
 
+   int32 tmpindex = (reg[rs] + unsignExt - dataOffset)>>2;
    if(op == OP_LW)
-      reg[rt] = mem[(reg[rs] + unsignExt - dataOffset)>>2];
-   else if(op == OP_SW){ 
-      int32 tmpindex = (reg[rs] + unsignExt - dataOffset)>>2;
+      reg[rt] = mem[tmpindex];
+   else if(op == OP_SW){
       mem[tmpindex] = reg[rt];
+   } else if(op == OP_LB){
+	   int32 tempRT = mem[tmpindex];
+	   int32 byteShiftTwo = ((tmpindex << 30) >> 31);
+	   int32 byteShiftOne = ((tmpindex << 31) >> 31);
+	   if (byteShiftTwo != 0 && byteShiftOne != 0)
+		   tempRT = ((tempRT << 24) >> 24);
+	   else if (byteShiftTwo != 0 && byteShiftOne == 0)
+		   tempRT = ((tempRT << 16) >> 24);
+	   else if (byteShiftTwo == 0 && byteShiftOne != 0)
+	   		   tempRT = ((tempRT << 8) >> 24);
+	   else if (byteShiftTwo == 0 && byteShiftOne == 0)
+	   		   tempRT = (tempRT >> 24);
+	   reg[rt] = tempRT;
    }
 
    return newInst;
