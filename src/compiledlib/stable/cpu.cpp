@@ -20,6 +20,7 @@
 #define FUNCT_XOR 38
 #define FUNCT_ADD 20
 #define FUNCT_ADDU 33
+#define FUNCT_JALR 9
 
 struct CPU{};
 
