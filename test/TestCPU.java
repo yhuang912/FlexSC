@@ -28,7 +28,7 @@ import java.util.Arrays;
 public class TestCPU {
 
 	static final int REGISTER_SIZE = 32;
-	static final int MEM_SIZE = 72;// 2K words
+	static final int MEM_SIZE = 350;// 2K words
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
@@ -108,6 +108,7 @@ public class TestCPU {
 			index = lib.toSignals(i, inst.lengthOfIden);
 			data = env.inputOfAlice(instructions[i]);
 			inst.write(index, data);
+			System.out.println("Wrote instruction number "+i);
 		}		
 		System.out.println("exiting getInstructions");
 		return inst;
@@ -211,7 +212,7 @@ public class TestCPU {
 					}*/
 					System.out.println("newInst");
 					printBooleanArray(newInst, lib);
-					if (checkMatchBooleanArray(newInst, lib, 0b00000100000100010000000000010100))
+					if (checkMatchBooleanArray(newInst, lib, 0b00000000000000110001011011000010))
 						System.out.println("Got match");
 					
 					pc = cpu.function(reg, newInst, pc);
@@ -287,7 +288,7 @@ public class TestCPU {
 						break; 
 					
 					printBooleanArray(newInst, lib);
-					if (checkMatchBooleanArray(newInst, lib, 0b00000100000100010000000000010100))
+					if (checkMatchBooleanArray(newInst, lib, 0b00000000000000110001011011000010))
 						System.out.println("got match");
 					
 					//int andCount = ((CVCompEnv)env).numOfAnds;
