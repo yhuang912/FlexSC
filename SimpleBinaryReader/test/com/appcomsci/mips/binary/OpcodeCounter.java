@@ -75,10 +75,18 @@ public class OpcodeCounter {
 		// Finally, pick off options
 		
 		Object o;
-		if((o = parser.getOptionValue(oE)) != null)
+		if((o = parser.getOptionValue(oE)) != null) {
 			config.setEntryPoint((String)o);
-		if((o = parser.getOptionValue(oL)) != null)
-			config.setFunctionLoadList((String) o);
+			if((o = parser.getOptionValue(oL)) != null)
+				config.setFunctionLoadList((String) o);
+			else // Load list defaults to entry point, NOT something in
+				// config file
+				config.setFunctionLoadList((String) o);
+		} else {
+			// Set load list if given, otherwise use config file
+			if((o = parser.getOptionValue(oL)) != null)
+				config.setFunctionLoadList((String) o);
+		}
 		if((o = parser.getOptionValue(oB)) != null)
 			config.setBinaryFileName((String)o);
 	}
@@ -162,9 +170,9 @@ public class OpcodeCounter {
 		for(OpCount oc:opList) {
 			MipsInstructionSet.Operation opData = MipsInstructionSet.Operation.valueOf(oc.op);
 			if(opData != null)
-				System.out.println(opData.toString() + " [0x" + Long.toHexString(opData.getValue()) + "] " + oc.count);
+				System.out.printf("%s [0x%08x] %d\n", opData.toString(), opData.getValue(), oc.count);
 			else
-				System.out.println("0x" + Long.toHexString(oc.op) + " " + oc.count);
+				System.out.printf("[0x%08x] %d\n", oc.op, oc.count);
 		}
 	}
 
