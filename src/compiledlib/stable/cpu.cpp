@@ -17,12 +17,15 @@
 #define OP_JAL 3
 
 //OP_CODE_R
-#define FUNCT_SLR 2
+#define FUNCT_SLL 0
+#define FUNCT_SRL 2
+#define FUNCT_SLLV 6
 #define FUNCT_JR 8
 #define FUNCT_JALR 9
 #define FUNCT_ADD 20
 #define FUNCT_ADDU 33
 #define FUNCT_SUBU 35
+#define FUNCT_OR 37
 #define FUNCT_XOR 38
 #define FUNCT_SLT 42
 
@@ -42,6 +45,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
    int32 rt = ((inst << 11)>>27);
    int32 rs = ((inst << 6) >> 27);
    int32 rd = ((inst << 16)>>27);
+   int32 shamt = ((inst << 21)>>27);
    int32 reg_rs, reg_rt, reg_rd;
    int32 unsignExt = ((inst << 16)>>16);
    int32 zeroExt = unsignExt;
@@ -76,9 +80,13 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
          else reg_rd = 0;
       } else if (funct == FUNCT_SUBU) {
          reg_rd = reg_rs - reg_rt;
-      } else if (funct == FUNCT_SLR){
-         reg_rd = (reg_rt >> ((inst << 21) >> 27));    
-      }
+//} else if (funct == FUNCT_SRL){
+//      reg_rd = (reg_rt >> shamt);    
+//    } else if (funct == FUNCT_SLL){
+//      reg_rd = (reg_rt << shamt);    
+      } else if (funct == FUNCT_OR){
+         reg_rd = (reg_rt | reg_rs);    
+      }       
       reg[rd] = reg_rd;
    }
    else {
