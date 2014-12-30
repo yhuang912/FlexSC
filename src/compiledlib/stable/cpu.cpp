@@ -6,21 +6,25 @@
 #define false 0
 #define PRINT 0
 
+// OP_CODE_I
 #define OP_ADDIU 9
 #define OP_ANDI 12
-#define OP_JAL 3
+#define OP_LUI 15
 
 #define OP_BNE 5
 #define OP_BEQ 4
 #define OP_BAL 1
+#define OP_JAL 3
 
+//OP_CODE_R
+#define FUNCT_SLR 2
 #define FUNCT_JR 8
-#define FUNCT_SLT 42
-#define FUNCT_SUBU 35
-#define FUNCT_XOR 38
+#define FUNCT_JALR 9
 #define FUNCT_ADD 20
 #define FUNCT_ADDU 33
-#define FUNCT_JALR 9
+#define FUNCT_SUBU 35
+#define FUNCT_XOR 38
+#define FUNCT_SLT 42
 
 struct CPU{};
 
@@ -28,7 +32,7 @@ int2 CPU.checkType(int32 opcode) {
    int2 ret;
    if (opcode == 0)
       ret = OP_CODE_R;
-   else if (opcode ==  0x09|| opcode == 0x0C)
+   else if (opcode ==  0x09|| opcode == 0x0C || opcode == 0x0f)
       ret = OP_CODE_I;
    else ret = OP_CODE_OTHERS;
    return ret;
@@ -57,7 +61,9 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
          reg_rt = reg_rs + (unsignExt);
       } else if (op == OP_ANDI) {
          reg_rt = reg_rs & zeroExt;
-      } 
+      } else if (op == OP_LUI) {
+	reg_rt = (zeroExt << 16);
+      }
       reg[rt] = reg_rt;
    }
    else if (op_type == OP_CODE_R) {//R type
@@ -70,6 +76,8 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
          else reg_rd = 0;
       } else if (funct == FUNCT_SUBU) {
          reg_rd = reg_rs - reg_rt;
+      } else if (funct == FUNCT_SLR){
+         reg_rd = (reg_rt >> ((inst << 21) >> 27));    
       }
       reg[rd] = reg_rd;
    }
