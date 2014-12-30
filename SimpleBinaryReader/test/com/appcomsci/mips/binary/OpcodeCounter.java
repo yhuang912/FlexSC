@@ -20,6 +20,12 @@ import static com.appcomsci.mips.memory.MipsInstructionSet.OP_BGEZ;
 import static com.appcomsci.mips.memory.MipsInstructionSet.OP_BLTZ;
 import static com.appcomsci.mips.memory.MipsInstructionSet.OP_FUNCT;
 import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM;
+import static com.appcomsci.mips.memory.MipsInstructionSet.OP_MASK;
+import static com.appcomsci.mips.memory.MipsInstructionSet.OP_SHIFT;
+import static com.appcomsci.mips.memory.MipsInstructionSet.FUNCT_MASK;
+import static com.appcomsci.mips.memory.MipsInstructionSet.FUNCT_SHIFT;
+import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM_CODE_MASK;
+import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM_CODE_SHIFT;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getFunct;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getOp;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getRegImmCode;
@@ -126,16 +132,17 @@ public class OpcodeCounter {
 		inst = rdr.getInstructions(config.getFunctionLoadList());
 		for(long instr:inst.getData()) {
 			long op = getOp(instr);
+			long bits = instr & (OP_MASK << OP_SHIFT);
 			if(op == OP_FUNCT) {
-				op |= getFunct(instr);
+				bits |= instr & (FUNCT_MASK << FUNCT_SHIFT);
 			} else if(op == OP_REGIMM) {
-				op |= getRegImmCode(instr);
+				bits |= instr & (OP_REGIMM_CODE_MASK << OP_REGIMM_CODE_SHIFT);
 			}
-			OpCount x = countTable.get(op);
+			OpCount x = countTable.get(bits);
 			if(x == null) {
 				x = new OpCount();
-				x.op = op;
-				countTable.put(op, x);
+				x.op = bits;
+				countTable.put(bits, x);
 			}
 			x.count += 1;
 		}
@@ -155,7 +162,7 @@ public class OpcodeCounter {
 		for(OpCount oc:opList) {
 			MipsInstructionSet.Operation opData = MipsInstructionSet.Operation.valueOf(oc.op);
 			if(opData != null)
-				System.out.println(opData.toString() + " " + oc.count);
+				System.out.println(opData.toString() + " " + opData.getValue() + " " + oc.count);
 			else
 				System.out.println(Long.toHexString(oc.op) + " " + oc.count);
 		}

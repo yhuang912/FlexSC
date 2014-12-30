@@ -39,8 +39,8 @@ public class MipsInstructionSet {
 	// IMM codes
 	public static final int OP_BLTZ   = 0x00;
 	public static final int OP_BGEZ   = 0x01;
-	public static final int OP_BLTZAL = 0x10; // Link
-	public static final int OP_BGEZAL = 0x11; // Link
+	public static final int OP_BLTZAL = 0x10; // Link.  Obsolete.
+	public static final int OP_BGEZAL = 0x11; // Link.  Obsolete.
 	
 	// Constants for bit picking functions
 	
@@ -147,37 +147,37 @@ public class MipsInstructionSet {
 	// An enum that covers the interesting MIPS instructions
 	
 	public enum Operation {
-		FUNCT(0),
-		REGIMM(1 << OP_SHIFT),
-		J(2 << OP_SHIFT),
-		JAL(3 << OP_SHIFT),
-		BEQ(4 << OP_SHIFT),
-		BNE(5 << OP_SHIFT),
-		BLEZ(6 << OP_SHIFT),
-		BGTZ(7 << OP_SHIFT),
-		ADDI(8 << OP_SHIFT),
-		ADDIU(9 << OP_SHIFT),
-		SLTI(10 << OP_SHIFT),
-		SLTIU(11 << OP_SHIFT),
-		ANDI(12 << OP_SHIFT),
-		ORI(13 << OP_SHIFT),
-		XORI(14 << OP_SHIFT),
-		LUI(15 << OP_SHIFT),
-		BEQL(20 << OP_SHIFT),	// Obsolete
-		BNEL(21 << OP_SHIFT),	// Obsolete
-		BLEZL(22 << OP_SHIFT),	// Obsolete
-		BGTZL(23 << OP_SHIFT),	// Obsolete
-		LB(32 << OP_SHIFT),
-		LH(33 << OP_SHIFT),
-		LWL(34 << OP_SHIFT),
-		LW(35 << OP_SHIFT),
-		LBU(36 << OP_SHIFT),
-		LHU(37 << OP_SHIFT),
-		LWR(38 << OP_SHIFT),
-		SB(40 << OP_SHIFT),
-		SH(41 << OP_SHIFT),
-		SWL(42 << OP_SHIFT),
-		SW(43 << OP_SHIFT),
+		// FUNCT(0),
+		// REGIMM(1L << OP_SHIFT),
+		J(2L << OP_SHIFT),
+		JAL(3L << OP_SHIFT),
+		BEQ(4L << OP_SHIFT),
+		BNE(5L << OP_SHIFT),
+		BLEZ(6L << OP_SHIFT),
+		BGTZ(7L << OP_SHIFT),
+		ADDI(8L << OP_SHIFT),
+		ADDIU(9L << OP_SHIFT),
+		SLTI(10L << OP_SHIFT),
+		SLTIU(11L << OP_SHIFT),
+		ANDI(12L << OP_SHIFT),
+		ORI(13L << OP_SHIFT),
+		XORI(14L << OP_SHIFT),
+		LUI(15L << OP_SHIFT),
+		BEQL(20L << OP_SHIFT),	// Obsolete
+		BNEL(21L << OP_SHIFT),	// Obsolete
+		BLEZL(22L << OP_SHIFT),	// Obsolete
+		BGTZL(23L << OP_SHIFT),	// Obsolete
+		LB(32L << OP_SHIFT),
+		LH(33L << OP_SHIFT),
+		LWL(34L << OP_SHIFT),
+		LW(35L << OP_SHIFT),
+		LBU(36L << OP_SHIFT),
+		LHU(37L << OP_SHIFT),
+		LWR(38L << OP_SHIFT),
+		SB(40L << OP_SHIFT),
+		SH(41L << OP_SHIFT),
+		SWL(42L << OP_SHIFT),
+		SW(43L << OP_SHIFT),
 		SLL(0 | (OP_FUNCT<<OP_SHIFT)),
 		SRL(2 | (OP_FUNCT<<OP_SHIFT)),
 		SRA(3 | (OP_FUNCT<<OP_SHIFT)),
@@ -202,8 +202,8 @@ public class MipsInstructionSet {
 		NOR(39 | (OP_FUNCT<<OP_SHIFT)),
 		SLT(42 | (OP_FUNCT<<OP_SHIFT)),
 		SLTU(43 | (OP_FUNCT<<OP_SHIFT)),
-		BLTZ(0 | (OP_REGIMM<<OP_SHIFT)),
-		BGEZ(1 | (OP_REGIMM<<OP_SHIFT)),
+		BLTZ((0<<OP_REGIMM_CODE_SHIFT) | (OP_REGIMM<<OP_SHIFT)),
+		BGEZ((1<<OP_REGIMM_CODE_SHIFT) | (OP_REGIMM<<OP_SHIFT)),
 		;
 		
 		private static Map<Long, Operation> opMap;
@@ -221,6 +221,10 @@ public class MipsInstructionSet {
 		private final long value;
 		private Operation(long value) {
 			this.value = value;
+		}
+
+		public long getValue() {
+			return value;
 		}
 	}
 }
