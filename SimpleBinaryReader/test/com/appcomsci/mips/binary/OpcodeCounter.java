@@ -162,9 +162,9 @@ public class OpcodeCounter {
 		for(OpCount oc:opList) {
 			MipsInstructionSet.Operation opData = MipsInstructionSet.Operation.valueOf(oc.op);
 			if(opData != null)
-				System.out.println(opData.toString() + " " + opData.getValue() + " " + oc.count);
+				System.out.println(opData.toString() + " [0x" + Long.toHexString(opData.getValue()) + "] " + oc.count);
 			else
-				System.out.println(Long.toHexString(oc.op) + " " + oc.count);
+				System.out.println("0x" + Long.toHexString(oc.op) + " " + oc.count);
 		}
 	}
 
