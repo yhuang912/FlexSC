@@ -59,6 +59,7 @@ public class MEM implements IWritable<MEM, Boolean> {
 		Boolean[] rs = env.inputOfAlice(Utils.fromInt(0, 32));
 		Boolean[] unsignExt = env.inputOfAlice(Utils.fromInt(0, 32));
 		Boolean[] op = env.inputOfAlice(Utils.fromInt(0, 32));
+		Boolean[] tmpAddress = env.inputOfAlice(Utils.fromInt(0, 32));
 		Boolean[] tmpindex = env.inputOfAlice(Utils.fromInt(0, 32));
 		Boolean[] tempRT = env.inputOfAlice(Utils.fromInt(0, 32));
 		Boolean[] byteShiftTwo = env.inputOfAlice(Utils.fromInt(0, 32));
@@ -132,9 +133,10 @@ public class MEM implements IWritable<MEM, Boolean> {
 		Boolean[] f_tmp_32 = env.inputOfAlice(Utils.fromInt(dataOffset, 32));
 		Boolean[] f_tmp_31 = intLib.sub(__tmp27,f_tmp_32);
 		Boolean[] __tmp28 = f_tmp_31;
+		tmpAddress = __tmp28;
 		int f_tmp_33 = 2;
 		int __tmp29 = f_tmp_33;
-		Boolean[] f_tmp_34 = intLib.rightPublicShift(__tmp28, __tmp29);
+		Boolean[] f_tmp_34 = intLib.rightPublicShift(tmpAddress, __tmp29);
 		Boolean[] __tmp30 = f_tmp_34;
 		tmpindex = __tmp30;
 		int f_tmp_35 = 35;
@@ -183,7 +185,7 @@ public class MEM implements IWritable<MEM, Boolean> {
 		tempRT = __tmp49;
 		int f_tmp_57 = 30;
 		int __tmp50 = f_tmp_57;
-		Boolean[] f_tmp_58 = intLib.leftPublicShift(tmpindex, __tmp50);
+		Boolean[] f_tmp_58 = intLib.leftPublicShift(tmpAddress, __tmp50);
 		Boolean[] __tmp51 = f_tmp_58;
 		int f_tmp_59 = 31;
 		int __tmp52 = f_tmp_59;
@@ -194,7 +196,7 @@ public class MEM implements IWritable<MEM, Boolean> {
 		byteShiftTwo = __tmp54;
 		int f_tmp_62 = 31;
 		int __tmp55 = f_tmp_62;
-		Boolean[] f_tmp_63 = intLib.leftPublicShift(tmpindex, __tmp55);
+		Boolean[] f_tmp_63 = intLib.leftPublicShift(tmpAddress, __tmp55);
 		Boolean[] __tmp56 = f_tmp_63;
 		int f_tmp_64 = 31;
 		int __tmp57 = f_tmp_64;

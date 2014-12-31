@@ -36,7 +36,7 @@ public class TestCPU {
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
-	static final int Alice_input = 17;
+	static final int Alice_input = 8388608;
 	static final int Bob_input = 13;
 	int[] mem;
 	Configuration config;
@@ -169,14 +169,14 @@ public class TestCPU {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
-		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+		/*MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
 	    List<MemorySet> sets = b.build();
 	    for(MemorySet s:sets) {
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(instData);
 	        System.out.println(m.size());
 	        // m now contains the map for this step.
 	        // You could cache this back in s I guess.
-	    }
+	    }*/
 		instructions = instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
@@ -288,16 +288,13 @@ public class TestCPU {
 					
 					testHalt = testTerminate(reg, newInst, lib);
 					
-					//System.out.println("Alice:"+count+" "+testHalt);
 					if (testHalt)
 						break;
 									
 					System.out.println("newInst");
 					printBooleanArray(newInst, lib);
 					//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
-						//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101000, 32));
-						//newInst = env.inputOfAlice(Utils.fromInt(0b10001111110000110000000000101000, 32));
-						
+						//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101001, 32));
 					pc = cpu.function(reg, newInst, pc);
 					
 					printRegisters(reg, lib);
@@ -373,9 +370,9 @@ public class TestCPU {
 						break; 
 					
 					printBooleanArray(newInst, lib);
-					//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
+					//if (checkMatchBooleanArray(newInst, lib, 0))
 						//newInst = env.inputOfAlice(new boolean[32]);
-						//System.out.println("no problem");
+						
 					//int andCount = ((CVCompEnv)env).numOfAnds;
 					pc = cpu.function(reg, newInst, pc);
 					//System.out.println( "CPU circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
@@ -422,17 +419,23 @@ public class TestCPU {
 		setBinaryFileName(rest[0]);
 	}
 	
-	private static boolean checkMatchBooleanArray(Boolean[] array, IntegerLib<Boolean> lib, int matchVal){
+	private static boolean checkMatchBooleanArray(Boolean[] array, IntegerLib<Boolean> lib, int matchVal) throws Exception{
 		boolean[] temp = lib.getEnv().outputToAlice(array);
 		boolean match = true;
-		for (int i = 31; i >=0; i--){
-			if (!temp[i] && ((matchVal & (1 << i)) != 0))
-				match = false;
-			else if (temp[i] && ((matchVal & (1 << i)) == 0))
-				match = false;
+		if (lib.getEnv().getParty() == Party.Alice){
+			for (int i = 31; i >=0; i--){
+				if (!temp[i] && ((matchVal & (1 << i)) != 0))
+					match = false;
+				else if (temp[i] && ((matchVal & (1 << i)) == 0))
+					match = false;
+			}
+			//System.out.println("Alice Match = " + match);
+			lib.getEnv().os.write(match ? 1 : 0);
 		}
-		
-		return match;
+		else{
+			match = (lib.getEnv().is.read() == 1);
+			//System.out.println("Bob Match: " + match);
+		}return match;
 	}
 	private static void printBooleanArray(Boolean[] array, IntegerLib<Boolean> lib){
 		String output = "";
