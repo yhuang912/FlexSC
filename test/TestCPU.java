@@ -169,14 +169,14 @@ public class TestCPU {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
-		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+		/*MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
 	    List<MemorySet> sets = b.build();
 	    for(MemorySet s:sets) {
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(instData);
 	        System.out.println(m.size());
 	        // m now contains the map for this step.
 	        // You could cache this back in s I guess.
-	    }
+	    }*/
 		instructions = instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
@@ -291,16 +291,13 @@ public class TestCPU {
 					//System.out.println("Alice:"+count+" "+testHalt);
 					if (testHalt)
 						break;
-										
-					/*if (count ==16) {
-						System.out.println("Too far :(");
-						break;
-					}*/
+									
 					System.out.println("newInst");
 					printBooleanArray(newInst, lib);
 					//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
 						//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101000, 32));
-					
+						//newInst = env.inputOfAlice(Utils.fromInt(0b10001111110000110000000000101000, 32));
+						
 					pc = cpu.function(reg, newInst, pc);
 					
 					printRegisters(reg, lib);
@@ -377,8 +374,8 @@ public class TestCPU {
 					
 					printBooleanArray(newInst, lib);
 					//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
-						//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101000, 32));
-					
+						//newInst = env.inputOfAlice(new boolean[32]);
+						//System.out.println("no problem");
 					//int andCount = ((CVCompEnv)env).numOfAnds;
 					pc = cpu.function(reg, newInst, pc);
 					//System.out.println( "CPU circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
