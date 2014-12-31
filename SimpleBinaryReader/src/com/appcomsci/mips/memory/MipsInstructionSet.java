@@ -66,6 +66,7 @@ public class MipsInstructionSet {
 	
 	/** Address presumed to be a branch to itself */
 	public static final long SPIN_ADDRESS = 0x0;
+	public static final long SPIN_INSTRUCTION = 0xffff | (OP_BEQ<<OP_SHIFT);
 	public static final long NOP = 0x0;
 	
 	/**
