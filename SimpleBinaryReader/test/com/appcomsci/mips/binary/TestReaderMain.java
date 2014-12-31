@@ -19,13 +19,12 @@ public class TestReaderMain {
 			System.err.println("Exception setting up configuration: " + e);
 			System.exit(1);
 		}
-		cfg.setBinaryFileName(args[0]);
 		cfg.setEntryPoint(args[1]);
 		try {
-			Reader rdr = new Reader(new File(cfg.getBinaryFileName()), cfg);
+			Reader rdr = new Reader(new File(args[0]), cfg);
 			DataSegment seg = rdr.getData();
 		} catch(Exception e) {
-			System.err.println("Exception reading file " + cfg.getBinaryFileName());
+			System.err.println("Exception reading file " + args[0]);
 		}
 	}
 
