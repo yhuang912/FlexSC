@@ -65,7 +65,6 @@ public class MipsInstructionSet {
 	
 	public static final int INSTR_INDEX_SHIFT = 0;
 	public static final int INSTR_INDEX_MASK = 0x03ffffff;
-	public static final int INSTR_INDEX_SXT_SHIFT = 6;
 	
 	public static final int RETURN_REG = 0x1f;
 	
@@ -154,13 +153,11 @@ public class MipsInstructionSet {
 	}
 	
 	public static int getInstrIndex(long instruction) {
-		int r = (int)((instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK);
-		return (r<<INSTR_INDEX_SXT_SHIFT)>>INSTR_INDEX_SXT_SHIFT;
+		return (int)((instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK);
 	}
 	
 	public static int getInstrIndex(int instruction) {
-		int r = (instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK;
-		return (r<<INSTR_INDEX_SXT_SHIFT)>>INSTR_INDEX_SXT_SHIFT;
+		return (instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK;
 	}
 	
 	// An enum that covers the interesting MIPS instructions
