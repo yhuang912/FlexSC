@@ -29,6 +29,7 @@ import static com.appcomsci.mips.memory.MipsInstructionSet.getOffset;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getOp;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getRegImmCode;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getSrcReg;
+import static com.appcomsci.mips.memory.MipsInstructionSet.getSrc2Reg;
 import jargs.gnu.CmdLineParser;
 
 import java.io.File;
@@ -123,7 +124,12 @@ public class MemSetBuilder extends MipsProgram {
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(getEntryPoint());	
 		DataSegment inst = rdr.getInstructions(getFunctionLoadList());
 		
-		return build(inst, ent);
+		List<MemorySet> sets = build(inst, ent);
+		
+//		for(MemorySet s:sets) {
+//			s.getAddressMap(inst);
+//		}
+		return sets;
 	}
 	
 	/**
@@ -218,7 +224,7 @@ public class MemSetBuilder extends MipsProgram {
 			while(thI.hasNext()) {
 				ThreadState th = thI.next();
 //System.err.println("  Thread " + th.getId() + " A: " + Long.toHexString(th.getCurrentAddress()) + " D: " +
-//Long.toHexString(th.getCurrentAddress() == SPIN_ADDRESS ? 0 : inst.getDatum(th.getCurrentAddress())));
+//Long.toHexString(th.getCurrentAddress() == SPIN_ADDRESS ? 0 : instructions.getDatum(th.getCurrentAddress())));
 
 				if(th.isDelayed()) {
 					// If a delay slot, just pop it off and continue
@@ -243,9 +249,7 @@ public class MemSetBuilder extends MipsProgram {
 								if(isHonorDelaySlots()) {
 									th.doDelay();
 								} else {
-//System.err.println("Popping " + Long.toHexString(th.getCurrentAddress()));
 									th.popAddress();
-//System.err.println("New address " + Long.toHexString(th.getCurrentAddress()));
 								}
 							} else {
 								// Flying leap
@@ -334,12 +338,25 @@ public class MemSetBuilder extends MipsProgram {
 							} else {
 								// Push branch target
 								th.pushAddress(targetAddress);
-//System.err.println("Call push " + Long.toHexString(targetAddress));
 							}
 						}
 						break;
 						// Conditional branches.
 					case OP_BEQ:
+						{
+							if(getSrcReg(instr) == getSrc2Reg(instr)) {
+								long targetAddress = th.getCurrentAddress() + (getOffset(instr)<<2) + 4;
+								// An unconditional branch, since the two registers are equal.
+								if(isHonorDelaySlots()) {
+									th.doDelay();
+								} else {
+									th.popAddress();
+									th.pushAddress(targetAddress);
+								}
+								break;
+							}
+						}
+						/* FALL THROUGH */
 					case OP_BNE:
 					case OP_BLEZ:
 					case OP_BGTZ:
