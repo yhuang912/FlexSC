@@ -5,6 +5,9 @@ package com.appcomsci.mips.binary;
 
 import java.math.BigInteger;
 import java.util.NoSuchElementException;
+import static com.appcomsci.mips.memory.MipsInstructionSet.SPIN_ADDRESS;
+import static com.appcomsci.mips.memory.MipsInstructionSet.SPIN_INSTRUCTION;
+import static com.appcomsci.mips.memory.MipsInstructionSet.NOP;
 
 /**
  * This class describes the contents of a chunk of memory.
@@ -48,6 +51,11 @@ public class DataSegment {
 	 * @throws NoSuchElementException if the address is out of range
 	 */
 	public long getDatum(long address) {
+		// Hacks for spinning
+		if(address == SPIN_ADDRESS)
+			return SPIN_INSTRUCTION;
+		if(address == SPIN_ADDRESS+4)
+			return NOP;
 		long index = address-startAddress;
 		if((index & 0x3) != 0) {
 			throw new UnsupportedOperationException("Address not a multiple of 4: " + Long.toHexString(address));
@@ -119,6 +127,12 @@ public class DataSegment {
 	public boolean[] getDatumAsBoolean(long address) {
 		if(data == null)
 			return null;
+		
+		// Hacks for spinning
+		if(address == SPIN_ADDRESS)
+			return datumToBoolean(SPIN_INSTRUCTION);
+		if(address == SPIN_ADDRESS+4)
+			return datumToBoolean(NOP);
 		if(booleanData == null) {
 			getDataAsBoolean();
 		}
