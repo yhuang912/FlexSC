@@ -84,11 +84,13 @@ public class MemSetBuilder extends MipsProgram {
 	
 	/**
 	 * Generate a list of instructions that might be executed in any program step.
+	 * The program is supplied by the caller on the command line, or from a config object
+	 * passed to the constructor.
 	 * 
-	 * @return An array of MemorySet objects.  The first element of this array [accessible
+	 * @return A list of MemorySet objects.  The first element of this list [accessible
 	 * via get(0)] is the address of the first instruction at the entry point.  Subsequent
-	 * elements are the addresses of subsequent instructions in the program.  They may be accessed by running
-	 * down the returned ArrayList in order, or by following the NextMemorySet properties.
+	 * elements are the addresses of subsequent instructions in the program.  They may be accessed by
+	 * following the NextMemorySet properties.
 	 * 
 	 * The analysis attempts to trace possible execution paths.  Each time a conditional branch
 	 * is encountered, a new thread representing a possible execution path is started.  If a
@@ -111,11 +113,29 @@ public class MemSetBuilder extends MipsProgram {
 	 * 
 	 * @throws FileNotFoundException If the binary doesn't exist
 	 * @throws IllegalArgumentException ??
-	 * @throws IOException If the binary (or properties file) can't be read.
+	 * @throws IOException If the binary can't be read.
 	 * @throws MemSetBuilderException For some impossible conditions in the set builder
 	 */
 	public List<MemorySet> build()
 			throws FileNotFoundException, IllegalArgumentException, IOException, MemSetBuilderException {
+
+		Reader rdr = new Reader(new File(getBinaryFileName()), getConfiguration());
+		SymbolTableEntry ent = rdr.getSymbolTableEntry(getEntryPoint());	
+		DataSegment inst = rdr.getInstructions(getFunctionLoadList());
+		
+		return build(inst, ent);
+	}
+	
+	/**
+	 * Run the builder with user-supplied instructions and entry point.  The configuration
+	 * is only consulted for (a) the max number of program steps and (b) to determine if
+	 * delay slots are to be honored.
+	 * @param instructions The program instructions
+	 * @param entryPoint The program entry point
+	 * @return A list of MemorySet objects.  See the description for build().
+	 * @throws MemSetBuilderException For some impossible conditions in the set builder
+	 */
+	public List<MemorySet> build(DataSegment instructions, SymbolTableEntry entryPoint) throws  MemSetBuilderException{
 		
 		// This is the array to be returned.
 		List<MemorySet> execSets = new ArrayList<MemorySet>();
@@ -127,17 +147,14 @@ public class MemSetBuilder extends MipsProgram {
 		// Each value in the hash map is a bucket of MemorySets
 		Map<MemorySet, ArrayList<MemorySet>> memSetMap = new HashMap<MemorySet, ArrayList<MemorySet>>();
 		
-	    int maxSteps =getMaxProgramSteps();
-		Reader rdr = new Reader(new File(getBinaryFileName()), getConfiguration());
-		SymbolTableEntry ent = rdr.getSymbolTableEntry(getEntryPoint());	
-		DataSegment inst = rdr.getInstructions(getFunctionLoadList());
+	    int maxSteps = getMaxProgramSteps();
 		
 		// The list of currently "executing" threads
 		
 		LinkedList<ThreadState> threads = new LinkedList<ThreadState>();
 		
 		// Initially, one thread starting at the entry address
-		ThreadState initial = new ThreadState(ent.getAddress());
+		ThreadState initial = new ThreadState(entryPoint.getAddress());
 		threads.add(initial);
 		
 		executionLoop: for(int executionStep = 0; executionStep < maxSteps; executionStep++) {
@@ -178,7 +195,7 @@ public class MemSetBuilder extends MipsProgram {
 			
 			// Quit if the set of possible addresses is the universe.  (Should probably make
 			// this half the universe or something and make the next set equal to the universe)
-			if(currentSet.size() >= inst.getDataLength()) {
+			if(currentSet.size() >= instructions.getDataLength()) {
 				currentSet.setNextMemorySet(currentSet);
 				break;
 			}
@@ -211,7 +228,7 @@ public class MemSetBuilder extends MipsProgram {
 					long addr = th.getCurrentAddress();
 					long instr = NOP;
 					if(addr != SPIN_ADDRESS)
-						instr = inst.getDatum(th.getCurrentAddress());
+						instr = instructions.getDatum(th.getCurrentAddress());
 					
 					// Now we get down to the tedious work of simulating individual
 					// instructions
@@ -232,7 +249,7 @@ public class MemSetBuilder extends MipsProgram {
 								}
 							} else {
 								// Flying leap
-								currentSet = new MemorySet(executionStep+1, inst);
+								currentSet = new MemorySet(executionStep+1, instructions);
 								execSets.add(executionStep+1, currentSet);
 								prevSet.setNextMemorySet(currentSet);
 								currentSet.setNextMemorySet(currentSet);
@@ -241,7 +258,7 @@ public class MemSetBuilder extends MipsProgram {
 							break;
 							// Flying leap with link
 						case OP_JALR:
-							currentSet = new MemorySet(executionStep+1, inst);
+							currentSet = new MemorySet(executionStep+1, instructions);
 							execSets.add(executionStep+1, currentSet);
 							prevSet.setNextMemorySet(currentSet);
 							currentSet.setNextMemorySet(currentSet);
