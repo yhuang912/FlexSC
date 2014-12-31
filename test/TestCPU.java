@@ -169,14 +169,14 @@ public class TestCPU {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
-		/*MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
 	    List<MemorySet> sets = b.build();
 	    for(MemorySet s:sets) {
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(instData);
 	        System.out.println(m.size());
 	        // m now contains the map for this step.
 	        // You could cache this back in s I guess.
-	    }*/
+	    }
 		instructions = instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
