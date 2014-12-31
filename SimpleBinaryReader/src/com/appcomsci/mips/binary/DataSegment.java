@@ -46,7 +46,7 @@ public class DataSegment {
 	/** The contents of a word of memory at a specific address
 	 * 
 	 * @param address The address
-	 * @return The data as that address
+	 * @return The data at that address
 	 * @throws UnsupportedOperationException if the address is not a multiple of 4
 	 * @throws NoSuchElementException if the address is out of range
 	 */
