@@ -39,8 +39,8 @@ public class MipsInstructionSet {
 	// IMM codes
 	public static final int OP_BLTZ   = 0x00;
 	public static final int OP_BGEZ   = 0x01;
-	public static final int OP_BLTZAL = 0x10; // Link.  Obsolete.
-	public static final int OP_BGEZAL = 0x11; // Link.  Obsolete.
+	public static final int OP_BLTZAL = 0x10; // Link.
+	public static final int OP_BGEZAL = 0x11; // Link.
 	
 	// Constants for bit picking functions
 	
@@ -50,19 +50,24 @@ public class MipsInstructionSet {
 	public static final int OP_REGIMM_CODE_SHIFT = 16;
 	public static final int OP_REGIMM_CODE_MASK = 0x1f;
 	
-	public static final int SRC_REG_SHIFT = 20;
+	public static final int SRC_REG_SHIFT = 21;
 	public static final int SRC_REG_MASK  = 0x1f;
+	
+	public static final int SRC2_REG_SHIFT = 16;
+	public static final int SRC2_REG_MASK = 0x1f;
 	
 	public static final int FUNCT_SHIFT = 0;
 	public static final int FUNCT_MASK = 0x3f;
 	
 	public static final int OFFSET_SHIFT = 0;
 	public static final int OFFSET_MASK = 0xffff;
+	public static final int OFFSET_SXT_SHIFT = 16;
 	
 	public static final int INSTR_INDEX_SHIFT = 0;
 	public static final int INSTR_INDEX_MASK = 0x03ffffff;
+	public static final int INSTR_INDEX_SXT_SHIFT = 6;
 	
-	public static final int RETURN_REG = 0x1e;
+	public static final int RETURN_REG = 0x1f;
 	
 	/** Address presumed to be a branch to itself */
 	public static final long SPIN_ADDRESS = 0x0;
@@ -129,20 +134,33 @@ public class MipsInstructionSet {
 		return (instruction>>SRC_REG_SHIFT)&SRC_REG_MASK;
 	}
 	
+	public static int getSrc2Reg(long instruction) {
+		return (int)((instruction>>SRC2_REG_SHIFT)&SRC2_REG_MASK);
+	}
+	
+	public static int getSrc2Reg(int instruction) {
+		return (instruction>>SRC2_REG_SHIFT)&SRC2_REG_MASK;
+	}
+
+	
 	public static int getOffset(long instruction) {
-		return (int)((instruction>>OFFSET_SHIFT)&OFFSET_MASK);
+		int r = (int)((instruction>>OFFSET_SHIFT)&OFFSET_MASK);
+		return (r<<OFFSET_SXT_SHIFT)>>OFFSET_SXT_SHIFT;
 	}
 	
 	public static int getOffset(int instruction) {
-		return (instruction>>OFFSET_SHIFT)&OFFSET_MASK;
+		int r = (instruction>>OFFSET_SHIFT)&OFFSET_MASK;
+		return (r<<OFFSET_SXT_SHIFT)>>OFFSET_SXT_SHIFT;
 	}
 	
 	public static int getInstrIndex(long instruction) {
-		return (int)((instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK);
+		int r = (int)((instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK);
+		return (r<<INSTR_INDEX_SXT_SHIFT)>>INSTR_INDEX_SXT_SHIFT;
 	}
 	
 	public static int getInstrIndex(int instruction) {
-		return (instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK;
+		int r = (instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK;
+		return (r<<INSTR_INDEX_SXT_SHIFT)>>INSTR_INDEX_SXT_SHIFT;
 	}
 	
 	// An enum that covers the interesting MIPS instructions
