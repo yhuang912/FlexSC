@@ -36,6 +36,7 @@ public class TestCPU {
 	static final int Bob_input = 13;
 	int[] mem;
 	Configuration config;
+	private static String binaryFileName;	// should not be static FIXME
 	 
 	 
 	
@@ -171,7 +172,7 @@ public class TestCPU {
 				CPU cpu = new CPU(env);
 				MEM mem = new MEM(env);
 				SecureArray<Boolean> reg = getRegister(env);
-				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
+				Reader rdr = new Reader(new File(getBinaryFileName()), config);
 				SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
 				DataSegment memData = rdr.getData();
@@ -256,7 +257,7 @@ public class TestCPU {
 				SecureArray<Boolean> reg = getRegister(env);
 //might be better to have bob send the number of instructions to alice.  That's the only reason 
 				//we currently read the file at all. 
-				Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
+				Reader rdr = new Reader(new File(getBinaryFileName()), config);
 				//SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
 				int numInst = inst.getDataLength();
@@ -334,9 +335,7 @@ public class TestCPU {
 			printUsage();
 			System.exit(2);
 		}
-		if(rest.length > 0) {
-			config.setBinaryFileName(rest[0]);
-		}
+		setBinaryFileName(rest[0]);
 	}
 	
 	private static boolean checkMatchBooleanArray(Boolean[] array, IntegerLib<Boolean> lib, int matchVal){
@@ -404,6 +403,15 @@ public class TestCPU {
 	private static void printUsage() {
 		System.out.println("Usage: java RunACSEmulatorServer [binary file]");
 	}
+
+        public static void setBinaryFileName(String fileName) {
+                binaryFileName = fileName;
+        }
+
+        public static String getBinaryFileName() {
+                return binaryFileName;
+        }
+
 	static public void main(String args[]) throws Exception {
 		Configuration config = new Configuration();
 		TestCPU test = new TestCPU(config);
