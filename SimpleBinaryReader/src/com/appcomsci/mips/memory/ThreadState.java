@@ -2,6 +2,7 @@ package com.appcomsci.mips.memory;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 
 /**
  * Tracks the state of a execution thread.
@@ -64,7 +65,18 @@ public class ThreadState {
 		ThreadState that = (ThreadState) o;
 		if(this.delayed != that.delayed)
 			return false;
-		return this.stack.equals(that.stack);
+		if(this.stack.size() != that.stack.size())
+			return false;
+		
+		// Default equals() method is by reference.
+		Iterator<Long> thisI = this.stack.iterator();
+		Iterator<Long> thatI = that.stack.iterator();
+		while(thisI.hasNext()) {
+			if(!thisI.next().equals(thatI.next())) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
