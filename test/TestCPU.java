@@ -8,6 +8,8 @@ import circuits.arithmetic.IntegerLib;
 import com.appcomsci.mips.binary.DataSegment;
 import com.appcomsci.mips.binary.Reader;
 import com.appcomsci.mips.binary.SymbolTableEntry;
+import com.appcomsci.mips.memory.MemSetBuilder;
+import com.appcomsci.mips.memory.MemorySet;
 import com.appcomsci.sfe.common.Configuration;
 
 import flexsc.CVCompEnv;
@@ -23,12 +25,14 @@ import jargs.gnu.CmdLineParser;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
+import java.util.TreeMap;
 //import gc.Boolean;
 
 public class TestCPU {
 
 	static final int REGISTER_SIZE = 32;
-	static final int MEM_SIZE = 350;// 2K words
+	static final int MEM_SIZE = 72;// 2K words
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
@@ -54,6 +58,74 @@ public class TestCPU {
 		Boolean eq2 = lib.eq(reg.trivialOram.read(31), lib.toSignals(0, 32));
 		eq = lib.and(eq, eq2);
 		return lib.declassifyToBoth(new Boolean[]{eq})[0]; 
+	}
+	
+	public void testInstruction (CompEnv<Boolean> env) throws Exception {
+		
+		SecureArray<Boolean> reg = new SecureArray<Boolean>(env, REGISTER_SIZE, WORD_SIZE);
+		//int inst = 		0b00000000000000110001011011000010; //SRL
+		int inst = 		0b00000000100100111001100000100101; //OR
+		int rsCont = 	0b00000000000000000000000000000101;
+		int rtCont = 	0b00000000000000000000000000011001;
+		//int rdCont = 	0b00000000000000000000000000000000;
+		Boolean[] rs = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
+		Boolean[] rt = env.inputOfAlice(Utils.fromInt(19, reg.lengthOfIden));
+		//Boolean[] rd = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
+		Boolean[] rsContent = env.inputOfAlice(Utils.fromInt(rsCont, WORD_SIZE));
+		Boolean[] rtContent = env.inputOfAlice(Utils.fromInt(rtCont, WORD_SIZE));
+		//Boolean[] rdContent = env.inputOfAlice(Utils.fromInt(rdCont, WORD_SIZE));
+		reg.write(rs, rsContent);
+		reg.write(rt, rtContent);
+		//reg.write(rd, rdContent);
+		env.flush();
+		
+		CPU cpu = new CPU(env);
+		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+		Boolean[] pc; 
+		pc = cpu.function(reg, env.inputOfAlice(Utils.fromInt(inst, 32)), env.inputOfAlice(Utils.fromInt(0,32)));
+		
+		String output = "";
+		for (int i = 31 ; i >= 26;  i--){
+			if ((inst & (1 << i)) != 0)
+				output += "1";
+			else 
+				output += "0";
+		}
+		output += "|";
+		for (int i = 25 ; i >= 21;  i--){
+			if ((inst & (1 << i)) != 0)
+				output += "1";
+			else 
+				output += "0";
+		}
+		output += "|";
+		for (int i = 20 ; i >= 16;  i--){
+			if ((inst & (1 << i)) != 0)
+				output += "1";
+			else 
+				output += "0";
+		}
+		output += "|";
+		for (int i = 15 ; i >= 11;  i--){
+			if ((inst & (1 << i)) != 0)
+				output += "1";
+			else 
+				output += "0";
+		}
+		output += "|";
+		for (int i = 10 ; i >= 0;  i--){
+			if ((inst & (1 << i)) != 0)
+				output += "1";
+			else 
+				output += "0";
+		}
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println("testing instruction: " + output);
+		printRegisters(reg, lib);	
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println("PC: ");
+		printBooleanArray(pc, lib);
+		
 	}
 	public SecureArray<Boolean> getRegister(CompEnv<Boolean> env)
 			throws Exception {
@@ -97,6 +169,14 @@ public class TestCPU {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
+		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+	    List<MemorySet> sets = b.build();
+	    for(MemorySet s:sets) {
+	        TreeMap<Long,boolean[]> m = s.getAddressMap(instData);
+	        System.out.println(m.size());
+	        // m now contains the map for this step.
+	        // You could cache this back in s I guess.
+	    }
 		instructions = instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
@@ -108,8 +188,12 @@ public class TestCPU {
 		for (int i = 0; i < numInst; i++){
 			index = lib.toSignals(i, inst.lengthOfIden);
 			data = env.inputOfAlice(instructions[i]);
+			/*if (env.getParty() == Party.Alice)
+				data = env.inputOfAlice(instructions[i]);
+			else 
+				data = env.inputOfAlice(new boolean[WORD_SIZE]);*/
 			inst.write(index, data);
-			System.out.println("Wrote instruction number "+i);
+			//System.out.println("Wrote instruction number "+i);
 		}		
 		System.out.println("exiting getInstructions");
 		return inst;
@@ -168,6 +252,7 @@ public class TestCPU {
 				listen(54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
+				testInstruction(env);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				CPU cpu = new CPU(env);
 				MEM mem = new MEM(env);
@@ -213,8 +298,8 @@ public class TestCPU {
 					}*/
 					System.out.println("newInst");
 					printBooleanArray(newInst, lib);
-					if (checkMatchBooleanArray(newInst, lib, 0b00000000000000110001011011000010))
-						System.out.println("Got match");
+					//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
+						//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101000, 32));
 					
 					pc = cpu.function(reg, newInst, pc);
 					
@@ -250,6 +335,7 @@ public class TestCPU {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				testInstruction(env);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				CPU cpu = new CPU(env);
 				MEM mem = new MEM(env);
@@ -279,6 +365,7 @@ public class TestCPU {
 					//Statistics sta = ((PMCompEnv) env).statistic;
 					//sta.flush();
 				}
+				
 				int count = 0;
 				while (true){
 					newInst = mem.func(reg, instructionBank, pc, newInst, 0, 0);
@@ -289,8 +376,8 @@ public class TestCPU {
 						break; 
 					
 					printBooleanArray(newInst, lib);
-					if (checkMatchBooleanArray(newInst, lib, 0b00000000000000110001011011000010))
-						System.out.println("got match");
+					//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
+						//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101000, 32));
 					
 					//int andCount = ((CVCompEnv)env).numOfAnds;
 					pc = cpu.function(reg, newInst, pc);
