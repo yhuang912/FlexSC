@@ -14,6 +14,8 @@ import java.util.NoSuchElementException;
 public class DataSegment {
 	private final long startAddress;
 	private final long data[];
+	private boolean booleanData[][];
+	
 	DataSegment(final long address, final long data[]) {
 		this.startAddress = address;
 		if(data != null)
@@ -21,19 +23,23 @@ public class DataSegment {
 		else
 			this.data = null;
 	}
+	
 	/** The start address of this chunk of memory */
 	public long getStartAddress() {
 		return startAddress;
 	}
+	
 	/** Data length, in words */
 	public int getDataLength() {
 		if(data == null) return 0;
 		return data.length;
 	}
+	
 	/** The contents of this chunk of memory */
 	public long[] getData() {
 		return data;
 	}
+	
 	/** The contents of a word of memory at a specific address
 	 * 
 	 * @param address The address
@@ -51,6 +57,7 @@ public class DataSegment {
 			throw new NoSuchElementException("No such address " + Long.toHexString(address));
 		return data[(int) index];
 	}
+
 	/** The contents of this chunk of memory, as big integers */
 	public BigInteger[] getDataAsBigIntegers() {
 		if(data == null)
@@ -68,25 +75,61 @@ public class DataSegment {
 		return rslt;
 	}
 	
+	/** Convert a 32 bit datum (represented as a long) to a 32 element
+	 * boolean array.
+	 * @param datum The original data
+	 * @return The converted array
+	 */
+	private boolean[] datumToBoolean(long datum) {
+		long mask = 0x00000001;
+		boolean t[] = new boolean[32];
+		// Let compiler decide how much to unroll this loop
+		for(int j = 0; j < 32; j++) {
+			t[j] = (datum&mask) != 0;
+			mask <<= 1;
+		}
+		return t;
+	}
+	
 	/** Contents of this chunk of memory as booleans.  Little endian.
+	 * Caches the boolean data as a side effect.
 	 * 
 	 * @return An array of arrays of booleans
 	 */
 	public boolean[][] getDataAsBoolean() {
 		if(data == null)
 			return null;
-		boolean rslt[][] = new boolean[data.length][32];
-		for(int i = 0; i < data.length; i++) {
-			long x = data[i];
-			long mask = 0x00000001;
-			boolean t[] = rslt[i];
-			// Let compiler decide how much to unroll this loop
-			for(int j = 0; j < 32; j++) {
-				t[j] = (x&mask) != 0;
-				mask <<= 1;
+		if(booleanData == null) {
+			booleanData = new boolean[data.length][];
+			for(int i = 0; i < data.length; i++) {
+				booleanData[i] = datumToBoolean(data[i]);
 			}
 		}
-		return rslt;
+		return booleanData;
+	}
+	
+	/** Get the contents of a word of memory at a specific address.
+	 * The contents are represented as a boolean array.
+	 * 
+	 * @param address The address
+	 * @return The data as that address
+	 * @throws UnsupportedOperationException if the address is not a multiple of 4
+	 * @throws NoSuchElementException if the address is out of range
+	 */
+	public boolean[] getDatumAsBoolean(long address) {
+		if(data == null)
+			return null;
+		if(booleanData == null) {
+			getDataAsBoolean();
+		}
+		long index = address-startAddress;
+		if((index & 0x3) != 0) {
+			throw new UnsupportedOperationException("Address not a multiple of 4: " + Long.toHexString(address));
+		}
+		index = index / 4;
+		if(index < 0 || index >= data.length)
+			throw new NoSuchElementException("No such address " + Long.toHexString(address));
+		return booleanData[(int) index];
 	}
 	/*
 	public void addInstructions(SectionData sec) {

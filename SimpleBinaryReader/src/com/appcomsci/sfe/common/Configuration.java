@@ -21,12 +21,8 @@ public class Configuration {
 	public static final String PROPERTY_FILE = "emulator.properties";
 	private static final String DEFAULT_PROPERTY_FILE = "emulator.properties";
 	
-	public static final String READER_PATH = "binary.reader.path";
+	public static final String READER_PATH_PROPERTY = "binary.reader.path";
 	public static final String DEFAULT_READER_PATH = "/opt/mipsel/usr/bin/mipsel-linux-gnu-llvm-objdump";
-	
-	public static final String BINARY_FILE_NAME_PROPERTY = "emulator.binary";
-	
-	public static final String BINARY_EVA_FILE_NAME_PROPERTY = "eva.binary";
 	
 	public static final String ENTRY_POINT_PROPERTY = "entry.point";
 	public static final String DEFAULT_ENTRY_POINT = "sfe_main";
@@ -44,16 +40,17 @@ public class Configuration {
 	
 	public static final String MAX_PROGRAM_STEPS_PROPERTY = "max.program.steps";
 	public static final int DEFAULT_MAX_PROGRAM_STEPS = 1000;
-
 	
-	private String binaryFileName;
-	private String binaryEvaFileName;
+	public static final String HONOR_DELAY_SLOTS_PROPERTY = "honor.delay.slots";
+	public static final boolean DEFAULT_HONOR_DELAY_SLOTS = false;
+
 	private String entryPoint;
 	private String emulatorClientDir;
 	private String emulatorServerDir;
 	private String serverName;
 	private String binaryReaderPath;
 	private int maxProgramSteps;
+	private boolean honorDelaySlots;
 	
 	private List<String> functionLoadList;
 	
@@ -67,8 +64,8 @@ public class Configuration {
 		InputStream resourceStream = null;	
 		SfeProperties properties = null;
 		try {
-			System.out.println("Working Directory = " +
-		              System.getProperty("user.dir"));
+//			System.out.println("Working Directory = " +
+//		              System.getProperty("user.dir"));
 			resourceStream = new FileInputStream(props);			
 		} catch(FileNotFoundException e) {
 			resourceStream =  Configuration.class.getClassLoader().getResourceAsStream(props);
@@ -80,26 +77,24 @@ public class Configuration {
 			resourceStream.close();
 		}
 		
-		binaryFileName = properties.getProperty(BINARY_FILE_NAME_PROPERTY);
-		binaryEvaFileName = properties.getProperty(BINARY_EVA_FILE_NAME_PROPERTY);
 		entryPoint = properties.getProperty(ENTRY_POINT_PROPERTY, DEFAULT_ENTRY_POINT);
 		emulatorClientDir = properties.getProperty(EMULATOR_CLIENT_DIR_PROPERTY, DEFAULT_EMULATOR_CLIENT_DIR);
 		emulatorServerDir = properties.getProperty(EMULATOR_SERVER_DIR_PROPERTY, DEFAULT_EMULATOR_SERVER_DIR);
 		serverName = properties.getProperty(SERVER_NAME_PROPERTY, DEFAULT_SERVER_NAME);
-		binaryReaderPath = properties.getProperty(READER_PATH, DEFAULT_READER_PATH);
+		binaryReaderPath = properties.getProperty(READER_PATH_PROPERTY, DEFAULT_READER_PATH);
 		maxProgramSteps = properties.getProperty(MAX_PROGRAM_STEPS_PROPERTY, DEFAULT_MAX_PROGRAM_STEPS);
+		honorDelaySlots = properties.getProperty(HONOR_DELAY_SLOTS_PROPERTY, DEFAULT_HONOR_DELAY_SLOTS);
 		initFunctionLoadList(properties);	
 	}
 	
 	public Configuration(Configuration that) {
-		this.setBinaryFileName(that.getBinaryFileName());
-		this.setBinaryEvaFileName(that.getBinaryEvaFileName());
 		this.setEntryPoint(that.getEntryPoint());
 		this.setEmulatorClientDir(that.getEmulatorClientDir());
 		this.setEmulatorServerDir(that.getEmulatorServerDir());
 		this.setServerName(that.getServerName());
 		this.setBinaryReaderPath(that.getBinaryReaderPath());
 		this.setMaxProgramSteps(that.getMaxProgramSteps());
+		this.setHonorDelaySlots(that.isHonorDelaySlots());
 		functionLoadList = new ArrayList<String>();
 		for(String s:that.getFunctionLoadList()) {
 			functionLoadList.add(s);
@@ -115,30 +110,6 @@ public class Configuration {
 		} else {
 			setFunctionLoadList(s);
 		}
-	}
-	
-	public String getBinaryEvaFileName() {
-		if(binaryEvaFileName == null) {
-			System.err.println("No binary file given for Eva");
-			System.exit(1);
-		}
-		return binaryEvaFileName;
-	}
-	
-	public void setBinaryEvaFileName(String binaryEvaFileName) {
-		this.binaryEvaFileName = binaryEvaFileName;
-	}
-	
-	public String getBinaryFileName() {
-		if(binaryFileName == null) {
-			System.err.println("No binary file given");
-			System.exit(1);
-		}
-		return binaryFileName;
-	}
-	
-	public void setBinaryFileName(String binaryFileName) {
-		this.binaryFileName = binaryFileName;
 	}
 	
 	public String getEntryPoint() {
@@ -157,6 +128,7 @@ public class Configuration {
 		this.binaryReaderPath = binaryReaderPath;
 	}
 	
+	
 	public List<String> getFunctionLoadList() {
 		return functionLoadList;
 	}
@@ -164,12 +136,12 @@ public class Configuration {
 	public void setFunctionLoadList(List<String>newlist) {
 		this.functionLoadList = newlist;
 	}
-	
-	public void setFunctionLoadList(String list) {
-			String fcns[] = list.split("[, ]+", 0);
-			functionLoadList = Arrays.asList(fcns);
-	}
 
+	public void setFunctionLoadList(String list) {
+		String fcns[] = list.split("[, ]+", 0);
+		functionLoadList = Arrays.asList(fcns);
+	}
+	
 	public String getServerName() {
 		return serverName;
 	}
@@ -206,6 +178,20 @@ public class Configuration {
 	 */
 	public void setMaxProgramSteps(int maxProgramSteps) {
 		this.maxProgramSteps = maxProgramSteps;
+	}
+
+	/**
+	 * @return the honorDelaySlots
+	 */
+	public boolean isHonorDelaySlots() {
+		return honorDelaySlots;
+	}
+
+	/**
+	 * @param honorDelaySlots the honorDelaySlots to set
+	 */
+	public void setHonorDelaySlots(boolean honorDelaySlots) {
+		this.honorDelaySlots = honorDelaySlots;
 	}
 
 }

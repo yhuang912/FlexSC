@@ -53,9 +53,7 @@ import com.appcomsci.sfe.common.Configuration;
  * @author Allen McIntosh
  *
  */
-public class MemSetBuilder {
-	private boolean honorDelaySlots = false;
-	private Configuration config;
+public class MemSetBuilder extends MipsProgram {
 	
 	/**
 	 * Contructor: Pick up configuration from a user-supplied config object
@@ -63,9 +61,8 @@ public class MemSetBuilder {
 	 * @param honorDelaySlots If true, execute instructions in delay slots before
 	 *		taking branches.
 	 */
-	public MemSetBuilder(Configuration config, boolean honorDelaySlots) {
-		this.config = config; // Should we clone this?
-		this.honorDelaySlots = honorDelaySlots;
+	public MemSetBuilder(Configuration config) {
+		super(config);
 	}
 	
 	/**
@@ -75,98 +72,16 @@ public class MemSetBuilder {
 	 * @throws IOException
 	 */
 	public MemSetBuilder(String args[]) throws IOException, CmdLineParser.OptionException {
-		// Create configuration object.  This reads the properties file.
-		config = new Configuration();
-		
-		// Now parse command line arguments
-		
-		CmdLineParser parser = new CmdLineParser();
-		CmdLineParser.Option.StringOption oE = new CmdLineParser.Option.StringOption('e', "entry.point");
-		CmdLineParser.Option.StringOption oL = new CmdLineParser.Option.StringOption('l', "function.load.list");
-		CmdLineParser.Option.StringOption oB = new CmdLineParser.Option.StringOption('b', "binary.reader.path");
-		CmdLineParser.Option.IntegerOption oM = new CmdLineParser.Option.IntegerOption('m', "max.program.steps");
-		CmdLineParser.Option.BooleanOption oD = new CmdLineParser.Option.BooleanOption('d', "honor.delay.slots");
-		parser.addOption(oE);
-		parser.addOption(oL);
-		parser.addOption(oB);
-		parser.addOption(oM);
-		parser.addOption(oD);
-
-		parser.parse(args);
-		
-		// Pick off file name, which should be remaining arg
-		// (and currently only arg)
-		// If no file name, will get from properties file.
-		// This is probably an error.
-
-		String rest[] = parser.getRemainingArgs();
-		if(rest.length > 1 || rest.length == 0) {
-			printUsage();
-			System.exit(2);
-		}
-		if(rest.length > 0) {
-			config.setBinaryFileName(rest[0]);
-		}
-		
-		// Finally, pick off options
-		
-		Object o;
-		if((o = parser.getOptionValue(oE)) != null)
-			config.setEntryPoint((String)o);
-		if((o = parser.getOptionValue(oL)) != null)
-			config.setFunctionLoadList((String) o);
-		if((o = parser.getOptionValue(oB)) != null)
-			config.setBinaryFileName((String)o);
-		if((o = parser.getOptionValue(oM)) != null)
-			config.setMaxProgramSteps((Integer)o);
-		if((o = parser.getOptionValue(oD)) != null)
-			honorDelaySlots = (Boolean) o;
+		super(args);
 	}
 	
-	private static void printUsage() {
+	protected void printUsage() {
+		printUsageStatic();
+	}
+	
+	private static void printUsageStatic() {
+
 		System.err.println("Usage!");
-	}
-	
-	/**
-	 * Change the entry point used
-	 * @param entryPoint The name of the new entry point
-	 */
-	public void setEntryPoint(String entryPoint) {
-		synchronized(config) { // Probably unnecessary
-			config.setEntryPoint(entryPoint);
-		}
-	}
-	
-	public String getEntryPoint() {
-		return config.getEntryPoint();
-	}
-	
-	/**
-	 * Change the list of functions to be loaded.
-	 * @param loadList The new (comma-separated) list of functions to be loaded.
-	 */
-	public void setFunctionLoadList(String loadList) {
-		synchronized(config) {
-			config.setFunctionLoadList(loadList);
-		}
-	}
-	
-	public List<String> getFunctionLoadList() {
-		return config.getFunctionLoadList();
-	}
-	
-	/**
-	 * Change the maximum number of program steps.
-	 * @param maxProgramSteps The new maximum number of program steps.
-	 */
-	public void setMaxProgramSteps(int maxProgramSteps) {
-		synchronized(config) { // Probably unnecessary
-			config.setMaxProgramSteps(maxProgramSteps);
-		}
-	}
-	
-	public int getMaxProgramSteps() {
-		return config.getMaxProgramSteps();
 	}
 	
 	/**
@@ -213,22 +128,11 @@ public class MemSetBuilder {
 		// A hash map, for detecting recurring states.
 		// Each value in the hash map is a bucket of MemorySets
 		Map<MemorySet, ArrayList<MemorySet>> memSetMap = new HashMap<MemorySet, ArrayList<MemorySet>>();
-
-		// Grab things from the config properties.  Synchronize so that we see something
-		// consistent.  If the caller wishes to change more than one property in a
-		// multi-threaded environment, they should likewise synchronize on the
-		// config object.
 		
-		int maxSteps;
-		Reader rdr;
-		SymbolTableEntry ent;
-		DataSegment inst;
-		synchronized(config) {
-			maxSteps = config.getMaxProgramSteps();
-			rdr = new Reader(new File(config.getBinaryFileName()), config);
-			ent = rdr.getSymbolTableEntry(config.getEntryPoint());	
-			inst = rdr.getInstructions(config.getFunctionLoadList());
-		}
+	    int maxSteps =getMaxProgramSteps();
+		Reader rdr = new Reader(new File(getBinaryFileName()), getConfiguration());
+		SymbolTableEntry ent = rdr.getSymbolTableEntry(getEntryPoint());	
+		DataSegment inst = rdr.getInstructions(getFunctionLoadList());
 		
 		// The list of currently "executing" threads
 		
@@ -321,7 +225,7 @@ public class MemSetBuilder {
 						case OP_JR:
 							if(getSrcReg(instr) == RETURN_REG) {
 								// Assume this is a return
-								if(honorDelaySlots) {
+								if(isHonorDelaySlots()) {
 									th.doDelay();
 								} else {
 //System.err.println("Popping " + Long.toHexString(th.getCurrentAddress()));
@@ -357,7 +261,7 @@ public class MemSetBuilder {
 								long targetAddress = th.getCurrentAddress() + (getOffset(instr)<<2) + 4;
 								ThreadState newThread = new ThreadState(th);
 								newThreads.add(newThread);
-								if(honorDelaySlots) {
+								if(isHonorDelaySlots()) {
 									newThread.doDelay(targetAddress);
 								} else {
 									// Replace current address with branch target
@@ -374,7 +278,7 @@ public class MemSetBuilder {
 								long targetAddress = th.getCurrentAddress() + (getOffset(instr)<<2) + 4;
 								ThreadState newThread = new ThreadState(th);
 								newThreads.add(newThread);
-								if(honorDelaySlots) {
+								if(isHonorDelaySlots()) {
 									newThread.doCall(targetAddress);
 								} else {
 									// Push branch target
@@ -394,7 +298,7 @@ public class MemSetBuilder {
 							long targetAddress = th.getCurrentAddress()+4;
 							targetAddress &= (long)(~MipsInstructionSet.INSTR_INDEX_MASK)<<2;
 							targetAddress |= getInstrIndex(instr)<<2;
-							if(honorDelaySlots) {
+							if(isHonorDelaySlots()) {
 								th.doDelay(targetAddress);
 							} else {
 								// Replace current address with branch target
@@ -410,7 +314,7 @@ public class MemSetBuilder {
 							targetAddress &= (long)(~MipsInstructionSet.INSTR_INDEX_MASK)<<2;
 							targetAddress |= getInstrIndex(instr)<<2;
 							th.advance();
-							if(honorDelaySlots) {
+							if(isHonorDelaySlots()) {
 								th.doCall(targetAddress);
 							} else {
 								// Push branch target
@@ -428,7 +332,7 @@ public class MemSetBuilder {
 							long targetAddress = th.getCurrentAddress() + (getOffset(instr)<<2) + 4;
 							ThreadState newThread = new ThreadState(th);
 							newThreads.add(newThread);
-							if(honorDelaySlots) {
+							if(isHonorDelaySlots()) {
 								newThread.doDelay(targetAddress);
 							} else {
 								newThread.popAddress();
@@ -490,26 +394,12 @@ public class MemSetBuilder {
 			b = new MemSetBuilder(args);
 		} catch(CmdLineParser.OptionException e) {
 			System.err.println(e.getMessage());
-			printUsage();
+			printUsageStatic();
 			System.exit(2);
 		}
 		List<MemorySet> sets = b.build();
 		for(MemorySet m:sets) {
 			System.err.println(m.toString());
 		}
-	}
-
-	/**
-	 * @return the honorDelaySlots
-	 */
-	public boolean isHonorDelaySlots() {
-		return honorDelaySlots;
-	}
-
-	/**
-	 * @param honorDelaySlots the honorDelaySlots to set
-	 */
-	public void setHonorDelaySlots(boolean honorDelaySlots) {
-		this.honorDelaySlots = honorDelaySlots;
 	}
 }

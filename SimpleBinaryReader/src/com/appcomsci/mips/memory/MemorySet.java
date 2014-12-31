@@ -4,7 +4,7 @@
 package com.appcomsci.mips.memory;
 
 import java.util.List;
-import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.appcomsci.mips.binary.DataSegment;
@@ -57,6 +57,19 @@ public class MemorySet {
 	 */
 	public TreeSet<Long> getAddresses() {
 		return addresses;
+	}
+	
+	/**
+	 * Get a map from addresses in this set to the data at those addresses
+	 * @param dseg A DataSegment containing the data
+	 * @return The map.
+	 */
+	public TreeMap<Long,boolean[]> getAddressMap(DataSegment dseg) {
+		TreeMap<Long, boolean[]> rslt = new TreeMap<Long, boolean[]>();
+		for(Long addr:addresses) {
+			rslt.put(addr, dseg.getDatumAsBoolean(addr));
+		}
+		return rslt;
 	}
 	
 	/**

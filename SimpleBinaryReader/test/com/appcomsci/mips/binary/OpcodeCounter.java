@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.appcomsci.mips.memory.MipsInstructionSet;
+import com.appcomsci.mips.memory.MipsProgram;
 import com.appcomsci.sfe.common.Configuration;
 
 import static com.appcomsci.mips.memory.MipsInstructionSet.OP_BGEZ;
@@ -34,8 +35,7 @@ import static com.appcomsci.mips.memory.MipsInstructionSet.getRegImmCode;
  * @author Allen McIntosh
  *
  */
-public class OpcodeCounter {
-	private Configuration config;
+public class OpcodeCounter extends MipsProgram {
 	/**
 	 * Constructor: Pick up configuration from command line arguments, with
 	 * a properties file as backup.
@@ -43,84 +43,15 @@ public class OpcodeCounter {
 	 * @throws IOException
 	 */
 	public OpcodeCounter(String args[]) throws IOException, CmdLineParser.OptionException {
-		// Create configuration object.  This reads the properties file.
-		config = new Configuration();
-		
-		// Now parse command line arguments
-		
-		CmdLineParser parser = new CmdLineParser();
-		CmdLineParser.Option.StringOption oE = new CmdLineParser.Option.StringOption('e', "entry.point");
-		CmdLineParser.Option.StringOption oL = new CmdLineParser.Option.StringOption('l', "function.load.list");
-		CmdLineParser.Option.StringOption oB = new CmdLineParser.Option.StringOption('b', "binary.reader.path");
-		parser.addOption(oE);
-		parser.addOption(oL);
-		parser.addOption(oB);
-
-		parser.parse(args);
-		
-		// Pick off file name, which should be remaining arg
-		// (and currently only arg)
-		// If no file name, will get from properties file.
-		// This is probably an error.
-
-		String rest[] = parser.getRemainingArgs();
-		if(rest.length > 1 || rest.length == 0) {
-			printUsage();
-			System.exit(2);
-		}
-		if(rest.length > 0) {
-			config.setBinaryFileName(rest[0]);
-		}
-		
-		// Finally, pick off options
-		
-		Object o;
-		if((o = parser.getOptionValue(oE)) != null) {
-			config.setEntryPoint((String)o);
-			if((o = parser.getOptionValue(oL)) != null)
-				config.setFunctionLoadList((String) o);
-			else // Load list defaults to entry point, NOT something in
-				// config file
-				config.setFunctionLoadList((String) o);
-		} else {
-			// Set load list if given, otherwise use config file
-			if((o = parser.getOptionValue(oL)) != null)
-				config.setFunctionLoadList((String) o);
-		}
-		if((o = parser.getOptionValue(oB)) != null)
-			config.setBinaryFileName((String)o);
+		super(args);
 	}
 	
-	private static void printUsage() {
+	protected void printUsage() {
+		printUsageStatic();
+	}
+	
+	private static void printUsageStatic() {
 		System.err.println("Usage!");
-	}
-	
-	/**
-	 * Change the entry point used
-	 * @param entryPoint The name of the new entry point
-	 */
-	public void setEntryPoint(String entryPoint) {
-		synchronized(config) { // Probably unnecessary
-			config.setEntryPoint(entryPoint);
-		}
-	}
-	
-	public String getEntryPoint() {
-		return config.getEntryPoint();
-	}
-	
-	/**
-	 * Change the list of functions to be loaded.
-	 * @param loadList The new (comma-separated) list of functions to be loaded.
-	 */
-	public void setFunctionLoadList(String loadList) {
-		synchronized(config) {
-			config.setFunctionLoadList(loadList);
-		}
-	}
-	
-	public List<String> getFunctionLoadList() {
-		return config.getFunctionLoadList();
 	}
 	
 	public class OpCount {
@@ -135,9 +66,9 @@ public class OpcodeCounter {
 		
 		TreeMap<Long, OpCount> countTable = new TreeMap<Long, OpCount>();
 		
-		rdr = new Reader(new File(config.getBinaryFileName()), config);
-		ent = rdr.getSymbolTableEntry(config.getEntryPoint());	
-		inst = rdr.getInstructions(config.getFunctionLoadList());
+		rdr = new Reader(new File(getBinaryFileName()), getConfiguration());
+		ent = rdr.getSymbolTableEntry(getEntryPoint());	
+		inst = rdr.getInstructions(getFunctionLoadList());
 		for(long instr:inst.getData()) {
 			long op = getOp(instr);
 			long bits = instr & (OP_MASK << OP_SHIFT);
@@ -163,7 +94,7 @@ public class OpcodeCounter {
 			c = new OpcodeCounter(args);
 		} catch(CmdLineParser.OptionException e) {
 			System.err.println(e.getMessage());
-			printUsage();
+			printUsageStatic();
 			System.exit(2);
 		}
 		Collection<OpCount> opList =	c.countOps();
