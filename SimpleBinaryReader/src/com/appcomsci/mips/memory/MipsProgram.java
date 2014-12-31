@@ -26,8 +26,9 @@ public abstract class MipsProgram {
 	
 	private Configuration config;
 	
-	public MipsProgram(Configuration config) {
+	public MipsProgram(Configuration config, String binaryFileName) {
 		this.config = config;
+		this.binaryFileName = binaryFileName;
 	}
 	
 	public MipsProgram(String args[]) throws IOException, CmdLineParser.OptionException {

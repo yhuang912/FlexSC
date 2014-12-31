@@ -57,12 +57,10 @@ public class MemSetBuilder extends MipsProgram {
 	
 	/**
 	 * Contructor: Pick up configuration from a user-supplied config object
-	 * @param config The configuration object used to initialize this builder.
-	 * @param honorDelaySlots If true, execute instructions in delay slots before
-	 *		taking branches.
+	 * @param config The configuration object used to initialize this builder
 	 */
-	public MemSetBuilder(Configuration config) {
-		super(config);
+	public MemSetBuilder(Configuration config, String binaryFileName) {
+		super(config, binaryFileName);
 	}
 	
 	/**
