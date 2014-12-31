@@ -8,6 +8,8 @@ import circuits.arithmetic.IntegerLib;
 import com.appcomsci.mips.binary.DataSegment;
 import com.appcomsci.mips.binary.Reader;
 import com.appcomsci.mips.binary.SymbolTableEntry;
+import com.appcomsci.mips.memory.MemSetBuilder;
+import com.appcomsci.mips.memory.MemorySet;
 import com.appcomsci.sfe.common.Configuration;
 
 import flexsc.CVCompEnv;
@@ -23,6 +25,8 @@ import jargs.gnu.CmdLineParser;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
+import java.util.TreeMap;
 //import gc.Boolean;
 
 public class TestCPU {
@@ -165,6 +169,14 @@ public class TestCPU {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
+		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+	    List<MemorySet> sets = b.build();
+	    for(MemorySet s:sets) {
+	        TreeMap<Long,boolean[]> m = s.getAddressMap(instData);
+	        System.out.println(m.size());
+	        // m now contains the map for this step.
+	        // You could cache this back in s I guess.
+	    }
 		instructions = instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
@@ -176,8 +188,12 @@ public class TestCPU {
 		for (int i = 0; i < numInst; i++){
 			index = lib.toSignals(i, inst.lengthOfIden);
 			data = env.inputOfAlice(instructions[i]);
+			/*if (env.getParty() == Party.Alice)
+				data = env.inputOfAlice(instructions[i]);
+			else 
+				data = env.inputOfAlice(new boolean[WORD_SIZE]);*/
 			inst.write(index, data);
-			System.out.println("Wrote instruction number "+i);
+			//System.out.println("Wrote instruction number "+i);
 		}		
 		System.out.println("exiting getInstructions");
 		return inst;
