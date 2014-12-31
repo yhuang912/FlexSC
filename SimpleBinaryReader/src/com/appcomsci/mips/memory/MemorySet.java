@@ -94,6 +94,7 @@ public class MemorySet {
 		if(nextMemorySet != null) {
 			sb.append(" Next: " + nextMemorySet.getExecutionStep());
 		}
+		sb.append(" [" + addresses.size() + "] ");
 		for(Long l:addresses) {
 			sb.append(" " + Long.toHexString(l));
 		}
