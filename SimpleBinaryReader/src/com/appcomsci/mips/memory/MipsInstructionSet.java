@@ -160,66 +160,70 @@ public class MipsInstructionSet {
 		return (instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK;
 	}
 	
+	public enum OperationType {
+		R, I, INSTR, REGIMM
+	}
+	
 	// An enum that covers the interesting MIPS instructions
 	
 	public enum Operation {
 		// FUNCT(0),
 		// REGIMM(1L << OP_SHIFT),
-		J(2L << OP_SHIFT),
-		JAL(3L << OP_SHIFT),
-		BEQ(4L << OP_SHIFT),
-		BNE(5L << OP_SHIFT),
-		BLEZ(6L << OP_SHIFT),
-		BGTZ(7L << OP_SHIFT),
-		ADDI(8L << OP_SHIFT),
-		ADDIU(9L << OP_SHIFT),
-		SLTI(10L << OP_SHIFT),
-		SLTIU(11L << OP_SHIFT),
-		ANDI(12L << OP_SHIFT),
-		ORI(13L << OP_SHIFT),
-		XORI(14L << OP_SHIFT),
-		LUI(15L << OP_SHIFT),
-		BEQL(20L << OP_SHIFT),	// Obsolete
-		BNEL(21L << OP_SHIFT),	// Obsolete
-		BLEZL(22L << OP_SHIFT),	// Obsolete
-		BGTZL(23L << OP_SHIFT),	// Obsolete
-		LB(32L << OP_SHIFT),
-		LH(33L << OP_SHIFT),
-		LWL(34L << OP_SHIFT),
-		LW(35L << OP_SHIFT),
-		LBU(36L << OP_SHIFT),
-		LHU(37L << OP_SHIFT),
-		LWR(38L << OP_SHIFT),
-		SB(40L << OP_SHIFT),
-		SH(41L << OP_SHIFT),
-		SWL(42L << OP_SHIFT),
-		SW(43L << OP_SHIFT),
-		SLL(0 | (OP_FUNCT<<OP_SHIFT)),
-		SRL(2 | (OP_FUNCT<<OP_SHIFT)),
-		SRA(3 | (OP_FUNCT<<OP_SHIFT)),
-		SLLV(4 | (OP_FUNCT<<OP_SHIFT)),
-		SRLV(6 | (OP_FUNCT<<OP_SHIFT)),
-		SRAV(7 | (OP_FUNCT<<OP_SHIFT)),
-		JR(8 | (OP_FUNCT<<OP_SHIFT)),
-		JALR(9 | (OP_FUNCT<<OP_SHIFT)),
-		MOVZ(10 | (OP_FUNCT<<OP_SHIFT)),
-		MOVN(11 | (OP_FUNCT<<OP_SHIFT)),
-		MULT(24 | (OP_FUNCT<<OP_SHIFT)),
-		MULTU(25 | (OP_FUNCT<<OP_SHIFT)),
-		DIV(26 | (OP_FUNCT<<OP_SHIFT)),
-		DIVU(27 | (OP_FUNCT<<OP_SHIFT)),
-		ADD(32 | (OP_FUNCT<<OP_SHIFT)),
-		ADDU(33 | (OP_FUNCT<<OP_SHIFT)),
-		SUB(34 | (OP_FUNCT<<OP_SHIFT)),
-		SUBU(35 | (OP_FUNCT<<OP_SHIFT)),
-		AND(36 | (OP_FUNCT<<OP_SHIFT)),
-		OR(37 | (OP_FUNCT<<OP_SHIFT)),
-		XOR(38 | (OP_FUNCT<<OP_SHIFT)),
-		NOR(39 | (OP_FUNCT<<OP_SHIFT)),
-		SLT(42 | (OP_FUNCT<<OP_SHIFT)),
-		SLTU(43 | (OP_FUNCT<<OP_SHIFT)),
-		BLTZ((0<<OP_REGIMM_CODE_SHIFT) | (OP_REGIMM<<OP_SHIFT)),
-		BGEZ((1<<OP_REGIMM_CODE_SHIFT) | (OP_REGIMM<<OP_SHIFT)),
+		J(2L << OP_SHIFT,				OperationType.INSTR),
+		JAL(3L << OP_SHIFT,				OperationType.INSTR),
+		BEQ(4L << OP_SHIFT,				OperationType.I),
+		BNE(5L << OP_SHIFT,				OperationType.I),
+		BLEZ(6L << OP_SHIFT,			OperationType.I),
+		BGTZ(7L << OP_SHIFT,			OperationType.I),
+		ADDI(8L << OP_SHIFT,			OperationType.I),
+		ADDIU(9L << OP_SHIFT,			OperationType.I),
+		SLTI(10L << OP_SHIFT,			OperationType.I),
+		SLTIU(11L << OP_SHIFT,			OperationType.I),
+		ANDI(12L << OP_SHIFT,			OperationType.I),
+		ORI(13L << OP_SHIFT,			OperationType.I),
+		XORI(14L << OP_SHIFT,			OperationType.I),
+		LUI(15L << OP_SHIFT,			OperationType.I),
+		LB(32L << OP_SHIFT,				OperationType.I),
+		LH(33L << OP_SHIFT,				OperationType.I),
+		LWL(34L << OP_SHIFT,			OperationType.I),
+		LW(35L << OP_SHIFT,				OperationType.I),
+		LBU(36L << OP_SHIFT,			OperationType.I),
+		LHU(37L << OP_SHIFT,			OperationType.I),
+		LWR(38L << OP_SHIFT,			OperationType.I),
+		SB(40L << OP_SHIFT,				OperationType.I),
+		SH(41L << OP_SHIFT,				OperationType.I),
+		SWL(42L << OP_SHIFT,			OperationType.I),
+		SW(43L << OP_SHIFT,				OperationType.I),
+		SLL(0 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SRL(2 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SRA(3 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SLLV(4 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SRLV(6 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SRAV(7 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		JR(8 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		JALR(9 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		MOVZ(10 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		MOVN(11 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		MFHI(16 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		MTHI(17 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		MFLO(18 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		MTLO(16 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		MULT(24 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		MULTU(25 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		DIV(26 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		DIVU(27 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		ADD(32 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		ADDU(33 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SUB(34 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SUBU(35 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		AND(36 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		OR(37 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		XOR(38 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		NOR(39 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SLT(42 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		SLTU(43 | (OP_FUNCT<<OP_SHIFT),	OperationType.R),
+		BLTZ((0<<OP_REGIMM_CODE_SHIFT) | (OP_REGIMM<<OP_SHIFT), OperationType.REGIMM),
+		BGEZ((1<<OP_REGIMM_CODE_SHIFT) | (OP_REGIMM<<OP_SHIFT),	OperationType.REGIMM),
 		;
 		
 		private static Map<Long, Operation> opMap;
@@ -235,12 +239,18 @@ public class MipsInstructionSet {
 		}
 		
 		private final long value;
-		private Operation(long value) {
+		private final OperationType type;
+		private Operation(long value, OperationType type) {
 			this.value = value;
+			this.type = type;
 		}
 
 		public long getValue() {
 			return value;
+		}
+
+		public OperationType getType() {
+			return type;
 		}
 	}
 }
