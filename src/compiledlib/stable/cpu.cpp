@@ -90,13 +90,15 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
       reg[rd] = reg_rd;
    }
    else {
-      int32 reg_31;
+//      int32 reg_31 = reg[31];
+int32 oldPC = pc;
       if (op == OP_JAL ){
-         reg_31 = pc + 8;
+//         reg_31 = pc + 8;
          pc = ((inst << 6) >> 6);
+	 
       } 
       else if ( op == OP_BAL) {
-         reg_31 = pc+ 8;
+//         reg_31 = pc+ 8;
          if (reg_rt >= 0)
             pc = pc + (unsignExt << 2);
          // Dnote: I think we don't want this line?  Is this an unconditional branch?
@@ -104,7 +106,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
       }
 
       if(op == OP_JAL || op == OP_BAL)
-         reg[31] = reg_31;
+         reg[31] = oldPC + 8;
    }
 
 
