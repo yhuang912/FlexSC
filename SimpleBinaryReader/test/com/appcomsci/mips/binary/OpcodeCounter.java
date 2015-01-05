@@ -29,6 +29,7 @@ import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM_CODE_MASK;
 import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM_CODE_SHIFT;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getFunct;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getOp;
+import static com.appcomsci.mips.memory.MipsInstructionSet.getOpBits;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getRegImmCode;
 
 /**
@@ -70,13 +71,7 @@ public class OpcodeCounter extends MipsProgram {
 		ent = rdr.getSymbolTableEntry(getEntryPoint());	
 		inst = rdr.getInstructions(getFunctionLoadList());
 		for(long instr:inst.getData()) {
-			long op = getOp(instr);
-			long bits = instr & (OP_MASK << OP_SHIFT);
-			if(op == OP_FUNCT) {
-				bits |= instr & (FUNCT_MASK << FUNCT_SHIFT);
-			} else if(op == OP_REGIMM) {
-				bits |= instr & (OP_REGIMM_CODE_MASK << OP_REGIMM_CODE_SHIFT);
-			}
+			long bits = getOpBits(instr);
 			OpCount x = countTable.get(bits);
 			if(x == null) {
 				x = new OpCount();

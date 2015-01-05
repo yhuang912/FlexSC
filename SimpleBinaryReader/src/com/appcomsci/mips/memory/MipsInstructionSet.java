@@ -160,10 +160,21 @@ public class MipsInstructionSet {
 		return (instruction>>INSTR_INDEX_SHIFT)&INSTR_INDEX_MASK;
 	}
 	
+	public static long getOpBits(long instr) {
+		long op = getOp(instr);
+		long bits = instr & (OP_MASK << OP_SHIFT);
+		if(op == OP_FUNCT) {
+			bits |= instr & (FUNCT_MASK << FUNCT_SHIFT);
+		} else if(op == OP_REGIMM) {
+			bits |= instr & (OP_REGIMM_CODE_MASK << OP_REGIMM_CODE_SHIFT);
+		}
+		return bits;
+	}
+	
 	public enum OperationType {
 		FUNCT,
 		I,
-		J,			// like I, but the B/J instructions
+		J,		// like I, but the B/J instructions in that set
 		MW,		// I, Memory, Write
 		MR,		// I, Memory, Read 
 		REGIMM
@@ -242,8 +253,8 @@ public class MipsInstructionSet {
 			};
 		}
 		
-		public static Operation valueOf(long op) {
-			return opMap.get(op);
+		public static Operation valueOf(long instr) {
+			return opMap.get(getOpBits(instr));
 		}
 		
 		private final long value;
