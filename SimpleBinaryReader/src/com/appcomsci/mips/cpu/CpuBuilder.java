@@ -16,10 +16,48 @@ import com.appcomsci.mips.memory.MipsInstructionSet;
 
 public class CpuBuilder {
 	
+	private static void emitActions(StringBuilder sb, Set<String>operations, String name) {
+		if(operations.size() == 0)
+			return;
+
+		boolean codeWritten = sb.length() > 0;
+		sb.append("\t");
+		if(codeWritten)
+			sb.append("else ");
+		sb.append("if(op_type == ");
+		sb.append(name);
+		sb.append(") {\n");
+
+		codeWritten = false;
+
+		// Output actions in order give in input file
+		for(Map.Entry<String, List<String>>e: actions) {
+			String op = e.getKey();
+			if(operations.contains(op)) {
+				sb.append("\t\t");
+				if(codeWritten)
+					sb.append("else ");
+				codeWritten = true;
+				sb.append("if(op == OP_");
+				sb.append(op);
+				sb.append(") {\n");
+				for(String x:e.getValue()) {
+					sb.append("\t\t");
+					sb.append(x);
+					sb.append("\n");
+				}
+				sb.append("\t\t}\n");
+			}
+		}
+		sb.append("\t}\n");
+	}
+
 	public static String build(Set<MipsInstructionSet.Operation>operations) {
+
 		boolean needMult = false;
 		Set<String> I_ops = new HashSet<String>();
 		Set<String> R_ops = new HashSet<String>();
+		Set<String> REGIMM_ops = new HashSet<String>();
 		for(MipsInstructionSet.Operation o : operations) {
 			switch(o.getType()) {
 			case I:
@@ -27,6 +65,9 @@ public class CpuBuilder {
 				break;
 			case R:
 				R_ops.add(o.toString());
+				break;
+			case REGIMM:
+				REGIMM_ops.add(o.toString());
 				break;
 			}
 			switch(o) {
@@ -63,57 +104,9 @@ public class CpuBuilder {
 					System.out.println("\t, secure int32[2] hiLo");
 			} else if(s.startsWith("%ACTIONS")) {
 				StringBuilder sb = new StringBuilder();
-				if(I_ops.size() > 0) {
-					sb.append("\tif(op_type == OP_CODE_I) {\n");
-					// Output actions in order give in input file
-					boolean codeWritten = false;
-					for(Map.Entry<String, List<String>>e: actions) {
-						String op = e.getKey();
-						if(I_ops.contains(op)) {
-							sb.append("\t\t");
-							if(codeWritten)
-								sb.append("else ");
-							codeWritten = true;
-							sb.append("if(op == OP_");
-							sb.append(op);
-							sb.append(") {\n");
-							for(String x:e.getValue()) {
-								sb.append("\t\t");
-								sb.append(x);
-								sb.append("\n");
-							}
-							sb.append("\t\t}\n");
-						}
-					}
-					sb.append("\t}\n");
-				}
-				if(R_ops.size() > 0) {
-					if(sb.length() > 0)
-						sb.append("\telse ");
-					else
-						sb.append("\t");
-					sb.append("if(op_type == OP_CODE_R) {\n");
-					boolean codeWritten = false;
-					for(Map.Entry<String, List<String>>e: actions) {
-						String op = e.getKey();
-						if(R_ops.contains(op)) {
-							sb.append("\t\t");
-							if(codeWritten)
-								sb.append("else ");
-							codeWritten = true;
-							sb.append("if(funct == OP_");
-							sb.append(op);
-							sb.append(") {\n");
-							for(String x:e.getValue()) {
-								sb.append("\t\t");
-								sb.append(x);
-								sb.append("\n");
-							}
-							sb.append("\t\t}\n");
-						}
-					}
-					sb.append("\t}\n");
-				}
+				emitActions(sb, I_ops, "OP_CODE_I");
+				emitActions(sb, R_ops, "OP_CODE_R");
+				emitActions(sb, REGIMM_ops, "OP_CODE_REGIMM");
 				System.out.print(sb.toString());
 			} else {
 				System.out.println(s);

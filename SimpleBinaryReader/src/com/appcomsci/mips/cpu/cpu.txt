@@ -73,6 +73,8 @@ int2 CPU.checkType(int32 opcode) {
 	int2 ret;
 	if(opcode == 0)
 		ret = OP_CODE_R;
+	else if(opcode == 1)
+		ret = OP_CODE_REGIMM;
 %CHECK_TYPE
 	else
 		ret = OP_CODE_OTHERS:
