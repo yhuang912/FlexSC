@@ -417,6 +417,11 @@ public class MemSetBuilder extends MipsProgram {
 			}
 			
 		}
+		
+		// Record which sets use memory
+		for(MemorySet s:execSets) {
+			s.setUsesMemory(instructions);
+		}
 		return execSets;
 		
 	}
