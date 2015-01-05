@@ -28,6 +28,9 @@ public class MemorySet {
 	 * The next execution step, or null if we ran off the end of the world
 	 */
 	private MemorySet nextMemorySet;
+	/** Does this use memory?
+	 */
+	boolean usesMemory;
 	/**
 	 * Build a memory set consisting of the current addresses of a list of threads.
 	 * @param executionStep The number of the execution step
@@ -72,6 +75,36 @@ public class MemorySet {
 		return rslt;
 	}
 	
+	/**
+	 * Determine if any instruction at this step uses memory.
+	 * Cache the value for later use.
+	 * @param dseg The program instructions.
+	 */
+	public void setUsesMemory(DataSegment dseg) {
+		for(Long addr:addresses) {
+			long instr = dseg.getDatum(addr);
+			MipsInstructionSet.Operation op = MipsInstructionSet.Operation.valueOf(instr);
+			switch(op.getType()) {
+			case MW:
+			case MR:
+				usesMemory = true;
+				return;
+			default:
+				break;
+			}
+		}
+		usesMemory = false;
+	}
+	
+	/**
+	 * Do the instructions in this set reference memory?
+	 * Note:  The value of this method is cached.  It must be set initially
+	 * by calling setUsesMemory().
+	 * @return True if memory is read or written, false otherwise.
+	 */
+	public boolean isUsesMemory() {
+		return usesMemory;
+	}
 	/**
 	 * Get the number of possible addresses in this execution step
 	 * @return The number of possible addresses in this execution step

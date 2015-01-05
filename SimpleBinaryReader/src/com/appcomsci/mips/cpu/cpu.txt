@@ -1,7 +1,9 @@
 #define OP_CODE_R 1
-#define OP_CODE_I 2
-#define OP_CODE_REGIMM 3
-#define OP_CODE_OTHERS 4
+#define OP_CODE_J 2
+#define OP_CODE_I 3
+#define OP_CODE_IR 4
+#define OP_CODE_REGIMM 5
+#define OP_CODE_OTHERS 6
 
 // Branches
 
@@ -93,6 +95,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	int32 unsignExt = inst & 0xffff;
 	int32 zeroExt = unsignExt;
 	int32 funct = inst & 0x3f;
+	int32 newpc;
 
 	if (unsignExt &0x00008000 != 0)
 		unsignExt = unsignExt | 0xffff0000;
@@ -127,8 +130,13 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	newpc = (newpc&0xf0000000) | ((inst<<2)&0xffffffc);
 %OP_JAL
 	newpc = (newpc&0xf0000000) | ((inst<<2)&0xffffffc);
-	reg_31 = newpc + 4;
+	reg[31] = newpc + 4;
 %OP_JR
+	/* This is fine as a FUNCT instruction, it just doesn't touch rd */
+	newpc = reg_rs;
+%OP_JALR
+	/* This is fine as FUNCT instruction */
+	reg_rd = newpc + 4;
 	newpc = reg_rs;
 %OP_BNE
 	if(reg_rs != reg_rt)
