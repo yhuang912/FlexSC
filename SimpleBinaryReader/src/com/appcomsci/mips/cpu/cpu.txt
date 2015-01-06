@@ -127,7 +127,6 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 
 	int3 op_type = this.checkType(op);
 %ACTIONS
-	reg[0] = 0;
 	return newpc;
 }
 %OP_ADDI

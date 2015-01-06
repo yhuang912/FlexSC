@@ -190,6 +190,10 @@ public class CpuBuilder {
 				codeWritten = emitActions(sb, codeWritten, J_ops, MipsInstructionSet.OperationType.J);
 				codeWritten = emitActions(sb, codeWritten, R_ops, MipsInstructionSet.OperationType.FUNCT);
 				emitActions(sb, codeWritten, REGIMM_ops, MipsInstructionSet.OperationType.REGIMM);
+				if(I_ops.size() > 0 || R_ops.size() > 0) {
+					sb.append("\treg[0] = 0;");
+					sb.append(lineSeparator);
+				}
 			} else {
 				sb.append(s);
 				sb.append(lineSeparator);
