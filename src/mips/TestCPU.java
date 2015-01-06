@@ -1,4 +1,5 @@
-//package test;
+package mips;
+
 import compiledlib.dov.*;
 
 import oram.SecureArray;

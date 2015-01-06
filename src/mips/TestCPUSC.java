@@ -1,4 +1,4 @@
-//package test;
+package mips;
 import compiledlib.dov.*;
 
 import oram.SecureArray;
@@ -26,62 +26,64 @@ import java.io.File;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 //import gc.Boolean;
 
-public class TestCPU {
+public class TestCPUSC {
 
 	static final int REGISTER_SIZE = 32;
 	static final int MEM_SIZE = 72;// 2K words
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
-	static final Mode m = Mode.VERIFY;
+	static final Mode m = Mode.REAL;
 	static final int Alice_input = 8388608;
 	static final int Bob_input = 13;
-	static final boolean MULTIPLE_BANKS = false;
 	int[] mem;
 	Configuration config;
 	private static String binaryFileName;	// should not be static FIXME
 	 
 	 
 	
-	public TestCPU(Configuration config) {
+	public TestCPUSC(Configuration config) {
 		this.config = config;
 		mem = new int[MEM_SIZE];
 		// http://www.mrc.uidaho.edu/mrc/people/jff/digital/MIPSir.html
+		// 001001ssssstttttddddd00000100001 for ADDU s t -> d
+		mem[0] = 0b00000000001000000001000000100001;
 	}
 
 	
-	public boolean testTerminate(SecureArray<Boolean> reg, Boolean[] ins, IntegerLib<Boolean> lib) {
-		Boolean eq = lib.eq(ins, lib.toSignals(0b00000011111000000000000000001000, 32));
-		Boolean eq2 = lib.eq(reg.trivialOram.read(31), lib.toSignals(0, 32));
+	public boolean testTerminate(SecureArray<GCSignal> reg, GCSignal[] ins, IntegerLib<GCSignal> lib) {
+		GCSignal eq = lib.eq(ins, lib.toSignals(0b00000011111000000000000000001000, 32));
+		GCSignal eq2 = lib.eq(reg.trivialOram.read(31), lib.toSignals(0, 32));
 		eq = lib.and(eq, eq2);
-		return lib.declassifyToBoth(new Boolean[]{eq})[0]; 
+		boolean[] a = lib.declassifyToBoth(new GCSignal[]{eq});
+		//System.out.print(Arrays.toString(a));
+		return a[0]; 
 	}
 	
-	public void testInstruction (CompEnv<Boolean> env) throws Exception {
+	public void testInstruction (CompEnv<GCSignal> env) throws Exception {
 		
-		SecureArray<Boolean> reg = new SecureArray<Boolean>(env, REGISTER_SIZE, WORD_SIZE);
+		SecureArray<GCSignal> reg = new SecureArray<GCSignal>(env, REGISTER_SIZE, WORD_SIZE);
 		//int inst = 		0b00000000000000110001011011000010; //SRL
 		int inst = 		0b00000000100100111001100000100101; //OR
 		int rsCont = 	0b00000000000000000000000000000101;
 		int rtCont = 	0b00000000000000000000000000011001;
 		//int rdCont = 	0b00000000000000000000000000000000;
-		Boolean[] rs = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
-		Boolean[] rt = env.inputOfAlice(Utils.fromInt(19, reg.lengthOfIden));
-		//Boolean[] rd = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
-		Boolean[] rsContent = env.inputOfAlice(Utils.fromInt(rsCont, WORD_SIZE));
-		Boolean[] rtContent = env.inputOfAlice(Utils.fromInt(rtCont, WORD_SIZE));
-		//Boolean[] rdContent = env.inputOfAlice(Utils.fromInt(rdCont, WORD_SIZE));
+		GCSignal[] rs = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
+		GCSignal[] rt = env.inputOfAlice(Utils.fromInt(19, reg.lengthOfIden));
+		//GCSignal[] rd = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
+		GCSignal[] rsContent = env.inputOfAlice(Utils.fromInt(rsCont, WORD_SIZE));
+		GCSignal[] rtContent = env.inputOfAlice(Utils.fromInt(rtCont, WORD_SIZE));
+		//GCSignal[] rdContent = env.inputOfAlice(Utils.fromInt(rdCont, WORD_SIZE));
 		reg.write(rs, rsContent);
 		reg.write(rt, rtContent);
 		//reg.write(rd, rdContent);
 		env.flush();
 		
 		CPU cpu = new CPU(env);
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		Boolean[] pc; 
+		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+		GCSignal[] pc; 
 		pc = cpu.function(reg, env.inputOfAlice(Utils.fromInt(inst, 32)), env.inputOfAlice(Utils.fromInt(0,32)));
 		
 		String output = "";
@@ -127,11 +129,11 @@ public class TestCPU {
 		printBooleanArray(pc, lib);
 		
 	}
-	public SecureArray<Boolean> getRegister(CompEnv<Boolean> env)
+	public SecureArray<GCSignal> getRegister(CompEnv<GCSignal> env)
 			throws Exception {
 
 		// inital registers are all 0's. no need to set value.
-		SecureArray<Boolean> oram = new SecureArray<Boolean>(env,
+		SecureArray<GCSignal> oram = new SecureArray<GCSignal>(env,
 				REGISTER_SIZE, WORD_SIZE);
 
 		// for testing purpose.
@@ -144,17 +146,17 @@ public class TestCPU {
 		return oram;
 	}
 
-	public SecureArray<Boolean> getMemory(CompEnv<Boolean> env)
+	public SecureArray<GCSignal> getMemory(CompEnv<GCSignal> env)
 			throws Exception {
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 		// inital registers are all 0's. no need to set value.
-		SecureArray<Boolean> oram = new SecureArray<Boolean>(env, MEM_SIZE,
+		SecureArray<GCSignal> oram = new SecureArray<GCSignal>(env, MEM_SIZE,
 				WORD_SIZE);
 		for (int i = 0; i < 2; ++i) {
 			// index can be evaluated publicly.
-			Boolean[] index = lib.toSignals(i, oram.lengthOfIden);
+			GCSignal[] index = lib.toSignals(i, oram.lengthOfIden);
 
-			Boolean[] data;
+			GCSignal[] data;
 			if (env.getParty() == Party.Alice) {
 				data = env.inputOfAlice(Utils.fromInt(mem[i], WORD_SIZE));
 			} else {
@@ -164,18 +166,26 @@ public class TestCPU {
 		}
 		return oram;
 	}
-	public SecureArray<Boolean> getInstructionsGen(CompEnv<Boolean> env, DataSegment instData)
+	public SecureArray<GCSignal> getInstructionsGen(CompEnv<GCSignal> env, DataSegment instData)
 			throws Exception {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
+		/*MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+	    List<MemorySet> sets = b.build();
+	    for(MemorySet s:sets) {
+	        TreeMap<Long,boolean[]> m = s.getAddressMap(instData);
+	        System.out.println(m.size());
+	        // m now contains the map for this step.
+	        // You could cache this back in s I guess.
+	    }*/
 		instructions = instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
-		SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		Boolean[] data; 
-		Boolean[] index;
+		SecureArray<GCSignal> inst = new SecureArray<GCSignal>(env, numInst + MEM_SIZE, WORD_SIZE);
+		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+		GCSignal[] data; 
+		GCSignal[] index;
 
 		for (int i = 0; i < numInst; i++){
 			index = lib.toSignals(i, inst.lengthOfIden);
@@ -189,47 +199,14 @@ public class TestCPU {
 		}		
 		System.out.println("exiting getInstructions");
 		return inst;
-	}			
-	
-	public SecureArray<Boolean>[] getInstructionsMultiBanksGen(CompEnv<Boolean> env, DataSegment instData, 
-			boolean[] containsRW, int pcOffset) throws Exception {
-		boolean[][] instructions = null; 
-		System.out.println("entering getInstructions");
-		int numInst = instData.getDataLength();
-		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
-	    List<MemorySet> sets = b.build();
-		int numBanks = sets.size();
-	    SecureArray[] instBanks = new SecureArray[numBanks];
-		//SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		Boolean[] data; 
-		Boolean[] index;
+	}							
 
-		for(MemorySet s:sets) {
-	        int i = s.getExecutionStep();
-			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
-			instBanks[i] = new SecureArray<Boolean>(env, m.size(), WORD_SIZE);
-			int count = 0;
-			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
-				index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
-				data = env.inputOfAlice(entry.getValue());
-				// once the indices are correct, write here. 
-				//instBanks[i].write(index, data);
-				count++;
-				System.out.println(count);
-			}
-			
-		}		
-		System.out.println("exiting getInstructions");
-		return instBanks;
-	}
-
-	public SecureArray<Boolean> getInstructionsEva(CompEnv<Boolean> env, int numInst)
+	public SecureArray<GCSignal> getInstructionsEva(CompEnv<GCSignal> env, int numInst)
 			throws Exception {
-		SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		Boolean[] data; 
-		Boolean[] index;
+		SecureArray<GCSignal> inst = new SecureArray<GCSignal>(env, numInst + MEM_SIZE, WORD_SIZE);
+		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+		GCSignal[] data; 
+		GCSignal[] index;
 
 		for (int i = 0; i < numInst; i++){
 			index = lib.toSignals(i, inst.lengthOfIden);
@@ -240,10 +217,10 @@ public class TestCPU {
 	}		
 	
 	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
-	public SecureArray<Boolean> getMemoryGen(CompEnv<Boolean> env, DataSegment memData, SecureArray<Boolean> memBank, int numInst) throws Exception{
+	public SecureArray<GCSignal> getMemoryGen(CompEnv<GCSignal> env, DataSegment memData, SecureArray<GCSignal> memBank, int numInst) throws Exception{
 		System.out.println("entering getMemoryGen");
 		boolean memory[][] = memData.getDataAsBoolean();	
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 		//remove numInst when we separate instructions from memory. 
 		for (int i = numInst; i < numInst + memData.getDataLength(); i++){
 			memBank.write(lib.toSignals(i, memBank.lengthOfIden), env.inputOfAlice(memory[i-numInst]));
@@ -254,14 +231,14 @@ public class TestCPU {
 	}
 	
 	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead.
-	public SecureArray<Boolean> getMemoryEva(CompEnv<Boolean> env, SecureArray<Boolean> memBank, int numInst, int dataLen)
+	public SecureArray<GCSignal> getMemoryEva(CompEnv<GCSignal> env, SecureArray<GCSignal> memBank, int numInst, int dataLen)
 			throws Exception {
 		//after separating instruction, instantiate memBank 
 	        //instead of passing it in. 
-		//SecureArray<Boolean> memBank = new SecureArray<Boolean>(env, MEMORY_SIZE, WORD_SIZE);
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		Boolean[] data; 
-		Boolean[] index;
+		//SecureArray<GCSignal> memBank = new SecureArray<GCSignal>(env, MEMORY_SIZE, WORD_SIZE);
+		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+		GCSignal[] data; 
+		GCSignal[] index;
 
 		for (int i = numInst; i < numInst+ dataLen ; i++){
 			index = lib.toSignals(i, memBank.lengthOfIden);
@@ -276,39 +253,31 @@ public class TestCPU {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Alice, is, os);
 				testInstruction(env);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				CPU cpu = new CPU(env);
 				MEM mem = new MEM(env);
-				SecureArray<Boolean> reg = getRegister(env);
+				SecureArray<GCSignal> reg = getRegister(env);
 				Reader rdr = new Reader(new File(getBinaryFileName()), config);
 				SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
 				DataSegment memData = rdr.getData();
+				SecureArray<GCSignal> instructionBank = getInstructionsGen(env, inst);
+				//instantiate new secure array for memory once we separate instructions from memory.
+				instructionBank = getMemoryGen(env, memData, instructionBank, inst.getDataLength() );
+				// is this cast ok?  Or should we modify the mem circuit? 
 				int pcOffset = (int) ent.getAddress();
 				System.out.println("pcoffset: " + pcOffset);
 				int dataOffset = (int) rdr.getDataAddress();
-				boolean[] containsRW = new boolean[inst.getDataLength()];
-				SecureArray<Boolean> instructionBank = null;
-				if (MULTIPLE_BANKS){
-					SecureArray<Boolean>[] instructionBanks = getInstructionsMultiBanksGen(env, inst, containsRW, pcOffset);
-				}
-					//instantiate new secure array for memory once we separate instructions from memory.
-				else {
-					 instructionBank = getInstructionsGen(env, inst);
-					 instructionBank = getMemoryGen(env, memData, instructionBank, inst.getDataLength() );
-				 }
-				// is this cast ok?  Or should we modify the mem circuit? 
-				
 				
 				//Xiao's two lines
 				
-				//SecureArray<Boolean> memory = getMemory(env);
+				//SecureArray<GCSignal> memory = getMemory(env);
 				
 				//could this cast cause problems when msb is 1?
-				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
-				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
+				GCSignal[] pc = lib.toSignals(pcOffset, WORD_SIZE);
+				GCSignal[] newInst = lib.toSignals(0, WORD_SIZE);
 				boolean testHalt;
 				int count = 0; 
 				printOramBank(instructionBank, lib, 60);
@@ -341,7 +310,7 @@ public class TestCPU {
 				}
 
 				//Xiao's reading of register value after computation. 
-				//Boolean[] reg2 = reg.read(lib.toSignals(2, reg.lengthOfIden));
+				//GCSignal[] reg2 = reg.read(lib.toSignals(2, reg.lengthOfIden));
 				//os.flush();
 				//System.out.println(Utils.toInt(env.outputToAlice(reg2)));
 				
@@ -361,13 +330,13 @@ public class TestCPU {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Bob, is, os);
 				testInstruction(env);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				CPU cpu = new CPU(env);
 				MEM mem = new MEM(env);
 
-				SecureArray<Boolean> reg = getRegister(env);
+				SecureArray<GCSignal> reg = getRegister(env);
 //might be better to have bob send the number of instructions to alice.  That's the only reason 
 				//we currently read the file at all. 
 				Reader rdr = new Reader(new File(getBinaryFileName()), config);
@@ -377,21 +346,17 @@ public class TestCPU {
 				DataSegment memData = rdr.getData();
 				int dataLen = memData.getDataLength();
 				
-				SecureArray<Boolean> instructionBank = getInstructionsEva(env, numInst);
+				SecureArray<GCSignal> instructionBank = getInstructionsEva(env, numInst);
 				//instantiate new secure array for memory once we separate instructions from memory.
 				instructionBank = getMemoryEva(env, instructionBank, numInst, dataLen);
 				
-				//SecureArray<Boolean> memory = getMemory(env);
-				Boolean[] newInst = lib.toSignals(0,WORD_SIZE);                           
-				Boolean[] pc = lib.toSignals(0, WORD_SIZE);
+				//SecureArray<GCSignal> memory = getMemory(env);
+				GCSignal[] newInst = lib.toSignals(0,WORD_SIZE);                           
+				GCSignal[] pc = lib.toSignals(0, WORD_SIZE);
 				Boolean halt;
 				boolean testHalt;
 				printOramBank(instructionBank, lib, 60);
 				
-				if (m == Mode.COUNT) {
-					//Statistics sta = ((PMCompEnv) env).statistic;
-					//sta.flush();
-				}
 				
 				int count = 0;
 				while (true){
@@ -413,12 +378,6 @@ public class TestCPU {
 					printBooleanArray(pc, lib);
 				}
 				
-				if (m == Mode.COUNT) {
-					//Statistics sta = ((PMCompEnv) env).statistic;
-					//sta.finalize();
-					//andgates = sta.andGate;
-					//encs = sta.NumEncAlice;
-				}
 				os.flush();
 				disconnect();
 			} catch (Exception e) {
@@ -452,7 +411,7 @@ public class TestCPU {
 		setBinaryFileName(rest[0]);
 	}
 	
-	private static boolean checkMatchBooleanArray(Boolean[] array, IntegerLib<Boolean> lib, int matchVal) throws Exception{
+	private static boolean checkMatchBooleanArray(GCSignal[] array, IntegerLib<GCSignal> lib, int matchVal) throws Exception{
 		boolean[] temp = lib.getEnv().outputToAlice(array);
 		boolean match = true;
 		if (lib.getEnv().getParty() == Party.Alice){
@@ -470,7 +429,7 @@ public class TestCPU {
 			//System.out.println("Bob Match: " + match);
 		}return match;
 	}
-	private static void printBooleanArray(Boolean[] array, IntegerLib<Boolean> lib){
+	private static void printBooleanArray(GCSignal[] array, IntegerLib<GCSignal> lib){
 		String output = "";
 		boolean[] temp = lib.getEnv().outputToAlice(array);
 
@@ -481,9 +440,9 @@ public class TestCPU {
 			System.out.println(output);
 		
 	}
-	private static void printRegisters(SecureArray<Boolean> reg, IntegerLib<Boolean> lib){
+	private static void printRegisters(SecureArray<GCSignal> reg, IntegerLib<GCSignal> lib){
 		String output = "";
-		Boolean[] temp; 
+		GCSignal[] temp; 
 
 		for (int i = 0 ; i < 32; i++){
 			output += "|reg" + i + ": ";
@@ -501,9 +460,9 @@ public class TestCPU {
 			System.out.println(output);
 	}
 	
-	private static void printOramBank(SecureArray<Boolean> oramBank, IntegerLib<Boolean> lib, int numItems){
+	private static void printOramBank(SecureArray<GCSignal> oramBank, IntegerLib<GCSignal> lib, int numItems){
 		String output = "";
-		Boolean[] temp; 
+		GCSignal[] temp; 
 
 		for (int i = 0 ; i < numItems; i++){
 			output += "item number " + String.valueOf(i) +": ";
@@ -534,7 +493,7 @@ public class TestCPU {
 
 	static public void main(String args[]) throws Exception {
 		Configuration config = new Configuration();
-		TestCPU test = new TestCPU(config);
+		TestCPUSC test = new TestCPUSC(config);
 		process_cmdline_args(args, config);
 		GenRunnable gen = test.new GenRunnable();
 		EvaRunnable env = test.new EvaRunnable();
