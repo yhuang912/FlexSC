@@ -239,10 +239,25 @@ public class CpuBuilder {
 		}
 	}
 	public static void main(String args[]) {
-		Set<MipsInstructionSet.Operation> s = new HashSet<MipsInstructionSet.Operation>();
-		for(MipsInstructionSet.Operation i: MipsInstructionSet.Operation.values())
-			s.add(i);
-		String code = build(s);
+		Set<MipsInstructionSet.Operation> operations = new HashSet<MipsInstructionSet.Operation>();
+		if(args.length == 0) {
+			for(MipsInstructionSet.Operation op: MipsInstructionSet.Operation.values())
+				operations.add(op);
+		} else {
+			for(String s:args) {
+				MipsInstructionSet.Operation op = MipsInstructionSet.Operation.valueOf(s);
+				if(op == null) {
+					System.err.println("Invalid operation: " + s);
+				} else {
+					operations.add(op);
+				}
+			}
+		}
+		if(operations.size() == 0) {
+			System.err.println("No valid operations, giving up");
+			System.exit(1);
+		}
+		String code = build(operations);
 		System.out.print(code);
 	}
 }
