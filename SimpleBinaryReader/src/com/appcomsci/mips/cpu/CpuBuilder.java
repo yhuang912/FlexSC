@@ -19,6 +19,25 @@ public class CpuBuilder {
 	private static boolean emitActions(StringBuilder sb, boolean codeWritten, Set<String>operations, MipsInstructionSet.OperationType type) {
 		if(operations.size() == 0)
 			return codeWritten;
+		
+		String varName = null;
+		switch(type) {
+		case I:
+		case J:
+		case MR:
+		case MW:
+			varName = "op";
+			break;
+		case FUNCT:
+			varName = "funct";
+			break;
+		case REGIMM:
+			varName = "rt";	// The regimm bits live here
+			break;
+		default:
+			varName = "?";
+			break;
+		}
 
 		sb.append("\t");
 		if(codeWritten)
@@ -34,6 +53,11 @@ public class CpuBuilder {
 		case REGIMM:
 			sb.append("OP_CODE_REGIMM");
 			break;
+		case J:
+			sb.append("OP_CODE_J");
+			break;
+		default:
+			sb.append("?");
 		}
 		sb.append(") {");
 		sb.append(lineSeparator);
@@ -48,7 +72,9 @@ public class CpuBuilder {
 				if(actionsWritten)
 					sb.append("else ");
 				actionsWritten = true;
-				sb.append("if(op == OP_");
+				sb.append("if(");
+				sb.append(varName);
+				sb.append(" == OP_");
 				sb.append(op);
 				sb.append(") {");
 				sb.append(lineSeparator);
@@ -88,6 +114,8 @@ public class CpuBuilder {
 		for(MipsInstructionSet.Operation o : operations) {
 			switch(o.getType()) {
 			case I:
+			case MR:	// Lump these in with I's
+			case MW:
 				I_ops.add(o.toString());
 				break;
 			case FUNCT:
@@ -134,6 +162,25 @@ public class CpuBuilder {
 					sb.append("\t\tret = OP_CODE_I;");
 					sb.append(lineSeparator);
 				}
+				if(J_ops.size() > 0) {
+					sb.append("\telse if(");
+					sb.append(lineSeparator);
+					sb.append("\t\t");
+					boolean codeWritten = false;
+					for(String o: J_ops) {
+						if(codeWritten)
+							sb.append(" || ");
+						codeWritten = true;
+						sb.append("op == OP_");
+						sb.append(o.toString());
+					}
+					sb.append(lineSeparator);
+					sb.append("\t)");
+					sb.append(lineSeparator);
+					sb.append("\t\tret = OP_CODE_J;");
+					sb.append(lineSeparator);
+					
+				}
 			} else if(s.startsWith("%HILO_REG")) {
 				if(needMult)
 					sb.append("\t, secure int32[2] hiLo");
@@ -175,10 +222,15 @@ public class CpuBuilder {
 		}
 		text = new ArrayList<String>();
 		actions = new ArrayList<Map.Entry<String, List<String>>>();
+		Set<String>mnemonicSet = new HashSet<String>();
 		List<String> current = text;
 		for(String s:rawLines) {
 			if(s.startsWith("%OP_")) {
+				// Need to check for duplicates!
 				String mnemonic = s.substring(4);
+				if(mnemonicSet.contains(mnemonic)) {
+					System.err.println("Warning: duplicate actions for " + mnemonic);
+				}
 				current = new ArrayList<String>();
 				actions.add(new AbstractMap.SimpleImmutableEntry<String, List<String>>(mnemonic, current));
 			} else {
