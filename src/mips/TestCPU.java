@@ -40,7 +40,7 @@ public class TestCPU {
 	static final Mode m = Mode.VERIFY;
 	static final int Alice_input = 8388608;
 	static final int Bob_input = 13;
-	static final boolean MULTIPLE_BANKS = false;
+	static final boolean MULTIPLE_BANKS = true;
 	int[] mem;
 	Configuration config;
 	private static String binaryFileName;	// should not be static FIXME
@@ -205,19 +205,20 @@ public class TestCPU {
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 		Boolean[] data; 
 		Boolean[] index;
-
+  
 		for(MemorySet s:sets) {
 	        int i = s.getExecutionStep();
+	        System.out.println("step: " + i + " size: " + s.size());
 			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
 			instBanks[i] = new SecureArray<Boolean>(env, m.size(), WORD_SIZE);
 			int count = 0;
 			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
 				index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
-				data = env.inputOfAlice(entry.getValue());
+				//data = env.inputOfAlice(entry.getValue());
 				// once the indices are correct, write here. 
 				//instBanks[i].write(index, data);
 				count++;
-				System.out.println(count);
+				//System.out.println(count);
 			}
 			
 		}		

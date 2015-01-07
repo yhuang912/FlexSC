@@ -208,16 +208,17 @@ public class MipsEmulator {
 
 		for(MemorySet s:sets) {
 	        int i = s.getExecutionStep();
+	        System.out.println("step: " + i + " size: " + s.size());
 			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
 			instBanks[i] = new SecureArray<Boolean>(env, m.size(), WORD_SIZE);
 			int count = 0;
 			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
-				index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
-				data = env.inputOfAlice(entry.getValue());
+				//index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
+				//data = env.inputOfAlice(entry.getValue());
 				// once the indices are correct, write here. 
 				//instBanks[i].write(index, data);
 				count++;
-				System.out.println(count);
+				//System.out.println(count);
 			}
 			
 		}		
@@ -239,6 +240,39 @@ public class MipsEmulator {
 		}			
 		return inst;
 	}		
+	
+	public SecureArray<Boolean>[] getInstructionsMultiBanksEva(CompEnv<Boolean> env, DataSegment instData, 
+			boolean[] containsRW, int pcOffset) throws Exception {
+		boolean[][] instructions = null; 
+		int numInst = instData.getDataLength();
+		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+	    List<MemorySet> sets = b.build();
+		int numBanks = sets.size();
+	    SecureArray[] instBanks = new SecureArray[numBanks];
+		//SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
+		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+		Boolean[] data; 
+		Boolean[] index;
+
+		for(MemorySet s:sets) {
+	        int i = s.getExecutionStep();
+	        System.out.println("step: " + i + " size: " + s.size());
+			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
+			instBanks[i] = new SecureArray<Boolean>(env, m.size(), WORD_SIZE);
+			int count = 0;
+			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
+				//index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
+				//data = env.inputOfAlice(entry.getValue());
+				// once the indices are correct, write here. 
+				//instBanks[i].write(index, data);
+				count++;
+				//System.out.println(count);
+			}
+			
+		}		
+		System.out.println("exiting getInstructions");
+		return instBanks;
+	}
 	
 	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
 	public SecureArray<Boolean> getMemoryGen(CompEnv<Boolean> env, DataSegment memData, SecureArray<Boolean> memBank, int numInst) throws Exception{
@@ -287,6 +321,7 @@ public class MipsEmulator {
 				SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
 				DataSegment memData = rdr.getData();
+				// is this cast ok?  Or should we modify the mem circuit? 
 				int pcOffset = (int) ent.getAddress();
 				System.out.println("pcoffset: " + pcOffset);
 				int dataOffset = (int) rdr.getDataAddress();
@@ -294,34 +329,25 @@ public class MipsEmulator {
 				SecureArray<Boolean> instructionBank = null;
 				if (MULTIPLE_BANKS){
 					SecureArray<Boolean>[] instructionBanks = getInstructionsMultiBanksGen(env, inst, containsRW, pcOffset);
+					instructionBank = instructionBanks[0];
 				}
 					//instantiate new secure array for memory once we separate instructions from memory.
 				else {
 					 instructionBank = getInstructionsGen(env, inst);
 					 instructionBank = getMemoryGen(env, memData, instructionBank, inst.getDataLength() );
 				 }
-				// is this cast ok?  Or should we modify the mem circuit? 
 				
-				
-				//Xiao's two lines
-				
-				//SecureArray<Boolean> memory = getMemory(env);
-				
-				//could this cast cause problems when msb is 1?
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
 				boolean testHalt;
 				int count = 0; 
 				printOramBank(instructionBank, lib, 60);
 				while (true) {
-					//change instructionBank to memBank once we separate 
-					 
 					System.out.println("count: " + count);
 					count++;
 					newInst = mem.func(reg, instructionBank, pc, newInst, pcOffset, dataOffset);
 					
 					testHalt = testTerminate(reg, newInst, lib);
-					
 					if (testHalt)
 						break;
 									
@@ -334,18 +360,8 @@ public class MipsEmulator {
 					printRegisters(reg, lib);
 					System.out.println("PC: ");
 					printBooleanArray(pc, lib);
-					//lib.leftPublicShift(x, s)
-					///=Xiao's code====
-					//Boolean res = lib.eq(pc, lib.toSignals(100, pc.length));
-					//boolean resb = env.outputToAlice(res);
-					//====
 				}
 
-				//Xiao's reading of register value after computation. 
-				//Boolean[] reg2 = reg.read(lib.toSignals(2, reg.lengthOfIden));
-				//os.flush();
-				//System.out.println(Utils.toInt(env.outputToAlice(reg2)));
-				
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
