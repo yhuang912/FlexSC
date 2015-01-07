@@ -71,6 +71,6 @@ int main()
   int ret = sfe_main(cost, 1, 2);
   //for(i=0;i<MAX;i++)
     // printf("%d\n",distance[i]);
-  printf("\nreturned value: %d", ret); printf("\n");
+  //printf("\nreturned value: %d", ret); printf("\n");
   return 0;
 }
