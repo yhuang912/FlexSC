@@ -14,7 +14,7 @@ int allselected(int *selected)
   return 1;
 }
 
-void sfe_main(int cost[][MAX],int *preced,int *distance, int startID)
+int sfe_main(int cost[][MAX],int *preced,int *distance, int startID, int endID)
 {
   int selected[MAX]={0};
   int current=0,i,k,dc,smalldist,newdist;
@@ -47,6 +47,7 @@ void sfe_main(int cost[][MAX],int *preced,int *distance, int startID)
     current=k;
     selected[current]=1;
    }
+  return distance[endID];
 }
 
 int main()
@@ -66,8 +67,9 @@ int main()
     {9, INFINITE, INFINITE}};
 
   int i,preced[MAX]={0},distance[MAX];
-  sfe_main(cost,preced,distance, 1);
+  int ret = sfe_main(cost,preced,distance, 1, 2);
   for(i=0;i<MAX;i++)
     printf("%d\n",distance[i]);
+  printf("\nreturned value: %d", ret); printf("\n");
   return 0;
 }

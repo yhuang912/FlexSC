@@ -104,7 +104,7 @@ public class DataSegment {
 	 * 
 	 * @return An array of arrays of booleans
 	 */
-	public boolean[][] getDataAsBoolean() {
+	public boolean[][] getDataAsBooolean() {
 		if(data == null)
 			return null;
 		if(booleanData == null) {
@@ -134,7 +134,7 @@ public class DataSegment {
 		if(address == SPIN_ADDRESS+4)
 			return datumToBoolean(NOP);
 		if(booleanData == null) {
-			getDataAsBoolean();
+			getDataAsBooolean();
 		}
 		long index = address-startAddress;
 		if((index & 0x3) != 0) {
