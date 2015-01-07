@@ -49,7 +49,6 @@ public abstract class OramParty<T> {
 		p = env.p;
 		mode = env.m;
 		init();
-
 	}
 
 	public OramParty(CompEnv<T> env, int N, int dataSize, int lengthOfPos) {
