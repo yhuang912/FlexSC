@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define MAX 3
+#define MAX 7
 #define INFINITE 998
 
 int allselected(int *selected)
@@ -53,19 +53,19 @@ int sfe_main(int cost[][MAX], int startID, int endID)
 
 int main()
 {
-  /* int cost[MAX][MAX]= 
+  int cost[MAX][MAX]= 
      {{INFINITE,2,4,7,INFINITE,5,INFINITE},
       {2,INFINITE,INFINITE,6,3,INFINITE,8},
       {4,INFINITE,INFINITE,INFINITE,INFINITE,6,INFINITE},
       {7,6,INFINITE,INFINITE,INFINITE,1,6},
       {INFINITE,3,INFINITE,INFINITE,INFINITE,INFINITE,7},
       {5,INFINITE,6,1,INFINITE,INFINITE,6},
-      {INFINITE,8,INFINITE,6,7,6,INFINITE}};*/
+      {INFINITE,8,INFINITE,6,7,6,INFINITE}};
 
- int cost[MAX][MAX]= 
+  /* int cost[MAX][MAX]= 
    {{INFINITE, 6, 9},
     {5, INFINITE, 2},
-    {9, INFINITE, INFINITE}};
+    {9, INFINITE, INFINITE}};*/
 
  int i;
   int ret = sfe_main(cost, 1, 2);
