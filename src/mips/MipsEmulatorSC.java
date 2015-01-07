@@ -137,6 +137,10 @@ public class MipsEmulatorSC {
 
 		// for testing purpose.
 		// reg[4]=5 reg[5] = 6;
+		for(int i = 0; i < REGISTER_SIZE; ++i) {
+			oram.write(env.inputOfAlice(Utils.fromInt(i, oram.lengthOfIden)),
+					env.inputOfAlice(Utils.fromInt(0, WORD_SIZE)));
+		}
 		oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
 				env.inputOfAlice(Utils.fromInt(Alice_input, WORD_SIZE)));
 		oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
@@ -422,15 +426,15 @@ public class MipsEmulatorSC {
 					if (testHalt)
 						break; 
 					
-					printGCSignalArray(newInst, lib);
+					//printGCSignalArray(newInst, lib);
 					//if (checkMatchGCSignalArray(newInst, lib, 0))
 						//newInst = env.inputOfAlice(new boolean[32]);
 						
 					//int andCount = ((CVCompEnv)env).numOfAnds;
 					pc = cpu.function(reg, newInst, pc);
 					//System.out.println( "CPU circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
-					printRegisters(reg, lib);
-					printGCSignalArray(pc, lib);
+					//printRegisters(reg, lib);
+					//printGCSignalArray(pc, lib);
 				}
 				
 				if (m == Mode.COUNT) {

@@ -137,6 +137,10 @@ public class MipsEmulator {
 
 		// for testing purpose.
 		// reg[4]=5 reg[5] = 6;
+		for(int i = 0; i < REGISTER_SIZE; ++i) {
+			oram.write(env.inputOfAlice(Utils.fromInt(i, oram.lengthOfIden)),
+					env.inputOfAlice(Utils.fromInt(0, WORD_SIZE)));
+		}
 		oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
 				env.inputOfAlice(Utils.fromInt(Alice_input, WORD_SIZE)));
 		oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
