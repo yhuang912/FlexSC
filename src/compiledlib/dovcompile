@@ -1,0 +1,2 @@
+./compile.sh stable/cpu.cpp compiledlib.dov;
+./compile.sh cpp/mem.cpp compiledlib.dov;
