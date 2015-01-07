@@ -148,7 +148,7 @@ public class MipsEmulator {
 	public SecureArray<Boolean> getMemory(CompEnv<Boolean> env)
 			throws Exception {
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		// inital registers are all 0's. no need to set value.
+		// initial registers are all 0's. no need to set value.
 		SecureArray<Boolean> oram = new SecureArray<Boolean>(env, MEM_SIZE,
 				WORD_SIZE);
 		for (int i = 0; i < 2; ++i) {
@@ -170,7 +170,7 @@ public class MipsEmulator {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
-		instructions = instData.getDataAsBoolean(); 
+		instructions = instData.getDataAsBooolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
 		SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
@@ -277,7 +277,7 @@ public class MipsEmulator {
 	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
 	public SecureArray<Boolean> getMemoryGen(CompEnv<Boolean> env, DataSegment memData, SecureArray<Boolean> memBank, int numInst) throws Exception{
 		System.out.println("entering getMemoryGen");
-		boolean memory[][] = memData.getDataAsBoolean();	
+		boolean memory[][] = memData.getDataAsBooolean();	
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 		//remove numInst when we separate instructions from memory. 
 		for (int i = numInst; i < numInst + memData.getDataLength(); i++){
