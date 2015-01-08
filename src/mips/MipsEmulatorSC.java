@@ -187,7 +187,7 @@ public class MipsEmulatorSC {
 				data = env.inputOfAlice(new boolean[WORD_SIZE]);*/
 			inst.write(index, data);
 			//System.out.println("Wrote instruction number "+i);
-		}		
+		}env.flush();
 		System.out.println("exiting getInstructions");
 		return inst;
 	}			
@@ -345,10 +345,10 @@ public class MipsEmulatorSC {
 				int count = 0; 
 				//printOramBank(instructionBank, lib, 60);
 				while (true) {
-					//System.out.println("count: " + count);
-					//count++;
+					System.out.println("count: " + count);
+					count++;
 					newInst = mem.getInst(instructionBank, pc, pcOffset); 
-					mem.func(reg, instructionBank, newInst, dataOffset);
+					mem.func(reg, memBank, newInst, dataOffset);
 					
 					testHalt = testTerminate(reg, newInst, lib);
 					if (testHalt)
