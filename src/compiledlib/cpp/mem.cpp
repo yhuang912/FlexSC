@@ -4,13 +4,19 @@
 
 struct MEM{};
 
-int32 MEM.func(int32[32]reg, 
-      int32[2048]mem,
-      int32 pc, int32 inst, 
-      public int32 pcOffset, public int32 dataOffset){
+int32 MEM.getInst(int32[2048] instBank, int32 pc, public int32 pcOffset){
+	int32 index = (pc-pcOffset) >> 2;
+	int32 newInst = instBank[index];
+	return newInst;
+}
 
-   int32 index = (pc-pcOffset) >> 2;
-   int32 newInst = mem[index];
+void MEM.func(int32[32]reg,
+      int32[2048]mem,
+      int32 inst,
+      public int32 dataOffset){
+
+   //int32 index = (pc-pcOffset) >> 2;
+   //int32 newInst = mem[index];
 
    int32 rt = (inst << 11)>>27;
    int32 rs = (inst << 6) >> 27;
@@ -40,5 +46,5 @@ int32 MEM.func(int32[32]reg,
 	   reg[rt] = tempRT;
    }
 
-   return newInst;
+   //return newInst;
 }
