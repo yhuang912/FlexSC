@@ -30,6 +30,9 @@
 #define FUNCT_SLT 42
 
 struct CPU{};
+int32 SLL(int32 m, int32 n) = native intLib.leftPrivateShift;
+int32 SRL(int32 m, int32 n) = native intLib.rightPrivateShift;
+
 
 int2 CPU.checkType(int32 opcode) {
    int2 ret;
@@ -80,10 +83,10 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
          else reg_rd = 0;
       } else if (funct == FUNCT_SUBU) {
          reg_rd = reg_rs - reg_rt;
-//} else if (funct == FUNCT_SRL){
-//      reg_rd = (reg_rt >> shamt);    
-//    } else if (funct == FUNCT_SLL){
-//      reg_rd = (reg_rt << shamt);    
+} else if (funct == FUNCT_SRL){
+      reg_rd = SRL(reg_rt, shamt);//(reg_rt >> shamt);    
+    } else if (funct == FUNCT_SLL){
+      reg_rd = SLL(reg_rt, shamt);//(reg_rt << shamt);    
       } else if (funct == FUNCT_OR){
          reg_rd = (reg_rt | reg_rs);    
       }       
