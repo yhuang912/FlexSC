@@ -344,7 +344,7 @@ public class MipsEmulator {
 					System.out.println("count: " + count);
 					count++;
 					newInst = mem.getInst(instructionBank, pc, pcOffset); 
-					mem.func(reg, instructionBank, newInst, dataOffset);
+					mem.func(reg, memBank, newInst, dataOffset);
 					
 					testHalt = testTerminate(reg, newInst, lib);
 					if (testHalt)
