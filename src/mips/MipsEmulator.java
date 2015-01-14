@@ -1,7 +1,6 @@
 package mips;
 
 import compiledlib.dov.*;
-
 import oram.SecureArray;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
@@ -11,6 +10,7 @@ import com.appcomsci.mips.binary.Reader;
 import com.appcomsci.mips.binary.SymbolTableEntry;
 import com.appcomsci.mips.memory.MemSetBuilder;
 import com.appcomsci.mips.memory.MemorySet;
+import com.appcomsci.mips.memory.OramBank;
 import com.appcomsci.sfe.common.Configuration;
 
 import flexsc.CVCompEnv;
@@ -20,7 +20,6 @@ import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
 import gc.*;
-
 import jargs.gnu.CmdLineParser;
 
 import java.io.File;
@@ -170,7 +169,7 @@ public class MipsEmulator {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
-		instructions = instData.getDataAsBooolean(); 
+		instructions = instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
 		SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
@@ -209,7 +208,8 @@ public class MipsEmulator {
 	        int i = s.getExecutionStep();
 	        System.out.println("step: " + i + " size: " + s.size());
 			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
-			s.bank = new OramBank(new SecureArray<Boolean>(env, m.size(), WORD_SIZE));
+			OramBank bank = new TrivialOramBank(new SecureArray<Boolean>(env, m.size(), WORD_SIZE));
+			s.setOramBank(bank);
 			int count = 0;
 			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
 				//index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
@@ -276,7 +276,7 @@ public class MipsEmulator {
 	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
 	public SecureArray<Boolean> getMemoryGen(CompEnv<Boolean> env, DataSegment memData) throws Exception{
 		System.out.println("entering getMemoryGen");
-		boolean memory[][] = memData.getDataAsBooolean();	
+		boolean memory[][] = memData.getDataAsBoolean();	
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 		SecureArray<Boolean> memBank = new SecureArray<Boolean>(env, MEM_SIZE, WORD_SIZE);
 		for (int i = 0; i < memData.getDataLength(); i++){

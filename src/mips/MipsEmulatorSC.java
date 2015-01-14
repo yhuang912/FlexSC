@@ -209,7 +209,7 @@ public class MipsEmulatorSC {
 	        int i = s.getExecutionStep();
 	        System.out.println("step: " + i + " size: " + s.size());
 			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
-			s.bank = new OramBank(new SecureArray<GCSignal>(env, m.size(), WORD_SIZE));
+			s.bank = new TrivialOramBank(new SecureArray<GCSignal>(env, m.size(), WORD_SIZE));
 			int count = 0;
 			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
 				//index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);

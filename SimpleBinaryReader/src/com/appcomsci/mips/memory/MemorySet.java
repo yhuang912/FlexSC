@@ -6,8 +6,6 @@ package com.appcomsci.mips.memory;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import mips.OramBank;
-import flexsc.CompEnv;
 
 import com.appcomsci.mips.binary.DataSegment;
 
@@ -32,11 +30,11 @@ public class MemorySet {
 	private MemorySet nextMemorySet;
 	/** Does this use memory?
 	 */
-	boolean usesMemory;
+	private boolean usesMemory;
 	/**
 	 ** Oram Bank for storing the instructions securely
 	 */
-	public OramBank bank=null;
+	private OramBank oramBank = null;
 	/**
 	 * Build a memory set consisting of the current addresses of a list of threads.
 	 * @param executionStep The number of the execution step
@@ -177,6 +175,18 @@ public class MemorySet {
 	 */
 	public void setNextMemorySet(MemorySet nextMemorySet) {
 		this.nextMemorySet = nextMemorySet;
+	}
+	/**
+	 * @return the oramBank
+	 */
+	public OramBank getOramBank() {
+		return oramBank;
+	}
+	/**
+	 * @param oramBank the oramBank to set
+	 */
+	public void setOramBank(OramBank oramBank) {
+		this.oramBank = oramBank;
 	}
 	
 }
