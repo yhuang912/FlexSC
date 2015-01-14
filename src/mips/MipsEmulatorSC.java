@@ -170,7 +170,7 @@ public class MipsEmulatorSC {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
 		int numInst = instData.getDataLength();
-		instructions = instData.getDataAsBooolean(); 
+		instructions = instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
 		SecureArray<GCSignal> inst = new SecureArray<GCSignal>(env, numInst + MEM_SIZE, WORD_SIZE);
@@ -209,7 +209,7 @@ public class MipsEmulatorSC {
 	        int i = s.getExecutionStep();
 	        System.out.println("step: " + i + " size: " + s.size());
 			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
-			s.bank = new TrivialOramBank(new SecureArray<GCSignal>(env, m.size(), WORD_SIZE));
+			s.setOramBank(new TrivialOramBank(new SecureArray<GCSignal>(env, m.size(), WORD_SIZE)));
 			int count = 0;
 			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
 				//index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
