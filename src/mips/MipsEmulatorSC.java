@@ -276,7 +276,7 @@ public class MipsEmulatorSC {
 	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
 	public SecureArray<GCSignal> getMemoryGen(CompEnv<GCSignal> env, DataSegment memData) throws Exception{
 		System.out.println("entering getMemoryGen");
-		boolean memory[][] = memData.getDataAsBooolean();	
+		boolean memory[][] = memData.getDataAsBoolean();	
 		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 		SecureArray<GCSignal> memBank = new SecureArray<GCSignal>(env, MEM_SIZE, WORD_SIZE);
 		GCSignal[] data; 
