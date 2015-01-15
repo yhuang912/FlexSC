@@ -133,7 +133,9 @@ public class MipsEmulator {
 		// inital registers are all 0's. no need to set value.
 		SecureArray<Boolean> oram = new SecureArray<Boolean>(env,
 				REGISTER_SIZE, WORD_SIZE);
-
+		for(int i = 0; i < REGISTER_SIZE; ++i)
+			oram.write(env.inputOfAlice(Utils.fromInt(i, oram.lengthOfIden)),
+					env.inputOfAlice(Utils.fromInt(0, WORD_SIZE)));
 		// for testing purpose.
 		// reg[4]=5 reg[5] = 6;
 		oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
