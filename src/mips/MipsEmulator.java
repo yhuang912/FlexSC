@@ -37,14 +37,18 @@ public class MipsEmulator {
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
-	static final int Alice_input = 2;
-	static final int Bob_input = 1;
+	static final int Alice_input = 6;
+	static final int Bob_input = 5;
 	static final boolean MULTIPLE_BANKS = false;
 	int[] mem;
 	Configuration config;
 	private static String binaryFileName;	// should not be static FIXME
 	 
-	 
+	List<MemorySet> sets;
+	DataSegment instData; 
+	DataSegment memData;
+	int pcOffset; 
+	int dataOffset; 
 	
 	public MipsEmulator(Configuration config) {
 		this.config = config;
@@ -127,7 +131,7 @@ public class MipsEmulator {
 		printBooleanArray(pc, lib);
 		
 	}
-	public SecureArray<Boolean> getRegister(CompEnv<Boolean> env)
+	public SecureArray<Boolean> loadInputsToRegister(CompEnv<Boolean> env)
 			throws Exception {
 
 		// inital registers are all 0's. no need to set value.
@@ -146,167 +150,94 @@ public class MipsEmulator {
 		return oram;
 	}
 
-	public SecureArray<Boolean> getMemory(CompEnv<Boolean> env)
-			throws Exception {
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		// initial registers are all 0's. no need to set value.
-		SecureArray<Boolean> oram = new SecureArray<Boolean>(env, MEM_SIZE,
-				WORD_SIZE);
-		for (int i = 0; i < 2; ++i) {
-			// index can be evaluated publicly.
-			Boolean[] index = lib.toSignals(i, oram.lengthOfIden);
-
-			Boolean[] data;
-			if (env.getParty() == Party.Alice) {
-				data = env.inputOfAlice(Utils.fromInt(mem[i], WORD_SIZE));
-			} else {
-				data = env.inputOfAlice(new boolean[WORD_SIZE]);
-			}
-			oram.write(index, data);
-		}
-		return oram;
-	}
-	public SecureArray<Boolean> getInstructionsGen(CompEnv<Boolean> env, DataSegment instData)
+	
+	public SecureArray<Boolean> loadInstructionsSingleBank(CompEnv<Boolean> env)
 			throws Exception {
 		boolean[][] instructions = null; 
 		System.out.println("entering getInstructions");
-		int numInst = instData.getDataLength();
-		instructions = instData.getDataAsBoolean(); 
+		int numInst = this.instData.getDataLength();
+		instructions = this.instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
-		SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
+		SecureArray<Boolean> instBank = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 		Boolean[] data; 
 		Boolean[] index;
 
 		for (int i = 0; i < numInst; i++){
-			index = lib.toSignals(i, inst.lengthOfIden);
-			data = env.inputOfAlice(instructions[i]);
-			/*if (env.getParty() == Party.Alice)
+			index = lib.toSignals(i, instBank.lengthOfIden);
+			if (env.getParty() == Party.Alice)
 				data = env.inputOfAlice(instructions[i]);
 			else 
-				data = env.inputOfAlice(new boolean[WORD_SIZE]);*/
-			inst.write(index, data);
+				data = env.inputOfAlice(new boolean[WORD_SIZE]);
+			instBank.write(index, data);
 			//System.out.println("Wrote instruction number "+i);
 		}		
 		System.out.println("exiting getInstructions");
-		return inst;
+		return instBank;
 	}			
 	
-	public List<MemorySet> getInstructionsMultiBanksGen(CompEnv<Boolean> env, DataSegment instData, 
-			int pcOffset) throws Exception {
-		boolean[][] instructions = null; 
-		System.out.println("entering getInstructions");
-		int numInst = instData.getDataLength();
-		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
-	    List<MemorySet> sets = b.build();
-		int numBanks = sets.size();
-		//SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
+	public List<MemorySet> loadInstructionsMultiBanks(CompEnv<Boolean> env, SecureArray<Boolean> singleBank) throws Exception {
+		System.out.println("entering loadInstructions");
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 		Boolean[] data; 
 		Boolean[] index;
+		SecureArray<Boolean> instructionBank;
 
-		for(MemorySet s:sets) {
+		for(MemorySet s:this.sets) {
 	        int i = s.getExecutionStep();
 	        System.out.println("step: " + i + " size: " + s.size());
-			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
-			OramBank bank = new TrivialOramBank(new SecureArray<Boolean>(env, m.size(), WORD_SIZE));
-			s.setOramBank(bank);
-			int count = 0;
-			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
-				//index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
-				//data = env.inputOfAlice(entry.getValue());
-				// once the indices are correct, write here. 
-				//instBanks[i].write(index, data);
-				count++;
-				//System.out.println(count);
+	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	   
+			if (!MULTIPLE_BANKS)
+				instructionBank = singleBank;
+			else {
+				instructionBank = new SecureArray<Boolean>(env, s.size(), WORD_SIZE);
+				int count = 0;
+				for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
+					index = lib.toSignals((int)(entry.getKey() - pcOffset), instructionBank.lengthOfIden);
+					if (env.getParty() == Party.Alice){
+						data = env.inputOfAlice(entry.getValue());
+					}
+					else	 { 
+						data = env.inputOfAlice(new boolean[WORD_SIZE]); 
+
+					}
+					// once the indices are correct, write here. 
+					instructionBank.write(index, data);
+					count++;
+					//System.out.println(count);
+				}	
 			}
-			
+			OramBank bank = new OramBankImpl(instructionBank);
+			s.setOramBank(bank);
 		}		
 		System.out.println("exiting getInstructions");
 		return sets;
 	}
-
-	public SecureArray<Boolean> getInstructionsEva(CompEnv<Boolean> env, int numInst)
-			throws Exception {
-		SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		Boolean[] data; 
-		Boolean[] index;
-
-		for (int i = 0; i < numInst; i++){
-			index = lib.toSignals(i, inst.lengthOfIden);
-			data = env.inputOfAlice(new boolean[WORD_SIZE]);
-			inst.write(index, data);
-		}			
-		return inst;
-	}		
-	
-	public SecureArray<Boolean>[] getInstructionsMultiBanksEva(CompEnv<Boolean> env, DataSegment instData, 
-			 int pcOffset) throws Exception {
-		boolean[][] instructions = null; 
-		int numInst = instData.getDataLength();
-		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
-	    List<MemorySet> sets = b.build();
-		int numBanks = sets.size();
-	    SecureArray[] instBanks = new SecureArray[numBanks];
-		//SecureArray<Boolean> inst = new SecureArray<Boolean>(env, numInst + MEM_SIZE, WORD_SIZE);
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		Boolean[] data; 
-		Boolean[] index;
-
-		for(MemorySet s:sets) {
-	        int i = s.getExecutionStep();
-	        System.out.println("step: " + i + " size: " + s.size());
-			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	   
-			instBanks[i] = new SecureArray<Boolean>(env, m.size(), WORD_SIZE);
-			int count = 0;
-			for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
-				//index = lib.toSignals((int)(entry.getKey() - pcOffset), instBanks[i].lengthOfIden);
-				//data = env.inputOfAlice(entry.getValue());
-				// once the indices are correct, write here. 
-				//instBanks[i].write(index, data);
-				count++;
-				//System.out.println(count);
-			}
-			
-		}		
-		System.out.println("exiting getInstructions");
-		return instBanks;
-	}
 	
 	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
-	public SecureArray<Boolean> getMemoryGen(CompEnv<Boolean> env, DataSegment memData) throws Exception{
+	public SecureArray<Boolean> getMemory(CompEnv<Boolean> env) throws Exception{
 		System.out.println("entering getMemoryGen");
 		boolean memory[][] = memData.getDataAsBoolean();	
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 		SecureArray<Boolean> memBank = new SecureArray<Boolean>(env, MEM_SIZE, WORD_SIZE);
+		Boolean[] index; 
+		Boolean[] data;
 		for (int i = 0; i < memData.getDataLength(); i++){
-			memBank.write(lib.toSignals(i, memBank.lengthOfIden), env.inputOfAlice(memory[i]));
+			index = lib.toSignals(i, memBank.lengthOfIden);
+			if (env.getParty() == Party.Alice)
+				data = env.inputOfAlice(memory[i]);
+			else 
+				data = env.inputOfAlice(new boolean[WORD_SIZE]);
+			memBank.write(index, data);	
 		}
 		System.out.println("exiting getMemoryGen");
 		return memBank;
 	 
 	}
 	
-	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead.
-	public SecureArray<Boolean> getMemoryEva(CompEnv<Boolean> env, int dataLen)
-			throws Exception {
-		 
-		SecureArray<Boolean> memBank = new SecureArray<Boolean>(env, MEM_SIZE, WORD_SIZE);
-		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-		Boolean[] data; 
-		Boolean[] index;
-
-		for (int i = 0; i < dataLen ; i++){
-			index = lib.toSignals(i, memBank.lengthOfIden);
-			data = env.inputOfAlice(new boolean[WORD_SIZE]);
-			memBank.write(index, data);
-		}			
-		return memBank;
-	}	
-	
 	class GenRunnable extends network.Server implements Runnable {
+		
 		public void run() {
 			try {
 				listen(54321);
@@ -316,46 +247,40 @@ public class MipsEmulator {
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 				CPU cpu = new CPU(env);
 				MEM mem = new MEM(env);
-				SecureArray<Boolean> reg = getRegister(env);
-				Reader rdr = new Reader(new File(getBinaryFileName()), config);
-				SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
-				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
-				DataSegment memData = rdr.getData();
-				// is this cast ok?  Or should we modify the mem circuit? 
-				int pcOffset = (int) ent.getAddress();
-				System.out.println("pcoffset: " + pcOffset);
-				int dataOffset = (int) rdr.getDataAddress();
-				SecureArray<Boolean> instructionBank = null;
-				SecureArray<Boolean> memBank = null;
-				if (MULTIPLE_BANKS){
-					List<MemorySet> sets = getInstructionsMultiBanksGen(env, inst, pcOffset);
-					
+				SecureArray<Boolean> reg = loadInputsToRegister(env);
+				
+				SecureArray<Boolean> singleInstructionBank = null;
+				
+				if (!MULTIPLE_BANKS){
+					singleInstructionBank = loadInstructionsSingleBank(env);					
 				}
-					//instantiate new secure array for memory once we separate instructions from memory.
-				else {
-					 instructionBank = getInstructionsGen(env, inst);
-					 memBank = getMemoryGen(env, memData);
-				 }
+				loadInstructionsMultiBanks(env, singleInstructionBank);
+				SecureArray<Boolean> memBank = getMemory(env);
 				
 				Boolean[] pc = lib.toSignals(pcOffset, WORD_SIZE);
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
 				boolean testHalt;
 				int count = 0; 
-				printOramBank(instructionBank, lib, 60);
+				printOramBank(singleInstructionBank, lib, 60);
 				long startTime = System.nanoTime();
-				
+				MemorySet currentSet = sets.get(0);
+				SecureArray<Boolean> currentBank;
 				while (true) {
+					currentBank = currentSet.getOramBank().getArray();
 					System.out.println("count: " + count);
 					count++;
-					newInst = mem.getInst(instructionBank, pc, pcOffset); 
+					newInst = mem.getInst(currentBank, pc, pcOffset);
+					//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
 					mem.func(reg, memBank, newInst, dataOffset);
+					
+					System.out.println("newInst");
+					printBooleanArray(newInst, lib);
 					
 					testHalt = testTerminate(reg, newInst, lib);
 					if (testHalt)
 						break;
 									
-					System.out.println("newInst");
-					printBooleanArray(newInst, lib);
+					
 					//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
 						//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101001, 32));
 					pc = cpu.function(reg, newInst, pc);
@@ -363,6 +288,8 @@ public class MipsEmulator {
 					printRegisters(reg, lib);
 					System.out.println("PC: ");
 					printBooleanArray(pc, lib);
+					
+					currentSet = currentSet.getNextMemorySet();
 				}
 				float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
 				System.out.println("Run time: " + runTime);
@@ -385,7 +312,7 @@ public class MipsEmulator {
 	class EvaRunnable extends network.Client implements Runnable {
 		public double andgates;
 		public double encs;
-
+				
 		public void run() {
 			try {
 				connect("localhost", 54321);
@@ -396,35 +323,29 @@ public class MipsEmulator {
 				CPU cpu = new CPU(env);
 				MEM mem = new MEM(env);
 
-				SecureArray<Boolean> reg = getRegister(env);
-//might be better to have bob send the number of instructions to alice.  That's the only reason 
-				//we currently read the file at all. 
-				Reader rdr = new Reader(new File(getBinaryFileName()), config);
-				//SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
-				DataSegment inst = rdr.getInstructions(config.getFunctionLoadList());
-				int numInst = inst.getDataLength();
-				DataSegment memData = rdr.getData();
-				int dataLen = memData.getDataLength();
-				
-				SecureArray<Boolean> instructionBank = getInstructionsEva(env, numInst);
+				SecureArray<Boolean> reg = loadInputsToRegister(env);
+				SecureArray<Boolean> singleInstructionBank = null; 
+				if (!MULTIPLE_BANKS)
+					singleInstructionBank = loadInstructionsSingleBank(env);
+				loadInstructionsMultiBanks(env, singleInstructionBank);
+				SecureArray<Boolean> memBank = getMemory(env);
 				//instantiate new secure array for memory once we separate instructions from memory.
-				SecureArray<Boolean> memBank = getMemoryEva(env, dataLen);
-				
-				//SecureArray<Boolean> memory = getMemory(env);
+					
 				Boolean[] newInst = lib.toSignals(0,WORD_SIZE);                           
 				Boolean[] pc = lib.toSignals(0, WORD_SIZE);
-				Boolean halt;
 				boolean testHalt;
-				printOramBank(instructionBank, lib, 60);
+				printOramBank(singleInstructionBank, lib, 60);
 				
 				if (m == Mode.COUNT) {
 					//Statistics sta = ((PMCompEnv) env).statistic;
 					//sta.flush();
 				}
 				
-				int count = 0;
+				MemorySet currentSet = sets.get(0);
+				SecureArray<Boolean> currentBank;
 				while (true){
-					newInst = mem.getInst(instructionBank, pc, 0); 
+					currentBank = currentSet.getOramBank().getArray();
+					newInst = mem.getInst(currentBank, pc, 0); 
 					mem.func(reg, memBank, newInst, 0);
 					testHalt = testTerminate(reg, newInst, lib);
 
@@ -441,6 +362,8 @@ public class MipsEmulator {
 					//System.out.println( "CPU circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
 					printRegisters(reg, lib);
 					printBooleanArray(pc, lib);
+					currentSet = currentSet.getNextMemorySet();
+
 				}
 				
 				if (m == Mode.COUNT) {
@@ -566,10 +489,20 @@ public class MipsEmulator {
 
 	static public void main(String args[]) throws Exception {
 		Configuration config = new Configuration();
-		MipsEmulator test = new MipsEmulator(config);
+		MipsEmulator emulator = new MipsEmulator(config);
 		process_cmdline_args(args, config);
-		GenRunnable gen = test.new GenRunnable();
-		EvaRunnable env = test.new EvaRunnable();
+		Reader rdr = new Reader(new File(getBinaryFileName()), config);
+		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
+		emulator.instData = rdr.getInstructions(config.getFunctionLoadList());
+		emulator.memData = rdr.getData();
+		// is this cast ok?  Or should we modify the mem circuit? 
+		emulator.pcOffset = (int) ent.getAddress();
+		System.out.println("pcoffset: " + emulator.pcOffset);
+		emulator.dataOffset = (int) rdr.getDataAddress();
+		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+	    emulator.sets = b.build();
+		GenRunnable gen = emulator.new GenRunnable();
+		EvaRunnable env = emulator.new EvaRunnable();
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
 		tGen.start();
