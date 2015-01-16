@@ -90,7 +90,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 
 			return finalRes.data;
 		} else {
-			return lib.mux(res.data, lib.toSignals(initalValue, res.data.length), res.isDummy);
+			return lib.mux(res.data, lib.zeros(res.data.length), res.isDummy);
 		}
 	}
 

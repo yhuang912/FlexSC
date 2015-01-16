@@ -46,7 +46,7 @@ public class TrivialPrivateOram<T> extends OramParty<T> {
 			Block<T> scb1 = inputBlockOfClient(b1);
 			finalRes = lib.mux(res.data, scb1.data, res.isDummy);
 		} else {
-			finalRes = lib.mux(res.data, lib.toSignals(InitialValue, res.data.length),
+			finalRes = lib.mux(res.data, lib.zeros(res.data.length),
 					res.isDummy);
 		}
 
