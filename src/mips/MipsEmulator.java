@@ -33,7 +33,7 @@ import java.util.TreeMap;
 public class MipsEmulator {
 
 	static final int REGISTER_SIZE = 32;
-	static final int MEM_SIZE = 72;// 2K words
+	static final int MEM_SIZE = 72;// 160 < threshold for func1
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
@@ -342,6 +342,8 @@ public class MipsEmulator {
 				boolean testHalt;
 				int count = 0; 
 				printOramBank(instructionBank, lib, 60);
+				long startTime = System.nanoTime();
+				
 				while (true) {
 					System.out.println("count: " + count);
 					count++;
@@ -362,7 +364,16 @@ public class MipsEmulator {
 					System.out.println("PC: ");
 					printBooleanArray(pc, lib);
 				}
-
+				float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
+				System.out.println("Run time: " + runTime);
+				System.out.println("Average time / instruction: " + runTime / count );
+				Boolean[] output = reg.read(lib.toSignals(2, reg.lengthOfIden));
+				String outputStr = "";
+				boolean[] tmp = lib.getEnv().outputToAlice(output);
+				for (int j = 31 ; j >= 0 ; j--){
+					outputStr += (tmp[j] ? "1" : "0");
+				}	
+				System.out.println("Output: " + outputStr);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -438,6 +449,8 @@ public class MipsEmulator {
 					//andgates = sta.andGate;
 					//encs = sta.NumEncAlice;
 				}
+				Boolean[] output = reg.read(lib.toSignals(2, reg.lengthOfIden));
+				lib.getEnv().outputToAlice(output);
 				os.flush();
 				disconnect();
 			} catch (Exception e) {

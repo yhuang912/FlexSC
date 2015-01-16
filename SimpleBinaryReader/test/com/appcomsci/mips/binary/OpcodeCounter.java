@@ -93,13 +93,16 @@ public class OpcodeCounter extends MipsProgram {
 			System.exit(2);
 		}
 		Collection<OpCount> opList =	c.countOps();
+		int totalCount=0;
 		for(OpCount oc:opList) {
+			totalCount +=oc.count;
 			MipsInstructionSet.Operation opData = MipsInstructionSet.Operation.valueOf(oc.op);
 			if(opData != null)
 				System.out.printf("%s [0x%08x] %d\n", opData.toString(), opData.getValue(), oc.count);
 			else
 				System.out.printf("[0x%08x] %d\n", oc.op, oc.count);
 		}
+		System.out.println("Total Count: " + totalCount);
 	}
 
 }

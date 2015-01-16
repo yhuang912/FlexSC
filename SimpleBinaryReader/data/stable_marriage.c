@@ -1,4 +1,3 @@
-#include <stdio.h>
  
 int verbose = 0;
 enum {
@@ -39,13 +38,13 @@ void engage(int man, int woman)
 {
 	pairs[man] = woman;
 	pairs[woman] = man;
-	if (verbose) printf("%4s is engaged to %4s\n", name[man], name[woman]);
+	//	if (verbose) printf("%4s is engaged to %4s\n", name[man], name[woman]);
 }
  
 void dump(int woman, int man)
 {
 	pairs[man] = pairs[woman] = clown;
-	if (verbose) printf("%4s dumps %4s\n", name[woman], name[man]);
+	//	if (verbose) printf("%4s dumps %4s\n", name[woman], name[man]);
 }
  
 /* how high this person ranks that: lower is more preferred */
@@ -59,7 +58,7 @@ int rank(int this, int that)
 void propose(int man, int woman)
 {
 	int fiance = pairs[woman];
-	if (verbose) printf("%4s proposes to %4s\n", name[man], name[woman]);
+	//	if (verbose) printf("%4s proposes to %4s\n", name[man], name[woman]);
  
 	if (fiance == clown) {
 		engage(man, woman);
@@ -73,10 +72,10 @@ int covet(int man1, int wife2)
 {
 	if (rank(man1, wife2) < rank(man1, pairs[man1]) &&
 			rank(wife2, man1) < rank(wife2, pairs[wife2])) {
-		printf( "    %4s (w/ %4s) and %4s (w/ %4s) prefer each other"
-			" over current pairing.\n",
-			name[man1], name[pairs[man1]], name[wife2], name[pairs[wife2]]
-		);
+	  //		printf( "    %4s (w/ %4s) and %4s (w/ %4s) prefer each other"
+	  //			" over current pairing.\n",
+	  //name[man1], name[pairs[man1]], name[wife2], name[pairs[wife2]]
+	  //	);
 		return 1;
 	}
 	return 0;
@@ -115,20 +114,21 @@ int sfe_main()
 		}
 	} while (unengaged);
  
-	printf("Pairing:\n");
+	//	printf("Pairing:\n");
 	for (i = abe; i <= jon; i++)
-		printf("  %4s - %s\n", name[i],
-			pairs[i] == clown ? "clown" : name[pairs[i]]);
+	  //		printf("  %4s - %s\n", name[i],
+	  //			pairs[i] == clown ? "clown" : name[pairs[i]]);
+	  unstable();
+//	printf(unstable()
+//		? "Marriages not stable\n" /* draw sad face here */
+//		: "Stable matchup\n");
  
-	printf(unstable()
-		? "Marriages not stable\n" /* draw sad face here */
-		: "Stable matchup\n");
- 
-	printf("\nBut if Bob and Fred were to swap:\n");
+//	printf("\nBut if Bob and Fred were to swap:\n");
 	i = pairs[bob];
 	engage(bob, pairs[fred]);
 	engage(fred, i);
-	printf(unstable() ? "Marriages not stable\n" : "Stable matchup\n");
+	unstable();
+//	printf(unstable() ? "Marriages not stable\n" : "Stable matchup\n");
  
 	return 0;
 }
