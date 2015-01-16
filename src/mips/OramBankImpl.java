@@ -3,12 +3,12 @@ import com.appcomsci.mips.memory.OramBank;
 
 import oram.SecureArray;
 
-public class TrivialOramBank implements OramBank {
+public class OramBankImpl implements OramBank {
 	private int minIdx=0;
 	private int maxIdx;
 	private boolean isAssociative;
 	private SecureArray bank;
-	public TrivialOramBank(SecureArray bankInp){
+	public OramBankImpl(SecureArray bankInp){
 		bank = bankInp;
 	}
 	
