@@ -37,9 +37,9 @@ public class MipsEmulator {
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
-	static final int Alice_input = 6;
-	static final int Bob_input = 5;
-	static final boolean MULTIPLE_BANKS = false;
+	static final int Alice_input = 2;
+	static final int Bob_input = 3;
+	static final boolean MULTIPLE_BANKS = true;
 	int[] mem;
 	Configuration config;
 	private static String binaryFileName;	// should not be static FIXME
@@ -186,16 +186,28 @@ public class MipsEmulator {
 
 		for(MemorySet s:this.sets) {
 	        int i = s.getExecutionStep();
-	        System.out.println("step: " + i + " size: " + s.size());
+	        if (env.getParty() == Party.Alice)
+	        	System.out.println("step: " + i + " size: " + s.size());
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
 	        long maxAddr = m.lastEntry().getKey();
-	        long minAddr = m.firstEntry().getKey();
+	        long minAddr = m.ceilingKey((long)1);
 			if (!MULTIPLE_BANKS)
 				instructionBank = singleBank;
 			else {
 				instructionBank = new SecureArray<Boolean>(env, (int)(maxAddr - minAddr) + 1, WORD_SIZE);
 				int count = 0;
 				for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
+					if (env.getParty() == Party.Alice){
+						System.out.println("count: " + count + " key: " + entry.getKey() + " value: " );
+						String output = "";
+						for (int j = 31 ; j >= 0;  j--){
+							if (entry.getValue()[j])
+								output += "1";
+							else 
+								output += "0";
+						}
+						System.out.println(output);
+					}
 					index = lib.toSignals((int)(entry.getKey() - pcOffset), instructionBank.lengthOfIden);
 					if (env.getParty() == Party.Alice){
 						data = env.inputOfAlice(entry.getValue());
@@ -265,7 +277,8 @@ public class MipsEmulator {
 				Boolean[] newInst = lib.toSignals(0, WORD_SIZE);
 				boolean testHalt;
 				int count = 0; 
-				printOramBank(singleInstructionBank, lib, 60);
+				if (!MULTIPLE_BANKS)
+					printOramBank(singleInstructionBank, lib, 60);
 				long startTime = System.nanoTime();
 				MemorySet currentSet = sets.get(0);
 				SecureArray<Boolean> currentBank;
@@ -294,6 +307,8 @@ public class MipsEmulator {
 					printBooleanArray(pc, lib);
 					
 					currentSet = currentSet.getNextMemorySet();
+					//printOramBank(currentSet.getOramBank().getArray(), lib, 5);
+					System.out.println("execution step: " + currentSet.getExecutionStep());
 				}
 				float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
 				System.out.println("Run time: " + runTime);
@@ -338,7 +353,8 @@ public class MipsEmulator {
 				Boolean[] newInst = lib.toSignals(0,WORD_SIZE);                           
 				Boolean[] pc = lib.toSignals(0, WORD_SIZE);
 				boolean testHalt;
-				printOramBank(singleInstructionBank, lib, 60);
+				if (!MULTIPLE_BANKS)
+					printOramBank(singleInstructionBank, lib, 60);
 				
 				if (m == Mode.COUNT) {
 					//Statistics sta = ((PMCompEnv) env).statistic;
