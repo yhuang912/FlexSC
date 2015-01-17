@@ -187,11 +187,13 @@ public class MipsEmulator {
 		for(MemorySet s:this.sets) {
 	        int i = s.getExecutionStep();
 	        System.out.println("step: " + i + " size: " + s.size());
-	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	   
+	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
+	        long maxAddr = m.lastEntry().getKey();
+	        long minAddr = m.firstEntry().getKey();
 			if (!MULTIPLE_BANKS)
 				instructionBank = singleBank;
 			else {
-				instructionBank = new SecureArray<Boolean>(env, s.size(), WORD_SIZE);
+				instructionBank = new SecureArray<Boolean>(env, (int)(maxAddr - minAddr) + 1, WORD_SIZE);
 				int count = 0;
 				for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
 					index = lib.toSignals((int)(entry.getKey() - pcOffset), instructionBank.lengthOfIden);
@@ -208,7 +210,9 @@ public class MipsEmulator {
 					//System.out.println(count);
 				}	
 			}
-			OramBank bank = new OramBankImpl(instructionBank);
+			OramBankImpl bank = new OramBankImpl(instructionBank);
+			bank.setMaxAddress(maxAddr);
+			bank.setMinAddress(minAddr);
 			s.setOramBank(bank);
 		}		
 		System.out.println("exiting getInstructions");
