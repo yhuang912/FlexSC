@@ -190,11 +190,12 @@ public class MipsEmulator {
 	        	System.out.println("step: " + i + " size: " + s.size());
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
 	        long maxAddr = m.lastEntry().getKey();
+	        //long minAddr = m.firstEntry().getKey();
 	        long minAddr = m.ceilingKey((long)1);
 			if (!MULTIPLE_BANKS)
 				instructionBank = singleBank;
 			else {
-				instructionBank = new SecureArray<Boolean>(env, (int)(maxAddr - minAddr) + 1, WORD_SIZE);
+				instructionBank = new SecureArray<Boolean>(env, (int)((maxAddr - minAddr)/4) + 1, WORD_SIZE);
 				int count = 0;
 				for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
 					if (env.getParty() == Party.Alice){
@@ -218,6 +219,8 @@ public class MipsEmulator {
 					}
 					// once the indices are correct, write here. 
 					instructionBank.write(index, data);
+					printOramBank(instructionBank, lib, (int)((maxAddr - minAddr)/4) + 1);
+					//System.out.println(maxAddr +" "+ minAddr);
 					count++;
 					//System.out.println(count);
 				}	
@@ -307,7 +310,7 @@ public class MipsEmulator {
 					printBooleanArray(pc, lib);
 					
 					currentSet = currentSet.getNextMemorySet();
-					//printOramBank(currentSet.getOramBank().getArray(), lib, 5);
+					printOramBank(currentSet.getOramBank().getArray(), lib, 45);
 					System.out.println("execution step: " + currentSet.getExecutionStep());
 				}
 				float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
@@ -479,7 +482,7 @@ public class MipsEmulator {
 	private static void printOramBank(SecureArray<Boolean> oramBank, IntegerLib<Boolean> lib, int numItems){
 		String output = "";
 		Boolean[] temp; 
-
+		
 		for (int i = 0 ; i < numItems; i++){
 			output += "item number " + String.valueOf(i) +": ";
 			temp = oramBank.read(lib.toSignals(i, oramBank.lengthOfIden));
