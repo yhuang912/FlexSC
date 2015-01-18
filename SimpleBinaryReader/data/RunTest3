@@ -1,7 +1,15 @@
 B=/opt/mipsel/usr/bin
 S=$B/mipsel-linux-gnu
 
+P=data3
+P=func1
+
 # Uncomment to recompile binary
-$S-clang -O0 -o data3-clang data3.c
-$S-llvm-objdump -disassemble -t -r -s -section-headers data3-clang > data3.txt
-java -cp ../bin com.appcomsci.mips.binary.TestReaderMain data3-clang sfe_main
+$S-clang -O0 -o $P-clang $P.c
+$S-llvm-objdump -disassemble -t -r -s -section-headers $P-clang > $P-clang.txt
+$S-objdump -d -r -s -h $P-clang > $P-clang-x.txt
+
+$S-gcc -O0 -o $P-gcc $P.c
+$S-llvm-objdump -disassemble -t -r -s -section-headers $P-gcc > $P-gcc.txt
+$S-objdump -d -r -s -h $P-gcc > $P-gcc-x.txt
+java -cp ../bin com.appcomsci.mips.binary.TestReaderMain $P-clang sfe_main
