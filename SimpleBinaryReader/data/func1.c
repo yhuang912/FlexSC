@@ -1,3 +1,6 @@
+int func_a(int a, int b);
+int func_b(int a, int b);
+
 int sfe_main(int a, int b) { 
   int ret = 0;
   if(a>=b) 
