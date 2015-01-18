@@ -1,0 +1,9 @@
+CP="../bin:../../lib/jargs.jar"
+CP="../build/classes:../../lib/jargs.jar"
+java -classpath $CP \
+	-Demulator.properties=./emulator.properties \
+	com.appcomsci.mips.memory.MemSetBuilder \
+	--entry.point=sfe_main \
+	--function.load.list=sfe_main,func_a,func_b ./func1-gcc
+#	--function.load.list=allselected,sfe_main ./djikstra-clang
+#	--function.load.list=foo,bar,sfe_main  ./data3-gcc
