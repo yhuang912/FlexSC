@@ -291,8 +291,22 @@ public class MemSetBuilder extends MipsProgram {
 							}
 							break;
 						// Branches with link
-						case OP_BLTZAL:
 						case OP_BGEZAL:
+							{
+								// Look for unconditional call
+								if(getSrcReg(instr) == 0) {
+									long targetAddress = th.getCurrentAddress() + (getOffset(instr)<<2) + 4;
+									if(isHonorDelaySlots()) {
+										th.doCall(targetAddress);
+									} else {
+										// Push branch target
+										th.pushAddress(targetAddress);
+									}
+									break;
+								}
+							}
+							// Fall through
+						case OP_BLTZAL:
 							{
 								long targetAddress = th.getCurrentAddress() + (getOffset(instr)<<2) + 4;
 								ThreadState newThread = new ThreadState(th);
