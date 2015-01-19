@@ -27,9 +27,9 @@ public class OramBankImpl implements OramBank {
 	 * @return the span of the address range.  This is the necessary size of the 
 	 * SecureArray, if we do not have access to an oblivious associative map.
 	 */
-	public int getAddressRange(){
-		if (minAddress < 0) return (int) minAddress; 
-		else return (int)(maxAddress - minAddress);
+	public int getBankSize(){
+		if (minAddress < 0) return 0; 
+		else return (int)(maxAddress - minAddress)/4 + 1;
 	}
 	/**
 	 * @param val is the value to set minAddress to. 
@@ -43,5 +43,10 @@ public class OramBankImpl implements OramBank {
 	public void setMaxAddress(long val){
 		maxAddress = val;
 	}
-	
+	/**
+	 * @return minAddress value stored in this bank.  
+	 */
+	public long getMinAddress(){
+		return minAddress; 
+	}
 }

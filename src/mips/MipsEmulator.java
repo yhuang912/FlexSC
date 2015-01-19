@@ -195,7 +195,7 @@ public class MipsEmulator {
 			if (!MULTIPLE_BANKS)
 				instructionBank = singleBank;
 			else {
-				instructionBank = new SecureArray<Boolean>(env, (int)((maxAddr - minAddr)/4) + 1, WORD_SIZE);
+				instructionBank = new SecureArray<Boolean>(env, (int)((maxAddr - minAddr)/4 + 1), WORD_SIZE);
 				int count = 0;
 				for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
 					if (env.getParty() == Party.Alice){
@@ -209,17 +209,19 @@ public class MipsEmulator {
 						}
 						System.out.println(output);
 					}
-					index = lib.toSignals((int)(entry.getKey() - pcOffset), instructionBank.lengthOfIden);
-					if (env.getParty() == Party.Alice){
-						data = env.inputOfAlice(entry.getValue());
-					}
-					else	 { 
-						data = env.inputOfAlice(new boolean[WORD_SIZE]); 
+					if (entry.getKey() > 0){
+						index = lib.toSignals((int)((entry.getKey() - minAddr)/4), instructionBank.lengthOfIden);
+						if (env.getParty() == Party.Alice){
+							data = env.inputOfAlice(entry.getValue());
+						}
+						else	 { 
+							data = env.inputOfAlice(new boolean[WORD_SIZE]); 
 
+						}
+						// once the indices are correct, write here. 
+						instructionBank.write(index, data);
 					}
-					// once the indices are correct, write here. 
-					instructionBank.write(index, data);
-					printOramBank(instructionBank, lib, (int)((maxAddr - minAddr)/4) + 1);
+					printOramBank(instructionBank, lib, (int)((maxAddr - minAddr)/4 + 1));
 					//System.out.println(maxAddr +" "+ minAddr);
 					count++;
 					//System.out.println(count);
@@ -289,6 +291,10 @@ public class MipsEmulator {
 					currentBank = currentSet.getOramBank().getArray();
 					System.out.println("count: " + count);
 					count++;
+					System.out.println("execution step: " + currentSet.getExecutionStep());
+					printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
+					if (MULTIPLE_BANKS)
+						pcOffset = (int) currentSet.getOramBank().getMinAddress();
 					newInst = mem.getInst(currentBank, pc, pcOffset);
 					//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
 					mem.func(reg, memBank, newInst, dataOffset);
@@ -308,10 +314,10 @@ public class MipsEmulator {
 					printRegisters(reg, lib);
 					System.out.println("PC: ");
 					printBooleanArray(pc, lib);
+					System.out.println(pcOffset);
+					System.out.println(currentSet.getOramBank().getMinAddress());
 					
 					currentSet = currentSet.getNextMemorySet();
-					printOramBank(currentSet.getOramBank().getArray(), lib, 45);
-					System.out.println("execution step: " + currentSet.getExecutionStep());
 				}
 				float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
 				System.out.println("Run time: " + runTime);
@@ -368,6 +374,7 @@ public class MipsEmulator {
 				SecureArray<Boolean> currentBank;
 				while (true){
 					currentBank = currentSet.getOramBank().getArray();
+					printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
 					newInst = mem.getInst(currentBank, pc, 0); 
 					mem.func(reg, memBank, newInst, 0);
 					testHalt = testTerminate(reg, newInst, lib);
