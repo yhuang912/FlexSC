@@ -1,9 +1,9 @@
 package mips;
-import com.appcomsci.mips.memory.OramBank;
+
 
 import oram.SecureArray;
 
-public class OramBankImpl implements OramBank {
+public class OramBank {
 	private int minIdx=-1;
 	private int maxIdx;
 	private boolean isAssociative;
@@ -18,7 +18,7 @@ public class OramBankImpl implements OramBank {
 	 * working associative arrays.    
 	 */
 	private long minAddress;
-	public OramBankImpl(SecureArray<?> bankInp){
+	public OramBank(SecureArray<?> bankInp){
 		bank = bankInp;
 	}
 	public int getLengthOfIden(){ return bank.lengthOfIden; }
