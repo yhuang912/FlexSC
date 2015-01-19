@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import mips.OramBank;
+
 import com.appcomsci.mips.binary.DataSegment;
 
 /**
