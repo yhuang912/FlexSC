@@ -48,7 +48,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
    int32 rt = ((inst << 11)>>27);
    int32 rs = ((inst << 6) >> 27);
    int32 rd = ((inst << 16)>>27);
-   int5 shamt = ((inst << 21)>>27);
+   int32 shamt = ((inst << 21)>>27);
    int32 reg_rs, reg_rt, reg_rd;
    int32 unsignExt = ((inst << 16)>>16);
    int32 zeroExt = unsignExt;
@@ -119,7 +119,7 @@ int32 oldPC = pc;
    } else if (op == 3) { // OP_JAL
       pc = (inst << 6) >> 6;
    } else if ((op == OP_BNE && reg_rs != reg_rt) || (op == OP_BEQ && reg_rs == reg_rt)) { //OP_BNE and OP_BEQ
-      pc = pc + (unsignExt << 2);
+      pc = pc + 4 +(unsignExt << 2);
    } else
       pc = pc + 4;
 
