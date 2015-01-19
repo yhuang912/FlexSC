@@ -227,7 +227,7 @@ public class MipsEmulator {
 					//System.out.println(count);
 				}	
 			}
-			OramBankImpl bank = new OramBankImpl(instructionBank);
+			OramBank bank = new OramBank(instructionBank);
 			bank.setMaxAddress(maxAddr);
 			bank.setMinAddress(minAddr);
 			s.setOramBank(bank);
