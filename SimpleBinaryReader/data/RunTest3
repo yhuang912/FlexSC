@@ -9,7 +9,7 @@ $S-clang -O0 -o $P-clang $P.c
 $S-llvm-objdump -disassemble -t -r -s -section-headers $P-clang > $P-clang.txt
 $S-objdump -d -r -s -h $P-clang > $P-clang-x.txt
 
-$S-gcc -O0 -o $P-gcc $P.c
+$S-gcc -O0 -mno-explicit-relocs -o $P-gcc $P.c
 $S-llvm-objdump -disassemble -t -r -s -section-headers $P-gcc > $P-gcc.txt
 $S-objdump -d -r -s -h $P-gcc > $P-gcc-x.txt
 java -cp ../bin com.appcomsci.mips.binary.TestReaderMain $P-clang sfe_main
