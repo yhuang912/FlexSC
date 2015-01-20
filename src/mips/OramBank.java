@@ -4,9 +4,9 @@ package mips;
 import oram.SecureArray;
 
 public class OramBank<T> {
-	private int minIdx=-1;
-	private int maxIdx;
-	private boolean isAssociative;
+	//private int minIdx=-1;
+	//private int maxIdx;
+	//private boolean isAssociative;
 	private SecureArray<T> bank;
 	/**
 	 ** stores the maximum address value in this timestep.  We probably won't need this after we have

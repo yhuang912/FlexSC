@@ -36,8 +36,8 @@ public class MipsEmulator {
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.VERIFY;
-	static final int Alice_input = 2;
-	static final int Bob_input = 3;
+	static final int Alice_input = 5;
+	static final int Bob_input = 2;
 	static final boolean MULTIPLE_BANKS = true;
 	int[] mem;
 	Configuration config;
@@ -185,10 +185,14 @@ public class MipsEmulator {
 
 		for(MemorySet<Boolean> s:this.sets) {
 	        int i = s.getExecutionStep();
+	        if (i == 46)
+	        	System.out.println("stop");
 	        if (env.getParty() == Party.Alice)
 	        	System.out.println("step: " + i + " size: " + s.size());
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
 	        long maxAddr = m.lastEntry().getKey();
+	        if (maxAddr == 0)
+	        	break;
 	        //long minAddr = m.firstEntry().getKey();
 	        long minAddr = m.ceilingKey((long)1);
 			if (!MULTIPLE_BANKS)
