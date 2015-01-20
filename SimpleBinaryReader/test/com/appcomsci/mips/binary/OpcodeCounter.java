@@ -3,34 +3,17 @@
  */
 package com.appcomsci.mips.binary;
 
+import static com.appcomsci.mips.memory.MipsInstructionSet.getOpBits;
 import jargs.gnu.CmdLineParser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import com.appcomsci.mips.memory.MipsInstructionSet;
 import com.appcomsci.mips.memory.MipsProgram;
-import com.appcomsci.sfe.common.Configuration;
-
-import static com.appcomsci.mips.memory.MipsInstructionSet.OP_BGEZ;
-import static com.appcomsci.mips.memory.MipsInstructionSet.OP_BLTZ;
-import static com.appcomsci.mips.memory.MipsInstructionSet.OP_FUNCT;
-import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM;
-import static com.appcomsci.mips.memory.MipsInstructionSet.OP_MASK;
-import static com.appcomsci.mips.memory.MipsInstructionSet.OP_SHIFT;
-import static com.appcomsci.mips.memory.MipsInstructionSet.FUNCT_MASK;
-import static com.appcomsci.mips.memory.MipsInstructionSet.FUNCT_SHIFT;
-import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM_CODE_MASK;
-import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM_CODE_SHIFT;
-import static com.appcomsci.mips.memory.MipsInstructionSet.getFunct;
-import static com.appcomsci.mips.memory.MipsInstructionSet.getOp;
-import static com.appcomsci.mips.memory.MipsInstructionSet.getOpBits;
-import static com.appcomsci.mips.memory.MipsInstructionSet.getRegImmCode;
 
 /**
  * @author Allen McIntosh
