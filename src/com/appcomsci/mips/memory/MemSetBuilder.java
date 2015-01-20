@@ -296,6 +296,7 @@ public class MemSetBuilder<T> extends MipsProgram {
 								// Look for unconditional call
 								if(getSrcReg(instr) == 0) {
 									long targetAddress = th.getCurrentAddress() + (getOffset(instr)<<2) + 4;
+									th.advance();
 									if(isHonorDelaySlots()) {
 										th.doCall(targetAddress);
 									} else {
