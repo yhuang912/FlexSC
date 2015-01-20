@@ -300,6 +300,8 @@ public class MemSetBuilder<T> extends MipsProgram {
 									if(isHonorDelaySlots()) {
 										th.doCall(targetAddress);
 									} else {
+										// Advance past delay slot, ignoring it
+										th.advance();
 										// Push branch target
 										th.pushAddress(targetAddress);
 									}
@@ -351,6 +353,8 @@ public class MemSetBuilder<T> extends MipsProgram {
 							if(isHonorDelaySlots()) {
 								th.doCall(targetAddress);
 							} else {
+								// Advance past delay slot, ignoring it
+								th.advance();
 								// Push branch target
 								th.pushAddress(targetAddress);
 							}
