@@ -17,7 +17,7 @@ import com.appcomsci.mips.binary.DataSegment;
  * @author Allen McIntosh
  *
  */
-public class MemorySet {
+public class MemorySet<T> {
 	/**
 	 * The addresses
 	 */
@@ -29,14 +29,14 @@ public class MemorySet {
 	/**
 	 * The next execution step, or null if we ran off the end of the world
 	 */
-	private MemorySet nextMemorySet;
+	private MemorySet<T> nextMemorySet;
 	/** Does this use memory?
 	 */
 	private boolean usesMemory;
 	/**
 	 ** Oram Bank for storing the instructions securely
 	 */
-	private OramBank oramBank = null;
+	private OramBank<T> oramBank = null;
 	/**
 	 * Build a memory set consisting of the current addresses of a list of threads.
 	 * @param executionStep The number of the execution step
@@ -143,9 +143,9 @@ public class MemorySet {
 	public boolean equals(Object o) {
 		if(o == null)
 			return false;
-		if(!(o instanceof MemorySet))
+		if(!(o instanceof MemorySet<?>))
 			return false;
-		MemorySet that = (MemorySet) o;
+		MemorySet<T> that = (MemorySet<T>) o;
 		return this.getAddresses().equals(that.getAddresses());
 	}
 	
@@ -169,25 +169,25 @@ public class MemorySet {
 	/**
 	 * @return the nextMemorySet
 	 */
-	public MemorySet getNextMemorySet() {
+	public MemorySet<T> getNextMemorySet() {
 		return nextMemorySet;
 	}
 	/**
 	 * @param nextMemorySet the nextMemorySet to set
 	 */
-	public void setNextMemorySet(MemorySet nextMemorySet) {
+	public void setNextMemorySet(MemorySet<T> nextMemorySet) {
 		this.nextMemorySet = nextMemorySet;
 	}
 	/**
 	 * @return the oramBank
 	 */
-	public OramBank getOramBank() {
+	public OramBank<T> getOramBank() {
 		return oramBank;
 	}
 	/**
 	 * @param oramBank the oramBank to set
 	 */
-	public void setOramBank(OramBank oramBank) {
+	public void setOramBank(OramBank<T> oramBank) {
 		this.oramBank = oramBank;
 	}
 

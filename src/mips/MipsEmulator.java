@@ -10,7 +10,6 @@ import com.appcomsci.mips.binary.Reader;
 import com.appcomsci.mips.binary.SymbolTableEntry;
 import com.appcomsci.mips.memory.MemSetBuilder;
 import com.appcomsci.mips.memory.MemorySet;
-import com.appcomsci.mips.memory.OramBank;
 import com.appcomsci.sfe.common.Configuration;
 
 import flexsc.CVCompEnv;
@@ -44,7 +43,7 @@ public class MipsEmulator {
 	Configuration config;
 	private static String binaryFileName;	// should not be static FIXME
 	 
-	List<MemorySet> sets;
+	List<MemorySet<Boolean>> sets;
 	DataSegment instData; 
 	DataSegment memData;
 	int pcOffset; 
@@ -177,14 +176,14 @@ public class MipsEmulator {
 		return instBank;
 	}			
 	
-	public List<MemorySet> loadInstructionsMultiBanks(CompEnv<Boolean> env, SecureArray<Boolean> singleBank) throws Exception {
+	public List<MemorySet<Boolean>> loadInstructionsMultiBanks(CompEnv<Boolean> env, SecureArray<Boolean> singleBank) throws Exception {
 		System.out.println("entering loadInstructions");
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 		Boolean[] data; 
 		Boolean[] index;
 		SecureArray<Boolean> instructionBank;
 
-		for(MemorySet s:this.sets) {
+		for(MemorySet<Boolean> s:this.sets) {
 	        int i = s.getExecutionStep();
 	        if (env.getParty() == Party.Alice)
 	        	System.out.println("step: " + i + " size: " + s.size());
@@ -227,7 +226,7 @@ public class MipsEmulator {
 					//System.out.println(count);
 				}	
 			}
-			OramBank bank = new OramBank(instructionBank);
+			OramBank<Boolean> bank = new OramBank<Boolean>(instructionBank);
 			bank.setMaxAddress(maxAddr);
 			bank.setMinAddress(minAddr);
 			s.setOramBank(bank);
@@ -285,7 +284,7 @@ public class MipsEmulator {
 				if (!MULTIPLE_BANKS)
 					printOramBank(singleInstructionBank, lib, 60);
 				long startTime = System.nanoTime();
-				MemorySet currentSet = sets.get(0);
+				MemorySet<Boolean> currentSet = sets.get(0);
 				SecureArray<Boolean> currentBank;
 				while (true) {
 					currentBank = currentSet.getOramBank().getArray();
@@ -370,7 +369,7 @@ public class MipsEmulator {
 					//sta.flush();
 				}
 				
-				MemorySet currentSet = sets.get(0);
+				MemorySet<Boolean> currentSet = sets.get(0);
 				SecureArray<Boolean> currentBank;
 				while (true){
 					currentBank = currentSet.getOramBank().getArray();
@@ -529,7 +528,7 @@ public class MipsEmulator {
 		emulator.pcOffset = (int) ent.getAddress();
 		System.out.println("pcoffset: " + emulator.pcOffset);
 		emulator.dataOffset = (int) rdr.getDataAddress();
-		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+		MemSetBuilder<Boolean> b = new MemSetBuilder<Boolean>(config, binaryFileName);
 	    emulator.sets = b.build();
 		GenRunnable gen = emulator.new GenRunnable();
 		EvaRunnable env = emulator.new EvaRunnable();

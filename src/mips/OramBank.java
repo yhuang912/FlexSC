@@ -3,11 +3,11 @@ package mips;
 
 import oram.SecureArray;
 
-public class OramBank {
+public class OramBank<T> {
 	private int minIdx=-1;
 	private int maxIdx;
 	private boolean isAssociative;
-	private SecureArray<?> bank;
+	private SecureArray<T> bank;
 	/**
 	 ** stores the maximum address value in this timestep.  We probably won't need this after we have
 	 * working associative arrays.    
@@ -18,11 +18,11 @@ public class OramBank {
 	 * working associative arrays.    
 	 */
 	private long minAddress;
-	public OramBank(SecureArray<?> bankInp){
+	public OramBank(SecureArray<T> bankInp){
 		bank = bankInp;
 	}
 	public int getLengthOfIden(){ return bank.lengthOfIden; }
-	public SecureArray<?> getArray() { return bank; } 
+	public SecureArray<T> getArray() { return bank; } 
 	/**
 	 * @return the span of the address range.  This is the necessary size of the 
 	 * SecureArray, if we do not have access to an oblivious associative map.

@@ -54,7 +54,7 @@ import com.appcomsci.sfe.common.Configuration;
  * @author Allen McIntosh
  *
  */
-public class MemSetBuilder extends MipsProgram {
+public class MemSetBuilder<T> extends MipsProgram {
 	
 	/**
 	 * Contructor: Pick up configuration from a user-supplied config object
@@ -117,14 +117,14 @@ public class MemSetBuilder extends MipsProgram {
 	 * @throws IOException If the binary can't be read.
 	 * @throws MemSetBuilderException For some impossible conditions in the set builder
 	 */
-	public List<MemorySet> build()
+	public List<MemorySet<T>> build()
 			throws FileNotFoundException, IllegalArgumentException, IOException, MemSetBuilderException {
 
 		Reader rdr = new Reader(new File(getBinaryFileName()), getConfiguration());
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(getEntryPoint());	
 		DataSegment inst = rdr.getInstructions(getFunctionLoadList());
 		
-		List<MemorySet> sets = build(inst, ent);
+		List<MemorySet<T>> sets = build(inst, ent);
 		
 //		for(MemorySet s:sets) {
 //			s.getAddressMap(inst);
@@ -141,17 +141,17 @@ public class MemSetBuilder extends MipsProgram {
 	 * @return A list of MemorySet objects.  See the description for build().
 	 * @throws MemSetBuilderException For some impossible conditions in the set builder
 	 */
-	public List<MemorySet> build(DataSegment instructions, SymbolTableEntry entryPoint) throws  MemSetBuilderException{
+	public List<MemorySet<T>> build(DataSegment instructions, SymbolTableEntry entryPoint) throws  MemSetBuilderException{
 		
 		// This is the array to be returned.
-		List<MemorySet> execSets = new ArrayList<MemorySet>();
+		List<MemorySet<T>> execSets = new ArrayList<MemorySet<T>>();
 		
 		// The previous set, for forward chaining
-		MemorySet prevSet = null;
+		MemorySet<T> prevSet = null;
 		
 		// A hash map, for detecting recurring states.
 		// Each value in the hash map is a bucket of MemorySets
-		Map<MemorySet, ArrayList<MemorySet>> memSetMap = new HashMap<MemorySet, ArrayList<MemorySet>>();
+		Map<MemorySet<T>, ArrayList<MemorySet<T>>> memSetMap = new HashMap<MemorySet<T>, ArrayList<MemorySet<T>>>();
 		
 	    int maxSteps = getMaxProgramSteps();
 		
@@ -171,17 +171,17 @@ public class MemSetBuilder extends MipsProgram {
 			// Create a memory set that contains the current step number, and
 			// the address of all currently running threads.
 			
-			MemorySet currentSet = new MemorySet(executionStep, threads);
+			MemorySet<T> currentSet = new MemorySet<T>(executionStep, threads);
 			
 			// Have we seen this set before?
 			
-			ArrayList<MemorySet> bucket = memSetMap.get(currentSet);
+			ArrayList<MemorySet<T>> bucket = memSetMap.get(currentSet);
 			if(bucket == null) { // Definitely not
-				bucket = new ArrayList<MemorySet>();
+				bucket = new ArrayList<MemorySet<T>>();
 				memSetMap.put(currentSet, bucket);
 			} else {
 				// Maybe.  Does bucket contain a set equal to currentSet?
-				for(MemorySet s:bucket) {
+				for(MemorySet<T> s:bucket) {
 					if(currentSet.equals(s)) {
 						// Found an equivalent set.
 						if(prevSet == null) {
@@ -253,7 +253,7 @@ public class MemSetBuilder extends MipsProgram {
 								}
 							} else {
 								// Flying leap
-								currentSet = new MemorySet(executionStep+1, instructions);
+								currentSet = new MemorySet<T>(executionStep+1, instructions);
 								execSets.add(executionStep+1, currentSet);
 								prevSet.setNextMemorySet(currentSet);
 								currentSet.setNextMemorySet(currentSet);
@@ -262,7 +262,7 @@ public class MemSetBuilder extends MipsProgram {
 							break;
 							// Flying leap with link
 						case OP_JALR:
-							currentSet = new MemorySet(executionStep+1, instructions);
+							currentSet = new MemorySet<T>(executionStep+1, instructions);
 							execSets.add(executionStep+1, currentSet);
 							prevSet.setNextMemorySet(currentSet);
 							currentSet.setNextMemorySet(currentSet);
@@ -433,23 +433,23 @@ public class MemSetBuilder extends MipsProgram {
 		}
 		
 		// Record which sets use memory
-		for(MemorySet s:execSets) {
+		for(MemorySet<T> s:execSets) {
 			s.setUsesMemory(instructions);
 		}
 		return execSets;
 		
 	}
 	public static void main(String args[]) throws IOException, MemSetBuilderException {
-		MemSetBuilder b = null;
+		MemSetBuilder<Boolean> b = null;
 		try {
-			b = new MemSetBuilder(args);
+			b = new MemSetBuilder<Boolean>(args);
 		} catch(CmdLineParser.OptionException e) {
 			System.err.println(e.getMessage());
 			printUsageStatic();
 			System.exit(2);
 		}
-		List<MemorySet> sets = b.build();
-		for(MemorySet m:sets) {
+		List<MemorySet<Boolean>> sets = b.build();
+		for(MemorySet<Boolean> m:sets) {
 			System.err.println(m.toString());
 		}
 	}
