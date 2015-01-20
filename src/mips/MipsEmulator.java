@@ -185,8 +185,7 @@ public class MipsEmulator {
 
 		for(MemorySet<Boolean> s:this.sets) {
 	        int i = s.getExecutionStep();
-	        if (i == 46)
-	        	System.out.println("stop");
+	        
 	        if (env.getParty() == Party.Alice)
 	        	System.out.println("step: " + i + " size: " + s.size());
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
