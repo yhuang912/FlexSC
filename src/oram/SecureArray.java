@@ -11,7 +11,7 @@ public class SecureArray<T> {
 	public TrivialPrivateOram<T> trivialOram = null;
 	public RecursiveCircuitOram<T> circuitOram = null;
 	public int lengthOfIden;
-
+CompEnv<T> env;
 	public SecureArray(CompEnv<T> env, int N, int dataSize) throws Exception {
 		useTrivialOram = N <= threshold;
 		if (useTrivialOram) {
@@ -21,6 +21,7 @@ public class SecureArray<T> {
 			circuitOram = new RecursiveCircuitOram<T>(env, N, dataSize);
 			lengthOfIden = circuitOram.lengthOfIden;
 		}
+		this.env = env;
 	}
 
 	public T[] readAndRemove(T[] iden) {
@@ -35,10 +36,13 @@ public class SecureArray<T> {
 		
 	}
 	public T[] read(T[] iden) {
+		T[] res = null;
 		if (useTrivialOram)
-			return trivialOram.read(iden);
+			res= trivialOram.read(iden);
 		else
-			return circuitOram.read(iden);
+			res= circuitOram.read(iden);
+		env.flush();
+		return res;
 	}
 
 	public void write(T[] iden, T[] data) throws Exception {
@@ -46,6 +50,7 @@ public class SecureArray<T> {
 			trivialOram.write(iden, data);
 		else
 			circuitOram.write(iden, data);
+		env.flush();
 	}
 	
 	public void conditionalWrite(T[] iden, T[]data, T condition) {
