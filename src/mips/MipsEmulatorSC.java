@@ -185,7 +185,7 @@ public class MipsEmulatorSC {
 
 		for(MemorySet<GCSignal> s:this.sets) {
 	        int i = s.getExecutionStep();
-	        System.out.println(i);
+	        //System.out.println(i);
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
 	        long maxAddr = m.lastEntry().getKey();
 	        if (maxAddr == 0)
@@ -276,8 +276,8 @@ public class MipsEmulatorSC {
 				SecureArray<GCSignal> currentBank;
 				while (true) {
 					currentBank = currentSet.getOramBank().getArray();
-//					System.out.println("count: " + count);
-//					count++;
+					System.out.println("count: " + count);
+					count++;
 //					System.out.println("execution step: " + currentSet.getExecutionStep());
 //					printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
 					if (MULTIPLE_BANKS)
@@ -359,9 +359,11 @@ public class MipsEmulatorSC {
 				SecureArray<GCSignal> currentBank;
 				while (true){
 					currentBank = currentSet.getOramBank().getArray();
+					if (MULTIPLE_BANKS)
+						pcOffset = (int) currentSet.getOramBank().getMinAddress();
 					//printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
-					newInst = mem.getInst(currentBank, pc, 0); 
-					mem.func(reg, memBank, newInst, 0);
+					newInst = mem.getInst(currentBank, pc, pcOffset); 
+					mem.func(reg, memBank, newInst, dataOffset);
 					testHalt = testTerminate(reg, newInst, lib);
 
 					os.flush();
