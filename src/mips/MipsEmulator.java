@@ -377,8 +377,8 @@ public class MipsEmulator {
 				while (true){
 					currentBank = currentSet.getOramBank().getArray();
 					printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
-					newInst = mem.getInst(currentBank, pc, 0); 
-					mem.func(reg, memBank, newInst, 0);
+					newInst = mem.getInst(currentBank, pc, pcOffset); 
+					mem.func(reg, memBank, newInst, dataOffset);
 					testHalt = testTerminate(reg, newInst, lib);
 
 					os.flush();
