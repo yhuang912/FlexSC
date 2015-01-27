@@ -44,6 +44,8 @@ public class MipsEmulatorSC {
 	private static String binaryFileName;	// should not be static FIXME
 	 
 	List<MemorySet<GCSignal>> sets;
+	List<MemorySet<GCSignal>> sets2;
+
 	DataSegment instData; 
 	DataSegment memData;
 	int pcOffset; 
@@ -176,14 +178,15 @@ public class MipsEmulatorSC {
 		return instBank;
 	}			
 	
-	public List<MemorySet<GCSignal>> loadInstructionsMultiBanks(CompEnv<GCSignal> env, SecureArray<GCSignal> singleBank) throws Exception {
+	public List<MemorySet<GCSignal>> loadInstructionsMultiBanks(CompEnv<GCSignal> env, SecureArray<GCSignal> singleBank,
+			List<MemorySet<GCSignal>> ownSet) throws Exception {
 		System.out.println("entering loadInstructions");
 		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 		GCSignal[] data; 
 		GCSignal[] index;
 		SecureArray<GCSignal> instructionBank;
 
-		for(MemorySet<GCSignal> s:this.sets) {
+		for(MemorySet<GCSignal> s:ownSet) {
 	        int i = s.getExecutionStep();
 	        //System.out.println(i);
 	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
@@ -222,7 +225,7 @@ public class MipsEmulatorSC {
 			s.setOramBank(bank);
 		}		
 		System.out.println("exiting getInstructions");
-		return sets;
+		return ownSet;
 	}
 	
 	//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
@@ -264,7 +267,7 @@ public class MipsEmulatorSC {
 				if (!MULTIPLE_BANKS){
 					singleInstructionBank = loadInstructionsSingleBank(env);					
 				}
-				loadInstructionsMultiBanks(env, singleInstructionBank);
+				loadInstructionsMultiBanks(env, singleInstructionBank, sets);
 				SecureArray<GCSignal> memBank = getMemory(env);
 				
 				GCSignal[] pc = lib.toSignals(pcOffset, WORD_SIZE);
@@ -342,7 +345,7 @@ public class MipsEmulatorSC {
 				SecureArray<GCSignal> singleInstructionBank = null; 
 				if (!MULTIPLE_BANKS)
 					singleInstructionBank = loadInstructionsSingleBank(env);
-				loadInstructionsMultiBanks(env, singleInstructionBank);
+				loadInstructionsMultiBanks(env, singleInstructionBank, sets2);
 				SecureArray<GCSignal> memBank = getMemory(env);
 				//instantiate new secure array for memory once we separate instructions from memory.
 					
@@ -355,7 +358,7 @@ public class MipsEmulatorSC {
 					//sta.flush();
 				}
 				
-				MemorySet<GCSignal> currentSet = sets.get(0);
+				MemorySet<GCSignal> currentSet = sets2.get(0);
 				SecureArray<GCSignal> currentBank;
 				while (true){
 					currentBank = currentSet.getOramBank().getArray();
@@ -518,7 +521,8 @@ public class MipsEmulatorSC {
 		emulator.dataOffset = (int) rdr.getDataAddress();
 		MemSetBuilder<GCSignal> b = new MemSetBuilder<GCSignal>(config, binaryFileName);
 	    emulator.sets = b.build();
-		GenRunnable gen = emulator.new GenRunnable();
+	    emulator.sets2 = b.build();
+	    GenRunnable gen = emulator.new GenRunnable();
 		EvaRunnable env = emulator.new EvaRunnable();
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
