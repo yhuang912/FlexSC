@@ -27,12 +27,16 @@ void MEM.func(int32[32]reg,
 
    int32 tmpAddress = reg[rs] + unsignExt - dataOffset;
    int32 tmpindex = (tmpAddress)>>2;
+   int32 mem_tmp_r = mem[tmpindex];
+   int32 reg_rt_r = reg[rt];
+   int32 mem_tmp_w = mem_tmp_r;
+   int32 reg_rt_w = reg_rt_r;
    if(op == OP_LW)
-      reg[rt] = mem[tmpindex];
+      reg_rt_w = mem_tmp_r;
    else if(op == OP_SW){
-      mem[tmpindex] = reg[rt];
+      mem_tmp_w = reg_rt_r;
    } else if(op == OP_LB){
-	   int32 tempRT = mem[tmpindex];
+	   int32 tempRT = mem_tmp_r;
 	   int32 byteShiftTwo = ((tmpAddress << 30) >> 31);
 	   int32 byteShiftOne = ((tmpAddress << 31) >> 31);
 	   if (byteShiftTwo != 0 && byteShiftOne != 0)
@@ -43,8 +47,10 @@ void MEM.func(int32[32]reg,
 	   		   tempRT = ((tempRT << 8) >> 24);
 	   else if (byteShiftTwo == 0 && byteShiftOne == 0)
 	   		   tempRT = (tempRT >> 24);
-	   reg[rt] = tempRT;
+	   reg_rt_w = tempRT;
    }
+   reg[rt] = reg_rt_w;
+   mem[tmpindex] = mem_tmp_w;
 
    //return newInst;
 }

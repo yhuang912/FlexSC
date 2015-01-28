@@ -6,12 +6,26 @@ import java.util.Arrays;
 import flexsc.CompEnv;
 
 public class SecureArray<T> {
-	static final int threshold = 256;
+	int threshold = 256;
 	boolean useTrivialOram = false;
 	public TrivialPrivateOram<T> trivialOram = null;
 	public RecursiveCircuitOram<T> circuitOram = null;
 	public int lengthOfIden;
-CompEnv<T> env;
+	CompEnv<T> env;
+
+	public SecureArray(CompEnv<T> env, int N, int dataSize, int threshold) throws Exception {
+		this.threshold = threshold;
+		useTrivialOram = N <= threshold;
+		if (useTrivialOram) {
+			trivialOram = new TrivialPrivateOram<T>(env, N, dataSize);
+			lengthOfIden = trivialOram.lengthOfIden;
+		} else {
+			circuitOram = new RecursiveCircuitOram<T>(env, N, dataSize);
+			lengthOfIden = circuitOram.lengthOfIden;
+		}
+		this.env = env;
+	}
+
 	public SecureArray(CompEnv<T> env, int N, int dataSize) throws Exception {
 		useTrivialOram = N <= threshold;
 		if (useTrivialOram) {
@@ -32,8 +46,8 @@ CompEnv<T> env;
 		if (useTrivialOram)
 			trivialOram.setInitialValue(inital);
 		else
-			 circuitOram.setInitialValue(inital);
-		
+			circuitOram.setInitialValue(inital);
+
 	}
 	public T[] read(T[] iden) {
 		T[] res = null;
@@ -52,12 +66,12 @@ CompEnv<T> env;
 			circuitOram.write(iden, data);
 		env.flush();
 	}
-	
+
 	public void conditionalWrite(T[] iden, T[]data, T condition) {
 		if(useTrivialOram) {
-		T[] readData = trivialOram.readAndRemove(iden);
-		T[] toAdd = trivialOram.lib.mux(readData, data, condition);
-		trivialOram.putBack(iden, toAdd);
+			T[] readData = trivialOram.readAndRemove(iden);
+			T[] toAdd = trivialOram.lib.mux(readData, data, condition);
+			trivialOram.putBack(iden, toAdd);
 		}
 		else {
 			//op == 1 means write, 0 means read
