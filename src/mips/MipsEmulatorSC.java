@@ -32,7 +32,8 @@ import java.util.TreeMap;
 public class MipsEmulatorSC {
 
 	static final int REGISTER_SIZE = 32;
-	static final int MEM_SIZE = 72;// 160 < threshold for func1
+	static final int MEM_SIZE = 255;// 160 < threshold for func1
+	static final int THRESHOLD = 254;
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.REAL;
@@ -160,7 +161,7 @@ public class MipsEmulatorSC {
 		instructions = this.instData.getDataAsBoolean(); 
 		
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
-		SecureArray<GCSignal> instBank = new SecureArray<GCSignal>(env, numInst, WORD_SIZE, 512);
+		SecureArray<GCSignal> instBank = new SecureArray<GCSignal>(env, numInst, WORD_SIZE, THRESHOLD);
 		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 		GCSignal[] data; 
 		GCSignal[] index;
@@ -233,7 +234,7 @@ public class MipsEmulatorSC {
 		System.out.println("entering getMemoryGen");
 		boolean memory[][] = memData.getDataAsBoolean();	
 		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
-		SecureArray<GCSignal> memBank = new SecureArray<GCSignal>(env, MEM_SIZE, WORD_SIZE, 512);
+		SecureArray<GCSignal> memBank = new SecureArray<GCSignal>(env, MEM_SIZE, WORD_SIZE, THRESHOLD);
 		GCSignal[] index; 
 		GCSignal[] data;
 		for (int i = 0; i < memData.getDataLength(); i++){
