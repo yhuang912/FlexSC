@@ -12,7 +12,7 @@ import gc.GCSignal;
 public class TestCircuitOramRec {
 
 	public  static void main(String args[]) throws Exception {
-		for(int i = 20; i <=20 ; i++) {
+		for(int i = 8; i <=8 ; i++) {
 			GenRunnable gen = new GenRunnable(12345, i, 3, 32, 8, 6);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);

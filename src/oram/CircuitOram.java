@@ -57,9 +57,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 
 	public void flushOneTime(boolean[] pos) {
 		Block<T>[][] scPath = getPath(pos);
-
 		lib.flush(scPath, pos, scQueue);
-
 		putPath(scPath, pos);
 	}
 
@@ -74,11 +72,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		putPath(scPath, pos);
 
 		if (RandomWhenNotFound) {
-			PlainBlock b = randomBlock();
-			Block<T> scb = inputBlockOfClient(b);
-			Block<T> finalRes = lib.mux(res, scb, res.isDummy);
-
-			return finalRes.data;
+			return lib.mux(res.data, lib.randBools(res.data.length), res.isDummy);
 		} else {
 			return lib.mux(res.data, lib.zeros(res.data.length), res.isDummy);
 		}
@@ -88,7 +82,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
 		lib.add(scQueue, b);
 
-		env.flush();
+//		env.flush();
 		ControlEviction();
 	}
 
