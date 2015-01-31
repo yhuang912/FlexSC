@@ -49,7 +49,6 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
    int32 rs = ((inst << 6) >> 27);
    int32 rd = ((inst << 16)>>27);
    int32 shamt = ((inst << 21)>>27);
-   int32 reg_rs, reg_rt, reg_rd;
    int32 unsignExt = ((inst << 16)>>16);
    int32 zeroExt = unsignExt;
    int32 funct = (inst << 26) >> 26;
@@ -59,38 +58,38 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
 
    //printf("op: %d, inst: %d", op, ((inst << 26)>>26));
 
-   reg_rs = reg[rs];
-   reg_rt = reg[rt];
-   reg_rd = reg[rd];
+   int32 reg_rs_r = reg[rs];
+   int32 reg_rt_r = reg[rt];
+   int32 reg_rd_w = reg[rd];
+   int32 reg_rt_w = reg_rt_r;
+
    int2 op_type = this.checkType(op);
    if(op_type == OP_CODE_I) {
       if (op == OP_ADDIU) {
-         reg_rt = reg_rs + (unsignExt);
+         reg_rt_w = reg_rs_r + (unsignExt);
       } else if (op == OP_ANDI) {
-         reg_rt = reg_rs & zeroExt;
+         reg_rt_w = reg_rs_r & zeroExt;
       } else if (op == OP_LUI) {
-	reg_rt = (zeroExt << 16);
+	reg_rt_w = (zeroExt << 16);
       }
-      reg[rt] = reg_rt;
    }
    else if (op_type == OP_CODE_R) {//R type
       if (funct == FUNCT_ADDU) {
-         reg_rd = reg_rs + reg_rt;
+         reg_rd_w = reg_rs_r + reg_rt_r;
       } else if (funct == FUNCT_XOR) {
-         reg_rd = reg_rs ^ reg_rt;
+         reg_rd_w = reg_rs_r ^ reg_rt_r;
       } else if (funct == FUNCT_SLT) {
-         if (reg_rs < reg_rt) reg_rd = 1;
-         else reg_rd = 0;
+         if (reg_rs_r < reg_rt_r) reg_rd_w = 1;
+         else reg_rd_w = 0;
       } else if (funct == FUNCT_SUBU) {
-         reg_rd = reg_rs - reg_rt;
+         reg_rd_w = reg_rs_r - reg_rt_r;
 } else if (funct == FUNCT_SRL){
-      reg_rd = SRL(reg_rt, shamt);//(reg_rt >> shamt);    
+      reg_rd_w = SRL(reg_rt_r, shamt);//(reg_rt >> shamt);    
     } else if (funct == FUNCT_SLL){
-      reg_rd = SLL(reg_rt, shamt);//(reg_rt << shamt);    
+      reg_rd_w = SLL(reg_rt_r, shamt);//(reg_rt << shamt);    
       } else if (funct == FUNCT_OR){
-         reg_rd = (reg_rt | reg_rs);    
+         reg_rd_w = (reg_rt_r | reg_rs_r);    
       }       
-      reg[rd] = reg_rd;
    }
    else {
 //      int32 reg_31 = reg[31];
@@ -102,7 +101,7 @@ int32 oldPC = pc;
       } 
       else if ( op == OP_BAL) {
 //         reg_31 = pc+ 8;
-         if (reg_rt >= 0)
+         if (reg_rt_r >= 0)
             pc = pc + (unsignExt << 2);
          // Dnote: I think we don't want this line?  Is this an unconditional branch?
          //pc = pc + 4;
@@ -111,14 +110,15 @@ int32 oldPC = pc;
       if(op == OP_JAL || op == OP_BAL)
          reg[31] = oldPC + 8;
    }
-
+reg[rd] = reg_rd_w;
+reg[rt] = reg_rt_w;
 
    // then process pc
    if (op == 0 && funct == FUNCT_JR) {
-      pc = reg_rs;
+      pc = reg_rs_r;
    } else if (op == 3) { // OP_JAL
       pc = (inst << 6) >> 6;
-   } else if ((op == OP_BNE && reg_rs != reg_rt) || (op == OP_BEQ && reg_rs == reg_rt)) { //OP_BNE and OP_BEQ
+   } else if ((op == OP_BNE && reg_rs_r != reg_rt_r) || (op == OP_BEQ && reg_rs_r == reg_rt_r)) { //OP_BNE and OP_BEQ
       pc = pc + 4 +(unsignExt << 2);
    } else
       pc = pc + 4;
