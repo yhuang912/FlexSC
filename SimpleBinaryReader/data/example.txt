@@ -1,8 +1,0 @@
-S=/opt/mipsel/usr/bin/mipsel-linux-gnu
-cat <<'!' > cmp1.c
-int sfe_main(int a, int b) { return a>b; }
-int main(int argc, char **argv) { sfe_main(1,2); return 0; }
-!
-$S-gcc -O0 -mno-explicit-relocs -o cmp1 cmp1.c
-
-/opt/mipsel/usr/bin/mipsel-linux-gnu-llvm-objdump -disassemble -t -r -s -section-headers

@@ -1,2 +1,0 @@
-/opt/mipsel/usr/bin/mipsel-linux-gnu-gcc -O0 -mno-explicit-relocs -o $1 $1.c;
-/opt/mipsel/usr/bin/mipsel-linux-gnu-llvm-objdump -disassemble -t -r -s -section-headers $1 > $1.s;
