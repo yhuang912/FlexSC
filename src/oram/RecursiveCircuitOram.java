@@ -33,9 +33,6 @@ public class RecursiveCircuitOram<T> {
 		init(env, N, dataSize, 1<<6, 8, 3, 80);
 	}
 
-	public void setInitialValue(int initial) {
-		clients.get(0).setInitialValue(initial);
-	}
 	void init(CompEnv<T> env, int N, int dataSize, int cutoff, int recurFactor,
 			int capacity, int sp) {
 		this.is = env.is;

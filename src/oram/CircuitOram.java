@@ -63,10 +63,6 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		putPath(scPath, pos);
 	}
 
-	int initalValue = 0;
-	public void setInitialValue(int intial) {
-		initalValue = intial;
-	}
 	public T[] readAndRemove(T[] scIden, boolean[] pos,
 			boolean RandomWhenNotFound) {
 		Block<T>[][] scPath = getPath(pos);
@@ -115,39 +111,5 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		T[] toWrite = lib.mux(r, scData, op);
 		putBack(scIden, scNewPos, toWrite);
 		return toWrite;
-	}
-
-	public T[] conditionalReadAndRemove(T[] scIden, T[] pos, T condition) {
-		// Utils.print(env, "rar: iden:", scIden, pos, condition);
-		scIden = Arrays.copyOf(scIden, lengthOfIden);
-		T[] scPos = Arrays.copyOf(pos, lengthOfPos);
-		T[] randbools = lib.randBools(scPos.length);
-		T[] posToUse = lib.mux(randbools, scPos, condition);
-
-		boolean[] path = lib.declassifyToBoth(posToUse);
-
-		Block<T>[][] scPath = getPath(path);
-
-		Block<T> res = lib.conditionalReadAndRemove(scPath, scIden, condition);
-		Block<T> res2 = lib
-				.conditionalReadAndRemove(scQueue, scIden, condition);
-		res = lib.mux(res, res2, res.isDummy);
-
-		putPath(scPath, path);
-		env.flush();
-		return lib.mux(res.data, lib.toSignals(initalValue, res.data.length), res.isDummy);
-	}
-
-	public int cnttt = 0;
-	public void conditionalPutBack(T[] scIden, T[] scNewPos, T[] scData,
-			T condition) {
-		
-		env.flush();
-		scIden = Arrays.copyOf(scIden, lengthOfIden);
-
-		Block<T> b = new Block<T>(scIden, scNewPos, scData, lib.SIGNAL_ZERO);
-		lib.conditionalAdd(scQueue, b, condition);
-		env.flush();
-		ControlEviction();
 	}
 }

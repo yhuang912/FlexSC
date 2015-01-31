@@ -42,13 +42,7 @@ public class SecureArray<T> {
 		return circuitOram.clients.get(0).readAndRemove(iden, 
 				Arrays.copyOfRange(circuitOram.clients.get(0).lib.declassifyToBoth(iden), 0, circuitOram.clients.get(0).lengthOfPos), false);
 	}
-	public void setInitialValue(int inital) {
-		if (useTrivialOram)
-			trivialOram.setInitialValue(inital);
-		else
-			circuitOram.setInitialValue(inital);
 
-	}
 	public T[] read(T[] iden) {
 		T[] res = null;
 		if (useTrivialOram)
