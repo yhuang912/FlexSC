@@ -88,6 +88,8 @@
 #define OP_SLTU		43
 
 struct CPU{};
+int32 SLL(int32 m, int32 n) = native intLib.leftPrivateShift;
+int32 SRL(int32 m, int32 n) = native intLib.rightPrivateShift;
 
 int3 CPU.checkType(int32 op) {
 	int3 ret;
@@ -109,21 +111,21 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	int32 rs = ((inst << 6) >> 27);
 	int32 rd = ((inst << 16)>>27);
 	int32 shamt = ((inst << 21)>>27);
-	int32 reg_rs, reg_rt, reg_rd;
 	int32 unsignExt = inst & 0xffff;
 	int32 zeroExt = unsignExt;
 	int32 funct = inst & 0x3f;
 	// int32 regimm = rt;	// Use rt for faster but more opaque code
 	int32 newpc;
+	// These declarations must precede the "if"
+	int32 reg_rs_r = reg[rs];
+	int32 reg_rt_r = reg[rt];
+	int32 reg_rd_w = reg[rd];
+	int32 reg_rt_w = reg_rt_r;
 
 	if (unsignExt &0x00008000 != 0)
 		unsignExt = unsignExt | 0xffff0000;
 
-	reg_rs = reg[rs];
-	reg_rt = reg[rt];
-	reg_rd = reg[rd];
 	newpc = pc + 4;
-
 
 	int3 op_type = this.checkType(op);
 %ACTIONS
@@ -131,25 +133,25 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 }
 %OP_ADDI
 	MISSING TRAP
-	reg_rt = reg_rs + unsignExt;
+	reg_rt_w = reg_rs_r + unsignExt;
 %OP_ADDIU
-	reg_rt = reg_rs + unsignExt;
+	reg_rt_w = reg_rs_r + unsignExt;
 %OP_SLTI
 	MISSING
 %OP_SLTIU
 	MISSING
 %OP_ANDI
-	reg_rt = reg_rs & zeroExt;
+	reg_rt_w = reg_rs_r & zeroExt;
 %OP_ORI
-	reg_rt = reg_rs | zeroExt;
+	reg_rt_w = reg_rs_r | zeroExt;
 %OP_XORI
-	reg_rt = reg_rs ^ zeroExt;
+	reg_rt_w = reg_rs_r ^ zeroExt;
 %OP_LUI
-	reg_rt = zeroExt << 16;
+	reg_rt_w = zeroExt << 16;
 %OP_SLL
-	MISSING
+	reg_rd_w = SLL(reg_rt_r, shamt);//(reg_rt << shamt);
 %OP_SRL
-	MISSING
+	reg_rd_w = SRL(reg_rt_r, shamt);//(reg_rt >> shamt);
 %OP_SRA
 	MISSING
 %OP_SLLV
@@ -159,9 +161,9 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 %OP_SRAV
 	MISSING
 %OP_MOVZ
-	if(reg_rt == 0) reg_rd = reg_rs;
+	if(reg_rt_r == 0) reg_rd_w = reg_rs_r;
 %OP_MOVN
-	if(reg_rt != 0) reg_rd = reg_rs;
+	if(reg_rt_r != 0) reg_rd_w = reg_rs_r;
 %OP_MFHI
 	MISSING
 %OP_MTHI
@@ -180,26 +182,36 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	MISSING
 %OP_ADD
 	MISSING TRAP
-	reg_rd = reg_rs + reg_rt;
+	reg_rd_w = reg_rs_r + reg_rt_r;
 %OP_ADDU
-	reg_rd = reg_rs + reg_rt;
+	reg_rd_w = reg_rs_r + reg_rt_r;
 %OP_SUB
 	MISSING TRAP
-	reg_rd = reg_rs - reg_rt;
+	reg_rd_w = reg_rs_r - reg_rt_r;
 %OP_SUBU
-	reg_rd = reg_rs - reg_rt;
+	reg_rd_w = reg_rs_r - reg_rt_r;
 %OP_AND
-	reg_rd = reg_rs & reg_rt;
+	reg_rd_w = reg_rs_r & reg_rt_r;
 %OP_OR
-	reg_rd = reg_rs | reg_rt;
+	reg_rd_w = reg_rs_r | reg_rt_r;
 %OP_XOR
-	reg_rd = reg_rs ^ reg_rt;
+	reg_rd_w = reg_rs_r ^ reg_rt_r;
 %OP_NOR
-	reg_rd = ~(reg_rs | reg_rt);
+	// ~ operator is not implemented
+	// reg_rd_w = ~(reg_rs_r | reg_rt_r);
+	// UGLINESS
+	reg_rd_w = 0xffffffff ^ (reg_rs_r | reg_rt_r);
 %OP_SLT
-	if(reg_rs < reg_rt) reg_rd = 1; else reg_rd = 0;
+	if(reg_rs_r < reg_rt_r) reg_rd_w = 1; else reg_rd_w = 0;
 %OP_SLTU
-	if((unsigned)reg_rs < (unsigned)reg_rt) reg_rd = 1; else reg_rd = 0;
+	MISSING
+	// No casts and no unsigned types
+	//if((uint32)reg_rs_r < (uint32)reg_rt_r) reg_rd_w = 1; else reg_rd_w = 0;
+	// Following code throws compiler into infinite loop
+	// int64 u_reg_rs_r;
+	// int64 u_reg_rt_r;
+	// u_reg_rs_r = reg_rs_r; u_reg_rs_r = u_reg_rs_r & 0xffffffff;
+	// u_reg_rt_r = reg_rt_r; u_reg_rt_r = u_reg_rt_r & 0xffffffff;
 %OP_J
 	newpc = (newpc&0xf0000000) | ((inst<<2)&0xffffffc);
 %OP_JAL
@@ -207,36 +219,36 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	newpc = (newpc&0xf0000000) | ((inst<<2)&0xffffffc);
 %OP_JR
 	/* This is fine as a FUNCT instruction, it just doesn't touch rd */
-	newpc = reg_rs;
+	newpc = reg_rs_r;
 %OP_JALR
 	/* This is fine as FUNCT instruction */
-	reg_rd = newpc + 4;
-	newpc = reg_rs;
+	reg_rd_w = newpc + 4;
+	newpc = reg_rs_r;
 %OP_BNE
-	if(reg_rs != reg_rt)
+	if(reg_rs_r != reg_rt_r)
 		newpc = newpc + (unsignExt<<2);
 %OP_BEQ
-	if(reg_rs == reg_rt)
+	if(reg_rs_r == reg_rt_r)
 		newpc = newpc + (unsignExt<<2);
 %OP_BLEZ
-    if(reg_rs <= 0)
+    if(reg_rs_r <= 0)
     	newpc = newpc + (unsignExt<<2);
 %OP_BGTZ
-	if(reg_rs > 0)
+	if(reg_rs_r > 0)
 		newpc = newpc + (unsignExt<<2);
 %OP_BGEZ
-	if(reg_rs >= 0)
+	if(reg_rs_r >= 0)
 		newpc = newpc + (unsignExt<<2);
 %OP_BLTZ
-	if(reg_rs < 0)
+	if(reg_rs_r < 0)
 		newpc = newpc + (unsignExt<<2);
 %OP_BLTZAL
-	if(reg_rs < 0) {
+	if(reg_rs_r < 0) {
 		reg[31] = newpc + 4;
 		newpc = newpc + (unsignExt<<2);
 	}
 %OP_BGEZAL
-	if(reg_rs >= 0) {
+	if(reg_rs_r >= 0) {
 		reg[31] = newpc + 4;
 		newpc = newpc + (unsignExt<<2);
 	}

@@ -89,11 +89,11 @@ public class CpuBuilder {
 		}
 		switch(type) {
 		case I:
-			sb.append("\t\treg[rt] = reg_rt;");
+			sb.append("\t\treg[rt] = reg_rt_w;");
 			sb.append(lineSeparator);
 			break;
 		case FUNCT:
-			sb.append("\t\treg[rd] = reg_rd;");
+			sb.append("\t\treg[rd] = reg_rd_w;");
 			sb.append(lineSeparator);
 			break;
 		}
