@@ -121,7 +121,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	int32 reg_rs_r = reg[rs];
 	int32 reg_rt_r = reg[rt];
 	int32 reg_rd_w = reg[rd];
-	int32 reg_ret_w = reg[31];
+	int32 reg_ret_w = 0;
 	int32 reg_rt_w = reg_rt_r;
 
 	if (unsignExt &0x00008000 != 0)
