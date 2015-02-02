@@ -110,6 +110,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	int32 rt = ((inst << 11)>>27);
 	int32 rs = ((inst << 6) >> 27);
 	int32 rd = ((inst << 16)>>27);
+	int32 rret = 0;
 	int32 shamt = ((inst << 21)>>27);
 	int32 unsignExt = inst & 0xffff;
 	int32 zeroExt = unsignExt;
@@ -120,6 +121,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	int32 reg_rs_r = reg[rs];
 	int32 reg_rt_r = reg[rt];
 	int32 reg_rd_w = reg[rd];
+	int32 reg_ret_w = reg[31];
 	int32 reg_rt_w = reg_rt_r;
 
 	if (unsignExt &0x00008000 != 0)
@@ -128,9 +130,12 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	newpc = pc + 4;
 
 	int3 op_type = this.checkType(op);
+	if(op_type != OP_CODE_R)
+		rd = 0;
 %ACTIONS
 	reg[rt] = reg_rt_w;
 	reg[rd] = reg_rd_w;
+	reg[rret] = reg_ret_w;
 	reg[0] = 0;
 	return newpc;
 }
@@ -220,7 +225,8 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 %OP_J
 	newpc = (newpc&0xf0000000) | ((inst<<2)&0xffffffc);
 %OP_JAL
-	reg[31] = newpc + 4;
+	reg_ret_w = newpc + 4;
+	rret = 31;
 	newpc = (newpc&0xf0000000) | ((inst<<2)&0xffffffc);
 %OP_JR
 	/* This is fine as a FUNCT instruction, it just doesn't touch rd */
@@ -249,12 +255,14 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 		newpc = newpc + (unsignExt<<2);
 %OP_BLTZAL
 	if(reg_rs_r < 0) {
-		reg[31] = newpc + 4;
+		reg_ret_w = newpc + 4;
+		rret = 31;
 		newpc = newpc + (unsignExt<<2);
 	}
 %OP_BGEZAL
 	if(reg_rs_r >= 0) {
-		reg[31] = newpc + 4;
+		reg_ret_w = newpc + 4;
+		rret = 31;
 		newpc = newpc + (unsignExt<<2);
 	}
 %OP_LB
