@@ -129,6 +129,9 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 
 	int3 op_type = this.checkType(op);
 %ACTIONS
+	reg[rt] = reg_rt_w;
+	reg[rd] = reg_rd_w;
+	reg[0] = 0;
 	return newpc;
 }
 %OP_ADDI
@@ -137,9 +140,11 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 %OP_ADDIU
 	reg_rt_w = reg_rs_r + unsignExt;
 %OP_SLTI
-	MISSING
+	if(reg_rs_r < unsignExt) reg_rt_w = 1; else reg_rt_w = 0;
 %OP_SLTIU
 	MISSING
+	// See SLTU
+	// if((uint32)reg_rs_r < (unit32)unsignExt) reg_rt_w = 1; else reg_rt_w = 0;
 %OP_ANDI
 	reg_rt_w = reg_rs_r & zeroExt;
 %OP_ORI
