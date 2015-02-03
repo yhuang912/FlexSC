@@ -43,7 +43,10 @@ public class SecureArray<T> {
 				Arrays.copyOfRange(circuitOram.clients.get(0).lib.declassifyToBoth(iden), 0, circuitOram.clients.get(0).lengthOfPos), false);
 	}
 
+	
 	public T[] read(T[] iden) {
+		iden = Arrays.copyOf(iden, lengthOfIden);
+
 		T[] res = null;
 		if (useTrivialOram)
 			res= trivialOram.read(iden);
@@ -54,6 +57,8 @@ public class SecureArray<T> {
 	}
 
 	public void write(T[] iden, T[] data) throws Exception {
+		iden = Arrays.copyOf(iden, lengthOfIden);
+
 		if (useTrivialOram)
 			trivialOram.write(iden, data);
 		else
