@@ -1,5 +1,7 @@
 package oram;
 
+import java.util.TreeMap;
+
 import org.junit.Test;
 
 import util.Utils;
@@ -28,24 +30,25 @@ public class TestTrivialObliviousMap {
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> gen = CompEnv.getEnv(Mode.REAL, Party.Alice,
 						is, os);
-				TrivialObliviousMap<GCSignal> client = new TrivialObliviousMap<GCSignal>(gen, N, indexSize, dataSize);
-
-				int[] keys = new int[N];
-				int[] values = new int[N];
-				for(int i = 0; i < N; ++i) {
-					keys[i] = CompEnv.rnd.nextInt();
-					values[i] = CompEnv.rnd.nextInt();
-				}
-				client.initialize(keys, values, Party.Alice);
+				TrivialObliviousMap<GCSignal> client = new TrivialObliviousMap<GCSignal>(gen);
+				
+				int[] v = new int[N];
+				for(int i = 0; i < N; ++i) v[i] = CompEnv.rnd.nextInt();
+				
+				TreeMap<Long, boolean[]> m = new TreeMap();
+				for(int i = 0; i < N; ++i)
+					m.put((long) i, Utils.fromInt(v[i], 32));
+				
+				client.init(m, 32, 32);
 
 				for (int i = 0; i < N; ++i) {
-					GCSignal[] scb = client.read(gen.inputOfAlice(Utils.fromInt(keys[i], indexSize)));
+					GCSignal[] scb = client.read(gen.inputOfAlice(Utils.fromInt(i, indexSize)));
 					boolean[] b = client.env.outputToAlice(scb);
-					if (Utils.toInt(b) != values[i]) {
+					if (Utils.toInt(b) != v[i]) {
 						System.out.println("inconsistent: " + i + " "
-								+ Utils.toInt(b) + " " + values[i]);
+								+ Utils.toInt(b) + " " + v[i]);
 					}
-					else System.out.println(keys[i]+" "+values[i]+" "+Utils.toInt(b));
+					else System.out.println(i+" "+v[i]+" "+Utils.toInt(b));
 				}
 
 				os.flush();
@@ -70,21 +73,18 @@ public class TestTrivialObliviousMap {
 		public void run() {
 			try {
 				connect(host, port);
-
 				@SuppressWarnings("unchecked")
-				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob,
-						is, os);
-				TrivialObliviousMap<GCSignal> client = new TrivialObliviousMap<GCSignal>(env, N, indexSize, dataSize);
+				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
+				TrivialObliviousMap<GCSignal> client = new TrivialObliviousMap<GCSignal>(env);
 
 				int[] keys = new int[N];
 				int[] values = new int[N];
 
-				client.initialize(keys, values, Party.Alice);
+				client.init(N, 32,32);
 
 				for (int i = 0; i < N; ++i) {
-					GCSignal[] scb = client.read(env.inputOfAlice(Utils.fromInt(keys[i], indexSize)));
+					GCSignal[] scb = client.read(env.inputOfAlice(Utils.fromInt(i, indexSize)));
 					client.env.outputToAlice(scb);
-					
 				}
 
 				os.flush();
@@ -101,8 +101,8 @@ public class TestTrivialObliviousMap {
 
 	@Test
 	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345);
-		EvaRunnable eva = new EvaRunnable("localhost", 12345);
+		GenRunnable gen = new GenRunnable(54321);
+		EvaRunnable eva = new EvaRunnable("localhost", 54321);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(eva);
 		tGen.start();
