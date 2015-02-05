@@ -28,8 +28,12 @@ public class EmulatorUtils {
 		}
 		return match;
 	}
+	
 	public static<T> void printBooleanArray(String s, T[] array, IntegerLib<T> lib){
-		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
+		printBooleanArray(s, array, lib, true);
+	}
+	public static<T> void printBooleanArray(String s, T[] array, IntegerLib<T> lib, boolean smart){
+		if((lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT ) && smart)
 			return;
 		String output = s+":";
 		boolean[] temp = lib.getEnv().outputToAlice(array);
