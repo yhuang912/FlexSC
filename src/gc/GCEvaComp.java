@@ -8,6 +8,7 @@ import ot.FakeOTReceiver;
 import ot.OTExtReceiver;
 import ot.OTReceiver;
 import flexsc.Flag;
+import flexsc.Mode;
 import flexsc.Party;
 
 public abstract class GCEvaComp extends GCCompEnv{
@@ -16,8 +17,8 @@ public abstract class GCEvaComp extends GCCompEnv{
 
 	protected long gid = 0;
 
-	public GCEvaComp(InputStream is, OutputStream os) {
-		super(is, os, Party.Bob);
+	public GCEvaComp(InputStream is, OutputStream os, Mode m) {
+		super(is, os, Party.Bob, m);
 
 		if (Flag.FakeOT)
 			rcv = new FakeOTReceiver(is, os);

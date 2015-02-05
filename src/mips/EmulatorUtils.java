@@ -2,10 +2,14 @@ package mips;
 
 import oram.SecureArray;
 import circuits.arithmetic.IntegerLib;
+import flexsc.Mode;
 import flexsc.Party;
 
 public class EmulatorUtils {
+	
 	public static<T> boolean checkMatchBooleanArray(T[] array, IntegerLib<T> lib, int matchVal) throws Exception{
+		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
+			return true;
 		boolean[] temp = lib.getEnv().outputToAlice(array);
 		boolean match = true;
 		if (lib.getEnv().getParty() == Party.Alice){
@@ -21,9 +25,12 @@ public class EmulatorUtils {
 		else{
 			match = (lib.getEnv().is.read() == 1);
 			//System.out.println("Bob Match: " + match);
-		}return match;
+		}
+		return match;
 	}
 	public static<T> void printBooleanArray(T[] array, IntegerLib<T> lib){
+		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
+			return;
 		String output = "";
 		boolean[] temp = lib.getEnv().outputToAlice(array);
 
@@ -35,6 +42,8 @@ public class EmulatorUtils {
 		
 	}
 	public static<T> void printRegisters(SecureArray<T> reg, IntegerLib<T> lib){
+		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
+			return;
 		String output = "";
 		T[] temp; 
 
@@ -55,6 +64,8 @@ public class EmulatorUtils {
 	}
 	
 	public static<T> void printOramBank(SecureArray<T> oramBank, IntegerLib<T> lib, int numItems){
+		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
+			return;
 		String output = "";
 		T[] temp; 
 		

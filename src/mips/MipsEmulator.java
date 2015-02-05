@@ -33,7 +33,7 @@ public class MipsEmulator {
 	static final int MEM_SIZE = 72;// 160 < threshold for func1
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
-	static final Mode m = Mode.VERIFY;
+	static final Mode m = Mode.REAL;
 	static final int Alice_input = 5;
 	static final int Bob_input = 2;
 	static final boolean MULTIPLE_BANKS = true;
@@ -120,8 +120,8 @@ public class MipsEmulator {
 		if(lib.getEnv().getParty() == Party.Alice)
 			System.out.println("PC: ");
 		EmulatorUtils.printBooleanArray(pc, lib);
-
 	}
+	
 	public static <T> SecureArray<T> loadInputsToRegister(CompEnv<T> env)
 			throws Exception {
 
@@ -252,18 +252,10 @@ public class MipsEmulator {
 	}
 
 	public static class GenRunnable<T> extends network.Server implements Runnable {
-		List<MemorySet<T>> sets;
-		DataSegment instData; 
-		DataSegment memData;
-		int pcOffset; 
-		int dataOffset; 
+		MipsParty<T> mips;
 
 		public GenRunnable(List<MemorySet<T>> sets,	DataSegment instData, DataSegment memData, int pcOffset,int dataOffset ){
-			this.sets = sets;
-			this.instData = instData;
-			this.memData = memData;
-			this.pcOffset = pcOffset;
-			this.dataOffset = dataOffset;
+			mips = new MipsParty<T>(sets, instData, memData, pcOffset, dataOffset);
 		}
 		
 		public void run() {
@@ -271,65 +263,10 @@ public class MipsEmulator {
 				listen(54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(m, Party.Alice, is, os);
-				testInstruction(env);
-				IntegerLib<T> lib = new IntegerLib<T>(env);
-				CPU<T> cpu = new CPU<T>(env);
-				MEM<T> mem = new MEM<T>(env);
-				SecureArray<T> reg = loadInputsToRegister(env);
-
-				SecureArray<T> singleInstructionBank = null;
-
-				if (!MULTIPLE_BANKS){
-					singleInstructionBank = loadInstructionsSingleBank(env, instData);				
-				}
-				loadInstructionsMultiBanks(env, singleInstructionBank, sets, instData);
-				SecureArray<T> memBank = getMemory(env, memData);
-
-				T[] pc = lib.toSignals(pcOffset, WORD_SIZE);
-				T[] newInst = lib.toSignals(0, WORD_SIZE);
-				boolean testHalt;
-				int count = 0; 
-				if (!MULTIPLE_BANKS)
-					EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
-				long startTime = System.nanoTime();
-				MemorySet<T> currentSet = sets.get(0);
-				SecureArray<T> currentBank;
-				while (true) {
-					currentBank = currentSet.getOramBank().getArray();
-					System.out.println("count: " + count);
-					count++;
-					System.out.println("execution step: " + currentSet.getExecutionStep());
-					EmulatorUtils.printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
-					if (MULTIPLE_BANKS)
-						pcOffset = (int) currentSet.getOramBank().getMinAddress();
-					newInst = mem.getInst(currentBank, pc, pcOffset);
-					//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
-					mem.func(reg, memBank, newInst, dataOffset);
-
-					System.out.println("newInst");
-					EmulatorUtils.printBooleanArray(newInst, lib);
-
-					testHalt = testTerminate(reg, newInst, lib);
-					if (testHalt)
-						break;
-
-
-					//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
-					//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101001, 32));
-					pc = cpu.function(reg, newInst, pc);
-
-					EmulatorUtils.printRegisters(reg, lib);
-					System.out.println("PC: ");
-					EmulatorUtils.printBooleanArray(pc, lib);
-					System.out.println(pcOffset);
-					System.out.println(currentSet.getOramBank().getMinAddress());
-
-					currentSet = currentSet.getNextMemorySet();
-				}
-				float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
-				System.out.println("Run time: " + runTime);
-				System.out.println("Average time / instruction: " + runTime / count );
-				T[] output = reg.read(lib.toSignals(2, reg.lengthOfIden));
+				IntegerLib<T> lib = new IntegerLib<>(env);
+				mips.mainloop(env);
+				
+				T[] output = mips.reg.read(lib.toSignals(2, mips.reg.lengthOfIden));
 				String outputStr = "";
 				boolean[] tmp = lib.getEnv().outputToAlice(output);
 				for (int j = 31 ; j >= 0 ; j--){
@@ -344,7 +281,7 @@ public class MipsEmulator {
 		}
 	}
 
-	static class EvaRunnable<T> extends network.Client implements Runnable {
+	static class MipsParty<T> {
 		public double andgates;
 		public double encs;
 		List<MemorySet<T>> sets;
@@ -352,79 +289,92 @@ public class MipsEmulator {
 		DataSegment memData;
 		int pcOffset; 
 		int dataOffset; 
-
-		public EvaRunnable(List<MemorySet<T>> sets,	DataSegment instData, DataSegment memData, int pcOffset,int dataOffset ){
+		IntegerLib<T> lib;
+		public MipsParty(List<MemorySet<T>> sets,	DataSegment instData, DataSegment memData, int pcOffset,int dataOffset ){
 			this.sets = sets;
 			this.instData = instData;
 			this.memData = memData;
 			this.pcOffset = pcOffset;
 			this.dataOffset = dataOffset;
 		}
+		public SecureArray<T> reg;
+public void mainloop(CompEnv<T> env) throws Exception{
+	//testInstruction(env);
+	lib = new IntegerLib<T>(env);
+	CPU<T> cpu = new CPU<T>(env);
+	MEM<T> mem = new MEM<T>(env);
+	reg = loadInputsToRegister(env);
+
+	SecureArray<T> singleInstructionBank = null;
+
+	if (!MULTIPLE_BANKS){
+		singleInstructionBank = loadInstructionsSingleBank(env, instData);				
+	}
+	loadInstructionsMultiBanks(env, singleInstructionBank, sets, instData);
+	SecureArray<T> memBank = getMemory(env, memData);
+
+	T[] pc = lib.toSignals(pcOffset, WORD_SIZE);
+	T[] newInst = lib.toSignals(0, WORD_SIZE);
+	boolean testHalt;
+	int count = 0; 
+	if (!MULTIPLE_BANKS)
+		EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
+	long startTime = System.nanoTime();
+	MemorySet<T> currentSet = sets.get(0);
+	SecureArray<T> currentBank;
+	while (true) {
+		currentBank = currentSet.getOramBank().getArray();
+		System.out.println("count: " + count);
+		count++;
+		System.out.println("execution step: " + currentSet.getExecutionStep());
+		EmulatorUtils.printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
+		if (MULTIPLE_BANKS)
+			pcOffset = (int) currentSet.getOramBank().getMinAddress();
+		newInst = mem.getInst(currentBank, pc, pcOffset);
+		//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
+		mem.func(reg, memBank, newInst, dataOffset);
 
 		
+		testHalt = testTerminate(reg, newInst, lib);
+		
+		if (testHalt)
+			break;
+		System.out.println("newInst");
+		EmulatorUtils.printBooleanArray(newInst, lib);
 
+
+		//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
+		//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101001, 32));
+		pc = cpu.function(reg, newInst, pc);
+
+		EmulatorUtils.printRegisters(reg, lib);
+		System.out.println("PC: ");
+		EmulatorUtils.printBooleanArray(pc, lib);
+		System.out.println(pcOffset);
+		System.out.println(currentSet.getOramBank().getMinAddress());
+
+		currentSet = currentSet.getNextMemorySet();
+	}
+	float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
+	System.out.println("Run time: " + runTime);
+	System.out.println("Average time / instruction: " + runTime / count );
+}
+	}
+	static class EvaRunnable<T> extends network.Client implements Runnable {
+		MipsParty<T> mips;
+
+		public EvaRunnable(List<MemorySet<T>> sets,	DataSegment instData, DataSegment memData, int pcOffset,int dataOffset ){
+			mips = new MipsParty<T>(sets, instData, memData, pcOffset, dataOffset);
+		}
+		
 		public void run() {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
-				testInstruction(env);
-				IntegerLib<T> lib = new IntegerLib<T>(env);
-				CPU<T> cpu = new CPU<T>(env);
-				MEM<T> mem = new MEM<T>(env);
-
-				SecureArray<T> reg = loadInputsToRegister(env);
-				SecureArray<T> singleInstructionBank = null; 
-				if (!MULTIPLE_BANKS)
-					singleInstructionBank = loadInstructionsSingleBank(env, instData);
-				loadInstructionsMultiBanks(env, singleInstructionBank, sets, instData);
-				SecureArray<T> memBank = getMemory(env, memData);
-				//instantiate new secure array for memory once we separate instructions from memory.
-
-				T[] newInst = lib.toSignals(0,WORD_SIZE);                           
-				T[] pc = lib.toSignals(0, WORD_SIZE);
-				boolean testHalt;
-				if (!MULTIPLE_BANKS)
-					EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
-
-				if (m == Mode.COUNT) {
-					//Statistics sta = ((PMCompEnv) env).statistic;
-					//sta.flush();
-				}
-
-				MemorySet<T> currentSet = sets.get(0);
-				SecureArray<T> currentBank;
-				while (true){
-					currentBank = currentSet.getOramBank().getArray();
-					EmulatorUtils.printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
-					newInst = mem.getInst(currentBank, pc, pcOffset); 
-					mem.func(reg, memBank, newInst, dataOffset);
-					testHalt = testTerminate(reg, newInst, lib);
-
-					os.flush();
-					if (testHalt)
-						break; 
-
-					EmulatorUtils.printBooleanArray(newInst, lib);
-					//if (checkMatchBooleanArray(newInst, lib, 0))
-					//newInst = env.inputOfAlice(new boolean[32]);
-
-					//int andCount = ((CVCompEnv)env).numOfAnds;
-					pc = cpu.function(reg, newInst, pc);
-					//System.out.println( "CPU<Boolean> circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
-					EmulatorUtils.printRegisters(reg, lib);
-					EmulatorUtils.printBooleanArray(pc, lib);
-					currentSet = currentSet.getNextMemorySet();
-
-				}
-
-				if (m == Mode.COUNT) {
-					//Statistics sta = ((PMCompEnv) env).statistic;
-					//sta.finalize();
-					//andgates = sta.andGate;
-					//encs = sta.NumEncAlice;
-				}
-				T[] output = reg.read(lib.toSignals(2, reg.lengthOfIden));
+				mips.mainloop(env);
+				IntegerLib<T> lib = new IntegerLib<>(env);
+				T[] output = mips.reg.read(lib.toSignals(2, mips.reg.lengthOfIden));
 				lib.getEnv().outputToAlice(output);
 				os.flush();
 				disconnect();
@@ -486,9 +436,9 @@ public class MipsEmulator {
 		System.out.println("pcoffset: " + pcOffset);
 		int dataOffset = (int) rdr.getDataAddress();
 		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
-		List<MemorySet>sets = b.build();
-		GenRunnable gen = new GenRunnable(sets, instData, memData, pcOffset, dataOffset);
-		EvaRunnable env = new EvaRunnable(sets, instData, memData, pcOffset, dataOffset);
+		//List<MemorySet>sets = b.build();
+		GenRunnable gen = new GenRunnable(b.build(), instData, memData, pcOffset, dataOffset);
+		EvaRunnable env = new EvaRunnable(b.build(), instData, memData, pcOffset, dataOffset);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
 		tGen.start();
@@ -496,11 +446,6 @@ public class MipsEmulator {
 		tEva.start();
 		tGen.join();
 		tEva.join(); 
-
-		if (m == Mode.COUNT) {
-			System.out.println(env.andgates + " " + env.encs);
-		} else {
-		}
 
 	}
 }
