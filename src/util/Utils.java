@@ -8,7 +8,7 @@ import flexsc.CompEnv;
 import flexsc.Party;
 
 public class Utils {
-	
+
 	public static <T> T[] flatten(CompEnv<T> env, T[][][] data) {
 		T[] res = env.newTArray(data[0][0].length*data[0].length*data.length);
 		int width = data[0][0].length;
@@ -21,6 +21,18 @@ public class Utils {
 		}
 		return res;
 	}
+
+	//for compiler use
+	public static int logFloor(int n) {
+		int w = 0;
+		n--;
+		while(n > 0) {
+			w ++;
+			n >>= 1;
+		}
+		return w == 0 ? 1 : w;
+	}
+
 
 	public static boolean[] flatten(boolean[][][] data) {
 		boolean[] res = new boolean[data[0][0].length*data[0].length*data.length];
@@ -72,7 +84,7 @@ public class Utils {
 			res[i] = Arrays.copyOfRange(data, width*i, width*i+width);
 		}
 	}
-	
+
 	public static Boolean[] toBooleanArray(boolean[] a) {
 		Boolean[] res = new Boolean[a.length];
 		for (int i = 0; i < a.length; i++)
@@ -100,7 +112,7 @@ public class Utils {
 		for (int i = 0; i < value.length; i++)
 			res = (value[i]) ? (res | (1 << i)) : res;
 
-		return res;
+			return res;
 	}
 
 	public static long toUnSignedInt(boolean[] v) {
@@ -142,7 +154,7 @@ public class Utils {
 		for (int i = 0; i < value.length; i++)
 			res = (value[i]) ? (res | (1 << i)) : res;
 
-		return res;
+			return res;
 	}
 
 	public static double toFloat(boolean[] value, int widthV, int widthP) {
@@ -201,7 +213,7 @@ public class Utils {
 	}
 
 	final static int[] mask = { 0b00000001, 0b00000010, 0b00000100, 0b00001000,
-			0b00010000, 0b00100000, 0b01000000, 0b10000000 };
+		0b00010000, 0b00100000, 0b01000000, 0b10000000 };
 
 	public static boolean[] fromBigInteger(BigInteger bd, int length) {
 		byte[] b = bd.toByteArray();
@@ -234,6 +246,6 @@ public class Utils {
 		a /= Math.pow(2, offset);
 		return a;
 	}
-	
-	
+
+
 }
