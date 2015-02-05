@@ -28,6 +28,7 @@
     <copy todir="build/classes">
       <fileset dir="src">
         <include name="**/*.properties" />
+        <include name="**/*.txt" />
       </fileset>
     </copy>
     <jar destfile="dist/SimpleBinaryReader.jar">

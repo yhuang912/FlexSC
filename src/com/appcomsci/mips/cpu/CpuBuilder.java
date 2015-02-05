@@ -1,26 +1,139 @@
 package com.appcomsci.mips.cpu;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.HashSet;
 import java.util.Set;
 
 import com.appcomsci.mips.memory.MipsInstructionSet;
 
 public class CpuBuilder {
+	private static final String CPU_FILE_NAME = "cpu.txt";
+
+	private static final String lineSeparator = System.getProperty("line.separator");
+	private static final String fileSeparator = System.getProperty("file.separator");
 	
-	private static boolean emitActions(StringBuilder sb, boolean codeWritten, Set<String>operations, MipsInstructionSet.OperationType type) {
+	/** The main text of the CPU program */
+	private List<String> text;
+	private List<Map.Entry<String, List<String>>> actions;
+	
+	/** This constructor takes the CPU template from the classpath
+	 * @throws IOException
+	 */
+	public CpuBuilder() throws IOException {
+		// Look for cpu.txt inside jar file (we hope)
+		InputStream is = getClass().getResourceAsStream(CPU_FILE_NAME);
+		if(is == null) // Did it get slightly mislaid?
+			is = getClass().getResourceAsStream(fileSeparator+CPU_FILE_NAME);
+		if(is == null) // Really mislaid.  Oops.
+			throw new FileNotFoundException("Could not find " + CPU_FILE_NAME + " in classpath");
+		setup(new InputStreamReader(is));
+	}
+	
+	/**
+	 * This constructor reads the CPU template from a Reader.
+	 * Use InputStreamReader to bridge the gap from InputStreams
+	 * @param rdr The reader containing the CPU template
+	 * @throws IOException
+	 */
+	public CpuBuilder(Reader rdr) throws IOException {
+		setup(rdr);
+	}
+	
+	/**
+	 * This constructor reads the CPU template from a File.
+	 * @param f The file containing the CPU template.
+	 * @throws IOException
+	 */
+	public CpuBuilder(File f) throws IOException {
+		setup(Files.readAllLines(f.toPath(),StandardCharsets.US_ASCII));
+	}
+	
+	/**
+	 * Constructor setup
+	 * @param rdr A reader 
+	 * @throws IOException
+	 */
+	private void setup(Reader rdr) throws IOException {
+		BufferedReader br = new BufferedReader(rdr);
+		List<String> rawLines = new ArrayList<String>();
+		String s;
+		while((s=br.readLine()) != null)
+			rawLines.add(s);
+		setup(rawLines);
+	}
+	
+	/**
+	 * Constructor setup
+	 * @param rawLines A list of lines from the CPU template file
+	 */
+	private void setup(List<String>rawLines) {
+		text = new ArrayList<String>();
+		actions = new ArrayList<Map.Entry<String, List<String>>>();
+		Set<String>mnemonicSet = new HashSet<String>();
+		List<String> current = text;
+		for(String s:rawLines) {
+			if(s.startsWith("%OP_")) {
+				// Need to check for duplicates!
+				String mnemonic = s.substring(4);
+				if(mnemonicSet.contains(mnemonic)) {
+					System.err.println("Warning: duplicate actions for " + mnemonic);
+				}
+				current = new ArrayList<String>();
+				actions.add(new AbstractMap.SimpleImmutableEntry<String, List<String>>(mnemonic, current));
+			} else {
+				current.add(s);
+			}
+		}
+	}
+	
+	/**
+	 * Generate actions for operations of type "type".  The actions are a large if statement of the form
+	 * <br>
+	 * if(op_type == some_type) {
+	 * &nbsp;&nbsp;// Actions for type some_type
+	 * <br>
+	 * &nbsp;&nbsp;if(appropriate_var == something) {
+	 * <br>
+	 * &nbsp;&nbsp;&nbsp;&nbsp;actions
+	 * <br>
+	 * &nbsp;&nbsp;} else if(var == something_else) {
+	 * <br>
+	 * &nbsp;&nbsp;&nbsp;&nbsp;other actions
+	 * <br>
+	 * &nbsp;&nbsp;}
+	 * <br>
+	 * } else if(op_type == some_other_type) {
+	 * &nbsp;&nbsp;// Actions for some_other_type
+	 * <br>
+	 * }
+	 * <br>
+	 * @param sb Emit code here
+	 * @param codeWritten Has any code been written to the outer "if" yet?  Used to decide
+	 * 				whether or not to add an "else"
+	 * @param operations The set of operations to implement
+	 * @param type The general class of operations (REGIMM, FUNCT, regular, memory read or write)
+	 * @return False if no code has been written to the outer "if" yet.  True otherwise.
+	 * 				This constitutes an updated value for codeWritten.
+	 */
+	private boolean emitActions(StringBuilder sb, boolean codeWritten, Set<String>operations, MipsInstructionSet.OperationType type) {
 		if(operations.size() == 0)
 			return codeWritten;
 		
 		String varName = null;
+		// Decide which variable to check for the operation
 		switch(type) {
 		case I:
 		case J:
@@ -92,10 +205,18 @@ public class CpuBuilder {
 		return true;
 	}
 
-	public static String build(Set<MipsInstructionSet.Operation>operations) {
+	/**
+	 * Build a CPU
+	 * @param operations The set of operations to be implemented
+	 * @return The text of the CPU
+	 */
+	public String build(Set<MipsInstructionSet.Operation>operations) {
 		
 		StringBuilder sb = new StringBuilder();
 
+		// Build sets of ops by type.
+		// Also keep track of whether there were any multiplies or divides
+		
 		boolean needMult = false;
 		Set<String> I_ops = new HashSet<String>();
 		Set<String> R_ops = new HashSet<String>();
@@ -134,24 +255,6 @@ public class CpuBuilder {
 		}
 		for(String s:text) {
 			if(s.startsWith("%CHECK_TYPE")) {
-				if(I_ops.size() > 0) {
-					sb.append("\telse if(");
-					sb.append(lineSeparator);
-					sb.append("\t\t");
-					boolean codeWritten = false;
-					for(String o: I_ops) {
-						if(codeWritten)
-							sb.append(" || ");
-						codeWritten = true;
-						sb.append("op == OP_");
-						sb.append(o.toString());
-					}
-					sb.append(lineSeparator);
-					sb.append("\t)");
-					sb.append(lineSeparator);
-					sb.append("\t\tret = OP_CODE_I;");
-					sb.append(lineSeparator);
-				}
 				if(J_ops.size() > 0) {
 					sb.append("\telse if(");
 					sb.append(lineSeparator);
@@ -168,8 +271,7 @@ public class CpuBuilder {
 					sb.append("\t)");
 					sb.append(lineSeparator);
 					sb.append("\t\tret = OP_CODE_J;");
-					sb.append(lineSeparator);
-					
+					sb.append(lineSeparator);	
 				}
 			} else if(s.startsWith("%HILO_REG")) {
 				if(needMult)
@@ -188,49 +290,15 @@ public class CpuBuilder {
 		return sb.toString();
 	}
 
-	static {
-		setup();
-	}
-	
-	static String lineSeparator = System.getProperty("line.separator");
-	static List<String> text;
-	static List<Map.Entry<String, List<String>>> actions;
-	static void setup() {
-			lineSeparator = "\n";
-		
-		File f = new File("cpu.txt");
-		if(!f.exists()) {
-			System.err.println("No cpu.txt");
-			return;
-		}
-		List<String> rawLines = null;
-		try {
-			rawLines = Files.readAllLines(f.toPath(),StandardCharsets.US_ASCII);
-		} catch(IOException e) {
-			System.err.println("IO Exception: " + e);
-			return;
-		}
-		text = new ArrayList<String>();
-		actions = new ArrayList<Map.Entry<String, List<String>>>();
-		Set<String>mnemonicSet = new HashSet<String>();
-		List<String> current = text;
-		for(String s:rawLines) {
-			if(s.startsWith("%OP_")) {
-				// Need to check for duplicates!
-				String mnemonic = s.substring(4);
-				if(mnemonicSet.contains(mnemonic)) {
-					System.err.println("Warning: duplicate actions for " + mnemonic);
-				}
-				current = new ArrayList<String>();
-				actions.add(new AbstractMap.SimpleImmutableEntry<String, List<String>>(mnemonic, current));
-			} else {
-				current.add(s);
-			}
-		}
-	}
+	/** Main program for testing
+	 * 
+	 * @param args A list of operations to be implemented.  If empty, the complete set of operations
+	 *		defined by MipsInstructionSet.Operation.values() will be implemented.
+	 */
 	public static void main(String args[]) {
 		Set<MipsInstructionSet.Operation> operations = new HashSet<MipsInstructionSet.Operation>();
 		if(args.length == 0) {
+			// No args means do them all
 			for(MipsInstructionSet.Operation op: MipsInstructionSet.Operation.values())
 				operations.add(op);
 		} else {
@@ -247,7 +315,23 @@ public class CpuBuilder {
 			System.err.println("No valid operations, giving up");
 			System.exit(1);
 		}
-		String code = build(operations);
-		System.out.print(code);
+		try {
+			CpuBuilder bldr;
+			/*
+			File f = new File(CPU_FILE_NAME);
+			if(!f.exists()) {
+				System.err.println("No " + CPU_FILE_NAME);
+				return;
+			}
+			bldr = new CpuBuilder(new InputStreamReader(new FileInputStream(f)));
+			*/
+			bldr = new CpuBuilder();
+			String code = bldr.build(operations);
+			System.out.print(code);
+		} catch(FileNotFoundException e) {
+			System.err.println("No " + CPU_FILE_NAME + " despite existence check");
+		} catch(IOException e) {
+			System.err.println("Error reading " + CPU_FILE_NAME + ": " + e);
+		}
 	}
 }

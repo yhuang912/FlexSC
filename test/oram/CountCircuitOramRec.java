@@ -12,8 +12,8 @@ import flexsc.Party;
 public class CountCircuitOramRec {
 
 	public  static void main(String args[]) throws Exception {
-		for(int i = 9; i <=16 ; i++) {
-			GenRunnable gen = new GenRunnable(12345, i+1, 3, 32, 8, 6);
+		for(int i = 5; i <=14 ; i++) {
+			GenRunnable gen = new GenRunnable(12345, 15, 3, 32, 8, i);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
