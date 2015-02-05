@@ -289,7 +289,7 @@ public class MipsEmulator {
 			SecureArray<T> currentBank;
 			while (true) {
 				currentBank = currentSet.getOramBank().getArray();
-				System.out.println("count: " + count);
+				EmulatorUtils.print("count: " + count, lib);
 				count++;
 				//				System.out.println("execution step: " + currentSet.getExecutionStep());
 				EmulatorUtils.printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
