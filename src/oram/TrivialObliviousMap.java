@@ -26,14 +26,14 @@ public class TrivialObliviousMap<T> {
 		this.indexSize = indexLength;
 		this.dataSize = dataLength;
 		
-		this.key = env.newTArray(capacity, 0);
-		this.value = env.newTArray(capacity, 0);
+		key = env.newTArray(capacity, 0);
+		value = env.newTArray(capacity, 0);
 		
 		int i = 0;
-		//Party p = env.getParty() == Party.Alice ? Party.Bob : Party.Alice;
 		for(Entry<Long, boolean[]>e: m.entrySet()) {
-			key[i] = inputOfP(e.getKey().intValue(), indexLength);
-			value[i++] = inputOfP(e.getValue());
+			key[i] = inputOfP(e.getKey().intValue(), indexLength, env.getParty());
+			value[i] = inputOfP(e.getValue(), env.getParty());
+			i++;
 		}
 	}
 	
@@ -41,25 +41,25 @@ public class TrivialObliviousMap<T> {
 		this.capacity = cap;
 		this.indexSize = indexLength;
 		this.dataSize = dataLength;
-		System.out.println(indexLength);
-		this.key = env.newTArray(capacity, 0);
-		this.value = env.newTArray(capacity, 0);
+		key = env.newTArray(capacity, 0);
+		value = env.newTArray(capacity, 0);
 		
+		Party p = env.getParty() == Party.Alice ? Party.Bob: Party.Alice;
 		for(int i = 0; i < cap; ++i) {
-			key[i] = inputOfP(0, indexLength);
-			value[i++] = inputOfP(new boolean[dataLength]);
+			key[i] = inputOfP(0, indexLength, p);
+			value[i] = inputOfP(new boolean[dataLength], p);
 		}
 	}
 
-	private T[] inputOfP(boolean[] t) {
-		if( env.getParty() == Party.Alice)
+	private T[] inputOfP(boolean[] t, Party p) {
+		if( p == Party.Alice)
 			return env.inputOfAlice(t);
 		else 
 			return env.inputOfBob(t);
 	}
 	
-	private T[] inputOfP(int t, int width) {
-		if( env.getParty() == Party.Alice)
+	private T[] inputOfP(int t, int width, Party p ) {
+		if( p == Party.Alice)
 			return env.inputOfAlice(Utils.fromInt(t, width));
 		else 
 			return env.inputOfBob(Utils.fromInt(t, width));

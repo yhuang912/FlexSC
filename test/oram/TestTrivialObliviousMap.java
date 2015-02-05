@@ -32,23 +32,26 @@ public class TestTrivialObliviousMap {
 						is, os);
 				TrivialObliviousMap<GCSignal> client = new TrivialObliviousMap<GCSignal>(gen);
 				
+				int[] k = new int[N];
+				for(int i = 0; i < N; ++i) k[i] = CompEnv.rnd.nextInt();
 				int[] v = new int[N];
 				for(int i = 0; i < N; ++i) v[i] = CompEnv.rnd.nextInt();
 				
 				TreeMap<Long, boolean[]> m = new TreeMap();
 				for(int i = 0; i < N; ++i)
-					m.put((long) i, Utils.fromInt(v[i], 32));
+					m.put((long) k[i], Utils.fromInt(v[i], 32));
 				
 				client.init(m, 32, 32);
 
+				
 				for (int i = 0; i < N; ++i) {
-					GCSignal[] scb = client.read(gen.inputOfAlice(Utils.fromInt(i, indexSize)));
+					GCSignal[] scb = client.read(gen.inputOfAlice(Utils.fromInt(k[i], indexSize)));
 					boolean[] b = client.env.outputToAlice(scb);
 					if (Utils.toInt(b) != v[i]) {
 						System.out.println("inconsistent: " + i + " "
 								+ Utils.toInt(b) + " " + v[i]);
 					}
-					else System.out.println(i+" "+v[i]+" "+Utils.toInt(b));
+					else System.out.println(k[i]+" "+v[i]+" "+Utils.toInt(b));
 				}
 
 				os.flush();
@@ -75,16 +78,16 @@ public class TestTrivialObliviousMap {
 				connect(host, port);
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
-				TrivialObliviousMap<GCSignal> client = new TrivialObliviousMap<GCSignal>(env);
+				TrivialObliviousMap<GCSignal> server = new TrivialObliviousMap<GCSignal>(env);
 
 				int[] keys = new int[N];
 				int[] values = new int[N];
 
-				client.init(N, 32,32);
+				server.init(N, 32,32);
 
 				for (int i = 0; i < N; ++i) {
-					GCSignal[] scb = client.read(env.inputOfAlice(Utils.fromInt(i, indexSize)));
-					client.env.outputToAlice(scb);
+					GCSignal[] scb = server.read(env.inputOfAlice(new boolean[32]));
+					server.env.outputToAlice(scb);
 				}
 
 				os.flush();
