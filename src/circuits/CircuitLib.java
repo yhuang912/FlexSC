@@ -23,6 +23,14 @@ public class CircuitLib<T> {
 		SIGNAL_ONE = e.ONE();
 	}
 
+	//for compiler use
+	public T[] enforceBits(T[] a, int length) {
+		if(length > a.length)
+			return padSignal(a, length);
+		else
+			return Arrays.copyOfRange(a, 0, length);
+	}
+
 	public T[] toSignals(int a, int width) {
 		T[] result = env.newTArray(width);
 		for (int i = 0; i < width; ++i) {
