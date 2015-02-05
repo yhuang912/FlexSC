@@ -28,10 +28,10 @@ public class EmulatorUtils {
 		}
 		return match;
 	}
-	public static<T> void printBooleanArray(T[] array, IntegerLib<T> lib){
+	public static<T> void printBooleanArray(String s, T[] array, IntegerLib<T> lib){
 		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
 			return;
-		String output = "";
+		String output = s+":";
 		boolean[] temp = lib.getEnv().outputToAlice(array);
 
 		for (int i = array.length -1 ; i >= 0;  i--){
