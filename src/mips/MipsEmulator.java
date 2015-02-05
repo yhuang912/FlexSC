@@ -82,7 +82,7 @@ public class MipsEmulator {
 		//reg.write(rd, rdContent);
 		env.flush();
 		
-		CPU cpu = new CPU(env);
+		CPU<Boolean> cpu = new CPU<Boolean>(env);
 		IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
 		Boolean[] pc; 
 		pc = cpu.function(reg, env.inputOfAlice(Utils.fromInt(inst, 32)), env.inputOfAlice(Utils.fromInt(0,32)));
@@ -268,8 +268,8 @@ public class MipsEmulator {
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
 				testInstruction(env);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-				CPU cpu = new CPU(env);
-				MEM mem = new MEM(env);
+				CPU<Boolean> cpu = new CPU<Boolean>(env);
+				MEM<Boolean> mem = new MEM<Boolean>(env);
 				SecureArray<Boolean> reg = loadInputsToRegister(env);
 				
 				SecureArray<Boolean> singleInstructionBank = null;
@@ -350,8 +350,8 @@ public class MipsEmulator {
 				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
 				testInstruction(env);
 				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
-				CPU cpu = new CPU(env);
-				MEM mem = new MEM(env);
+				CPU<Boolean> cpu = new CPU<Boolean>(env);
+				MEM<Boolean> mem = new MEM<Boolean>(env);
 
 				SecureArray<Boolean> reg = loadInputsToRegister(env);
 				SecureArray<Boolean> singleInstructionBank = null; 
@@ -391,7 +391,7 @@ public class MipsEmulator {
 						
 					//int andCount = ((CVCompEnv)env).numOfAnds;
 					pc = cpu.function(reg, newInst, pc);
-					//System.out.println( "CPU circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
+					//System.out.println( "CPU<Boolean> circuit size:" + (((CVCompEnv)env).numOfAnds-andCount));
 					printRegisters(reg, lib);
 					printBooleanArray(pc, lib);
 					currentSet = currentSet.getNextMemorySet();
