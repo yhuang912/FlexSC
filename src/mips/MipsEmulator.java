@@ -40,11 +40,9 @@ public class MipsEmulator {
 	Configuration config;
 	private static String binaryFileName;	// should not be static FIXME
 
-
 	public MipsEmulator(Configuration config) {
 		this.config = config;
 	}
-
 
 	public static <T> boolean testTerminate(SecureArray<T> reg, T[] ins, IntegerLib<T> lib) {
 		T eq = lib.eq(ins, lib.toSignals(0b00000011111000000000000000001000, 32));
@@ -118,7 +116,7 @@ public class MipsEmulator {
 			System.out.println("testing instruction: " + output);
 		EmulatorUtils.printRegisters(reg, lib);	
 		if(lib.getEnv().getParty() == Party.Alice)
-		EmulatorUtils.printBooleanArray("PC", pc, lib);
+			EmulatorUtils.printBooleanArray("PC", pc, lib);
 	}
 
 	public static <T> SecureArray<T> loadInputsToRegister(CompEnv<T> env)
@@ -177,8 +175,8 @@ public class MipsEmulator {
 		for(MemorySet<T> s:sets) {
 			int i = s.getExecutionStep();
 
-			if (env.getParty() == Party.Alice)
-				System.out.println("step: " + i + " size: " + s.size());
+			EmulatorUtils.print("step: " + i + " size: " + s.size(), lib);
+
 			TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	  
 			long maxAddr = m.lastEntry().getKey();
 			if (maxAddr == 0)
@@ -191,8 +189,8 @@ public class MipsEmulator {
 				instructionBank = new SecureArray<T>(env, (int)((maxAddr - minAddr)/4 + 1), WORD_SIZE);
 				int count = 0;
 				for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
-					if (env.getParty() == Party.Alice){
-						System.out.println("count: " + count + " key: " + entry.getKey() + " value: " );
+					if (env.getParty() == Party.Alice) {
+						EmulatorUtils.print("count: " + count + " key: " + entry.getKey() + " value: " , lib);
 						String output = "";
 						for (int j = 31 ; j >= 0;  j--){
 							if (entry.getValue()[j])
@@ -200,8 +198,9 @@ public class MipsEmulator {
 							else 
 								output += "0";
 						}
-						System.out.println(output);
+						EmulatorUtils.print(output, lib);
 					}
+
 					if (entry.getKey() > 0){
 						index = lib.toSignals((int)((entry.getKey() - minAddr)/4), instructionBank.lengthOfIden);
 						if (env.getParty() == Party.Alice){
@@ -215,9 +214,7 @@ public class MipsEmulator {
 						instructionBank.write(index, data);
 					}
 					EmulatorUtils.printOramBank(instructionBank, lib, (int)((maxAddr - minAddr)/4 + 1));
-					//System.out.println(maxAddr +" "+ minAddr);
 					count++;
-					//System.out.println(count);
 				}	
 			}
 			OramBank<T> bank = new OramBank<T>(instructionBank);
@@ -246,9 +243,7 @@ public class MipsEmulator {
 		}
 		System.out.println("exiting getMemoryGen");
 		return memBank;
-
 	}
-
 
 
 	static class MipsParty<T> {
@@ -296,7 +291,7 @@ public class MipsEmulator {
 				currentBank = currentSet.getOramBank().getArray();
 				System.out.println("count: " + count);
 				count++;
-				System.out.println("execution step: " + currentSet.getExecutionStep());
+				//				System.out.println("execution step: " + currentSet.getExecutionStep());
 				EmulatorUtils.printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
 				if (MULTIPLE_BANKS)
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
@@ -309,7 +304,7 @@ public class MipsEmulator {
 
 				if (testHalt)
 					break;
-				
+
 				EmulatorUtils.printBooleanArray("newInst", newInst, lib);
 
 
@@ -331,61 +326,8 @@ public class MipsEmulator {
 			EmulatorUtils.printBooleanArray("Rsult", reg.read(lib.toSignals(2, 32)), lib, false);
 		}
 	}
-	
-	public static class GenRunnable<T> extends network.Server implements Runnable {
-		MipsParty<T> mips;
 
-		public GenRunnable(List<MemorySet<T>> sets,	DataSegment instData, DataSegment memData, int pcOffset,int dataOffset ){
-			mips = new MipsParty<T>(sets, instData, memData, pcOffset, dataOffset);
-		}
 
-		public void run() {
-			try {
-				listen(54321);
-				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<T> lib = new IntegerLib<>(env);
-				mips.mainloop(env);
-
-//				T[] output = mips.reg.read(lib.toSignals(2, mips.reg.lengthOfIden));
-//				String outputStr = "";
-//				boolean[] tmp = lib.getEnv().outputToAlice(output);
-//				for (int j = 31 ; j >= 0 ; j--){
-//					outputStr += (tmp[j] ? "1" : "0");
-//				}	
-//				System.out.println("Output: " + outputStr);
-				disconnect();
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-		}
-	}
-	
-	static class EvaRunnable<T> extends network.Client implements Runnable {
-		MipsParty<T> mips;
-
-		public EvaRunnable(List<MemorySet<T>> sets,	DataSegment instData, DataSegment memData, int pcOffset,int dataOffset ){
-			mips = new MipsParty<T>(sets, instData, memData, pcOffset, dataOffset);
-		}
-
-		public void run() {
-			try {
-				connect("localhost", 54321);
-				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
-				mips.mainloop(env);
-//				IntegerLib<T> lib = new IntegerLib<>(env);
-//				T[] output = mips.reg.read(lib.toSignals(2, mips.reg.lengthOfIden));
-//				lib.getEnv().outputToAlice(output);
-				os.flush();
-				disconnect();
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-		}
-	}
 	private static void process_cmdline_args(String[] args, Configuration config) {
 		CmdLineParser parser = new CmdLineParser();
 
@@ -411,8 +353,6 @@ public class MipsEmulator {
 		setBinaryFileName(rest[0]);
 	}
 
-
-
 	private static void printUsage() {
 		System.out.println("Usage: java RunACSEmulatorServer [binary file]");
 	}
@@ -433,9 +373,9 @@ public class MipsEmulator {
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 		DataSegment instData = rdr.getInstructions(config.getFunctionLoadList());
 		DataSegment memData = rdr.getData();
+
 		// is this cast ok?  Or should we modify the mem circuit? 
 		int pcOffset = (int) ent.getAddress();
-		System.out.println("pcoffset: " + pcOffset);
 		int dataOffset = (int) rdr.getDataAddress();
 		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
 		//List<MemorySet>sets = b.build();
@@ -449,5 +389,48 @@ public class MipsEmulator {
 		tGen.join();
 		tEva.join(); 
 
+	}
+
+	public static class GenRunnable<T> extends network.Server implements Runnable {
+		MipsParty<T> mips;
+
+		public GenRunnable(List<MemorySet<T>> sets,	DataSegment instData, DataSegment memData, int pcOffset,int dataOffset ){
+			mips = new MipsParty<T>(sets, instData, memData, pcOffset, dataOffset);
+		}
+
+		public void run() {
+			try {
+				listen(54321);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> env = CompEnv.getEnv(m, Party.Alice, is, os);
+				mips.mainloop(env);
+				disconnect();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
+	}
+
+	static class EvaRunnable<T> extends network.Client implements Runnable {
+		MipsParty<T> mips;
+
+		public EvaRunnable(List<MemorySet<T>> sets,	DataSegment instData, DataSegment memData, int pcOffset,int dataOffset ){
+			mips = new MipsParty<T>(sets, instData, memData, pcOffset, dataOffset);
+		}
+
+		public void run() {
+			try {
+				connect("localhost", 54321);
+				@SuppressWarnings("unchecked")
+				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				mips.mainloop(env);
+				os.flush();
+				disconnect();
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+		}
 	}
 }

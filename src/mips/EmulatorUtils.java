@@ -29,6 +29,18 @@ public class EmulatorUtils {
 		return match;
 	}
 	
+	public static<T> void print(String s, IntegerLib<T> lib, boolean smart) {
+		if((lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT ) && smart)
+			return;
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println(s);
+	}
+
+	public static<T> void print(String s, IntegerLib<T> lib) {
+		print(s, lib, true);
+	}
+
+	
 	public static<T> void printBooleanArray(String s, T[] array, IntegerLib<T> lib){
 		printBooleanArray(s, array, lib, true);
 	}
