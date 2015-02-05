@@ -4,9 +4,75 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import flexsc.CompEnv;
 import flexsc.Party;
 
 public class Utils {
+	
+	public static <T> T[] flatten(CompEnv<T> env, T[][][] data) {
+		T[] res = env.newTArray(data[0][0].length*data[0].length*data.length);
+		int width = data[0][0].length;
+		int current = 0;
+		for(int i = 0; i <data.length; ++i) {
+			for(int j = 0; j < data[0].length; ++j){
+				System.arraycopy(data[i][j], 0, res, current, width);
+				current += width;
+			}
+		}
+		return res;
+	}
+
+	public static boolean[] flatten(boolean[][][] data) {
+		boolean[] res = new boolean[data[0][0].length*data[0].length*data.length];
+		int width = data[0][0].length;
+		int current = 0;
+		for(int i = 0; i <data.length; ++i) {
+			for(int j = 0; j < data[0].length; ++j){
+				System.arraycopy(data[i][j], 0, res, current, width);
+				current += width;
+			}
+		}
+		return res;
+	}
+
+	public static <T> T[] flatten(CompEnv<T> env, T[][] data) {
+		T[] res = env.newTArray(data[0].length*data.length);
+		int current = 0;
+		for(int i = 0; i <data.length; ++i) {
+			System.arraycopy(data[i], 0, res, current, data[0].length);
+			current += data[0].length;
+		}
+		return res;
+	}
+
+	public static  boolean[] flatten(boolean[][] data) {
+		boolean[] res = new boolean[data[0].length*data.length];
+		int current = 0;
+		for(int i = 0; i < data.length; ++i) {
+			System.arraycopy(data[i], 0, res, current, data[0].length);
+			current += data[0].length;
+		}
+		return res;
+	}
+
+	public static<T> void unflatten(T[] data, T[][][]res) {
+		int width = res[0][0].length;
+		int current = 0;
+		for(int i = 0; i < res.length; ++i) 
+			for(int j = 0; j < res[0].length; ++j) { 
+				res[i][j] = Arrays.copyOfRange(data, current, current+width);
+				current += width;
+			}
+
+	}
+
+	public static<T> void unflatten(T[] data, T[][]res) {
+		int width = res[0].length;
+		for(int i = 0; i < res.length; ++i) {
+			res[i] = Arrays.copyOfRange(data, width*i, width*i+width);
+		}
+	}
+	
 	public static Boolean[] toBooleanArray(boolean[] a) {
 		Boolean[] res = new Boolean[a.length];
 		for (int i = 0; i < a.length; i++)

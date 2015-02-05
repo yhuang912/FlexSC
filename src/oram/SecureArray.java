@@ -13,6 +13,21 @@ public class SecureArray<T> {
 	public int lengthOfIden;
 	CompEnv<T> env;
 
+
+	public SecureArray(CompEnv<T> env, int N, int dataSize, int threshold, int cutoff, int recurFactor) throws Exception {
+		this.threshold = threshold;
+		useTrivialOram = N <= threshold;
+		if (useTrivialOram) {
+			trivialOram = new TrivialPrivateOram<T>(env, N, dataSize);
+			lengthOfIden = trivialOram.lengthOfIden;
+		} else {
+			circuitOram = new RecursiveCircuitOram<T>(env, N, dataSize, cutoff, recurFactor);
+			lengthOfIden = circuitOram.lengthOfIden;
+		}
+		this.env = env;
+	}
+
+
 	public SecureArray(CompEnv<T> env, int N, int dataSize, int threshold) throws Exception {
 		this.threshold = threshold;
 		useTrivialOram = N <= threshold;

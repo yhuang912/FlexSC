@@ -10,7 +10,6 @@ import flexsc.CompEnv;
 import flexsc.Party;
 
 public class TrivialObliviousMap<T> {
-	//Block<T>[] result;
 	int capacity, dataSize, indexSize;
 	CompEnv<T>  env;
 	T[][] key; T[][] value;
@@ -26,14 +25,21 @@ public class TrivialObliviousMap<T> {
 		this.indexSize = indexLength;
 		this.dataSize = dataLength;
 		
-		key = env.newTArray(capacity, 0);
-		value = env.newTArray(capacity, 0);
-		
+		boolean[][] ckey = new boolean[capacity][0];
+		boolean[][] cval = new boolean[capacity][0];
 		int i = 0;
 		for(Entry<Long, boolean[]>e: m.entrySet()) {
-			key[i] = inputOfP(e.getKey().intValue(), indexLength, env.getParty());
-			value[i] = inputOfP(e.getValue(), env.getParty());
+			ckey[i] = Utils.fromInt(e.getKey().intValue(), indexLength);
+			cval[i] = e.getValue();
 			i++;
+		}
+		if(env.getParty() == Party.Alice) {
+			key = env.inputOfAlice(ckey);
+			value = env.inputOfAlice(cval);
+		}
+		else {
+			key = env.inputOfBob(ckey);
+			value = env.inputOfBob(cval);
 		}
 	}
 	
@@ -41,30 +47,15 @@ public class TrivialObliviousMap<T> {
 		this.capacity = cap;
 		this.indexSize = indexLength;
 		this.dataSize = dataLength;
-		key = env.newTArray(capacity, 0);
-		value = env.newTArray(capacity, 0);
-		
-		Party p = env.getParty() == Party.Alice ? Party.Bob: Party.Alice;
-		for(int i = 0; i < cap; ++i) {
-			key[i] = inputOfP(0, indexLength, p);
-			value[i] = inputOfP(new boolean[dataLength], p);
+		if(env.getParty() == Party.Bob) {
+			key = env.inputOfAlice(new boolean[capacity][indexLength]);
+			value = env.inputOfAlice(new boolean[capacity][dataLength]);
+		}
+		else {
+			key = env.inputOfBob(new boolean[capacity][indexLength]);
+			value = env.inputOfBob(new boolean[capacity][dataLength]);
 		}
 	}
-
-	private T[] inputOfP(boolean[] t, Party p) {
-		if( p == Party.Alice)
-			return env.inputOfAlice(t);
-		else 
-			return env.inputOfBob(t);
-	}
-	
-	private T[] inputOfP(int t, int width, Party p ) {
-		if( p == Party.Alice)
-			return env.inputOfAlice(Utils.fromInt(t, width));
-		else 
-			return env.inputOfBob(Utils.fromInt(t, width));
-	}
-
 
 	public T[] read(T[] scIden) {
 		scIden = lib.padSignedSignal(scIden, indexSize);

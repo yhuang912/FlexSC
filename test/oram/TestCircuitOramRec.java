@@ -13,6 +13,7 @@ public class TestCircuitOramRec {
 
 	public  static void main(String args[]) throws Exception {
 		for(int i = 5; i <=10 ; i++) {
+			                                                  //it is log(cutoff!)
 			GenRunnable gen = new GenRunnable(12345, 15, 3, 32, 8, i);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
@@ -27,6 +28,7 @@ public class TestCircuitOramRec {
 	}
 	@Test
 	public void runThreads() throws Exception {
+															   //it is log(cutoff!)
 		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 8, 6);
 		EvaRunnable eva = new EvaRunnable("localhost", 12345);
 		Thread tGen = new Thread(gen);

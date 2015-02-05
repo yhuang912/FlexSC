@@ -28,6 +28,11 @@ public class RecursiveCircuitOram<T> {
 		init(env, N, dataSize, cutoff, recurFactor, capacity, sp);
 	}
 
+	public RecursiveCircuitOram(CompEnv<T> env, int N, int dataSize,
+			int cutoff, int recurFactor) {
+		init(env, N, dataSize, cutoff, recurFactor, 3, 80);
+	}
+
 	// with default params
 	public RecursiveCircuitOram(CompEnv<T> env, int N, int dataSize) {
 		init(env, N, dataSize, 1<<6, 8, 3, 80);

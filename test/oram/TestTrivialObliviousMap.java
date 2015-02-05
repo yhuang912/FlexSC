@@ -80,18 +80,12 @@ public class TestTrivialObliviousMap {
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
 				TrivialObliviousMap<GCSignal> server = new TrivialObliviousMap<GCSignal>(env);
 
-				int[] keys = new int[N];
-				int[] values = new int[N];
-
 				server.init(N, 32,32);
 
 				for (int i = 0; i < N; ++i) {
 					GCSignal[] scb = server.read(env.inputOfAlice(new boolean[32]));
 					server.env.outputToAlice(scb);
 				}
-
-				os.flush();
-
 				os.flush();
 
 				disconnect();
