@@ -33,7 +33,7 @@ public class MipsEmulator {
 	static final int MEM_SIZE = 72;// 160 < threshold for func1
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
-	static final Mode m = Mode.REAL;
+	static final Mode m = Mode.VERIFY;
 	static final int Alice_input = 5;
 	static final int Bob_input = 2;
 	static final boolean MULTIPLE_BANKS = true;
@@ -289,7 +289,7 @@ public class MipsEmulator {
 			SecureArray<T> currentBank;
 			while (true) {
 				currentBank = currentSet.getOramBank().getArray();
-				EmulatorUtils.print("count: " + count, lib);
+				EmulatorUtils.print("count: " + count, lib, false);
 				count++;
 				//				System.out.println("execution step: " + currentSet.getExecutionStep());
 				EmulatorUtils.printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
