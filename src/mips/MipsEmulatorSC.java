@@ -85,7 +85,7 @@ public class MipsEmulatorSC {
 		//reg.write(rd, rdContent);
 		env.flush();
 		
-		CPU cpu = new CPU(env);
+		CPU<GCSignal> cpu = new CPU<GCSignal>(env);
 		IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 		GCSignal[] pc; 
 		pc = cpu.function(reg, env.inputOfAlice(Utils.fromInt(inst, 32)), env.inputOfAlice(Utils.fromInt(0,32)));
@@ -259,8 +259,8 @@ public class MipsEmulatorSC {
 				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Alice, is, os);
 				//testInstruction(env);
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
-				CPU cpu = new CPU(env);
-				MEM mem = new MEM(env);
+				CPU<GCSignal> cpu = new CPU<GCSignal>(env);
+				MEM<GCSignal> mem = new MEM<GCSignal>(env);
 				SecureArray<GCSignal> reg = loadInputsToRegister(env);
 				
 				SecureArray<GCSignal> singleInstructionBank = null;
@@ -339,8 +339,8 @@ public class MipsEmulatorSC {
 				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Bob, is, os);
 				//testInstruction(env);
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
-				CPU cpu = new CPU(env);
-				MEM mem = new MEM(env);
+				CPU<GCSignal> cpu = new CPU<GCSignal>(env);
+				MEM<GCSignal> mem = new MEM<GCSignal>(env);
 
 				SecureArray<GCSignal> reg = loadInputsToRegister(env);
 				SecureArray<GCSignal> singleInstructionBank = null; 
