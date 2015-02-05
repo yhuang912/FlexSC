@@ -315,8 +315,8 @@ public class MipsEmulator {
 				EmulatorUtils.printRegisters(reg, lib);
 
 				EmulatorUtils.printBooleanArray("PC", pc, lib);
-				System.out.println(pcOffset);
-				System.out.println(currentSet.getOramBank().getMinAddress());
+				EmulatorUtils.print(pcOffset+"", lib);
+				EmulatorUtils.print(currentSet.getOramBank().getMinAddress()+"", lib);
 
 				currentSet = currentSet.getNextMemorySet();
 			}
