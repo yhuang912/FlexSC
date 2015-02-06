@@ -68,8 +68,11 @@ public class MipsInstructionSet {
 	
 	public static final int RETURN_REG = 0x1f;
 	
+	// This really doesn't belong in this file
 	/** Address presumed to be a branch to itself */
-	public static final long SPIN_ADDRESS = 0x0;
+	public static final String SPIN_SYMBOL = "hlt";
+	public static final long DEFAULT_SPIN_ADDRESS = -1L;
+	private static long spinAddress = DEFAULT_SPIN_ADDRESS;
 	public static final long SPIN_INSTRUCTION = 0xffff | (OP_BEQ<<OP_SHIFT);
 	public static final long NOP = 0x0;
 	
@@ -271,5 +274,19 @@ public class MipsInstructionSet {
 		public OperationType getType() {
 			return type;
 		}
+	}
+
+	/**
+	 * @return the spinAddress
+	 */
+	public static long getSpinAddress() {
+		return spinAddress;
+	}
+
+	/**
+	 * @param spinAddress the spinAddress to set
+	 */
+	public static void setSpinAddress(long spinAddress) {
+		MipsInstructionSet.spinAddress = spinAddress;
 	}
 }

@@ -5,7 +5,7 @@ package com.appcomsci.mips.binary;
 
 import java.math.BigInteger;
 import java.util.NoSuchElementException;
-import static com.appcomsci.mips.memory.MipsInstructionSet.SPIN_ADDRESS;
+import static com.appcomsci.mips.memory.MipsInstructionSet.DEFAULT_SPIN_ADDRESS;
 import static com.appcomsci.mips.memory.MipsInstructionSet.SPIN_INSTRUCTION;
 import static com.appcomsci.mips.memory.MipsInstructionSet.NOP;
 
@@ -52,9 +52,9 @@ public class DataSegment {
 	 */
 	public long getDatum(long address) {
 		// Hacks for spinning
-		if(address == SPIN_ADDRESS)
+		if(address == DEFAULT_SPIN_ADDRESS)
 			return SPIN_INSTRUCTION;
-		if(address == SPIN_ADDRESS+4)
+		if(address == DEFAULT_SPIN_ADDRESS+4)
 			return NOP;
 		long index = address-startAddress;
 		if((index & 0x3) != 0) {
@@ -129,9 +129,9 @@ public class DataSegment {
 			return null;
 		
 		// Hacks for spinning
-		if(address == SPIN_ADDRESS)
+		if(address == DEFAULT_SPIN_ADDRESS)
 			return datumToBoolean(SPIN_INSTRUCTION);
-		if(address == SPIN_ADDRESS+4)
+		if(address == DEFAULT_SPIN_ADDRESS+4)
 			return datumToBoolean(NOP);
 		if(booleanData == null) {
 			getDataAsBoolean();

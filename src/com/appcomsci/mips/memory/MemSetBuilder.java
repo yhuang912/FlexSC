@@ -21,7 +21,7 @@ import static com.appcomsci.mips.memory.MipsInstructionSet.OP_JALR;
 import static com.appcomsci.mips.memory.MipsInstructionSet.OP_JR;
 import static com.appcomsci.mips.memory.MipsInstructionSet.OP_REGIMM;
 import static com.appcomsci.mips.memory.MipsInstructionSet.RETURN_REG;
-import static com.appcomsci.mips.memory.MipsInstructionSet.SPIN_ADDRESS;
+import static com.appcomsci.mips.memory.MipsInstructionSet.DEFAULT_SPIN_ADDRESS;
 import static com.appcomsci.mips.memory.MipsInstructionSet.NOP;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getFunct;
 import static com.appcomsci.mips.memory.MipsInstructionSet.getInstrIndex;
@@ -96,12 +96,12 @@ public class MemSetBuilder<T> extends MipsProgram {
 	 * The analysis attempts to trace possible execution paths.  Each time a conditional branch
 	 * is encountered, a new thread representing a possible execution path is started.  If a
 	 * thread successfully reaches the end of the routine being analyzed, it is assumed to return to
-	 * the address MipsInstructionSet.SPIN_ADDRESS (currently 0) where it is assumed to spin
+	 * the address MipsInstructionSet.DEFAULT_SPIN_ADDRESS (currently 0) where it is assumed to spin
 	 * forever.
 	 * 
 	 * Eventually, one of the following happens:
 	 * 1) The analysis terminates.  (This will only happen in simple programs with no
-	 * loops).  The final MemorySet object will contain only SPIN_ADDRESS and will be
+	 * loops).  The final MemorySet object will contain only DEFAULT_SPIN_ADDRESS and will be
 	 * self-referential.
 	 * 2) The analysis hits the maximum number of program steps.  The NextMemorySet pointer
 	 * of the final object in the list will be null.
@@ -224,7 +224,7 @@ public class MemSetBuilder<T> extends MipsProgram {
 			while(thI.hasNext()) {
 				ThreadState th = thI.next();
 //System.err.println("  Thread " + th.getId() + " A: " + Long.toHexString(th.getCurrentAddress()) + " D: " +
-//Long.toHexString(th.getCurrentAddress() == SPIN_ADDRESS ? 0 : instructions.getDatum(th.getCurrentAddress())));
+//Long.toHexString(th.getCurrentAddress() == DEFAULT_SPIN_ADDRESS ? 0 : instructions.getDatum(th.getCurrentAddress())));
 
 				if(th.isDelayed()) {
 					// If a delay slot, just pop it off and continue
@@ -233,7 +233,7 @@ public class MemSetBuilder<T> extends MipsProgram {
 					// Get the current address, and the instr if it's not the spin.
 					long addr = th.getCurrentAddress();
 					long instr = NOP;
-					if(addr != SPIN_ADDRESS)
+					if(addr != DEFAULT_SPIN_ADDRESS)
 						instr = instructions.getDatum(th.getCurrentAddress());
 					
 					// Now we get down to the tedious work of simulating individual

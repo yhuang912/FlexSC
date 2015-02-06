@@ -40,7 +40,7 @@ public class ThreadState {
 	 */
 	public ThreadState(long programCounter) {
 		stack = new ArrayDeque<Long>();
-		stack.push(MipsInstructionSet.SPIN_ADDRESS);
+		stack.push(MipsInstructionSet.getSpinAddress());
 		stack.push(programCounter);
 		id = idCounter++;
 	}
@@ -107,7 +107,7 @@ public class ThreadState {
 	 * 
 	 */
 	public void advance() {
-		if(getCurrentAddress() == MipsInstructionSet.SPIN_ADDRESS)
+		if(getCurrentAddress() == MipsInstructionSet.getSpinAddress())
 			return;
 		
 		// Delayed execution pushes the addr of the delayed

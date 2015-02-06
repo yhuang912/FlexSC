@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
+import com.appcomsci.mips.memory.MipsInstructionSet;
+
 /**
  * @author Allen McIntosh
  *
@@ -52,7 +54,7 @@ public class Configuration {
 	private int maxProgramSteps;
 	private boolean honorDelaySlots;
 	
-	private List<String> functionLoadList;
+	private ArrayList<String> functionLoadList;
 	
 	/** Standard constructor.
 	 * Initializes from a property file specified via -D, or from the default
@@ -134,12 +136,20 @@ public class Configuration {
 	}
 	
 	public void setFunctionLoadList(List<String>newlist) {
-		this.functionLoadList = newlist;
+		this.functionLoadList = new ArrayList<String>(newlist);
+		if(!functionLoadList.contains(MipsInstructionSet.SPIN_SYMBOL)) {
+			functionLoadList.add(MipsInstructionSet.SPIN_SYMBOL);
+		}
 	}
 
 	public void setFunctionLoadList(String list) {
 		String fcns[] = list.split("[, ]+", 0);
-		functionLoadList = Arrays.asList(fcns);
+		// This ugliness because the result of Arrays.asList() does not do add
+		// (even though it says it is an ArrayList)
+		functionLoadList = new ArrayList<String>(Arrays.asList(fcns));
+		if(!functionLoadList.contains(MipsInstructionSet.SPIN_SYMBOL)) {
+			functionLoadList.add(MipsInstructionSet.SPIN_SYMBOL);
+		}
 	}
 	
 	public String getServerName() {

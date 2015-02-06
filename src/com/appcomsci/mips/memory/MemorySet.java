@@ -125,7 +125,7 @@ public class MemorySet<T> {
 	 */
 	public boolean isAllSpinning() {
 		if(addresses.size() != 1) return false;
-		return addresses.first() == MipsInstructionSet.SPIN_ADDRESS;
+		return addresses.first() == MipsInstructionSet.getSpinAddress();
 	}
 	
 	public String toString() {
