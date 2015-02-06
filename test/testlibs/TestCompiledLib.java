@@ -47,7 +47,7 @@ public class TestCompiledLib extends TestHarness {
 			BigInteger b = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
 			TestBigInteger.runThreads(new TestBigInteger.Helper(a, b) {
 				public <T>T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception {
-					return new NoClass<T>(e).leadingZero2(Signala.length, Signala);
+					return new NoClass<T>(e).leadingZero(Signala.length, Signala);
 //					return new IntegerLib<T>(e).leadingZeros(Signala);
 				}
 
