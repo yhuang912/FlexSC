@@ -5,17 +5,17 @@ import harness.TestBigInteger;
 import harness.TestHarness;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 import org.junit.Test;
 
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
+
 import compiledlib.libs.NoClass;
 
 public class TestCompiledLib extends TestHarness {
 
-//	@Test
+	@Test
 	public void testCountOnes() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
@@ -39,7 +39,7 @@ public class TestCompiledLib extends TestHarness {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testLeadingZeros() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
