@@ -14,8 +14,8 @@ import flexsc.Party;
 
 
 public class TestBigInteger extends TestHarness{
-	public static final int LENGTH = 799;
-	final static int RANGE = LENGTH;
+	public static final int LENGTH = 32;
+	final static int RANGE = LENGTH/2;
 	public static abstract class Helper {
 		BigInteger intA, intB;
 		boolean[] a;
@@ -24,8 +24,8 @@ public class TestBigInteger extends TestHarness{
 			intA = aa;
 			intB = bb;
 
-			a = Utils.fromBigInteger(aa, RANGE);
-			b = Utils.fromBigInteger(bb, RANGE);
+			a = Utils.fromBigInteger(aa, LENGTH);
+			b = Utils.fromBigInteger(bb, LENGTH);
 		}
 		public abstract <T>T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception;
 		public abstract BigInteger plainCompute(BigInteger x, BigInteger y);
@@ -109,10 +109,13 @@ public class TestBigInteger extends TestHarness{
 			System.out.println(eva.andgates);
 //		System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
 //		h.intA+" "+h.intB+"\n");
-//		System.out.println(Arrays.toString(h.a));
-//		System.out.println(Arrays.toString(h.b));
-		System.out.println(Arrays.toString( Utils.fromBigInteger(h.plainCompute(h.intA, h.intB),gen.z.length)));
-		System.out.println(Arrays.toString(Utils.fromBigInteger(Utils.toBigInteger(gen.z),gen.z.length)));
+		if(!h.plainCompute(h.intA, h.intB).equals(Utils.toBigInteger(gen.z))) 
+		{
+			System.out.println(Arrays.toString(h.a));
+			System.out.println(Arrays.toString(h.b));
+			System.out.println(Arrays.toString( Utils.fromBigInteger(h.plainCompute(h.intA, h.intB),gen.z.length)));
+			System.out.println(Arrays.toString(Utils.fromBigInteger(Utils.toBigInteger(gen.z),gen.z.length)));
+		}
 		
 		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toBigInteger(gen.z));
 	}
