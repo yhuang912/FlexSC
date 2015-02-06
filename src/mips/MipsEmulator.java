@@ -24,6 +24,7 @@ import compiledlib.dov.CPU;
 import compiledlib.dov.MEM;
 import mips.EmulatorUtils;
 import flexsc.CompEnv;
+// NEW import flexsc.CpuFcn;
 import flexsc.Mode;
 import flexsc.Party;
 
@@ -267,6 +268,7 @@ public class MipsEmulator {
 			//testInstruction(env);
 			lib = new IntegerLib<T>(env);
 			CPU<T> cpu = new CPU<T>(env);
+// NEW			CpuFcn<T> cpu = new CPU<T>(env);
 			MEM<T> mem = new MEM<T>(env);
 			reg = loadInputsToRegister(env);
 
@@ -377,10 +379,10 @@ public class MipsEmulator {
 		// is this cast ok?  Or should we modify the mem circuit? 
 		int pcOffset = (int) ent.getAddress();
 		int dataOffset = (int) rdr.getDataAddress();
-		MemSetBuilder b = new MemSetBuilder(config, binaryFileName);
+		MemSetBuilder<Boolean> b = new MemSetBuilder<Boolean>(config, binaryFileName);
 		//List<MemorySet>sets = b.build();
-		GenRunnable gen = new GenRunnable(b.build(), instData, memData, pcOffset, dataOffset);
-		EvaRunnable env = new EvaRunnable(b.build(), instData, memData, pcOffset, dataOffset);
+		GenRunnable<Boolean> gen = new GenRunnable<Boolean>(b.build(), instData, memData, pcOffset, dataOffset);
+		EvaRunnable<Boolean> env = new EvaRunnable<Boolean>(b.build(), instData, memData, pcOffset, dataOffset);
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
 		tGen.start();
