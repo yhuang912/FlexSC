@@ -1,4 +1,4 @@
-int@log(n+1) countOnes@n(int@n x) {
+dummy int@log(n+1) countOnes@n(int@n x) {
   if(n==1) return x;
   int@log(n/2+1) first = countOnes@(n/2)(x$0~n/2$);
   int@log(n-n/2+1) second = countOnes@(n-n/2)(x$n/2~n$);
@@ -6,7 +6,7 @@ int@log(n+1) countOnes@n(int@n x) {
   return r;
 }
  
-int@log(n) leadingZero@n(int@n x) {
+dummy int@log(n) leadingZero@n(int@n x) {
       int@n y = 0;
       if(x$n-1$ == 0)
          y$n-1$ = 1;

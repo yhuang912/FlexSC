@@ -23,8 +23,8 @@ public class TestCompiledLib extends TestHarness {
 			BigInteger b = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
 			TestBigInteger.runThreads(new TestBigInteger.Helper(a, b) {
 				public <T>T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception {
-//					return new NoClass<T>(e).countOnes(Signala.length, Signala);
-					return new IntegerLib<>(e).numberOfOnes(Signala);
+					return new NoClass<T>(e).countOnes(Signala.length, Signala, e.ONE());
+//					return new IntegerLib<>(e).numberOfOnes(Signala);
 				}
 
 				public BigInteger plainCompute(BigInteger x, BigInteger y) {
@@ -39,7 +39,7 @@ public class TestCompiledLib extends TestHarness {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void testLeadingZeros() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
@@ -47,7 +47,7 @@ public class TestCompiledLib extends TestHarness {
 			BigInteger b = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
 			TestBigInteger.runThreads(new TestBigInteger.Helper(a, b) {
 				public <T>T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception {
-					return new NoClass<T>(e).leadingZero(Signala.length, Signala);
+					return new NoClass<T>(e).leadingZero(Signala.length, Signala, e.ONE());
 //					return new IntegerLib<T>(e).leadingZeros(Signala);
 				}
 
