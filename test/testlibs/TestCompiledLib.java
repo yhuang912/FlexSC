@@ -15,7 +15,7 @@ import compiledlib.libs.NoClass;
 
 public class TestCompiledLib extends TestHarness {
 
-	@Test
+//	@Test
 	public void testCountOnes() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
@@ -39,7 +39,7 @@ public class TestCompiledLib extends TestHarness {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void testLeadingZeros() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
