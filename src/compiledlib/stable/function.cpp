@@ -14,4 +14,4 @@ int@log(n) leadingZero@n(int@n x) {
             if(x$i$==0 && y$i+1$==1)
                   y$i$ = 1;
       return countOnes@n(y);
-} 
+}

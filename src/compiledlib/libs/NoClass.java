@@ -138,4 +138,69 @@ public class NoClass<t__T> implements IWritable<NoClass, t__T> {
 		t__T[] __tmp40 = f_tmp_23;
 		return __tmp40;
 	}
+	public t__T[] leadingZero2(int n, t__T[] x) throws Exception {
+		t__T[] y = env.inputOfAlice(Utils.fromInt(0, n));
+		int i = 0;
+		int f_tmp_24 = 0;
+		int __tmp41 = f_tmp_24;
+		y = env.inputOfAlice(Utils.fromInt(__tmp41, n));
+		int f_tmp_25 = 1;
+		int __tmp42 = f_tmp_25;
+		i = __tmp42;
+		int __tmp43 = n;
+		boolean f_tmp_26 = i < __tmp43;
+		boolean __tmp44 = f_tmp_26;
+		while(__tmp44) {
+			t__T __tmp45 = x[i];
+			t__T __tmp46 = __tmp45;//intLib.enforceBits(__tmp45, 1);
+			y[i]=__tmp46;
+			int __tmp47 = i;
+			int f_tmp_27 = 1;
+			int __tmp48 = f_tmp_27;
+			int f_tmp_28 = __tmp47 + __tmp48;
+			int __tmp49 = f_tmp_28;
+			i = __tmp49;
+			__tmp43 = n;
+			boolean f_tmp_29 = i < __tmp43;
+			__tmp44 = f_tmp_29;
+		}
+		int __tmp50 = n;
+		int f_tmp_30 = 2;
+		int __tmp51 = f_tmp_30;
+		int f_tmp_31 = __tmp50 - __tmp51;
+		int __tmp52 = f_tmp_31;
+		i = __tmp52;
+		int f_tmp_32 = 0;
+		int __tmp53 = f_tmp_32;
+		boolean f_tmp_33 = i >= __tmp53;
+		boolean __tmp54 = f_tmp_33;
+		while(__tmp54) {
+			t__T __tmp55 = y[i];
+			t__T __tmp57 = __tmp55;
+			t__T __tmp58 = y[(i)+(1)];
+			t__T __tmp60 = __tmp58;
+			t__T f_tmp_34 = intLib.or(__tmp57,__tmp60);
+			t__T __tmp61 = f_tmp_34;
+			boolean f_tmp_35 = true;
+			boolean __tmp62 = f_tmp_35;
+			t__T __tmp63 = y[i];
+			t__T f_tmp_37 = env.inputOfAlice(__tmp62);
+			t__T __tmp64 = intLib.mux(__tmp63, f_tmp_37,__tmp61);
+			y[i]=__tmp64;
+			int __tmp65 = i;
+			int f_tmp_38 = 1;
+			int __tmp66 = f_tmp_38;
+			int f_tmp_39 = __tmp65 - __tmp66;
+			int __tmp67 = f_tmp_39;
+			i = __tmp67;
+			int f_tmp_40 = 0;
+			__tmp53 = f_tmp_40;
+			boolean f_tmp_41 = i >= __tmp53;
+			__tmp54 = f_tmp_41;
+		}
+		t__T[] __tmp68 = intLib.enforceBits(y, n);
+		t__T[] f_tmp_42 = countOnes(n, __tmp68);
+		t__T[] __tmp69 = f_tmp_42;
+		return __tmp69;
+	}
 }
