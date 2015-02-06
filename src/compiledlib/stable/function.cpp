@@ -8,6 +8,8 @@ int@log(n+1) countOnes@n(int@n x) {
  
 int@log(n) leadingZero@n(int@n x) {
       int@n y = 0;
+      if(x$n-1$ == 0)
+         y$n-1$ = 1;
       for(public int32 i=n-2; i>=0; i=i-1)
             if(x$i$==0 && y$i+1$==1)
                   y$i$ = 1;
