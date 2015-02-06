@@ -30,6 +30,12 @@ public class CircuitLib<T> {
 			return Arrays.copyOfRange(a, 0, length);
 	}
 
+	 public T[] enforceBits(T a, int length) {
+         T[] ret = zeros(length);
+         ret[0] = a;
+         return ret;
+   }
+	 
 	public T[] toSignals(int a, int width) {
 		T[] result = env.newTArray(width);
 		for (int i = 0; i < width; ++i) {
