@@ -95,7 +95,9 @@ public class TestCircuitOramRecOpt {
 							.fromInt(element, dataSize));
 					os.flush();
 					Flag.sw.startTotal();
+					double t11 = System.nanoTime();
 					client.write(client.baseOram.lib.toSignals(element), scData);
+					System.out.println((System.nanoTime()-t11)/1000000000.0);
 					double t = Flag.sw.stopTotal();
 //					System.out.println(Flag.sw.ands + " " + t / 1000000000.0
 //							+ " " + Flag.sw.ands / t * 1000);
