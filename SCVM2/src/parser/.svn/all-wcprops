@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/repos/security/!svn/ver/9541/sc-ram/code/SCVM2/src/parser
+END
+CParser.java
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/security/!svn/ver/9541/sc-ram/code/SCVM2/src/parser/CParser.java
+END
+Token.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/security/!svn/ver/7680/sc-ram/code/SCVM2/src/parser/Token.java
+END
+TokenMgrError.java
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/security/!svn/ver/7680/sc-ram/code/SCVM2/src/parser/TokenMgrError.java
+END
+SimpleCharStream.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/security/!svn/ver/7680/sc-ram/code/SCVM2/src/parser/SimpleCharStream.java
+END
+C.jj
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/security/!svn/ver/9541/sc-ram/code/SCVM2/src/parser/C.jj
+END
+ParseException.java
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/security/!svn/ver/7680/sc-ram/code/SCVM2/src/parser/ParseException.java
+END
+CParserTokenManager.java
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/security/!svn/ver/9525/sc-ram/code/SCVM2/src/parser/CParserTokenManager.java
+END
+CParserConstants.java
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/security/!svn/ver/9525/sc-ram/code/SCVM2/src/parser/CParserConstants.java
+END
