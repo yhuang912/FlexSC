@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 
 import rand.ISAACProvider;
+import util.Utils;
 
 public abstract class CompEnv<T> {
 
@@ -63,6 +64,39 @@ public abstract class CompEnv<T> {
 		this.m = m;
 		this.p = p;
 	}
+	
+	public T[][] inputOfAlice(boolean[][] in) {
+		boolean[] flattened = Utils.flatten(in);
+		T[] res = inputOfAlice(flattened);
+		T[][] unflattened = newTArray(in.length, in[0].length);
+		Utils.unflatten(res, unflattened);
+		return unflattened;
+	}
+	
+	public T[][] inputOfBob(boolean[][] in) {
+		boolean[] flattened = Utils.flatten(in);
+		T[] res = inputOfBob(flattened);
+		T[][] unflattened = newTArray(in.length, in[0].length);
+		Utils.unflatten(res, unflattened);
+		return unflattened;
+	}
+
+	public T[][][] inputOfAlice(boolean[][][] in) {
+		boolean[] flattened = Utils.flatten(in);
+		T[] res = inputOfAlice(flattened);
+		T[][][] unflattened = newTArray(in.length, in[0].length, in[0][0].length);
+		Utils.unflatten(res, unflattened);
+		return unflattened;
+	}
+	
+	public T[][][] inputOfBob(boolean[][][] in) {
+		boolean[] flattened = Utils.flatten(in);
+		T[] res = inputOfBob(flattened);
+		T[][][] unflattened = newTArray(in.length, in[0].length, in[0][0].length);
+		Utils.unflatten(res, unflattened);
+		return unflattened;
+	}
+
 
 	public abstract T inputOfAlice(boolean in);
 

@@ -53,6 +53,8 @@ public class CVCompEnv extends BooleanCompEnv {
 
 		return res;
 	}
+	
+	
 
 	@Override
 	public boolean outputToAlice(Boolean out) {
