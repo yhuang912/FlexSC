@@ -12,8 +12,7 @@ import gc.GCSignal;
 public class TestCircuitOramRecOpt {
 
 	public  static void main(String args[]) throws Exception {
-		for(int i = 24; i <=24 ; i+=2) {
-			GenRunnable gen = new GenRunnable(12345, i, 3, 32, 8, 6);
+			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 32, 8, 6);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
@@ -23,7 +22,6 @@ public class TestCircuitOramRecOpt {
 			tGen.join();
 			Flag.sw.print();
 			System.out.print("\n");
-		}
 	}
 	@Test
 	public void runThreads() throws Exception {
