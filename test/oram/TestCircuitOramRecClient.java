@@ -1,6 +1,6 @@
 package oram;
 
-import oram.TestCircuitOramRec.EvaRunnable;
+import oram.TestCircuitOramRecOpt.EvaRunnable;
 import flexsc.Flag;
 
 public class TestCircuitOramRecClient {
