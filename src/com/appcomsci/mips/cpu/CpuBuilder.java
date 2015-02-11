@@ -2,11 +2,11 @@ package com.appcomsci.mips.cpu;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -204,15 +204,37 @@ public class CpuBuilder {
 		sb.append(lineSeparator);
 		return true;
 	}
+	
+	/** Build a CPU
+	 * 
+	 * @param operations The set of operations to be implemented
+	 * @param f Write the CPU program to this file
+	 * @throws FileNotFoundException
+	 */
+	
+	public void build(Set<MipsInstructionSet.Operation>operations, File f) throws FileNotFoundException {
+		PrintStream w = new PrintStream(f);
+		build(operations, w);
+	}
+	
+	/** Build a CPU
+	 * 
+	 * @param operations The set of operations to be implemented
+	 * @param w Write the CPU program here
+	 */
+	
+	public void build(Set<MipsInstructionSet.Operation>operations, PrintStream w) {
+		StringBuilder sb = new StringBuilder();
+		build(operations, sb);
+		w.print(sb.toString());
+	}
 
 	/**
 	 * Build a CPU
 	 * @param operations The set of operations to be implemented
 	 * @return The text of the CPU
 	 */
-	public String build(Set<MipsInstructionSet.Operation>operations) {
-		
-		StringBuilder sb = new StringBuilder();
+	public void build(Set<MipsInstructionSet.Operation>operations, StringBuilder sb) {
 
 		// Build sets of ops by type.
 		// Also keep track of whether there were any multiplies or divides
@@ -287,7 +309,6 @@ public class CpuBuilder {
 				sb.append(lineSeparator);
 			}
 		}
-		return sb.toString();
 	}
 
 	/** Main program for testing
@@ -326,8 +347,9 @@ public class CpuBuilder {
 			bldr = new CpuBuilder(new InputStreamReader(new FileInputStream(f)));
 			*/
 			bldr = new CpuBuilder();
-			String code = bldr.build(operations);
-			System.out.print(code);
+			StringBuilder code = new StringBuilder();
+			bldr.build(operations, code);
+			System.out.print(code.toString());
 		} catch(FileNotFoundException e) {
 			System.err.println("No " + CPU_FILE_NAME + " despite existence check");
 		} catch(IOException e) {
