@@ -53,7 +53,7 @@ public class BSCircuitOram<T> {
 				/ recurFactor;
 		while (newN > cutoff) {
 			CircuitORAMInterface<T> o;
-			if(newN < 0) {
+			if(newN < 1<<20) {
 				o = new CircuitOramNOOT<T>(indexsize, env, newN, newDataSize, capacity, sp);
 				clients.add(o);
 			}
