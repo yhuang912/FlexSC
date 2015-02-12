@@ -28,6 +28,8 @@ public class CommandTool {
 			Config.path = args[3] + "/" + path;
 		else
 			Config.path = "/Users/wangxiao/git/FlexSC_rc/src/"+ path;
+		if(args.length > 4)
+			Config.implementedInterface = args[4];
 		if(args.length > 2) {
 			if(args[2].equalsIgnoreCase("true"))
 				compile(args[0], true);

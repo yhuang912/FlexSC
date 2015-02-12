@@ -865,7 +865,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 	}
 
 	public String visit(VariableType type) {
-		return isDefine ? type.name + " extends IWritable<"+type.name+", "+dataType+">" : type.name;
+		return isDefine ? type.name + " extends " + Config.implementedInterface + "<"+type.name+", "+dataType+">" : type.name;
 	}
 
 	@Override

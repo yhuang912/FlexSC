@@ -22,9 +22,11 @@ public class Config {
 		"gc.GCSignal",
 		"java.util.Arrays",
 		"java.util.Random",
-		"flexsc.IWritable",
+//		"flexsc.IWritable",
 		"flexsc.Comparator",
 		"java.lang.reflect.Array"};
+
+	public static String implementedInterface = "flexsc.IWritable";
 
 	public static String path = "../../git/FlexSC/src/"+packageName.replace(".", "/");
 	

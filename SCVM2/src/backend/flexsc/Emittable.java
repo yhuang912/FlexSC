@@ -30,6 +30,7 @@ public abstract class Emittable {
 		out.println("package "+Config.packageName+";");
 		for(String s : Config.importPackage)
 			out.println("import "+s+";");
+		out.println("import " + Config.implementedInterface + ";");
 
 	}
 

@@ -33,14 +33,15 @@ public class TypeEmittable extends Emittable {
 			for(int i = 0; i<type.typeParameter.size(); ++i) {
 				this.typeParameters.add(
 						((VariableType)type.typeParameter.get(i)).name
-						+" extends IWritable<"+((VariableType)type.typeParameter.get(i)).name+","+codeGen.dataType+">"
+						+" extends " + config.implementedInterface + "<"+((VariableType)type.typeParameter.get(i)).name+","+codeGen.dataType+">"
 						);
 			}
 		}
 		
 		codeGen.isDefine = false;
 		if(this.inheritWritable(type)) {
-			this.implementInterfaces.add("IWritable<"+codeGen.visit(type)+", "+codeGen.dataType+">");
+			// Should this be interface or class?
+			this.implementInterfaces.add(config.implementedInterface + "<"+codeGen.visit(type)+", "+codeGen.dataType+">");
 		}
 	}
 	

@@ -25,7 +25,7 @@ public class FunctionPointerEmittable extends Emittable {
 		this.isAbstract = true;
 
 		for(int i = 0; i<fty.typeParameters.size(); ++i) {
-			this.typeParameters.add(fty.typeParameters.get(i)+" extends IWritable<"+fty.typeParameters.get(i)+","+codeGen.dataType+">");
+			this.typeParameters.add(fty.typeParameters.get(i)+" extends " + config.implementedInterface + "<"+fty.typeParameters.get(i)+","+codeGen.dataType+">");
 		}
 		
 		if(tm.nativeNameMapping.containsKey(name)) {
