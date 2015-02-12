@@ -4,6 +4,8 @@
 *.war
 *.ear
 /bin
+/build
+/dist
 .DS_Store
 *.swp
 NPOTKey
