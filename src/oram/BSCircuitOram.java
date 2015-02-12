@@ -12,7 +12,7 @@ import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Party;
 
-public class RecursiveOptCircuitOram<T> {
+public class BSCircuitOram<T> {
 	public TrivialPrivateOram<T> baseOram;
 	public ArrayList<CircuitORAMInterface<T>> clients = new ArrayList<>();
 	public int lengthOfIden;
@@ -25,14 +25,14 @@ public class RecursiveOptCircuitOram<T> {
 	protected OutputStream os;
 	Party p;
 	CompEnv<T> env;
-IntegerLib<T> lib ;
-	public RecursiveOptCircuitOram(CompEnv<T> env, int N, int dataSize,
+	IntegerLib<T> lib;
+	public BSCircuitOram(CompEnv<T> env, int N, int dataSize,
 			int cutoff, int recurFactor, int capacity, int sp) {
 		init(env, N, dataSize, cutoff, recurFactor, capacity, sp);
 	}
 
 	// with default params
-	public RecursiveOptCircuitOram(CompEnv<T> env, int N, int dataSize) {
+	public BSCircuitOram(CompEnv<T> env, int N, int dataSize) {
 		init(env, N, dataSize, 1<<6, 8, 3, 80);
 	}
 

@@ -11,9 +11,8 @@ public class CountCircuitOramRec {
 
 	public  static void main(String args[]) throws Exception {
 
-		for(int d = 5; d < 20; ++d) {
 			System.out.print("datasize: "+40+"  ");
-			GenRunnable gen = new GenRunnable(12345, 3, 40, 8, 6);
+			GenRunnable gen = new GenRunnable(12345, 3, 32, 8, 6);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
@@ -21,7 +20,6 @@ public class CountCircuitOramRec {
 			Thread.sleep(10);
 			tEva.start();
 			tGen.join();
-		}
 	}
 
 
@@ -54,9 +52,9 @@ public class CountCircuitOramRec {
 				CompEnv<Boolean> env = CompEnv.getEnv(Mode.COUNT, Party.Alice,
 						is, os);
 
-				for(int i = 4; i <= 10 ; i++) {
+
 					RecursiveCircuitOram<Boolean> client = new RecursiveCircuitOram<Boolean>(
-							env, 1<<i, dataSize, cutoff, recurFactor, capacity, 80);
+							env, 1<<16, dataSize, cutoff, recurFactor, capacity, 80);
 
 
 					Boolean[] scData = client.baseOram.env.inputOfAlice(Utils
@@ -67,16 +65,8 @@ public class CountCircuitOramRec {
 					client.write(client.baseOram.lib.toSignals(1), scData);
 					double ands = ((PMCompEnv)env).statistic.andGate;
 
-					TrivialPrivateOram<Boolean> client2 = new TrivialPrivateOram<Boolean>(env, 1<<i, dataSize);
-					scData = client2.env.inputOfAlice(Utils.fromInt(1, dataSize));
-					Flag.sw.ands = 0;
-					((PMCompEnv)env).statistic.flush();
-					client2.write(client2.lib.toSignals(1), scData);
-					if(ands < ((PMCompEnv)env).statistic.andGate) {
-						System.out.println("\t"+(i-1));
-						break;
-					}
-				}
+					System.out.println("\t"+ands);
+
 
 				os.flush();
 

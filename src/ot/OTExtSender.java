@@ -101,25 +101,31 @@ public class OTExtSender extends OTSender {
 			int msgBitLength, GCSignal[][] msgPairs, InputStream is,
 			OutputStream os, Cipher cipher) throws IOException {
 		BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
+		int numOfPairs = msgPairs.length;
+
+		BitMatrix Q = new BitMatrix(numOfPairs, SecurityParameter.k1);
 
 		Flag.sw.startOTIO();
 		for (int i = 0; i < SecurityParameter.k1; i++) {
 			cphPairs[i][0] = RWBigInteger.readBI(is);
 			cphPairs[i][1] = RWBigInteger.readBI(is);
-		}
-		Flag.sw.stopOTIO();
-
-		int numOfPairs = msgPairs.length;
-
-		BitMatrix Q = new BitMatrix(numOfPairs, SecurityParameter.k1);
-
-		for (int i = 0; i < SecurityParameter.k1; i++) {
 			if (s[i])
 				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][1],
 						numOfPairs);
 			else
 				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][0],
 						numOfPairs);
+		}
+		Flag.sw.stopOTIO();
+
+
+		for (int i = 0; i < SecurityParameter.k1; i++) {
+//			if (s[i])
+//				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][1],
+//						numOfPairs);
+//			else
+//				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][0],
+//						numOfPairs);
 		}
 
 		BitMatrix tQ = Q.transpose();
@@ -134,12 +140,14 @@ public class OTExtSender extends OTSender {
 			y[i][1] = cipher.enc(
 					GCSignal.newInstance(tQ.data[i].xor(biS).toByteArray()),
 					msgPairs[i][1], i);
+			y[i][0].send(os);
+			y[i][1].send(os);
 		}
 
 		Flag.sw.startOTIO();
 		for (int i = 0; i < numOfPairs; i++) {
-			y[i][0].send(os);
-			y[i][1].send(os);
+//			y[i][0].send(os);
+//			y[i][1].send(os);
 		}
 		os.flush();
 		Flag.sw.stopOTIO();
