@@ -45,6 +45,9 @@ public class Configuration {
 	
 	public static final String HONOR_DELAY_SLOTS_PROPERTY = "honor.delay.slots";
 	public static final boolean DEFAULT_HONOR_DELAY_SLOTS = false;
+	
+	public static final String MULTIPLE_BANKS_PROPERTY = "multiple.banks";
+	public static final boolean DEFAULT_MULTIPLE_BANKS = true;
 
 	private String entryPoint;
 	private String emulatorClientDir;
@@ -53,6 +56,7 @@ public class Configuration {
 	private String binaryReaderPath;
 	private int maxProgramSteps;
 	private boolean honorDelaySlots;
+	private boolean multipleBanks;
 	
 	private ArrayList<String> functionLoadList;
 	
@@ -86,6 +90,7 @@ public class Configuration {
 		binaryReaderPath = properties.getProperty(READER_PATH_PROPERTY, DEFAULT_READER_PATH);
 		maxProgramSteps = properties.getProperty(MAX_PROGRAM_STEPS_PROPERTY, DEFAULT_MAX_PROGRAM_STEPS);
 		honorDelaySlots = properties.getProperty(HONOR_DELAY_SLOTS_PROPERTY, DEFAULT_HONOR_DELAY_SLOTS);
+		multipleBanks = properties.getProperty(MULTIPLE_BANKS_PROPERTY, DEFAULT_MULTIPLE_BANKS);
 		initFunctionLoadList(properties);	
 	}
 	
@@ -201,6 +206,20 @@ public class Configuration {
 	 */
 	public void setHonorDelaySlots(boolean honorDelaySlots) {
 		this.honorDelaySlots = honorDelaySlots;
+	}
+
+	/**
+	 * @return the multipleBanks
+	 */
+	public boolean isMultipleBanks() {
+		return multipleBanks;
+	}
+
+	/**
+	 * @param multipleBanks the multipleBanks to set
+	 */
+	public void setMultipleBanks(boolean multipleBanks) {
+		this.multipleBanks = multipleBanks;
 	}
 
 }
