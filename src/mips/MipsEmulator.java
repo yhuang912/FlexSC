@@ -39,8 +39,8 @@ public class MipsEmulator {
 	static final Mode m = Mode.VERIFY;
 	static final int Alice_input = 5;
 	static final int Bob_input = 2;
-	static final boolean MULTIPLE_BANKS = true;
-	Configuration config;
+	// static final boolean MULTIPLE_BANKS = true;
+	static Configuration config;
 	private static String binaryFileName;	// should not be static FIXME
 
 	public MipsEmulator(Configuration config) {
@@ -186,14 +186,16 @@ public class MipsEmulator {
 				break;
 			//long minAddr = m.firstEntry().getKey();
 			long minAddr = m.ceilingKey((long)1);
-			if (!MULTIPLE_BANKS)
+			if (!config.isMultipleBanks())
 				instructionBank = singleBank;
 			else {
 				instructionBank = new SecureArray<T>(env, (int)((maxAddr - minAddr)/4 + 1), WORD_SIZE);
 				int count = 0;
 				for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
 					if (env.getParty() == Party.Alice) {
-						EmulatorUtils.print("count: " + count + " key: " + entry.getKey() + " value: " , lib);
+						EmulatorUtils.print("count: " + count + " key: " + entry.getKey() +
+								" (0x" + Long.toHexString(entry.getKey()) + ")" +
+								" value: " , lib);
 						String output = "";
 						for (int j = 31 ; j >= 0;  j--){
 							if (entry.getValue()[j])
@@ -276,7 +278,7 @@ public class MipsEmulator {
 
 			SecureArray<T> singleInstructionBank = null;
 
-			if (!MULTIPLE_BANKS){
+			if (!config.isMultipleBanks()){
 				singleInstructionBank = loadInstructionsSingleBank(env, instData);				
 			}
 			loadInstructionsMultiBanks(env, singleInstructionBank, sets, instData);
@@ -286,7 +288,7 @@ public class MipsEmulator {
 			T[] newInst = lib.toSignals(0, WORD_SIZE);
 			boolean testHalt;
 			int count = 0; 
-			if (!MULTIPLE_BANKS)
+			if (!config.isMultipleBanks())
 				EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
 			long startTime = System.nanoTime();
 			MemorySet<T> currentSet = sets.get(0);
@@ -297,7 +299,7 @@ public class MipsEmulator {
 				count++;
 				//				System.out.println("execution step: " + currentSet.getExecutionStep());
 				EmulatorUtils.printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
-				if (MULTIPLE_BANKS)
+				if (config.isMultipleBanks())
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
 				newInst = mem.getInst(currentBank, pc, pcOffset);
 				//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
@@ -370,20 +372,14 @@ public class MipsEmulator {
 	}
 
 	static public void main(String args[]) throws Exception {
-		Configuration config = new Configuration();
-		MipsEmulator emulator = new MipsEmulator(config);
+		config = new Configuration();
+		// not used MipsEmulator emulator = new MipsEmulator(config);
 		process_cmdline_args(args, config);
 		Reader rdr = new Reader(new File(getBinaryFileName()), config);
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
+		
 		DataSegment instData = rdr.getInstructions(config.getFunctionLoadList());
 		DataSegment memData = rdr.getData();
-		
-		// This doesn't belong here.  FIXME
-		// Set up spin symbol
-		SymbolTableEntry halt = rdr.getSymbolTableEntry(MipsInstructionSet.SPIN_SYMBOL);
-		if(halt != null) {
-			MipsInstructionSet.setSpinAddress(halt.getAddress());
-		}
 
 		// is this cast ok?  Or should we modify the mem circuit? 
 		int pcOffset = (int) ent.getAddress();
