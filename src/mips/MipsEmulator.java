@@ -34,11 +34,13 @@ public class MipsEmulator {
 
 	static final int REGISTER_SIZE = 32;
 	static final int MEM_SIZE = 72;// 160 < threshold for func1
+	static final int THRESHOLD = 1024;
+	static final int RECURSE_THRESHOLD = 512;
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
-	static final Mode m = Mode.VERIFY;
-	static final int Alice_input = 5;
-	static final int Bob_input = 2;
+	static final Mode m = Mode.REAL;
+	static final int Alice_input = 4;
+	static final int Bob_input = 5;
 	static final boolean MULTIPLE_BANKS = true;
 	Configuration config;
 	private static String binaryFileName;	// should not be static FIXME
@@ -145,12 +147,12 @@ public class MipsEmulator {
 	public static<T> SecureArray<T> loadInstructionsSingleBank(CompEnv<T> env, DataSegment instData)
 			throws Exception {
 		boolean[][] instructions = null; 
-		System.out.println("entering getInstructions");
+		System.out.println("entering getInstructions, SingleBank");
 		int numInst = instData.getDataLength();
 		instructions = instData.getDataAsBoolean(); 
 
 		//once we split the instruction from memory, remove the + MEMORY_SIZE
-		SecureArray<T> instBank = new SecureArray<T>(env, numInst + MEM_SIZE, WORD_SIZE);
+		SecureArray<T> instBank = new SecureArray<T>(env, numInst, WORD_SIZE, THRESHOLD);
 		IntegerLib<T> lib = new IntegerLib<T>(env);
 		T[] data; 
 		T[] index;
@@ -185,7 +187,11 @@ public class MipsEmulator {
 			if (maxAddr == 0)
 				break;
 			//long minAddr = m.firstEntry().getKey();
-			long minAddr = m.ceilingKey((long)1);
+			long minAddr;
+			if (s.size() == 1)
+				minAddr = maxAddr;
+			else minAddr = m.ceilingKey((long)1);
+			
 			if (!MULTIPLE_BANKS)
 				instructionBank = singleBank;
 			else {
@@ -233,7 +239,7 @@ public class MipsEmulator {
 		System.out.println("entering getMemoryGen");
 		boolean memory[][] = memData.getDataAsBoolean();	
 		IntegerLib<T> lib = new IntegerLib<T>(env);
-		SecureArray<T> memBank = new SecureArray<T>(env, MEM_SIZE, WORD_SIZE);
+		SecureArray<T> memBank = new SecureArray<T>(env, MEM_SIZE, WORD_SIZE, THRESHOLD, RECURSE_THRESHOLD);
 		T[] index; 
 		T[] data;
 		for (int i = 0; i < memData.getDataLength(); i++){

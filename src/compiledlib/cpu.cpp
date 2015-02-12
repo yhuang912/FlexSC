@@ -10,6 +10,7 @@
 #define OP_ADDIU 9
 #define OP_ANDI 12
 #define OP_LUI 15
+#define OP_SLTI 10
 
 #define OP_BNE 5
 #define OP_BEQ 4
@@ -70,6 +71,10 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
          reg_rt = reg_rs & zeroExt;
       } else if (op == OP_LUI) {
 	reg_rt = (zeroExt << 16);
+      } else if (op == OP_SLTI){
+    	  if (reg_rs < unsignExt)
+    		  reg_rt = 1;
+    	  else reg_rt = 0;
       }
       reg[rt] = reg_rt;
    }
