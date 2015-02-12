@@ -1,7 +1,5 @@
 package oram;
 
-import org.junit.Test;
-
 import util.Utils;
 import flexsc.CompEnv;
 import flexsc.Flag;
@@ -24,20 +22,7 @@ public class TestCircuitOramRecOpt {
 			Flag.sw.print();
 			System.out.print("\n");
 	}
-	@Test
-	public void runThreads() throws Exception {
-		GenRunnable gen = new GenRunnable(12345, 25, 3, 32, 8, 6);
-		EvaRunnable eva = new EvaRunnable("localhost", 12345);
-		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start();
-		Thread.sleep(10);
-		tEva.start();
-		tGen.join();
-		Flag.sw.print();
-		System.out.print("\n");
-	}
-
+	
 	final static int writeCount = 5;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
@@ -83,8 +68,8 @@ public class TestCircuitOramRecOpt {
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Alice,
 						is, os);
-				RecursiveOptCircuitOram<GCSignal> client = new RecursiveOptCircuitOram<GCSignal>(
-						env, N, dataSize, cutoff, recurFactor, capacity, 80);
+				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
+						env, N, dataSize,32,  cutoff, recurFactor, capacity, 80);
 
 				for (int i = 0; i < writeCount; ++i) {
 					System.out.println(i);
@@ -161,8 +146,9 @@ public class TestCircuitOramRecOpt {
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob,
 						is, os);
-				RecursiveOptCircuitOram<GCSignal> server = new RecursiveOptCircuitOram<GCSignal>(
-						env, N, dataSize, cutoff, recurFactor, capacity, 80);
+				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
+						env, N, dataSize,32,  cutoff, recurFactor, capacity, 80);
+				
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
 					GCSignal[] scData = server.baseOram.env

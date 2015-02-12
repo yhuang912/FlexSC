@@ -23,8 +23,8 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		return res;
 	}
 
-	public CircuitOram(CompEnv<T> env, int N, int dataSize, int cap, int sp) {
-		super(env, N, dataSize, cap);
+	public CircuitOram(int indexsize, CompEnv<T> env, int N, int dataSize, int cap, int sp) {
+		super(indexsize, env, N, dataSize, cap);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData,
 				logN, capacity, env);
 		queueCapacity = 30;
@@ -36,8 +36,8 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		scQueue = prepareBlocks(queue, queue);
 	}
 
-	public CircuitOram(CompEnv<T> env, int N, int dataSize) {
-		super(env, N, dataSize, 3);
+	public CircuitOram(int indexsize, CompEnv<T> env, int N, int dataSize) {
+		super(indexsize, env, N, dataSize, 3);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData,
 				logN, capacity, env);
 		queueCapacity = 30;

@@ -27,7 +27,7 @@ public abstract class OramParty<T> {
 	public BucketLib<T> lib;
 	boolean[] dummyArray;
 
-	public OramParty(CompEnv<T> env, int N, int dataSize) {
+	public OramParty(int indexsize, CompEnv<T> env, int N, int dataSize) {
 		this.env = env;
 		this.is = env.is;
 		this.os = env.os;
@@ -44,14 +44,14 @@ public abstract class OramParty<T> {
 
 		this.N = 1 << logN;
 		lengthOfData = dataSize;
-		lengthOfIden = logN;
+		lengthOfIden = indexsize;
 		lengthOfPos = logN - 1;
 		p = env.p;
 		mode = env.m;
 		init();
 	}
 
-	public OramParty(CompEnv<T> env, int N, int dataSize, int lengthOfPos) {
+	public OramParty(int indexsize, CompEnv<T> env, int N, int dataSize, int lengthOfPos) {
 		this.env = env;
 		this.is = env.is;
 		this.os = env.os;
@@ -66,7 +66,7 @@ public abstract class OramParty<T> {
 		--logN;
 		this.N = 1 << logN;
 		lengthOfData = dataSize;
-		lengthOfIden = logN;
+		lengthOfIden = indexsize;
 		this.lengthOfPos = lengthOfPos;
 		p = env.p;
 		mode = env.m;

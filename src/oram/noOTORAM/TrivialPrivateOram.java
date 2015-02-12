@@ -11,8 +11,8 @@ public class TrivialPrivateOram<T> extends OramParty<T> {
 	Block<T>[] result;
 	int capacity;
 
-	public TrivialPrivateOram(CompEnv<T> env, int N, int dataSize) {
-		super(env, N, dataSize, 1);
+	public TrivialPrivateOram(int indexsize, CompEnv<T> env, int N, int dataSize) {
+		super(indexsize, env, N, dataSize, 1);
 		this.capacity = N;
 		bucket = new PlainBlock[capacity];
 

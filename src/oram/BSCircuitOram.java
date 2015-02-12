@@ -26,17 +26,17 @@ public class BSCircuitOram<T> {
 	Party p;
 	CompEnv<T> env;
 	IntegerLib<T> lib;
-	public BSCircuitOram(CompEnv<T> env, int N, int dataSize,
+	public BSCircuitOram(CompEnv<T> env, int N, int dataSize, int indexsize, 
 			int cutoff, int recurFactor, int capacity, int sp) {
-		init(env, N, dataSize, cutoff, recurFactor, capacity, sp);
+		init(env, N, dataSize,indexsize, cutoff, recurFactor, capacity, sp);
 	}
 
 	// with default params
-	public BSCircuitOram(CompEnv<T> env, int N, int dataSize) {
-		init(env, N, dataSize, 1<<6, 8, 3, 80);
+	public BSCircuitOram(CompEnv<T> env, int N, int dataSize, int indexsize) {
+		init(env, N, dataSize,indexsize, 1<<6, 8, 3, 80);
 	}
 
-	void init(CompEnv<T> env, int N, int dataSize, int cutoff, int recurFactor,
+	void init(CompEnv<T> env, int N, int dataSize,int indexsize, int cutoff, int recurFactor,
 			int capacity, int sp) {
 		this.env = env;
 		lib = new IntegerLib<T>(env);
@@ -46,27 +46,27 @@ public class BSCircuitOram<T> {
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		CircuitOram<T> oram = new CircuitOram<T>(env, N, dataSize, capacity, sp);
+		CircuitOram<T> oram = new CircuitOram<T>(indexsize, env, N, dataSize, capacity, sp);
 		lengthOfIden = oram.lengthOfIden;
 		clients.add(oram);
-		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1 << oram.lengthOfIden)
+		int newDataSize =(indexsize+ oram.lengthOfPos) * recurFactor, newN = (1 << oram.lengthOfIden)
 				/ recurFactor;
 		while (newN > cutoff) {
 			CircuitORAMInterface<T> o;
 			if(newN < 1<< 20) {
-				o = new CircuitOramNOOT<T>(env, newN, newDataSize, capacity, sp);
+				o = new CircuitOramNOOT<T>(indexsize, env, newN, newDataSize, capacity, sp);
 				clients.add(o);
 			}
 			else {
-				o = new CircuitOram<T>(env, newN, newDataSize, capacity, sp);
+				o = new CircuitOram<T>(indexsize, env, newN, newDataSize, capacity, sp);
 				clients.add(o);
 			}
-			newDataSize = o.getLengthOfPos()* recurFactor;
+			newDataSize = (indexsize + o.getLengthOfPos())* recurFactor;
 			newN = (1 << o.getLengthOfIndex()) / recurFactor;
 		}
 		
 		CircuitORAMInterface<T> last = clients.get(clients.size() - 1);
-		baseOram = new TrivialPrivateOram<T>(env, (1 << last.getLengthOfIndex()),
+		baseOram = new TrivialPrivateOram<T>(indexsize, env, (1 << last.getLengthOfIndex()),
 				last.getLengthOfPos());
 	}
 
@@ -89,17 +89,15 @@ public class BSCircuitOram<T> {
 
 	public T[][] travelToDeep(T[] iden, int level) {
 		if (level == clients.size()) {
-			T[] baseMap = baseOram.readAndRemove(lib.padSignal(iden, baseOram.lengthOfIden));
-			T[] ithPos = baseOram.lib.rightPublicShift(iden,
-					baseOram.lengthOfIden);// iden>>baseOram.lengthOfIden;
+			T[] baseMap = baseOram.readAndRemove(iden);
 
-			T[] pos = extract(baseMap, ithPos,
+			T[] pos = extract(baseMap, iden,
 					clients.get(level - 1).getLengthOfPos());
 
 			T[] newPos = baseOram.lib
 					.randBools(clients.get(level - 1).getLengthOfPos());
-			put(baseMap, ithPos, newPos);
-			baseOram.putBack(lib.padSignal(iden, baseOram.lengthOfIden), baseMap);
+			put(baseMap, iden, newPos);
+			baseOram.putBack(iden, baseMap);
 			T[][] result = baseOram.env.newTArray(2, 0);
 			result[0] = pos;
 			result[1] = newPos;
@@ -107,21 +105,17 @@ public class BSCircuitOram<T> {
 		} else {
 			CircuitORAMInterface<T> currentOram = clients.get(level);
 
-			T[][] poses = travelToDeep(subIdentifier(iden, currentOram),
-					level + 1);
+			T[][] poses = travelToDeep(iden, level + 1);
 
 			boolean[] oldPos = baseOram.lib.declassifyToBoth(poses[0]);
 
-			T[] data = currentOram.readAndRemove(
-					subIdentifier(iden, currentOram), oldPos, true);
-			T[] ithPos = lib.rightPublicShift(iden,
-					currentOram.getLengthOfIndex());// iden>>currentOram.lengthOfIden;//iden/(1<<currentOram.lengthOfIden);
+			T[] data = currentOram.readAndRemove(iden, oldPos, true);
 
-			T[] pos = extract(data, ithPos, clients.get(level - 1).getLengthOfPos());
+			T[] pos = extract(data, iden, clients.get(level - 1).getLengthOfPos());
 			T[] tmpNewPos = baseOram.lib
 					.randBools(clients.get(level - 1).getLengthOfPos());
-			put(data, ithPos, tmpNewPos);
-			currentOram.putBack(subIdentifier(iden, currentOram), poses[1],
+			put(data, iden, tmpNewPos);
+			currentOram.putBack(iden, poses[1],
 					data);
 			T[][] result = env.newTArray(2, 0);
 			result[0] = pos;
@@ -130,33 +124,27 @@ public class BSCircuitOram<T> {
 		}
 	}
 
-	public T[] subIdentifier(T[] iden, CircuitORAMInterface<T> o) {
-		// int a = iden & ((1<<o.lengthOfIden)-1);//(iden % (1<<o.lengthOfIden))
-		return lib.padSignal(iden, o.getLengthOfIndex());
-	}
-
-	public T[] extract(T[] array, T[] ithPos, int length) {
-		int numberOfEntry = array.length / length;
+	public T[] extract(T[] array, T[] iden, int length) {
+		int total_length = (length+iden.length);
+		int numberOfEntry = array.length / (length+iden.length);
 		T[] result = Arrays.copyOfRange(array, 0, length);
-		for (int i = 1; i < numberOfEntry; ++i) {
-			T hit = baseOram.lib.eq(baseOram.lib.toSignals(i, ithPos.length),
-					ithPos);
-			result = baseOram.lib.mux(result,
-					Arrays.copyOfRange(array, i * length, (i + 1) * length),
+		for (int i = 0; i < numberOfEntry; ++i) {
+			T hit = lib.eq(Arrays.copyOfRange(array, i*total_length, i*total_length+iden.length), iden);
+			result = lib.mux(result,
+					Arrays.copyOfRange(array, i * total_length+iden.length, (i + 1) * total_length),
 					hit);
 		}
 		return result;
 	}
 
-	public void put(T[] array, T[] ithPos, T[] content) {
-		int numberOfEntry = array.length / content.length;
+	public void put(T[] array, T[] iden, T[] content) {
+		int total_length = (content.length+iden.length);
+		int numberOfEntry = array.length / (content.length+iden.length);
 		for (int i = 0; i < numberOfEntry; ++i) {
-			T hit = baseOram.lib.eq(baseOram.lib.toSignals(i, ithPos.length),
-					ithPos);
-			T[] tmp = baseOram.lib.mux(
-					Arrays.copyOfRange(array, i * content.length, (i + 1)
-							* content.length), content, hit);
-			System.arraycopy(tmp, 0, array, i * content.length, content.length);
+			T hit = lib.eq(Arrays.copyOfRange(array, i*total_length, i*total_length+iden.length), iden);
+			T[] a = lib.mux(content, Arrays.copyOfRange(array, i * total_length+iden.length, (i + 1) * total_length),
+					hit);
+			System.arraycopy(a, 0, array, i*total_length+iden.length, a.length);
 		}
 	}
 

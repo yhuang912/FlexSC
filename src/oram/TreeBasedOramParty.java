@@ -9,8 +9,8 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	public PlainBlock[][] tree;
 	protected int capacity;
 
-	public TreeBasedOramParty(CompEnv<T> env, int N, int dataSize, int capacity) {
-		super(env, N, dataSize);
+	public TreeBasedOramParty(int indexsize, CompEnv<T> env, int N, int dataSize, int capacity) {
+		super(indexsize, env, N, dataSize);
 		this.capacity = capacity;
 
 		if (env.m != Mode.COUNT) {
