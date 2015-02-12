@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<project name="SCVM2" default="dist">
+  <property name="dist.dir" value="dist" />
+  <property name="jar" value="SCVM2.jar" />
+  <property name="build.dir" value="build" />
+  <property name="class.dir" value="${build.dir}/classes" />
+  <property name="src.dir" value="src" />
+  <property name="test.dir" value="test" />
+  <property name="install.dir" value="../lib" />
+
+  <target name="init">
+    <mkdir dir="${class.dir}" />
+    <mkdir dir="${dist.dir}" />
+  </target>
+
+  <target name="compile" depends="init">
+    <javac includeantruntime="false" debug="on" destdir="${class.dir}">
+      <src path="${src.dir}" />
+      <src path="${test.dir}" />
+    </javac>
+    <copy todir="${class.dir}">
+      <fileset dir="${src.dir}">
+        <include name="**/*.properties" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="clean" depends="init">
+    <delete dir="${build.dir}" />
+    <delete dir="${dist.dir}" />
+  </target>
+
+  <target name="dist" depends="compile">
+    <jar destfile="${dist.dir}/${jar}">
+      <fileset dir="${class.dir}" />
+    </jar>
+  </target>
+
+  <target name="install" depends="dist">
+    <copy todir="${install.dir}">
+      <fileset dir="${dist.dir}" />
+    </copy>
+  </target>
+</project>
