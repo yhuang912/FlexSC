@@ -107,8 +107,7 @@ public class Configuration {
 		String s = properties.getProperty(FUNCTION_LOAD_LIST_PROPERTY);
 		if(s == null) {
 			// Default to entry point if no load list given
-			functionLoadList = new ArrayList<String>();
-			functionLoadList.add(entryPoint);
+			setFunctionLoadList(entryPoint);
 		} else {
 			setFunctionLoadList(s);
 		}
