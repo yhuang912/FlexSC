@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.appcomsci.mips.memory.MipsInstructionSet;
 import com.appcomsci.sfe.common.Configuration;
 import com.appcomsci.sfe.common.SfeProperties;
 
@@ -237,6 +238,18 @@ public class Reader {
 			} else {
 				ent.setSectionData(sec);
 			}
+		}
+		
+		// This is wrong.  The address of the spin symbol should not be static.  FIXME
+		// Second, the length of the halt symbol should not be zero.
+		
+		SymbolTableEntry halt = getSymbolTableEntry(MipsInstructionSet.SPIN_SYMBOL);
+		if(halt != null) {
+			if(halt.getNumBytes() == 0) {
+				System.err.println("Warning: Halt length listed as 0");
+				halt.setNumBytes(8);
+			}
+			MipsInstructionSet.setSpinAddress(halt.getAddress());
 		}
 	}
 	
