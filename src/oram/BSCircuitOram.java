@@ -49,11 +49,11 @@ public class BSCircuitOram<T> {
 		CircuitOram<T> oram = new CircuitOram<T>(indexsize, env, N, dataSize, capacity, sp);
 		lengthOfIden = oram.lengthOfIden;
 		clients.add(oram);
-		int newDataSize =(indexsize+ oram.lengthOfPos) * recurFactor, newN = (1 << oram.lengthOfIden)
+		int newDataSize =(indexsize+ oram.lengthOfPos) * recurFactor, newN = (1 << oram.getLogN())
 				/ recurFactor;
 		while (newN > cutoff) {
 			CircuitORAMInterface<T> o;
-			if(newN < 1<< 20) {
+			if(newN < 0) {
 				o = new CircuitOramNOOT<T>(indexsize, env, newN, newDataSize, capacity, sp);
 				clients.add(o);
 			}
@@ -62,11 +62,11 @@ public class BSCircuitOram<T> {
 				clients.add(o);
 			}
 			newDataSize = (indexsize + o.getLengthOfPos())* recurFactor;
-			newN = (1 << o.getLengthOfIndex()) / recurFactor;
+			newN = (1 << o.getLogN()) / recurFactor;
 		}
 		
 		CircuitORAMInterface<T> last = clients.get(clients.size() - 1);
-		baseOram = new TrivialPrivateOram<T>(indexsize, env, (1 << last.getLengthOfIndex()),
+		baseOram = new TrivialPrivateOram<T>(indexsize, env, (1 << last.getLogN()),
 				last.getLengthOfPos());
 	}
 

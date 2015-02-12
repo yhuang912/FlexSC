@@ -171,4 +171,9 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAM
 	public int getLengthOfIndex() {
 		return lengthOfIden;
 	}
+	
+	@Override
+	public int getLogN() {
+		return logN;
+	}
 }

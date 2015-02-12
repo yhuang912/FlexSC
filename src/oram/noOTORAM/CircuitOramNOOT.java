@@ -117,4 +117,9 @@ public class CircuitOramNOOT<T> extends TreeBasedOramParty<T> implements Circuit
 	public int getLengthOfIndex() {
 		return lengthOfIden;
 	}
+	
+	@Override
+	public int getLogN() {
+		return logN;
+	}
 }

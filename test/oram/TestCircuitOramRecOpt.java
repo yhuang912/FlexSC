@@ -11,7 +11,7 @@ public class TestCircuitOramRecOpt {
 
 	public  static void main(String args[]) throws Exception {
 //			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 32, 8, 6);
-		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 8, 6);
+		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 4, 8);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);

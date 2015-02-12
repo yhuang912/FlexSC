@@ -7,4 +7,5 @@ public interface CircuitORAMInterface<T> {
 	public int getLengthOfIndex();
 	public T[] read(T[] scIden, boolean[] pos, T[] scNewPos);
 	public void write(T[] scIden, boolean[] pos, T[] scNewPos, T[] scData);
+	public int getLogN();
 }
