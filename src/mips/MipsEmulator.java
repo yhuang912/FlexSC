@@ -9,6 +9,7 @@ import java.util.TreeMap;
 //import gc.Boolean;
 
 
+
 import oram.SecureArray;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
@@ -18,6 +19,7 @@ import com.appcomsci.mips.binary.Reader;
 import com.appcomsci.mips.binary.SymbolTableEntry;
 import com.appcomsci.mips.memory.MemSetBuilder;
 import com.appcomsci.mips.memory.MemorySet;
+import com.appcomsci.mips.memory.MipsInstructionSet;
 import com.appcomsci.sfe.common.Configuration;
 
 import compiledlib.dov.CPU;
@@ -375,6 +377,13 @@ public class MipsEmulator {
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 		DataSegment instData = rdr.getInstructions(config.getFunctionLoadList());
 		DataSegment memData = rdr.getData();
+		
+		// This doesn't belong here.  FIXME
+		// Set up spin symbol
+		SymbolTableEntry halt = rdr.getSymbolTableEntry(MipsInstructionSet.SPIN_SYMBOL);
+		if(halt != null) {
+			MipsInstructionSet.setSpinAddress(halt.getAddress());
+		}
 
 		// is this cast ok?  Or should we modify the mem circuit? 
 		int pcOffset = (int) ent.getAddress();
