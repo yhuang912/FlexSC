@@ -1,2 +1,3 @@
-./compile.sh cpu.cpp compiledlib.dov;
-./compile.sh mem.cpp compiledlib.dov;
+mkdir -p dov
+./compile.sh cpu.cpp compiledlib.dov true .. flexsc.ICpuWritable
+./compile.sh mem.cpp compiledlib.dov true ..
