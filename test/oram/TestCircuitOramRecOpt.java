@@ -69,7 +69,7 @@ public class TestCircuitOramRecOpt {
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Alice,
 						is, os);
 				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
-						env, N, dataSize,32,  cutoff, recurFactor, capacity, 80);
+						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
 
 				for (int i = 0; i < writeCount; ++i) {
 					System.out.println(i);
