@@ -246,11 +246,18 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		}
 
 		private boolean testTerminate(SecureArray<T> reg, T[] ins, IntegerLib<T> lib) {
-			T eq = lib.eq(ins, lib.toSignals(0b00010000000000001111111111111111, 32));
+			// Look for branch to here.  There are several ways to code this.
+			// Gcc and cousins use BEQ $0,$0,-1
+			// 0x1000ffff = 0b000100 00000 00000 1111111111111111
+			T eq = lib.eq(ins, lib.toSignals(0x1000ffff, 32));
+			// Look for jr $31 where $31 contains zero
+			// 0x03e00008 = 0b000000 11111 0000000000 00000 001000
+			T eq1 = lib.eq(ins, lib.toSignals(0x03e00008, 32));
 			T eq2 = lib.eq(reg.trivialOram.read(31), lib.toSignals(0, 32));
-			eq = lib.and(eq, eq2);
+			eq1 = lib.and(eq1, eq2);
+			eq = lib.or(eq,  eq1);
 			T[] res = lib.getEnv().newTArray(1);
-			res[0] = eq;
+			res[0] = eq1;
 			return lib.declassifyToBoth(res)[0]; 
 		}
 
