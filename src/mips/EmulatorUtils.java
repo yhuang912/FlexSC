@@ -1,6 +1,7 @@
 package mips;
 
 import oram.SecureArray;
+import oram.SecureMap;
 import circuits.arithmetic.IntegerLib;
 import flexsc.Mode;
 import flexsc.Party;
@@ -79,7 +80,7 @@ public class EmulatorUtils {
 			System.out.println(output);
 	}
 	
-	public static<T> void printOramBank(SecureArray<T> oramBank, IntegerLib<T> lib, int numItems){
+	public static<T> void printOramBank(SecureMap<T> oramBank, IntegerLib<T> lib, int numItems){
 		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
 			return;
 		String output = "";

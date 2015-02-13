@@ -25,6 +25,16 @@ public class SecureMap<T> {
 		}
 		this.env = env;
 	}
+	public SecureMap(CompEnv<T> env, int N, int U, int thresh) throws Exception {
+		this.threshold = thresh;
+		useTrivialOMap = true;//for now;
+		if (useTrivialOMap) {
+			tmap = new TrivialObliviousMap<T>(env);
+		} else {
+			circuitOram = new RecursiveCircuitOram<T>(env, N, 32);
+		}
+		this.env = env;
+	}
 	public void init(TreeMap<Long,boolean[]> m, int indexLength, int dataLength) {
 		if(useTrivialOMap)
 			tmap.init(m, indexLength, dataLength);

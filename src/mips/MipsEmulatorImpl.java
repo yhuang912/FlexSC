@@ -9,17 +9,7 @@ import java.util.Map;
 import java.util.TreeMap;
 //import gc.Boolean;
 
-
-
-
-
-
-
-
-
-
-
-
+import oram.SecureMap;
 import oram.SecureArray;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
@@ -199,7 +189,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			MEM<T> mem = new MEM<T>(env);
 			reg = loadInputsToRegister(env);
 
-			SecureArray<T> singleInstructionBank = null;
+			SecureMap<T> singleInstructionBank = null;
 
 			if (!config.isMultipleBanks()){
 				singleInstructionBank = loadInstructionsSingleBank(env, instData);				
@@ -215,7 +205,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
 			long startTime = System.nanoTime();
 			MemorySet<T> currentSet = sets.get(0);
-			SecureArray<T> currentBank;
+			SecureMap<T> currentBank;
 			while (true) {
 				currentBank = currentSet.getOramBank().getArray();
 				EmulatorUtils.print("count: " + count, lib, false);
@@ -283,38 +273,42 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			return oram;
 		}
 
-		private SecureArray<T> loadInstructionsSingleBank(CompEnv<T> env, DataSegment instData)
+		private SecureMap<T> loadInstructionsSingleBank(CompEnv<T> env, DataSegment instData)
 				throws Exception {
-			boolean[][] instructions = null; 
+			TreeMap<Long, boolean[]> instructions = null; 
 			System.out.println("entering getInstructions, SingleBank");
 			int numInst = instData.getDataLength();
-			instructions = instData.getDataAsBoolean(); 
+			instructions = instData.getDataAsBooleanMap(); 
 
 			//once we split the instruction from memory, remove the + MEMORY_SIZE
-			SecureArray<T> instBank = new SecureArray<T>(env, numInst, WORD_SIZE, THRESHOLD);
+			SecureMap<T> instBank = new SecureMap<T>(env, numInst, WORD_SIZE, THRESHOLD);
 			IntegerLib<T> lib = new IntegerLib<T>(env);
 			T[] data; 
 			T[] index;
 
-			for (int i = 0; i < numInst; i++){
-				index = lib.toSignals(i, instBank.lengthOfIden);
-				if (env.getParty() == Party.Alice)
-					data = env.inputOfAlice(instructions[i]);
-				else 
-					data = env.inputOfAlice(new boolean[WORD_SIZE]);
-				instBank.write(index, data);
-				//System.out.println("Wrote instruction number "+i);
-			}		
+			if (env.getParty() == Party.Alice)
+				instBank.init(instructions, 32, 32);
+			else
+				instBank.init(numInst, 32, 32);
+//			for (int i = 0; i < numInst; i++){
+//				index = lib.toSignals(i, instBank.lengthOfIden);
+//				if (env.getParty() == Party.Alice)
+//					data = env.inputOfAlice(instructions[i]);
+//				else 
+//					data = env.inputOfAlice(new boolean[WORD_SIZE]);
+//				instBank.write(index, data);
+//				//System.out.println("Wrote instruction number "+i);
+//			}		
 			System.out.println("exiting getInstructions");
 			return instBank;
 		}			
 
-		private void loadInstructionsMultiBanks(CompEnv<T> env, SecureArray<T> singleBank, List<MemorySet<T>> sets, DataSegment instData) throws Exception {
+		private void loadInstructionsMultiBanks(CompEnv<T> env, SecureMap<T> singleBank, List<MemorySet<T>> sets, DataSegment instData) throws Exception {
 			System.out.println("entering loadInstructions");
 			IntegerLib<T> lib = new IntegerLib<T>(env);
 			T[] data; 
 			T[] index;
-			SecureArray<T> instructionBank;
+			SecureMap<T> instructionBank;
 
 			for(MemorySet<T> s:sets) {
 				int i = s.getExecutionStep();
@@ -335,38 +329,47 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				if (!config.isMultipleBanks())
 					instructionBank = singleBank;
 				else {
-					instructionBank = new SecureArray<T>(env, (int)((maxAddr - minAddr)/4 + 1), WORD_SIZE);
+					instructionBank = new SecureMap<T>(env, (int)((maxAddr - minAddr)/4 + 1), WORD_SIZE);
 					int count = 0;
-					for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
-						if (env.getParty() == Party.Alice) {
-							EmulatorUtils.print("count: " + count + " key: " + entry.getKey() +
-									" (0x" + Long.toHexString(entry.getKey()) + ")" +
-									" value: " , lib);
-							String output = "";
-							for (int j = 31 ; j >= 0;  j--){
-								if (entry.getValue()[j])
-									output += "1";
-								else 
-									output += "0";
+					if (config.getMode() == Mode.VERIFY){
+						for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
+							if (env.getParty() == Party.Alice) {
+								EmulatorUtils.print("count: " + count + " key: " + entry.getKey() +
+										" (0x" + Long.toHexString(entry.getKey()) + ")" +
+										" value: " , lib);
+								String output = "";
+								for (int j = 31 ; j >= 0;  j--){
+									if (entry.getValue()[j])
+										output += "1";
+									else 
+										output += "0";
+								}
+								EmulatorUtils.print(output, lib);
 							}
-							EmulatorUtils.print(output, lib);
+							count++;
 						}
+					}
 
-						if (entry.getKey() > 0){
-							index = lib.toSignals((int)((entry.getKey() - minAddr)/4), instructionBank.lengthOfIden);
-							if (env.getParty() == Party.Alice){
-								data = env.inputOfAlice(entry.getValue());
-							}
-							else	 { 
-								data = env.inputOfAlice(new boolean[WORD_SIZE]); 
-
-							}
-							// once the indices are correct, write here. 
-							instructionBank.write(index, data);
-						}
+					if (env.getParty() == Party.Alice){
+						instructionBank.init(m, 32, 32);
+					}
+					else 
+						instructionBank.init(m.size(), 32, 32);
+						//						if (entry.getKey() > 0){
+						//							index = lib.toSignals((int)((entry.getKey() - minAddr)/4), instructionBank.lengthOfIden);
+						//							if (env.getParty() == Party.Alice){
+						//								data = env.inputOfAlice(entry.getValue());
+						//							}
+						//							else	 { 
+						//								data = env.inputOfAlice(new boolean[WORD_SIZE]); 
+						//
+						//							}
+						//							// once the indices are correct, write here. 
+						//							instructionBank.write(index, data);
+						//						}
 						EmulatorUtils.printOramBank(instructionBank, lib, (int)((maxAddr - minAddr)/4 + 1));
-						count++;
-					}	
+					
+
 				}
 				OramBank<T> bank = new OramBank<T>(instructionBank);
 				bank.setMaxAddress(maxAddr);
