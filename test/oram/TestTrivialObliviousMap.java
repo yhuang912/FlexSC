@@ -30,7 +30,7 @@ public class TestTrivialObliviousMap {
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> gen = CompEnv.getEnv(Mode.REAL, Party.Alice,
 						is, os);
-				TrivialObliviousMap<GCSignal> client = new TrivialObliviousMap<GCSignal>(gen);
+				SecureMap<GCSignal> client = new SecureMap<GCSignal>(gen, 0, 0);
 				
 				int[] k = new int[N];
 				for(int i = 0; i < N; ++i) k[i] = CompEnv.rnd.nextInt();
@@ -78,7 +78,7 @@ public class TestTrivialObliviousMap {
 				connect(host, port);
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
-				TrivialObliviousMap<GCSignal> server = new TrivialObliviousMap<GCSignal>(env);
+				SecureMap<GCSignal> server = new SecureMap<GCSignal>(env, 0, 0);
 
 				server.init(N, 32,32);
 
