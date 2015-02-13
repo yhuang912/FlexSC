@@ -58,7 +58,9 @@ public class Configuration {
 	private boolean honorDelaySlots;
 	private boolean multipleBanks;
 	
-	private ArrayList<String> functionLoadList;
+	private ArrayList<String> functionLoadList;	
+	
+	private SfeProperties properties = null;
 	
 	/** Standard constructor.
 	 * Initializes from a property file specified via -D, or from the default
@@ -67,8 +69,7 @@ public class Configuration {
 	 */
 	public Configuration() throws IOException {
 		String props = System.getProperty(PROPERTY_FILE, DEFAULT_PROPERTY_FILE);
-		InputStream resourceStream = null;	
-		SfeProperties properties = null;
+		InputStream resourceStream = null;
 		try {
 //			System.out.println("Working Directory = " +
 //		              System.getProperty("user.dir"));
@@ -220,6 +221,13 @@ public class Configuration {
 	 */
 	public void setMultipleBanks(boolean multipleBanks) {
 		this.multipleBanks = multipleBanks;
+	}
+
+	/**
+	 * @return the properties
+	 */
+	public SfeProperties getProperties() {
+		return properties;
 	}
 
 }
