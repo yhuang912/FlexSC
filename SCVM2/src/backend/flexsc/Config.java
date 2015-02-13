@@ -6,6 +6,7 @@ public class Config {
 	public static String[] importPackage = new String[]{
 		"java.security.SecureRandom",
 		"oram.SecureArray",
+		"oram.SecureMap",
 		"oram.CircuitOram",
 		"flexsc.Mode",
 		"flexsc.Party",
@@ -19,6 +20,7 @@ public class Config {
 		"gc.regular.GCGen",
 //		"gc.GCEva",
 //		"gc.GCGen",
+		
 		"gc.GCSignal",
 		"java.util.Arrays",
 		"java.util.Random",
