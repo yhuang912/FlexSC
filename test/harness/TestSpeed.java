@@ -18,16 +18,19 @@ public class TestSpeed extends TestHarness {
 	public <T>T[] secureCompute(T[] a, T[] b, CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
 		T[] res = null;
+		
 		double t1 = System.nanoTime();
 		Flag.sw.ands = 0;
 		for(int i = 0; i < 10; ++i) {
 //			res = lib.hammingDistance(a, b);
 			res = lib.and(a, b);
+			double t2 = System.nanoTime();
+			double t = (t2-t1)/1000000000.0;
+			System.out.println(t +"\t"+ Flag.sw.ands/t);
 		}
-		double t2 = System.nanoTime();
-		double t = (t2-t1)/1000000000.0;
 		
-		System.out.println(t +" "+ Flag.sw.ands/t);
+		
+		
 		return res;
 	}
 	int LEN = 1000000;
