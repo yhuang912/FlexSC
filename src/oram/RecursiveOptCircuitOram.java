@@ -53,7 +53,7 @@ IntegerLib<T> lib ;
 				/ recurFactor;
 		while (newN > cutoff) {
 			CircuitORAMInterface<T> o;
-			if(newN < 1<< 23) {
+			if(newN < 1<< 20) {
 				o = new CircuitOramNOOT<T>(env, newN, newDataSize, capacity, sp);
 				clients.add(o);
 			}
