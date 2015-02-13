@@ -5,6 +5,8 @@ package com.appcomsci.mips.binary;
 
 import java.math.BigInteger;
 import java.util.NoSuchElementException;
+import java.util.TreeMap;
+
 import static com.appcomsci.mips.memory.MipsInstructionSet.DEFAULT_SPIN_ADDRESS;
 import static com.appcomsci.mips.memory.MipsInstructionSet.SPIN_INSTRUCTION;
 import static com.appcomsci.mips.memory.MipsInstructionSet.NOP;
@@ -105,15 +107,31 @@ public class DataSegment {
 	 * @return An array of arrays of booleans
 	 */
 	public boolean[][] getDataAsBoolean() {
-		if(data == null)
-			return null;
-		if(booleanData == null) {
-			booleanData = new boolean[data.length][];
-			for(int i = 0; i < data.length; i++) {
-				booleanData[i] = datumToBoolean(data[i]);
-			}
-		}
+		if(booleanData == null)
+			buildBooleanData();
 		return booleanData;
+	}
+	
+	private void buildBooleanData()	{
+		if(data == null)
+			return;
+		booleanData = new boolean[data.length][];
+		for(int i = 0; i < data.length; i++) {
+			booleanData[i] = datumToBoolean(data[i]);
+		}
+	}
+	
+	public TreeMap<Long,boolean[]> getDataAsBooleanMap() {
+		if(booleanData == null)
+			buildBooleanData();
+		if(booleanData == null)
+			return null;
+		TreeMap<Long,boolean[]> rslt = new TreeMap<Long,boolean[]>();
+		for(int i = 0; i < data.length; i++) {
+			long addr = startAddress + i*4;
+			rslt.put(addr, booleanData[i]);
+		}
+		return rslt;
 	}
 	
 	/** Get the contents of a word of memory at a specific address.
