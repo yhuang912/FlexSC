@@ -86,11 +86,11 @@
 #define OP_SLT		42
 #define OP_SLTU		43
 
-struct CPU{};
+struct %CLASS{};
 int32 SLL(int32 m, int32 n) = native intLib.leftPrivateShift;
 int32 SRL(int32 m, int32 n) = native intLib.rightPrivateShift;
 
-int3 CPU.checkType(int32 op) {
+int3 %CLASS.checkType(int32 op) {
 	int3 ret;
 	if(op == 0)
 		ret = OP_CODE_R;
@@ -102,7 +102,7 @@ int3 CPU.checkType(int32 op) {
 	return ret;
 }
 
-int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
+int32 %CLASS.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 %HILO_REG
 	) {
 	int32 op = inst >> 26;
@@ -288,3 +288,28 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	MISSING
 %OP_SWR
 	MISSING
+%WRAPPER
+package compiledlib.dov;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import flexsc.CompEnv;
+import flexsc.CpuFcn;
+
+public class CpuImpl<T> extends CPU<T> implements CpuFcn<T> {
+	public CpuImpl(CompEnv<T> env) throws Exception {
+		super(env);
+	}
+
+	public static String opcodes[] = {
+%OPCODES
+	};
+	
+	Set<String> opcodeSet = new HashSet<String>(Arrays.asList(opcodes));
+
+	public Set<String> getOpcodesImplemented() {
+		return opcodeSet;
+	}
+}

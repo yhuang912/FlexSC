@@ -27,6 +27,8 @@ public class CpuBuilder {
 	
 	/** The main text of the CPU program */
 	private List<String> text;
+	/** The main text of the wrapper */
+	private List<String> wrapper;
 	private List<Map.Entry<String, List<String>>> actions;
 	
 	/** This constructor takes the CPU template from the classpath
@@ -93,6 +95,9 @@ public class CpuBuilder {
 				}
 				current = new ArrayList<String>();
 				actions.add(new AbstractMap.SimpleImmutableEntry<String, List<String>>(mnemonic, current));
+			} else if(s.startsWith("%WRAPPER")) {
+				wrapper = new ArrayList<String>();
+				current = wrapper;
 			} else {
 				current.add(s);
 			}
@@ -205,6 +210,42 @@ public class CpuBuilder {
 		return true;
 	}
 	
+	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String className, File f) throws FileNotFoundException {
+		PrintStream w = new PrintStream(f);
+		buildWrapper(operations, className, w);
+	}	
+	
+	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String className, PrintStream w) {
+		StringBuilder sb = new StringBuilder();
+		buildWrapper(operations, className, sb);
+		w.print(sb.toString());
+	}
+	
+	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String className, StringBuilder sb) {
+		for(String s:wrapper) {
+			if(s.startsWith("%OPCODES")) {
+				// Write out list of operations
+				for(MipsInstructionSet.Operation o : operations) {
+					sb.append("\t\t\"");
+					sb.append(o.toString());
+					sb.append("\",");
+					sb.append(lineSeparator);
+				}
+			} else if(s.contains("%CLASS")) {
+				String parts[] = s.split("%CLASS");
+				for(int i = 0; i < parts.length-1; i++) {
+					sb.append(parts[i]);
+					sb.append(className);
+				}
+				sb.append(parts[parts.length-1]);
+				sb.append(lineSeparator);
+			} else {
+				sb.append(s);
+				sb.append(lineSeparator);
+			}
+		}
+	}
+	
 	/** Build a CPU
 	 * 
 	 * @param operations The set of operations to be implemented
@@ -212,9 +253,9 @@ public class CpuBuilder {
 	 * @throws FileNotFoundException
 	 */
 	
-	public void build(Set<MipsInstructionSet.Operation>operations, File f) throws FileNotFoundException {
+	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String className, File f) throws FileNotFoundException {
 		PrintStream w = new PrintStream(f);
-		build(operations, w);
+		buildCpu(operations, className, w);
 	}
 	
 	/** Build a CPU
@@ -223,9 +264,9 @@ public class CpuBuilder {
 	 * @param w Write the CPU program here
 	 */
 	
-	public void build(Set<MipsInstructionSet.Operation>operations, PrintStream w) {
+	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String className, PrintStream w) {
 		StringBuilder sb = new StringBuilder();
-		build(operations, sb);
+		buildCpu(operations, className, sb);
 		w.print(sb.toString());
 	}
 
@@ -234,7 +275,7 @@ public class CpuBuilder {
 	 * @param operations The set of operations to be implemented
 	 * @return The text of the CPU
 	 */
-	public void build(Set<MipsInstructionSet.Operation>operations, StringBuilder sb) {
+	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String className, StringBuilder sb) {
 
 		// Build sets of ops by type.
 		// Also keep track of whether there were any multiplies or divides
@@ -304,6 +345,14 @@ public class CpuBuilder {
 				codeWritten = emitActions(sb, codeWritten, J_ops, MipsInstructionSet.OperationType.J);
 				codeWritten = emitActions(sb, codeWritten, R_ops, MipsInstructionSet.OperationType.FUNCT);
 				emitActions(sb, codeWritten, REGIMM_ops, MipsInstructionSet.OperationType.REGIMM);
+			} else if(s.contains("%CLASS")) {
+				String parts[] = s.split("%CLASS");
+				for(int i = 0; i < parts.length-1; i++) {
+					sb.append(parts[i]);
+					sb.append(className);
+				}
+				sb.append(parts[parts.length-1]);
+				sb.append(lineSeparator);
 			} else {
 				sb.append(s);
 				sb.append(lineSeparator);
@@ -348,8 +397,12 @@ public class CpuBuilder {
 			*/
 			bldr = new CpuBuilder();
 			StringBuilder code = new StringBuilder();
-			bldr.build(operations, code);
+			bldr.buildCpu(operations, "Cpu", code);
 			System.out.print(code.toString());
+			
+			StringBuilder wrapper = new StringBuilder();
+			bldr.buildWrapper(operations, "Cpu", wrapper);
+			System.out.print(wrapper.toString());
 		} catch(FileNotFoundException e) {
 			System.err.println("No " + CPU_FILE_NAME + " despite existence check");
 		} catch(IOException e) {
