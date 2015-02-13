@@ -18,6 +18,8 @@ import java.util.TreeMap;
 
 
 
+
+
 import oram.SecureArray;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
@@ -31,9 +33,11 @@ import com.appcomsci.mips.memory.MipsInstructionSet;
 import com.appcomsci.sfe.common.Configuration;
 
 import compiledlib.dov.CPU;
+import compiledlib.dov.CpuImpl;
 import compiledlib.dov.MEM;
 import mips.EmulatorUtils;
 import flexsc.CompEnv;
+import flexsc.CpuFcn;
 // NEW import flexsc.CpuFcn;
 import flexsc.Mode;
 import flexsc.Party;
@@ -191,8 +195,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		public void mainloop(CompEnv<T> env) throws Exception{
 			//testInstruction(env);
 			lib = new IntegerLib<T>(env);
-			CPU<T> cpu = new CPU<T>(env);
-// NEW			CpuFcn<T> cpu = new CPU<T>(env);
+			CpuFcn<T> cpu = new CpuImpl<T>(env);
 			MEM<T> mem = new MEM<T>(env);
 			reg = loadInputsToRegister(env);
 
