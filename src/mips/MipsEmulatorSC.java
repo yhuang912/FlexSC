@@ -32,8 +32,8 @@ import java.util.TreeMap;
 public class MipsEmulatorSC {
 
 	static final int REGISTER_SIZE = 32;
-	static final int MEM_SIZE = 255;// 160 < threshold for func1
-	static final int THRESHOLD = 254;
+	static final int MEM_SIZE = 256;// 160 < threshold for func1
+	static final int THRESHOLD = 255;
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
 	static final Mode m = Mode.REAL;
@@ -280,7 +280,7 @@ public class MipsEmulatorSC {
 				SecureArray<GCSignal> currentBank;
 				while (true) {
 					currentBank = currentSet.getOramBank().getArray();
-					System.out.println("count: " + count);
+					//	System.out.println("count: " + count);
 					count++;
 //					System.out.println("execution step: " + currentSet.getExecutionStep());
 //					printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
