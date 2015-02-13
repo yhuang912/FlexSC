@@ -1,5 +1,5 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
-package oram;
+package orambs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,7 +7,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import oram.noOTORAM.CircuitOramNOOT;
+import orambs.noOTORAM.CircuitOramNOOT;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Party;

@@ -1,5 +1,7 @@
 package oram;
 
+//import orambs.BSCircuitOram;
+import orambs.BSCircuitOram;
 import util.Utils;
 import flexsc.CompEnv;
 import flexsc.Flag;
@@ -10,8 +12,8 @@ import gc.GCSignal;
 public class TestCircuitOramRecOpt {
 
 	public  static void main(String args[]) throws Exception {
-//			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 32, 8, 6);
-		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 4, 8);
+			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 32, 8, 6);
+//		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 4, 8);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
@@ -23,7 +25,7 @@ public class TestCircuitOramRecOpt {
 			System.out.print("\n");
 	}
 	
-	final static int writeCount = 5;//1 << 7;
+	final static int writeCount = 30;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
 	public TestCircuitOramRecOpt() { }
@@ -68,13 +70,15 @@ public class TestCircuitOramRecOpt {
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Alice,
 						is, os);
-				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
-						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
-
+//				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
+//				env, N, dataSize,  cutoff,32, recurFactor, capacity, 80);
+				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
+						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
+double t1 = 0, t2;
 				for (int i = 0; i < writeCount; ++i) {
 					System.out.println(i);
 					int element = i % N;
-
+if(i == 9){Flag.sw.flush(); t1 = System.nanoTime();}
 
 					Flag.sw.ands = 0;
 					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils
@@ -89,10 +93,11 @@ public class TestCircuitOramRecOpt {
 //							+ " " + Flag.sw.ands / t * 1000);
 					Flag.sw.addCounter();
 
-					Runtime rt = Runtime.getRuntime();
-					double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
+//					Runtime rt = Runtime.getRuntime();
+//					double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
 //					System.out.println("mem: " + usedMB);
 				}
+				System.out.println((System.nanoTime()-t1)/1000000000.0/(writeCount-10));
 
 				for (int i = 0; i < readCount; ++i) {
 					int element = i % N;
@@ -146,8 +151,12 @@ public class TestCircuitOramRecOpt {
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Mode.REAL, Party.Bob,
 						is, os);
-				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
-						env, N, dataSize,32,  cutoff, recurFactor, capacity, 80);
+//				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
+//						env, N, dataSize,32,  cutoff, recurFactor, capacity, 80);
+				
+				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
+						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
+
 				
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;

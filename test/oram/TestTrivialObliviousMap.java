@@ -1,5 +1,7 @@
 package oram;
 
+import orambs.TrivialObliviousMap;
+
 import org.junit.Test;
 
 import util.Utils;

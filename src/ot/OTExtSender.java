@@ -71,7 +71,7 @@ public class OTExtSender extends OTSender {
 
 	public void send(GCSignal[][] msgPairs) throws IOException {
 		GCSignal[][] pairs = new GCSignal[SecurityParameter.k1
-				+ msgPairs.length][2];
+		                                  + msgPairs.length][2];
 		for (int i = 0; i < SecurityParameter.k1; i++) {
 			pairs[i][0] = GCSignal.freshLabel(rnd);
 			pairs[i][1] = GCSignal.freshLabel(rnd);
@@ -104,29 +104,38 @@ public class OTExtSender extends OTSender {
 		int numOfPairs = msgPairs.length;
 
 		BitMatrix Q = new BitMatrix(numOfPairs, SecurityParameter.k1);
+//		BitMatrix tQ = new BitMatrix(SecurityParameter.k1, numOfPairs);
 
-		Flag.sw.startOTIO();
+
 		for (int i = 0; i < SecurityParameter.k1; i++) {
+			Flag.sw.startOTIO();
 			cphPairs[i][0] = RWBigInteger.readBI(is);
 			cphPairs[i][1] = RWBigInteger.readBI(is);
-			if (s[i])
+			Flag.sw.stopOTIO();
+			if (s[i]) {
+//				tQ.updateRows(cipher.decrypt(keys[i].bytes, cphPairs[i][1],
+//						numOfPairs), i);
 				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][1],
 						numOfPairs);
-			else
+			}
+			else {
 				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][0],
 						numOfPairs);
+//				tQ.updateRows(cipher.decrypt(keys[i].bytes, cphPairs[i][0],
+//						numOfPairs), i);
+			}
 		}
-		Flag.sw.stopOTIO();
 
 
-		for (int i = 0; i < SecurityParameter.k1; i++) {
-//			if (s[i])
-//				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][1],
-//						numOfPairs);
-//			else
-//				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][0],
-//						numOfPairs);
-		}
+
+//		for (int i = 0; i < SecurityParameter.k1; i++) {
+			//			if (s[i])
+			//				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][1],
+			//						numOfPairs);
+			//			else
+			//				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][0],
+			//						numOfPairs);
+//		}
 
 		BitMatrix tQ = Q.transpose();
 
@@ -140,17 +149,21 @@ public class OTExtSender extends OTSender {
 			y[i][1] = cipher.enc(
 					GCSignal.newInstance(tQ.data[i].xor(biS).toByteArray()),
 					msgPairs[i][1], i);
+			Flag.sw.startOTIO();
 			y[i][0].send(os);
 			y[i][1].send(os);
+			Flag.sw.stopOTIO();
 		}
-
 		Flag.sw.startOTIO();
-		for (int i = 0; i < numOfPairs; i++) {
-//			y[i][0].send(os);
-//			y[i][1].send(os);
-		}
 		os.flush();
 		Flag.sw.stopOTIO();
+		//
+		//		for (int i = 0; i < numOfPairs; i++) {
+		////			y[i][0].send(os);
+		////			y[i][1].send(os);
+		//		}
+
+
 
 	}
 

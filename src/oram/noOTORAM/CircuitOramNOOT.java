@@ -24,8 +24,8 @@ public class CircuitOramNOOT<T> extends TreeBasedOramParty<T> implements Circuit
 		return res;
 	}
 
-	public CircuitOramNOOT(int indexsize, CompEnv<T> env, int N, int dataSize, int cap, int sp) {
-		super(indexsize, env, N, dataSize, cap);
+	public CircuitOramNOOT(CompEnv<T> env, int N, int dataSize, int cap, int sp) {
+		super(env, N, dataSize, cap);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData,
 				logN, capacity, env);
 		queueCapacity = 30;
@@ -37,8 +37,8 @@ public class CircuitOramNOOT<T> extends TreeBasedOramParty<T> implements Circuit
 		scQueue = prepareBlocks(queue, queue);
 	}
 
-	public CircuitOramNOOT(int indexsize, CompEnv<T> env, int N, int dataSize) {
-		super(indexsize, env, N, dataSize, 3);
+	public CircuitOramNOOT(CompEnv<T> env, int N, int dataSize) {
+		super(env, N, dataSize, 3);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData,
 				logN, capacity, env);
 		queueCapacity = 30;
@@ -116,10 +116,5 @@ public class CircuitOramNOOT<T> extends TreeBasedOramParty<T> implements Circuit
 	@Override
 	public int getLengthOfIndex() {
 		return lengthOfIden;
-	}
-	
-	@Override
-	public int getLogN() {
-		return logN;
 	}
 }

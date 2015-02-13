@@ -99,39 +99,43 @@ public class OTExtReceiver extends OTReceiver {
 					msgPairs[i][0], choices.length);
 			cphPairs[i][1] = cipher.encrypt(keyPairs[i][1].bytes,
 					msgPairs[i][1], choices.length);
-			//changes
+			Flag.sw.startOTIO();
 			RWBigInteger.writeBI(os, cphPairs[i][0]);
 			RWBigInteger.writeBI(os, cphPairs[i][1]);
+			Flag.sw.stopOTIO();
 		}
 
 		Flag.sw.startOTIO();
-		for (int i = 0; i < SecurityParameter.k1; i++) {
-//			RWBigInteger.writeBI(os, cphPairs[i][0]);
-//			RWBigInteger.writeBI(os, cphPairs[i][1]);
-		}
 		os.flush();
 		Flag.sw.stopOTIO();
+//		for (int i = 0; i < SecurityParameter.k1; i++) {
+//			RWBigInteger.writeBI(os, cphPairs[i][0]);
+//			RWBigInteger.writeBI(os, cphPairs[i][1]);
+//		}
+		
 
 		BitMatrix tT = T.transpose();
 		GCSignal[] res = new GCSignal[choices.length];
-
 		GCSignal[][] y = new GCSignal[choices.length][2];
 
-		Flag.sw.startOTIO();
+		
 		for (int i = 0; i < choices.length; i++) {
+//			GCSignal tmp =  GCSignal.newInstance(T.getRow(i).toByteArray());
+			Flag.sw.startOTIO();
 			y[i][0] = GCSignal.receive(is);
 			y[i][1] = GCSignal.receive(is);
+			Flag.sw.stopOTIO();
 			int sigma = choices[i] ? 1 : 0;
 			res[i] = cipher.dec(GCSignal.newInstance(tT.data[i].toByteArray()),
+//			res[i] = cipher.dec(tmp,
 					y[i][sigma], i);
 		}
-		Flag.sw.stopOTIO();
 
-		for (int i = 0; i < choices.length; i++) {
+//		for (int i = 0; i < choices.length; i++) {
 //			int sigma = choices[i] ? 1 : 0;
 //			res[i] = cipher.dec(GCSignal.newInstance(tT.data[i].toByteArray()),
 //					y[i][sigma], i);
-		}
+//		}
 
 		return res;
 	}

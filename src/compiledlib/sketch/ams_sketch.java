@@ -1,8 +1,8 @@
 package compiledlib.sketch;
 import java.security.SecureRandom;
 
-import oram.SecureArray;
 import oram.CircuitOram;
+import oram.SecureArray;
 import flexsc.Mode;
 import flexsc.Party;
 import flexsc.CompEnv;

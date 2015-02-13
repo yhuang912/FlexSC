@@ -16,7 +16,6 @@ import org.junit.Test;
 
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
-
 import compiledlib.priority_queue.BoolArray;
 import compiledlib.priority_queue.PriorityQueue;
 import compiledlib.priority_queue.PriorityQueueNode;

@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 
 import ot.FakeOTSender;
 import ot.OTExtSender;
+import ot.OTPreprocessSender;
 import ot.OTSender;
 import flexsc.Flag;
 import flexsc.Party;
@@ -27,11 +28,13 @@ public abstract class GCGenComp extends GCCompEnv{
 
 		if (Flag.FakeOT)
 			snd = new FakeOTSender(80, is, os);
+		else if(Flag.PreProcessOT)
+			snd = new OTPreprocessSender(80, is, os);
 		else
 			snd = new OTExtSender(80, is, os);
 	}
 
-	private GCSignal[] genPair() {
+	static public GCSignal[] genPair() {
 		GCSignal[] label = new GCSignal[2];
 		label[0] = GCSignal.freshLabel(rnd);
 		label[1] = R.xor(label[0]);
@@ -115,7 +118,7 @@ public abstract class GCGenComp extends GCCompEnv{
 			return true;
 
 		try {
-//			throw new Exception("bad label at final output.");
+			throw new Exception("bad label at final output.");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
