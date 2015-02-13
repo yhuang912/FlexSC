@@ -193,7 +193,7 @@ public class MipsEmulator {
 				minAddr = maxAddr;
 			else minAddr = m.ceilingKey((long)1);
 			
-			if (!isMultipleBanks())
+			if (!config.isMultipleBanks())
 				instructionBank = singleBank;
 			else {
 				instructionBank = new SecureArray<T>(env, (int)((maxAddr - minAddr)/4 + 1), WORD_SIZE);
