@@ -1,12 +1,13 @@
 #define OP_LW 35
 #define OP_SW 43
 #define OP_LB 32
-
+typedef OMap = native SecureMap;
+int32 OMap.read(int32 id) = native read;
 struct MEM{};
 
-int32 MEM.getInst(int32[2048] instBank, int32 pc, public int32 pcOffset){
+int32 MEM.getInst(OMap instBank, int32 pc, public int32 pcOffset){
 	int32 index = (pc-pcOffset) >> 2;
-	int32 newInst = instBank[index];
+	int32 newInst = instBank.read(index);
 	return newInst;
 }
 
