@@ -210,18 +210,18 @@ public class CpuBuilder {
 		return true;
 	}
 	
-	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String className, File f) throws FileNotFoundException {
+	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String packageName, String className, File f) throws FileNotFoundException {
 		PrintStream w = new PrintStream(f);
-		buildWrapper(operations, className, w);
+		buildWrapper(operations, packageName, className, w);
 	}	
 	
-	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String className, PrintStream w) {
+	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String packageName, String className, PrintStream w) {
 		StringBuilder sb = new StringBuilder();
-		buildWrapper(operations, className, sb);
+		buildWrapper(operations, packageName, className, sb);
 		w.print(sb.toString());
 	}
 	
-	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String className, StringBuilder sb) {
+	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String packageName, String className, StringBuilder sb) {
 		for(String s:wrapper) {
 			if(s.startsWith("%OPCODES")) {
 				// Write out list of operations
@@ -231,6 +231,10 @@ public class CpuBuilder {
 					sb.append("\",");
 					sb.append(lineSeparator);
 				}
+			} else if(s.startsWith("%PACKAGE")) {
+				sb.append("package ");
+				sb.append(packageName);
+				sb.append(lineSeparator);
 			} else if(s.contains("%CLASS")) {
 				String parts[] = s.split("%CLASS");
 				for(int i = 0; i < parts.length-1; i++) {
@@ -253,9 +257,9 @@ public class CpuBuilder {
 	 * @throws FileNotFoundException
 	 */
 	
-	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String className, File f) throws FileNotFoundException {
+	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String packageName, String className, File f) throws FileNotFoundException {
 		PrintStream w = new PrintStream(f);
-		buildCpu(operations, className, w);
+		buildCpu(operations, packageName, className, w);
 	}
 	
 	/** Build a CPU
@@ -264,9 +268,9 @@ public class CpuBuilder {
 	 * @param w Write the CPU program here
 	 */
 	
-	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String className, PrintStream w) {
+	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String packageName, String className, PrintStream w) {
 		StringBuilder sb = new StringBuilder();
-		buildCpu(operations, className, sb);
+		buildCpu(operations, packageName, className, sb);
 		w.print(sb.toString());
 	}
 
@@ -275,7 +279,7 @@ public class CpuBuilder {
 	 * @param operations The set of operations to be implemented
 	 * @return The text of the CPU
 	 */
-	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String className, StringBuilder sb) {
+	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String packageName, String className, StringBuilder sb) {
 
 		// Build sets of ops by type.
 		// Also keep track of whether there were any multiplies or divides
@@ -397,11 +401,11 @@ public class CpuBuilder {
 			*/
 			bldr = new CpuBuilder();
 			StringBuilder code = new StringBuilder();
-			bldr.buildCpu(operations, "Cpu", code);
+			bldr.buildCpu(operations, "compiledlib.dov", "Cpu", code);
 			System.out.print(code.toString());
 			
 			StringBuilder wrapper = new StringBuilder();
-			bldr.buildWrapper(operations, "Cpu", wrapper);
+			bldr.buildWrapper(operations, "compiledlib.dov", "Cpu", wrapper);
 			System.out.print(wrapper.toString());
 		} catch(FileNotFoundException e) {
 			System.err.println("No " + CPU_FILE_NAME + " despite existence check");
