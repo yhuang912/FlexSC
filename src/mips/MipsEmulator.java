@@ -38,19 +38,11 @@ public class MipsEmulator {
 	static final int RECURSE_THRESHOLD = 512;
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
-<<<<<<< HEAD
 	static final Mode m = Mode.VERIFY;
 	static final int Alice_input = 5;
 	static final int Bob_input = 2;
 	// static final boolean MULTIPLE_BANKS = true;
 	static Configuration config;
-=======
-	static final Mode m = Mode.REAL;
-	static final int Alice_input = 4;
-	static final int Bob_input = 5;
-	static final boolean MULTIPLE_BANKS = true;
-	Configuration config;
->>>>>>> e2b636ab471031e46f8d477dd6bb5d8ee1f8f047
 	private static String binaryFileName;	// should not be static FIXME
 
 	public MipsEmulator(Configuration config) {
@@ -195,20 +187,13 @@ public class MipsEmulator {
 			if (maxAddr == 0)
 				break;
 			//long minAddr = m.firstEntry().getKey();
-<<<<<<< HEAD
 				// do we still need this?
-=======
->>>>>>> e2b636ab471031e46f8d477dd6bb5d8ee1f8f047
 			long minAddr;
 			if (s.size() == 1)
 				minAddr = maxAddr;
 			else minAddr = m.ceilingKey((long)1);
 			
-<<<<<<< HEAD
 			if (!isMultipleBanks())
-=======
-			if (!MULTIPLE_BANKS)
->>>>>>> e2b636ab471031e46f8d477dd6bb5d8ee1f8f047
 				instructionBank = singleBank;
 			else {
 				instructionBank = new SecureArray<T>(env, (int)((maxAddr - minAddr)/4 + 1), WORD_SIZE);
