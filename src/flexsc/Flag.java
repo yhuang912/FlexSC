@@ -10,7 +10,7 @@ public class Flag {
 	public static StopWatch sw = new StopWatch(CountTime);
 	public static boolean countIO = false;
 	public static boolean FakeOT = false;
-	public static boolean PreProcessOT = false;
+	public static boolean PreProcessOT = true;
 	
 
 	public Flag() {
