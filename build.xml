@@ -19,10 +19,12 @@
       <src path="${src.dir}"/>
       <src path="${test.dir}"/>
       <classpath>
-        <pathelement location="lib/jargs.jar"/>
-        <pathelement location="lib/junit.jar"/>
-	<pathelement location="lib/commons-io-2.4.jar"/>
+        <pathelement location="lib/jargs.jar" />
+        <pathelement location="lib/junit.jar" />
+	<pathelement location="lib/commons-io-2.4.jar" />
       </classpath>
+      <exclude name="*/MipsEmulatorSC.java" />
+      <exclude name="*/MipsEmulatorVerify.java" />
     </javac>
   </target>
 
