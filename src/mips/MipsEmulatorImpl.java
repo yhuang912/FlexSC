@@ -39,7 +39,7 @@ import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
 
-public class MipsEmulator<ET> implements AbstractMipsEmulator {
+public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
 	static final int REGISTER_SIZE = 32;
 	static final int MEM_SIZE = 72;// 160 < threshold for func1
@@ -52,7 +52,7 @@ public class MipsEmulator<ET> implements AbstractMipsEmulator {
 	
 	protected LocalConfiguration config;
 	
-	private MipsEmulator(LocalConfiguration config) throws Exception {
+	private MipsEmulatorImpl(LocalConfiguration config) throws Exception {
 		this.config = config;
 	}
 
@@ -430,13 +430,13 @@ public class MipsEmulator<ET> implements AbstractMipsEmulator {
 		// use this class to store the mode also
 		LocalConfiguration config = new LocalConfiguration();
 		process_cmdline_args(args, config);
-		AbstractMipsEmulator emu = null;
+		MipsEmulator emu = null;
 		switch(config.getMode()) {
 		case VERIFY:
-			emu = new MipsEmulator<Boolean>(config);
+			emu = new MipsEmulatorImpl<Boolean>(config);
 			break;
 		case REAL:
-			emu = new MipsEmulator<GCSignal>(config);
+			emu = new MipsEmulatorImpl<GCSignal>(config);
 			break;
 		default:
 			System.err.println("Help!  What do I do about " +  config.getMode() + "?");

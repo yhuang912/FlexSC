@@ -8,6 +8,6 @@ package mips;
  * @author Allen McIntosh
  *
  */
-public interface AbstractMipsEmulator {
+public interface MipsEmulator {
 	public void emulate() throws Exception;
 }
