@@ -79,7 +79,6 @@ public class MemSetBuilder<T> extends MipsProgram {
 	}
 	
 	private static void printUsageStatic() {
-
 		System.err.println("Usage!");
 	}
 	
