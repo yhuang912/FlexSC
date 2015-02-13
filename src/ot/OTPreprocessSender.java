@@ -20,8 +20,8 @@ public class OTPreprocessSender  extends OTSender {
 		fillup();
 	}
 
-	final static public int bufferSize = 1024*1024;
-	final static public int fillLength = 50000;
+	final static public int bufferSize = 1024*1024*4;
+	final static public int fillLength = 100000;
 	GCSignal[][] buffer = new GCSignal[bufferSize][2];
 	int bufferusage = 0;
 
