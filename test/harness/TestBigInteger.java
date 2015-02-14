@@ -16,7 +16,7 @@ import flexsc.Party;
 
 
 public class TestBigInteger extends TestHarness {
-	public static final int LENGTH = 4096000;
+	public static final int LENGTH = 409600;
 	final static int RANGE = LENGTH/2;
 	public static abstract class Helper {
 		BigInteger intA, intB;
@@ -52,6 +52,7 @@ public class TestBigInteger extends TestHarness {
 				System.out.println("gen2");
 
 				T[] d = h.secureCompute(a, b, gen);
+				System.out.println("gen3");
 				os.flush();
 		          
 				z = gen.outputToAlice(d);
@@ -89,6 +90,7 @@ public class TestBigInteger extends TestHarness {
 
 				
 				T[] d = h.secureCompute(a, b, env);
+				System.out.println("eva3");
 //				if (Flag.mode == Mode.COUNT) {
 //					((PMCompEnv) env).statistic.finalize();
 //					andgates = ((PMCompEnv) env).statistic.andGate;
@@ -158,6 +160,7 @@ public class TestBigInteger extends TestHarness {
 //			tEva.start();
 //			tGen.join();
 //		}
+//		else {
 		if(new Integer(args[0]) == 0) {
 			GenRunnable gen = new GenRunnable(h);
 			Thread tGen = new Thread(gen);
@@ -167,5 +170,6 @@ public class TestBigInteger extends TestHarness {
 			Thread tEva = new Thread(eva);
 			tEva.start(); 
 		}
+//		}
 	}
 }
