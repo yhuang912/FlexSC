@@ -1,5 +1,6 @@
 package gc.offline;
 
+import flexsc.CompEnv;
 import flexsc.Flag;
 import gc.GCGenComp;
 import gc.GCSignal;
@@ -38,6 +39,10 @@ public class GCGen extends GCGenComp {
 	public GCGen(InputStream is, OutputStream os) {
 		super(is, os);
 		gb = new Garbler();
+		gtt[0][0] = GCSignal.freshLabel(CompEnv.rnd);
+		gtt[1][0] = GCSignal.freshLabel(CompEnv.rnd);
+		gtt[0][1] = GCSignal.freshLabel(CompEnv.rnd);
+		gtt[1][1] = GCSignal.freshLabel(CompEnv.rnd);
 	}
 	
 	@Override
