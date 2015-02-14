@@ -41,16 +41,20 @@ public class Test_2Input1Output extends TestHarness {
 		public void run() {
 			try {
 				listen(54321);
+				System.out.println(socketChannel);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, this);
 
 				T[] a = gen.inputOfAlice(h.a);
-				T[] b = gen.inputOfBob(new boolean[32]);
 
+				T[] b = gen.inputOfBob(new boolean[32]);
+				flush();
 				T[] d = h.secureCompute(a, b, gen);
-				os.flush();
+				flush();
+				System.out.println("...");
 
 				z = gen.outputToAlice(d);
+				System.out.println("...");
 
 				disconnect();
 			} catch (Exception e) {
@@ -72,25 +76,26 @@ public class Test_2Input1Output extends TestHarness {
 		public void run() {
 			try {
 				connect("localhost", 54321);
+				System.out.println(socketChannel);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, this);
+
+				System.out.println("...1");
 
 				T[] a = env.inputOfAlice(new boolean[32]);
-				T[] b = env.inputOfBob(h.b);
 
-				if (Flag.mode == Mode.COUNT) {
-					((PMCompEnv) env).statistic.flush();
-					;
-				}
+				System.out.println("...2");
+				T[] b = env.inputOfBob(h.b);
+				flush();
+				System.out.println("...3");
+
+
 				T[] d = h.secureCompute(a, b, env);
-				if (Flag.mode == Mode.COUNT) {
-					((PMCompEnv) env).statistic.finalize();
-					andgates = ((PMCompEnv) env).statistic.andGate;
-					encs = ((PMCompEnv) env).statistic.NumEncAlice;
-				}
+				flush();
+				System.out.println("...4");
 
 				env.outputToAlice(d);
-				os.flush();
+				flush();
 
 				disconnect();
 			} catch (Exception e) {
@@ -114,6 +119,7 @@ public class Test_2Input1Output extends TestHarness {
 		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
+			System.out.println(h.plainCompute(h.intA, h.intB)+" "+Utils.toSignedInt(gen.z));
 			Assert.assertEquals(h.plainCompute(h.intA, h.intB),
 					Utils.toSignedInt(gen.z));
 		}

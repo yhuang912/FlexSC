@@ -1,13 +1,13 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package flexsc;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
 
+import network.Network;
 import rand.ISAACProvider;
 import util.Utils;
 
@@ -24,53 +24,27 @@ public abstract class CompEnv<T> {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static CompEnv getEnv(Mode m, Party p, InputStream is,
-			OutputStream os) {
+	public static CompEnv getEnv(Mode m, Party p, Network w) {
 		Flag.mode = m;
-		return getEnv(p, is, os);
+		return getEnv(p, w);
 	}
 	
 	@SuppressWarnings("rawtypes")
-	public static CompEnv getEnv(Party p, InputStream is,
-			OutputStream os) {
+	public static CompEnv getEnv(Party p, Network w) {
 		if (Flag.mode == Mode.REAL)
 			if (p == Party.Bob)
-				return new gc.regular.GCEva(is, os);
+				return new gc.regular.GCEva(w);
 			else
-				return new gc.regular.GCGen(is, os);		
-		else if (Flag.mode == Mode.OPT)
-			if (p == Party.Bob)
-				return new gc.halfANDs.GCEva(is, os);
-			else
-				return new gc.halfANDs.GCGen(is, os);
-		else if (Flag.mode == Mode.OFFLINE)
-			if (p == Party.Bob)
-				return new gc.offline.GCEva(is, os);
-			else
-				return new gc.offline.GCGen(is, os);
-		else if (Flag.mode == Mode.VERIFY)
-			return new CVCompEnv(is, os, p);
-		else if (Flag.mode == Mode.COUNT)
-			return new PMCompEnv(is, os, p);
-		else {
-			try {
-				throw new Exception("not a supported Mode!");
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return null;
-		}
+				return new gc.regular.GCGen(w);
+		else return null;
 	}
 
-	public InputStream is;
-	public OutputStream os;
+	protected Network w;
 	public Party p;
 	public Mode m;
 
-	public CompEnv(InputStream is, OutputStream os, Party p, Mode m) {
-		this.is = is;
-		this.os = os;
+	public CompEnv(Network w, Party p, Mode m) {
+		this.w = w;
 		this.m = m;
 		this.p = p;
 	}
@@ -144,29 +118,5 @@ public abstract class CompEnv<T> {
 
 	public Party getParty() {
 		return p;
-	}
-
-	public void flush() {
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public void sync() throws IOException {
-		if (getParty() == Party.Alice) {
-			is.read();
-			os.write(0);
-			os.flush(); // dummy I/O to prevent dropping connection earlier than
-			// protocol payloads are received.
-		} else {
-			os.write(0);
-			os.flush();
-			is.read(); // dummy write to prevent dropping connection earlier
-			// than
-			// protocol payloads are received.
-		}
 	}
 }

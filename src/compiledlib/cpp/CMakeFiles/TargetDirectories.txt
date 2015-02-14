@@ -1,3 +1,0 @@
-/Users/wangxiao/git/FlexSC_rc/src/compiledlib/cpp/CMakeFiles/dfs.dir
-/Users/wangxiao/git/FlexSC_rc/src/compiledlib/cpp/CMakeFiles/prim.dir
-/Users/wangxiao/git/FlexSC_rc/src/compiledlib/cpp/CMakeFiles/ssp.dir

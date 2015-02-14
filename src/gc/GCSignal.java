@@ -3,12 +3,10 @@
 
 package gc;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import network.Server;
+import network.Network;
 
 public class GCSignal {
 	public static final int len = 10;
@@ -66,23 +64,13 @@ public class GCSignal {
 	}
 
 	// 'send' and 'receive' are supposed to be used only for secret signals
-	public void send(OutputStream os) {
-		try {
-			os.write(bytes);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void send(Network w) {
+		w.writeByte(bytes);
 	}
 
 	// 'send' and 'receive' are supposed to be used only for secret signals
-	public static GCSignal receive(InputStream ois) {
-		byte[] b = null;
-		try {
-			b = Server.readBytes(ois, len);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new GCSignal(b);
+	public static GCSignal receive(Network n) {
+		return new GCSignal(n.readBytes(len));
 	}
 
 	@Override

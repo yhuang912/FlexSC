@@ -1,12 +1,9 @@
 package gc;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
+import network.Network;
 import ot.FakeOTReceiver;
-import ot.OTExtReceiver;
-import ot.OTPreprocessReceiver;
 import ot.OTReceiver;
 import flexsc.Flag;
 import flexsc.Party;
@@ -17,21 +14,16 @@ public abstract class GCEvaComp extends GCCompEnv{
 
 	protected long gid = 0;
 
-	public GCEvaComp(InputStream is, OutputStream os) {
-		super(is, os, Party.Bob);
+	public GCEvaComp(Network w) {
+		super(w, Party.Bob);
 
 		if (Flag.FakeOT)
-			rcv = new FakeOTReceiver(is, os);
-		else if(Flag.PreProcessOT)
-			rcv = new OTPreprocessReceiver(is, os);
-		else
-			rcv = new OTExtReceiver(is, os);
-		
+			rcv = new FakeOTReceiver(w);
 	}
 
 	public GCSignal inputOfAlice(boolean in) {
 		Flag.sw.startOT();
-		GCSignal signal = GCSignal.receive(is);
+		GCSignal signal = GCSignal.receive(w);
 		Flag.sw.stopOT();
 		return signal;
 	}
@@ -53,6 +45,7 @@ public abstract class GCEvaComp extends GCCompEnv{
 		Flag.sw.startOT();
 		GCSignal[] signal = null;
 		try {
+
 			signal = rcv.receive(x);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -63,17 +56,16 @@ public abstract class GCEvaComp extends GCCompEnv{
 	}
 
 	public GCSignal[] inputOfAlice(boolean[] x) {
-		Flag.sw.startOT();
 		GCSignal[] result = new GCSignal[x.length];
 		for (int i = 0; i < x.length; ++i)
-			result[i] = GCSignal.receive(is);
-		Flag.sw.stopOT();
+			result[i] = GCSignal.receive(w);
+		System.out.println("...evq");
 		return result;
 	}
 
 	public boolean outputToAlice(GCSignal out) {
 		if (!out.isPublic())
-			out.send(os);
+			out.send(w);
 		return false;
 	}
 
@@ -81,7 +73,7 @@ public abstract class GCEvaComp extends GCCompEnv{
 		if (out.isPublic())
 			return out.v;
 
-		GCSignal lb = GCSignal.receive(is);
+		GCSignal lb = GCSignal.receive(w);
 		if (lb.equals(out))
 			return false;
 		// else if (lb.equals(R.xor(out)))
@@ -91,17 +83,12 @@ public abstract class GCEvaComp extends GCCompEnv{
 
 	public boolean[] outputToAlice(GCSignal[] out) {
 		boolean[] result = new boolean[out.length];
-
 		for (int i = 0; i < result.length; ++i) {
 			if (!out[i].isPublic())
-				out[i].send(os);
+				out[i].send(w);
 		}
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+		w.flush();
 
 		for (int i = 0; i < result.length; ++i)
 			result[i] = false;
