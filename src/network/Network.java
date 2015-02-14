@@ -11,7 +11,7 @@ public class Network {
 	public ArrayBlockingQueue<byte[]> queue;
 	ThreadedIO threadedio;
 	public InputStream is;
-	public OutputStream os;
+	protected OutputStream os;
 	static int bufferSize = 655360;
 
 	public void setUpThread() {
@@ -56,8 +56,9 @@ public class Network {
 
 	public void writeByte(byte[] data, int length) {
 		try {
-			os.write(data);
-		} catch (IOException e) {
+//			os.write(data);
+			queue.put(data);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
