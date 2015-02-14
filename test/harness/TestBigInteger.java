@@ -45,7 +45,7 @@ public class TestBigInteger extends TestHarness {
 				listen(54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, this);
-				
+
 				T [] a = gen.inputOfAlice(h.a);
 				System.out.println("gen1");
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
@@ -54,7 +54,7 @@ public class TestBigInteger extends TestHarness {
 				T[] d = h.secureCompute(a, b, gen);
 				System.out.println("gen3");
 				os.flush();
-		          
+
 				z = gen.outputToAlice(d);
 				Flag.sw.print();
 				disconnect();
@@ -78,7 +78,7 @@ public class TestBigInteger extends TestHarness {
 				connect("localhost", 54321);				
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Party.Bob, this);
-				
+
 				T [] a = env.inputOfAlice(new boolean[h.a.length]);
 				System.out.println("eva1");
 				T [] b = env.inputOfBob(h.b);
@@ -88,15 +88,15 @@ public class TestBigInteger extends TestHarness {
 					((PMCompEnv) env).statistic.flush();
 				}
 
-				
+
 				T[] d = h.secureCompute(a, b, env);
 				System.out.println("eva3");
-//				if (Flag.mode == Mode.COUNT) {
-//					((PMCompEnv) env).statistic.finalize();
-//					andgates = ((PMCompEnv) env).statistic.andGate;
-//					encs = ((PMCompEnv) env).statistic.NumEncAlice;
-//				}
-				
+				//				if (Flag.mode == Mode.COUNT) {
+				//					((PMCompEnv) env).statistic.finalize();
+				//					andgates = ((PMCompEnv) env).statistic.andGate;
+				//					encs = ((PMCompEnv) env).statistic.NumEncAlice;
+				//				}
+
 				env.outputToAlice(d);
 				os.flush();
 				Flag.sw.print();
@@ -119,8 +119,8 @@ public class TestBigInteger extends TestHarness {
 		tGen.join();
 		if(Flag.mode == Mode.COUNT)
 			System.out.println(eva.andgates);
-//		System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
-//		h.intA+" "+h.intB+"\n");
+		//		System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
+		//		h.intA+" "+h.intB+"\n");
 		if(!h.plainCompute(h.intA, h.intB).equals(Utils.toBigInteger(gen.z))) 
 		{
 			System.out.println(Arrays.toString(h.a));
@@ -128,10 +128,10 @@ public class TestBigInteger extends TestHarness {
 			System.out.println(Arrays.toString( Utils.fromBigInteger(h.plainCompute(h.intA, h.intB),gen.z.length)));
 			System.out.println(Arrays.toString(Utils.fromBigInteger(Utils.toBigInteger(gen.z),gen.z.length)));
 		}
-		
+
 		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toBigInteger(gen.z));
 	}
-	
+
 	public static void main(String[] args) throws InterruptedException {
 		BigInteger a = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
 		BigInteger b = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
@@ -144,32 +144,32 @@ public class TestBigInteger extends TestHarness {
 				BigInteger rb = x.xor(y);
 				BigInteger res = new BigInteger("0");
 				for(int i = 0; i < rb.bitLength(); ++i) {
-						if( rb.testBit(i) )
-							res = res.add(new BigInteger("1"));
+					if( rb.testBit(i) )
+						res = res.add(new BigInteger("1"));
 				}
 				return res;
-				}
+			}
 		};
-//		if(1 == 1) {
-//			GenRunnable gen = new GenRunnable(h);
-//			EvaRunnable eva = new EvaRunnable(h);
-//
-//			Thread tGen = new Thread(gen);
-//			Thread tEva = new Thread(eva);
-//			tGen.start(); Thread.sleep(5);
-//			tEva.start();
-//			tGen.join();
-//		}
-//		else {
-		if(new Integer(args[0]) == 0) {
+		if(1 == 1) {
 			GenRunnable gen = new GenRunnable(h);
-			Thread tGen = new Thread(gen);
-			tGen.run(); 
-		} else {
 			EvaRunnable eva = new EvaRunnable(h);
+
+			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
-			tEva.run(); 
+			tGen.start(); Thread.sleep(5);
+			tEva.start();
+			tGen.join();
 		}
-//		}
+		else {
+			if(new Integer(args[0]) == 0) {
+				GenRunnable gen = new GenRunnable(h);
+				Thread tGen = new Thread(gen);
+				tGen.run(); 
+			} else {
+				EvaRunnable eva = new EvaRunnable(h);
+				Thread tEva = new Thread(eva);
+				tEva.run(); 
+			}
+		}
 	}
 }

@@ -6,8 +6,8 @@
 
 package paillier;
 
-import java.math.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.Random;
 
 public class Paillier {
 

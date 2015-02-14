@@ -11,7 +11,7 @@ public class ThreadedIO implements Runnable {
 		this.queue = queue;
 		this.os = os;
 	}
-	public void run() {
+	public void run() {	
 		byte[] t = null;
 		try {
 			while(true) {
@@ -22,7 +22,6 @@ public class ThreadedIO implements Runnable {
 					t = queue.poll();
 				}
 				//				Thread.sleep(1);
-				
 			}
 			
 		} catch (Exception e) {

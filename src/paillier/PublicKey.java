@@ -6,8 +6,11 @@
 
 package paillier;
 
-import java.math.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.math.BigInteger;
 
 public class PublicKey implements Serializable {
 

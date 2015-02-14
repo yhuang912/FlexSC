@@ -21,8 +21,8 @@ public class Network {
 	}
 
 	public void flush(){
-		while(!queue.isEmpty()) {
-		}
+//		while(!queue.isEmpty()) {
+//		}
 	}
 	public byte[] readBytes(int len) {
 		byte[] temp = new byte[len];
@@ -58,7 +58,7 @@ public class Network {
 	public void writeByte(byte[] data, int length) {
 		try {
 			os.write(data);
-//			queue.put(data);
+//			queue.add(data);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,9 +1,6 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package flexsc;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -37,16 +34,16 @@ public abstract class CompEnv<T> {
 				return new gc.regular.GCEva(w);
 			else
 				return new gc.regular.GCGen(w);		
-//		else if (Flag.mode == Mode.OPT)
-//			if (p == Party.Bob)
-//				return new gc.halfANDs.GCEva(w);
-//			else
-//				return new gc.halfANDs.GCGen(w);
-//		else if (Flag.mode == Mode.OFFLINE)
-//			if (p == Party.Bob)
-//				return new gc.offline.GCEva(w);
-//			else
-//				return new gc.offline.GCGen(w);
+		else if (Flag.mode == Mode.OPT)
+			if (p == Party.Bob)
+				return new gc.halfANDs.GCEva(w);
+			else
+				return new gc.halfANDs.GCGen(w);
+		else if (Flag.mode == Mode.OFFLINE)
+			if (p == Party.Bob)
+				return new gc.offline.GCEva(w);
+			else
+				return new gc.offline.GCGen(w);
 //		else if (Flag.mode == Mode.VERIFY)
 //			return new CVCompEnv(w, p);
 //		else if (Flag.mode == Mode.COUNT)
