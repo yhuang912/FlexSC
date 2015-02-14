@@ -10,7 +10,6 @@ public class Server extends Network{
 		serverSocketChannel.socket().bind(new InetSocketAddress(port));
 		socketChannel=serverSocketChannel.accept();
 		socketChannel.configureBlocking(false);
-
 	}
 	
 	@Override
@@ -19,6 +18,7 @@ public class Server extends Network{
 					socketChannel.close();
 				}
 				serverSocketChannel.close();
+				System.out.println(t1/1000000000.0);
 	}
 
 

@@ -7,22 +7,20 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 public abstract class Network {
-	public static int bufferSize = 10000000;
+	public static int bufferSize = 1024*1024;
 	public SocketChannel socketChannel;
-//	public ByteBuffer readbuffer = ByteBuffer.allocate(bufferSize);
-	public ByteBuffer writebuffer = ByteBuffer.allocate(bufferSize);
+	public ByteBuffer readbuffer = ByteBuffer.allocate(bufferSize);
+	private ByteBuffer writebuffer = ByteBuffer.allocate(bufferSize);
 
 	public byte[] readBytes(int len) {
-//		System.out.println(socketChannel.isBlocking());
-		ByteBuffer readbuffer=null;
+		byte[] res = new byte[len];
+		readbuffer.clear();
+		readbuffer.limit(len);
 		try {
-			readbuffer = ByteBuffer.allocate(len);
 			int remain = len;
 			while (0 < remain) {
 				int readBytes;
-
 				readBytes = socketChannel.read(readbuffer);
-
 				if (readBytes != -1) {
 					remain -= readBytes;
 				}
@@ -31,8 +29,9 @@ public abstract class Network {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		System.out.println(readbuffer.);
-		return readbuffer.array();
+		readbuffer.flip();
+		readbuffer.get(res);
+		return res;
 	}
 
 
@@ -40,50 +39,39 @@ public abstract class Network {
 		byte[] lenBytes = readBytes(4);
 		return ByteBuffer.wrap(lenBytes).getInt();
 	}
+	
 	public byte[] readBytes( ){
-		byte[] lenBytes = readBytes(4);
-		int len = ByteBuffer.wrap(lenBytes).getInt();
-		return readBytes(len);
+//		byte[] lenBytes = readBytes(4);
+//		int len = ByteBuffer.wrap(lenBytes).getInt();
+		return readBytes(readInt());
 	}
 
+	public double t1 = 0;
 	public void writeInt(int a) {
 		try {
 			ByteBuffer res = ByteBuffer.allocate(4).putInt(a);
 			res.flip();
 			socketChannel.write(res);
-
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	public void writeByte(byte[] data) {
-		try {
-			ByteBuffer writebuffer = ByteBuffer.allocate(data.length+4);
-			writebuffer.clear();
-			ByteBuffer tmp = ByteBuffer.allocate(4).putInt(data.length);
-			writebuffer.put(tmp.array());
-			writebuffer.put(data);
-			writebuffer.flip();
-			socketChannel.write(writebuffer);
-
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
+	ByteBuffer tmp = ByteBuffer.allocate(4).putInt(data.length);
+		writeByte(tmp.array(), 4);
+		writeByte(data, data.length);
 	}
 
-	public void writeByte(byte[] data, int len) {
+	public void writeByte(byte[] data, int len) {	
 		try {
-			ByteBuffer writebuffer = ByteBuffer.allocate(len);
-
-			writebuffer.clear();
-			writebuffer = ByteBuffer.allocate(data.length);
 			writebuffer.put(data);
 			writebuffer.flip();
+			double tt = System.nanoTime();
 			socketChannel.write(writebuffer);
-
+			t1 += (System.nanoTime()- tt);
+			writebuffer.compact();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -11,7 +11,6 @@ public class Client extends Network {
 			socketChannel.connect(new InetSocketAddress("localhost", 54321));
 		}
 		socketChannel.configureBlocking(false);
-
 	}
 
 	@Override

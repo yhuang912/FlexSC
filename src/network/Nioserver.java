@@ -27,26 +27,47 @@ package network;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.AsynchronousServerSocketChannel;
+import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 public class Nioserver {
-	public static void main(String[] args) throws IOException {
-		ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-		serverSocketChannel.socket().bind(new InetSocketAddress(54321));
-		SocketChannel socketChannel=serverSocketChannel.accept();
+	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+		AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel.open();
+		serverSocketChannel.bind(new InetSocketAddress(54321));
+		AsynchronousSocketChannel socketChannel=serverSocketChannel.accept().get();
+//		socketChannel.configureBlocking(false);
 
 		System.out.println("connected");
-
-		
-		ByteBuffer buf = ByteBuffer.allocate(48);
-
-		int a = socketChannel.read(buf);
-		
-		while(a != -1) {
-			a = socketChannel.read(buf);
+		ByteBuffer buf = ByteBuffer.allocate(10);
+		int len = 10;
+		byte[] res = new byte[len];		
+		//		for(int i = 0; i < 10000; ++i) {
+		int i = 0;
+		int bytesRead = socketChannel.read(buf).get(); //read into buffer.
+		while (bytesRead != -1) {
+			buf.flip();  //make buffer ready for read
+			//			  System.out.println(bytesRead);
+//			while(buf.hasRemaining()) {
+//				System.out.print((char) ); // read 1 byte at a time
+//				buf.get();
+//			}
+			if(buf.remaining() >= 10) {
+				buf.get(res);
+//				System.out.println(Arrays.toString(res));
+			}
+			
+			buf.clear(); //make buffer ready for writing
+			bytesRead = socketChannel.read(buf).get();
 		}
-		System.out.println(Arrays.toString(buf.array()));
+		//			buf.flip();
+		//			buf.get(res);
+		//			System.out.println(Arrays.toString(res));
+		//		}
+
+
+
+		//		System.out.println(Arrays.toString();
 	}
 }

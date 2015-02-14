@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.junit.Assert;
 
 import util.Utils;
+import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
@@ -15,7 +16,7 @@ import flexsc.Party;
 
 
 public class TestBigInteger extends TestHarness{
-	public static final int LENGTH = 4096;
+	public static final int LENGTH = 40960;
 	final static int RANGE = LENGTH/2;
 	public static abstract class Helper {
 		BigInteger intA, intB;
@@ -43,14 +44,16 @@ public class TestBigInteger extends TestHarness{
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
-				
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, this);
+				Flag.sw.startTotal();
 				T [] a = gen.inputOfAlice(h.a);
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
 				T[] d = h.secureCompute(a, b, gen);
-				os.flush();
+//				os.flush();
 		          
 				z = gen.outputToAlice(d);
+				Flag.sw.print();
+				Flag.sw.flush();
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -71,7 +74,7 @@ public class TestBigInteger extends TestHarness{
 			try {
 				connect("localhost", 54321);				
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, this);
 				
 				T [] a = env.inputOfAlice(new boolean[h.a.length]);
 				T [] b = env.inputOfBob(h.b);
@@ -87,7 +90,8 @@ public class TestBigInteger extends TestHarness{
 				}
 				
 				env.outputToAlice(d);
-				os.flush();
+//				os.flush();
+				Flag.sw.print();
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -97,6 +101,34 @@ public class TestBigInteger extends TestHarness{
 	}
 
 
+	public static void main(String[] args) {
+		BigInteger a = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
+		BigInteger b = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
+		Helper h = new TestBigInteger.Helper(a, b) {
+			public <T>T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception {
+				return new IntegerLib<T>(e).hammingDistance(Signala, Signalb);}
+
+			public BigInteger plainCompute(BigInteger x, BigInteger y) {
+				BigInteger rb = x.xor(y);
+				BigInteger res = new BigInteger("0");
+				for(int i = 0; i < rb.bitLength(); ++i) {
+						if( rb.testBit(i) )
+							res = res.add(new BigInteger("1"));
+				}
+				return res;
+				}
+		};
+		if(new Integer(args[0]) == 0) {
+			GenRunnable gen = new GenRunnable(h);
+			Thread tGen = new Thread(gen);
+			tGen.run();
+		}
+		else {
+			EvaRunnable eva = new EvaRunnable(h);
+			Thread tEva = new Thread(eva);
+			tEva.run();
+		}
+	}
 	static public <T>void runThreads(Helper h) throws Exception {
 		GenRunnable<T> gen = new GenRunnable<T>(h);
 		EvaRunnable<T> eva = new EvaRunnable<T>(h);

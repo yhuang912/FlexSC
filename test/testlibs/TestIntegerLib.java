@@ -19,7 +19,7 @@ public class TestIntegerLib extends TestHarness {
 
 	Random rnd = new Random();
 
-	@Test
+//	@Test
 	public void testIntAdd() throws Exception {
 		for (int i = 0; i < testCases; i++) {
 			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 31), rnd.nextInt()
