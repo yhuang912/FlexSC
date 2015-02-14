@@ -81,7 +81,7 @@ double t1 = 0, t2;
 				for (int i = 0; i < writeCount; ++i) {
 					System.out.println(i);
 					int element = i % N;
-if(i == 5){Flag.sw.flush(); t1 = System.nanoTime();}
+if(i == 7){Flag.sw.flush(); t1 = System.nanoTime();}
 
 					Flag.sw.ands = 0;
 					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils
@@ -163,7 +163,7 @@ if(i == 5){Flag.sw.flush(); t1 = System.nanoTime();}
 				
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
-if(i == 5){Flag.sw.flush();}
+if(i == 7){Flag.sw.flush();}
 					GCSignal[] scData = server.baseOram.env
 							.inputOfAlice(new boolean[dataSize]);
 					Flag.sw.startTotal();
