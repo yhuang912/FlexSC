@@ -1,6 +1,7 @@
 package oakland;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -75,7 +76,7 @@ public class triangularCounting extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				lib = new IntegerLib<T>(gen, 2);
 
@@ -107,7 +108,7 @@ public class triangularCounting extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				lib = new IntegerLib<T>(env, 2);
 
@@ -118,14 +119,14 @@ public class triangularCounting extends TestHarness {
 					boolean[] tmp = new boolean[a.length];
 					fgc1[i] = lib.env.inputOfAlice(tmp);
 				}
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
 				double a = System.nanoTime();
 				T[] res = secureCompute(fgc1, lib);
 				System.out.println((System.nanoTime()-a)/1000000000);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -154,7 +155,7 @@ public class triangularCounting extends TestHarness {
 
 		// PrintMatrix(result);
 		// PrintMatrix(gen.z);
-		if (m == Mode.COUNT) {
+		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
 			Assert.assertTrue( finalRes == gen.z);

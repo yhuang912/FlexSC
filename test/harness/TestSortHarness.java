@@ -39,7 +39,7 @@ public class TestSortHarness extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				T[][] a = gen.newTArray(h.a.length, h.a[0].length);// new
 																	// T[h.a.length][h.a[0].length];
@@ -73,7 +73,7 @@ public class TestSortHarness extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> eva = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> eva = CompEnv.getEnv(Party.Bob, is, os);
 
 				T[][] a = eva.newTArray(h.a.length, h.a[0].length);
 				for (int i = 0; i < a.length; ++i)

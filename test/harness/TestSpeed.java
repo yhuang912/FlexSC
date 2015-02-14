@@ -14,15 +14,13 @@ import flexsc.Party;
 
 public class TestSpeed extends TestHarness {
 
-	Mode mode = Mode.REAL;
 	public <T>T[] secureCompute(T[] a, T[] b, CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
 		T[] res = null;
 		
 		double t1 = System.nanoTime();
 		Flag.sw.ands = 0;
-		for(int i = 0; i < 10; ++i) {
-//			res = lib.hammingDistance(a, b);
+		for(int i = 0; i < 1; ++i) {
 			res = lib.and(a, b);
 			double t2 = System.nanoTime();
 			double t = (t2-t1)/1000000000.0;
@@ -41,7 +39,7 @@ public class TestSpeed extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(mode, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				T[] a = gen.inputOfAlice(Utils.fromBigInteger(BigInteger.ONE, LEN));
 				T[] b = gen.inputOfBob(new boolean[LEN]);
@@ -67,17 +65,17 @@ public class TestSpeed extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(mode, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				T[] a = env.inputOfAlice(new boolean[LEN]);
 				T[] b = env.inputOfBob(Utils.fromBigInteger(BigInteger.ONE, LEN));
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 					;
 				}
 				T[] d = secureCompute(a, b, env);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -107,8 +105,10 @@ public class TestSpeed extends TestHarness {
 		tEva.join();
 	}
 	
-	public static void main(String args[]) throws Exception{
+	public static void main(String args[]) throws Exception {
 		 TestSpeed test = new TestSpeed();
-		 test.runThreads();
+		 if(new Integer(args[0]) == 0)
+			 test.new GenRunnable().run();
+		 else test.new EvaRunnable().run();
 	}
 }

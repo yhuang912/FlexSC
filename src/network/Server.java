@@ -9,6 +9,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+import flexsc.Flag;
+import flexsc.Mode;
+import flexsc.Party;
+
 public class Server {
 	static int bufferSize = 655360;
 	private ServerSocket sock;
@@ -32,6 +36,14 @@ public class Server {
 					// protocol payloads are received.
 
 		sock.close();
+		if(Flag.mode == Mode.OFFLINE && !Flag.offline) {
+			try {
+				gc.offline.GCGen.fout.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	static public byte[] readBytes(InputStream is, int len) throws IOException {

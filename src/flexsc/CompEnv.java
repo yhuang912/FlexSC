@@ -18,28 +18,39 @@ public abstract class CompEnv<T> {
 		Security.addProvider(new ISAACProvider());
 		try {
 			rnd = SecureRandom.getInstance("ISAACRandom");
-
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 	@SuppressWarnings("rawtypes")
-	public static CompEnv getEnv(Mode mode, Party p, InputStream is,
+	public static CompEnv getEnv(Mode m, Party p, InputStream is,
 			OutputStream os) {
-		if (mode == Mode.REAL)
+		Flag.mode = m;
+		return getEnv(p, is, os);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public static CompEnv getEnv(Party p, InputStream is,
+			OutputStream os) {
+		if (Flag.mode == Mode.REAL)
 			if (p == Party.Bob)
 				return new gc.regular.GCEva(is, os);
 			else
 				return new gc.regular.GCGen(is, os);		
-		else if (mode == Mode.OPT)
+		else if (Flag.mode == Mode.OPT)
 			if (p == Party.Bob)
 				return new gc.halfANDs.GCEva(is, os);
 			else
 				return new gc.halfANDs.GCGen(is, os);
-		else if (mode == Mode.VERIFY)
+		else if (Flag.mode == Mode.OFFLINE)
+			if (p == Party.Bob)
+				return new gc.offline.GCEva(is, os);
+			else
+				return new gc.offline.GCGen(is, os);
+		else if (Flag.mode == Mode.VERIFY)
 			return new CVCompEnv(is, os, p);
-		else if (mode == Mode.COUNT)
+		else if (Flag.mode == Mode.COUNT)
 			return new PMCompEnv(is, os, p);
 		else {
 			try {
@@ -50,7 +61,6 @@ public abstract class CompEnv<T> {
 			}
 			return null;
 		}
-
 	}
 
 	public InputStream is;
@@ -64,7 +74,7 @@ public abstract class CompEnv<T> {
 		this.m = m;
 		this.p = p;
 	}
-	
+
 	public T[][] inputOfAlice(boolean[][] in) {
 		boolean[] flattened = Utils.flatten(in);
 		T[] res = inputOfAlice(flattened);
@@ -72,7 +82,7 @@ public abstract class CompEnv<T> {
 		Utils.unflatten(res, unflattened);
 		return unflattened;
 	}
-	
+
 	public T[][] inputOfBob(boolean[][] in) {
 		boolean[] flattened = Utils.flatten(in);
 		T[] res = inputOfBob(flattened);
@@ -88,7 +98,7 @@ public abstract class CompEnv<T> {
 		Utils.unflatten(res, unflattened);
 		return unflattened;
 	}
-	
+
 	public T[][][] inputOfBob(boolean[][][] in) {
 		boolean[] flattened = Utils.flatten(in);
 		T[] res = inputOfBob(flattened);
@@ -150,12 +160,12 @@ public abstract class CompEnv<T> {
 			is.read();
 			os.write(0);
 			os.flush(); // dummy I/O to prevent dropping connection earlier than
-						// protocol payloads are received.
+			// protocol payloads are received.
 		} else {
 			os.write(0);
 			os.flush();
 			is.read(); // dummy write to prevent dropping connection earlier
-						// than
+			// than
 			// protocol payloads are received.
 		}
 	}

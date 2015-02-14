@@ -1,6 +1,7 @@
 package arithcircuit;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -31,7 +32,7 @@ public class TestBigInteger extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				T [] a = gen.inputOfAlice(Utils.fromBigInteger(BigInteger.ONE, LENGTH));
 
@@ -63,16 +64,16 @@ public class TestBigInteger extends TestHarness {
 			try {
 				connect("localhost", 54321);				
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				T [] a = env.inputOfAlice(new boolean[LENGTH]);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
 				for(int i = 0; i < TestABB.times; ++i)
 					secureCompute(a, env, 1);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -92,7 +93,6 @@ public class TestBigInteger extends TestHarness {
 	public void runThreads() throws Exception {
 		for(int i = 1; i <= 10; ++i) {
 			LENGTH = 1<<i;
-			m = Mode.REAL;
 			GenRunnable gen = new GenRunnable();
 			EvaRunnable eva = new EvaRunnable();
 
@@ -101,7 +101,7 @@ public class TestBigInteger extends TestHarness {
 			tGen.start(); Thread.sleep(5);
 			tEva.start();
 			tGen.join();
-			if(m == Mode.COUNT)
+			if(Flag.mode == Mode.COUNT)
 				System.out.println((1<<i) + " "+eva.andgates);
 		}
 	}

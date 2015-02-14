@@ -10,6 +10,7 @@ import circuits.arithmetic.FloatLib;
 import circuits.sparse_matrix.MatrixNode;
 import circuits.sparse_matrix.SparseMatrixLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -110,7 +111,7 @@ public class TestSparseMatrix<T> extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				SparseMatrixLib<T> slib;
 				if (testFixedPoint)
@@ -181,7 +182,7 @@ public class TestSparseMatrix<T> extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				SparseMatrixLib<T> slib;
 				if (testFixedPoint)
@@ -214,13 +215,13 @@ public class TestSparseMatrix<T> extends TestHarness {
 						fgc2[cnt2++] = slib.inputOfAlice(h.xa[i], h.ya[i],
 								h.va[i], false);
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 				// MatrixNode<T>[] re = h.secureCompute(Arrays.copyOf(fgc1,
 				// h.acnt), Arrays.copyOf(fgc2, h.bcnt), slib);
 				MatrixNode<T>[] re = h.secureCompute(fgc1, fgc2, slib);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -252,7 +253,7 @@ public class TestSparseMatrix<T> extends TestHarness {
 
 		PrintMatrix(h.a);
 		PrintMatrix(gen.z);
-		if (m == Mode.COUNT) {
+		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + "\t" + env.encs);
 		} else {
 

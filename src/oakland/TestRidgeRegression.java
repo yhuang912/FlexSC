@@ -1,6 +1,7 @@
 package oakland;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -66,7 +67,7 @@ public class TestRidgeRegression extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				// PrintMatrix(h.a);
 				if (testFixedPoint)
@@ -91,16 +92,16 @@ public class TestRidgeRegression extends TestHarness {
 
 
 
-					if(m == Mode.VERIFY)
+					if(Flag.mode== Mode.VERIFY)
 						re = lib.rref(fgc1);
 					else  re = lib.rref(lib.xor(fgc1, fgc2));
-					if(m == Mode.REAL)
+					if(Flag.mode== Mode.REAL)
 					time[tt] = (System.nanoTime()-d1)/1000000000.0;
-					else if(m == Mode.COUNT)
+					else if(Flag.mode== Mode.COUNT)
 						time[tt] = ((PMCompEnv)gen).statistic.andGate;
 				}
 
-				if(m == Mode.REAL || m == Mode.COUNT) {
+				if(Flag.mode== Mode.REAL || Flag.mode == Mode.COUNT) {
 					Arrays.sort(time);
 					System.out.println(len+" "+time[time.length/2]);
 				}
@@ -132,7 +133,7 @@ public class TestRidgeRegression extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				if (testFixedPoint)
 					lib = new DenseMatrixLib<T>(env, new FixedPointLib<T>(env, len, offset));
@@ -155,19 +156,19 @@ public class TestRidgeRegression extends TestHarness {
 						for (int j = 0; j < h.b[0].length; ++j)
 							fgc2[i][j] = lib.lib.inputOfBob(h.b[i][j]);
 
-					if (m == Mode.COUNT) {
+					if (Flag.mode== Mode.COUNT) {
 						((PMCompEnv) env).statistic.flush();
 					}
 
 
-					if(m == Mode.VERIFY)
+					if(Flag.mode== Mode.VERIFY)
 						re = lib.rref(fgc1);
 					else  re = lib.rref(lib.xor(fgc1, fgc2));
 
 				}
 
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode== Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -201,7 +202,7 @@ public class TestRidgeRegression extends TestHarness {
 		// PrintMatrix(result);
 		// PrintMatrix(gen.z);
 		
-		if(m == Mode.VERIFY){
+		if(Flag.mode== Mode.VERIFY){
 
 			for (int i = 0; i < result.length; ++i)
 				for (int j = 0; j < result[0].length; ++j) {
@@ -221,7 +222,6 @@ public class TestRidgeRegression extends TestHarness {
 	}
 	@Test
 	public void testAllCases() throws Exception {
-		TestHarness.m = Mode.COUNT;
 		for (int i = 20; i <= 20; i+=2) {
 			TestRidgeRegression.len = i;
 			double[][] d1 = TestRidgeRegression.randomMatrix(12, 12);

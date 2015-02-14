@@ -1,6 +1,7 @@
 package testlibs;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import harness.TestHarness;
 import harness.Test_2Input1Output;
 import harness.Test_2Input1Output.Helper;
@@ -33,6 +34,7 @@ public class TestIntegerLib extends TestHarness {
 				}
 			});
 		}
+		Flag.sw.print();
 	}
 
 	//@Test

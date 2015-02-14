@@ -5,6 +5,7 @@ import org.junit.Assert;
 import util.Utils;
 import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -38,7 +39,7 @@ public class TestFloat extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				FloatLib<T> lib = new FloatLib<T>(gen, widthV, widthP);
 				T[] f1 = lib.inputOfAlice(h.a);
@@ -68,18 +69,18 @@ public class TestFloat extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				FloatLib<T> lib = new FloatLib<T>(env, widthV, widthP);
 				T[] f1 = lib.inputOfAlice(0);
 				T[] f2 = lib.inputOfBob(h.b);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
 				T[] re = h.secureCompute(f1, f2, lib);
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -106,7 +107,7 @@ public class TestFloat extends TestHarness {
 		Thread.sleep(1);
 		tEva.start();
 		tGen.join();
-		if (TestHarness.m == Mode.COUNT) {
+		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
 			double error = 0;

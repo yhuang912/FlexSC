@@ -7,6 +7,7 @@ import org.junit.Assert;
 
 import util.Utils;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -42,7 +43,7 @@ public class TestBigInteger extends TestHarness{
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 				
 				T [] a = gen.inputOfAlice(h.a);
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
@@ -70,16 +71,16 @@ public class TestBigInteger extends TestHarness{
 			try {
 				connect("localhost", 54321);				
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 				
 				T [] a = env.inputOfAlice(new boolean[h.a.length]);
 				T [] b = env.inputOfBob(h.b);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
 				T[] d = h.secureCompute(a, b, env);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -105,7 +106,7 @@ public class TestBigInteger extends TestHarness{
 		tGen.start(); Thread.sleep(5);
 		tEva.start();
 		tGen.join();
-		if(m == Mode.COUNT)
+		if(Flag.mode == Mode.COUNT)
 			System.out.println(eva.andgates);
 //		System.out.println(Utils.toBigInteger(h.a)+" "+Utils.toBigInteger(h.b)+" "+
 //		h.intA+" "+h.intB+"\n");
