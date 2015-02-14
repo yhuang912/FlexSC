@@ -21,12 +21,12 @@ public class GCGen extends GCGenComp {
 	static{
 		try {
 			if(Flag.offline) {
-				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*1024);
+				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*10);
 				R = GCSignal.receive(fin);
 				R.setLSB();
 			}
 			else {
-				fout = new BufferedOutputStream(new FileOutputStream("table"), 1024*1024*1024);
+				fout = new BufferedOutputStream(new FileOutputStream("table"), 1024*1024*10);
 				R.send(fout);
 			}
 		} catch (FileNotFoundException e) {
