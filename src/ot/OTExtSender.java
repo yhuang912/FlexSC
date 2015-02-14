@@ -108,10 +108,10 @@ public class OTExtSender extends OTSender {
 
 
 		for (int i = 0; i < SecurityParameter.k1; i++) {
-			Flag.sw.startOTIO();
+//			Flag.sw.startOTIO();
 			cphPairs[i][0] = RWBigInteger.readBI(is);
 			cphPairs[i][1] = RWBigInteger.readBI(is);
-			Flag.sw.stopOTIO();
+//			Flag.sw.stopOTIO();
 			if (s[i]) {
 //				tQ.updateRows(cipher.decrypt(keys[i].bytes, cphPairs[i][1],
 //						numOfPairs), i);
@@ -149,14 +149,14 @@ public class OTExtSender extends OTSender {
 			y[i][1] = cipher.enc(
 					GCSignal.newInstance(tQ.data[i].xor(biS).toByteArray()),
 					msgPairs[i][1], i);
-			Flag.sw.startOTIO();
+//			Flag.sw.startOTIO();
 			y[i][0].send(os);
 			y[i][1].send(os);
-			Flag.sw.stopOTIO();
+//			Flag.sw.stopOTIO();
 		}
-		Flag.sw.startOTIO();
+//		Flag.sw.startOTIO();
 		os.flush();
-		Flag.sw.stopOTIO();
+//		Flag.sw.stopOTIO();
 		//
 		//		for (int i = 0; i < numOfPairs; i++) {
 		////			y[i][0].send(os);
@@ -168,10 +168,10 @@ public class OTExtSender extends OTSender {
 	}
 
 	private void initialize() throws Exception {
-		Flag.sw.startOTIO();
+//		Flag.sw.startOTIO();
 		os.write(msgBitLength);
 		os.flush();
-		Flag.sw.stopOTIO();
+//		Flag.sw.stopOTIO();
 
 		rcver = new NPOTReceiver(is, os);
 

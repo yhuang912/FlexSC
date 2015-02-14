@@ -2,6 +2,7 @@
 
 package ot;
 
+import flexsc.Flag;
 import gc.GCGenComp;
 import gc.GCSignal;
 
@@ -49,7 +50,9 @@ public class OTPreprocessSender  extends OTSender {
 
 
 	public  void send(GCSignal[] m) throws IOException {
+		Flag.sw.startOTIO();
 		byte z = Server.readBytes(is, 1)[0];
+		Flag.sw.stopOTIO();
 		bufferusage--;
 		if(z == 0) {
 			m[0].xor(buffer[bufferusage][0]).send(os);
@@ -67,8 +70,9 @@ public class OTPreprocessSender  extends OTSender {
 //		System.out.println(m.length);
 		if(bufferusage < m.length)
 			fillup();
-
+		Flag.sw.startOTIO();
 		byte[] z = Server.readBytes(is, m.length);
+		Flag.sw.startOTIO();
 		for(int i = 0; i < m.length; ++i) {
 			bufferusage--;
 			if(z[i] == 0) {
