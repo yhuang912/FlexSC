@@ -14,7 +14,7 @@ import flexsc.Mode;
 import flexsc.Party;
 
 public class Server {
-	static int bufferSize = 655360;
+	static int bufferSize = 65536000;
 	private ServerSocket sock;
 
 	public InputStream is;
@@ -52,6 +52,7 @@ public class Server {
 		int remain = len;
 		while (0 < remain) {
 			int readBytes = is.read(temp, len - remain, remain);
+			System.out.println(remain);
 			if (readBytes != -1) {
 				remain -= readBytes;
 			}

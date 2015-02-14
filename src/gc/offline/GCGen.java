@@ -133,7 +133,7 @@ public class GCGen extends GCGenComp {
 			res = b.v ? a : new GCSignal(false);
 		else {
 			if(Flag.offline) {
-//				res = readGateFromFile();
+				res = readGateFromFile();
 			} else {
 				res = garble(a, b);
 				writeGateToFile(res);
