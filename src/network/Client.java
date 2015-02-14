@@ -44,11 +44,14 @@ public class Client extends Network{
 	}
 
 	public void disconnect() throws Exception {
+		queue.add(new byte[0]);
+		thd.join();
 		os.write(0);
 		os.flush();
 		is.read(); // dummy write to prevent dropping connection earlier than
 		// protocol payloads are received.
 		sock.close();
+		
 	}
 
 	public void printStatistic() {

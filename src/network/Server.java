@@ -25,6 +25,8 @@ public class Server extends Network{
 
 
 	public void disconnect() throws Exception {
+		queue.add(new byte[0]);
+		thd.join();
 		is.read();
 		os.write(0);
 		os.flush(); // dummy I/O to prevent dropping connection earlier than

@@ -13,11 +13,12 @@ public class Network {
 	public InputStream is;
 	protected OutputStream os;
 	static int bufferSize = 655360;
-
+	Thread thd;
 	public void setUpThread() {
 		queue = new ConcurrentLinkedQueue<byte[]>();
 		threadedio = new ThreadedIO(queue, os);
-		new Thread(threadedio).start();
+		thd = new Thread(threadedio);
+		thd.start();
 	}
 
 	public void flush(){

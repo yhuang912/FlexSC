@@ -11,12 +11,14 @@ public class ThreadedIO implements Runnable {
 		this.queue = queue;
 		this.os = os;
 	}
+	
 	public void run() {	
 		byte[] t = null;
 		try {
 			while(true) {
 				t = queue.poll();
 				while(t != null) {
+					if(t.length == 0)return;
 					os.write(t);
 					os.flush();
 					t = queue.poll();
