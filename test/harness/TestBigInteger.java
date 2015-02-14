@@ -164,11 +164,11 @@ public class TestBigInteger extends TestHarness {
 		if(new Integer(args[0]) == 0) {
 			GenRunnable gen = new GenRunnable(h);
 			Thread tGen = new Thread(gen);
-			tGen.start(); 
+			tGen.run(); 
 		} else {
 			EvaRunnable eva = new EvaRunnable(h);
 			Thread tEva = new Thread(eva);
-			tEva.start(); 
+			tEva.run(); 
 		}
 //		}
 	}
