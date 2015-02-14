@@ -35,12 +35,12 @@ public class Server extends Network{
 					// protocol payloads are received.
 		sock.close();
 		if(Flag.mode == Mode.OFFLINE && !Flag.offline) {
-			try {
-				gc.offline.GCGen.fout.flush();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+//			try {
+//				gc.offline.GCGen.fout.flush();
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
 	}
 

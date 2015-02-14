@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import network.Network;
 import ot.FakeOTSender;
-import ot.OTExtSender;
-import ot.OTPreprocessSender;
 import ot.OTSender;
 import flexsc.CompEnv;
 import flexsc.Flag;
@@ -39,11 +37,11 @@ public abstract class GCGenComp extends GCCompEnv{
 		if(Flag.mode != Mode.OFFLINE || !Flag.offline)
 			label[0] = GCSignal.freshLabel(rnd);
 		if(Flag.mode == Mode.OFFLINE) {
-			if(Flag.offline) {
-				label[0] = GCSignal.receive(gc.offline.GCGen.fin);
-			}
-			else 
-				label[0].send(gc.offline.GCGen.fout);
+//			if(Flag.offline) {
+//				label[0] = GCSignal.receive(gc.offline.GCGen.fin);
+//			}
+//			else 
+//				label[0].send(gc.offline.GCGen.fout);
 		}
 		label[1] = R.xor(label[0]);
 		return label;
