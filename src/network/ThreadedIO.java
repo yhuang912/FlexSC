@@ -2,12 +2,12 @@ package network;
 
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ThreadedIO implements Runnable {
-	public ArrayBlockingQueue<byte[]> queue;
+	public ConcurrentLinkedQueue<byte[]> queue;
 	OutputStream os;
-	public ThreadedIO(ArrayBlockingQueue<byte[]> queue, OutputStream os) {
+	public ThreadedIO(ConcurrentLinkedQueue<byte[]> queue, OutputStream os) {
 		this.queue = queue;
 		this.os = os;
 	}

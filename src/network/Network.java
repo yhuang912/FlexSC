@@ -5,17 +5,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Network {
-	public ArrayBlockingQueue<byte[]> queue;
+	public ConcurrentLinkedQueue<byte[]> queue;
 	ThreadedIO threadedio;
 	public InputStream is;
 	protected OutputStream os;
 	static int bufferSize = 655360;
 
 	public void setUpThread() {
-		queue = new ArrayBlockingQueue<byte[]>(100000);
+		queue = new ConcurrentLinkedQueue<byte[]>();
 		threadedio = new ThreadedIO(queue, os);
 		new Thread(threadedio).start();
 	}
