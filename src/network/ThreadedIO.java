@@ -1,6 +1,5 @@
 package network;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -13,20 +12,16 @@ public class ThreadedIO implements Runnable {
 	}
 	public void run() {
 		while(true) {
+			try {
 			byte[] t = queue.poll();
 			while(t != null) {
-				try {
 					os.write(t);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
-			try {
 				Thread.sleep(10);
-			} catch (InterruptedException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(1);
 			}
 				
 		}

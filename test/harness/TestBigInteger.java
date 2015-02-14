@@ -48,10 +48,10 @@ public class TestBigInteger extends TestHarness{
 				
 				T [] a = gen.inputOfAlice(h.a);
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
-				T[] d = h.secureCompute(a, b, gen);
+//				T[] d = h.secureCompute(a, b, gen);
 				os.flush();
 		          
-				z = gen.outputToAlice(d);
+//				z = gen.outputToAlice(d);
 				Flag.sw.print();
 				disconnect();
 			} catch (Exception e) {
@@ -81,14 +81,14 @@ public class TestBigInteger extends TestHarness{
 					((PMCompEnv) env).statistic.flush();
 				}
 
-				T[] d = h.secureCompute(a, b, env);
-				if (Flag.mode == Mode.COUNT) {
-					((PMCompEnv) env).statistic.finalize();
-					andgates = ((PMCompEnv) env).statistic.andGate;
-					encs = ((PMCompEnv) env).statistic.NumEncAlice;
-				}
+//				T[] d = h.secureCompute(a, b, env);
+//				if (Flag.mode == Mode.COUNT) {
+//					((PMCompEnv) env).statistic.finalize();
+//					andgates = ((PMCompEnv) env).statistic.andGate;
+//					encs = ((PMCompEnv) env).statistic.NumEncAlice;
+//				}
 				
-				env.outputToAlice(d);
+//				env.outputToAlice(d);
 				os.flush();
 				Flag.sw.print();
 				disconnect();

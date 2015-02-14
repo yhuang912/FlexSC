@@ -17,7 +17,7 @@ public class Network {
 	public void setUpThread() {
 		queue = new ArrayBlockingQueue<byte[]>(100000);
 		threadedio = new ThreadedIO(queue, os);
-//		new Thread(threadedio).start();
+		new Thread(threadedio).start();
 	}
 
 	public void flush(){
