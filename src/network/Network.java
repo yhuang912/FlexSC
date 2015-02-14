@@ -15,7 +15,7 @@ public class Network {
 	static int bufferSize = 655360;
 
 	public void setUpThread() {
-		queue = new ArrayBlockingQueue<byte[]>(1000);
+		queue = new ArrayBlockingQueue<byte[]>(100000);
 		threadedio = new ThreadedIO(queue, os);
 //		new Thread(threadedio).start();
 	}
