@@ -3,16 +3,14 @@ package gc.offline;
 import flexsc.Flag;
 import gc.GCEvaComp;
 import gc.GCSignal;
-
-import java.io.InputStream;
-import java.io.OutputStream;
+import network.Network;
 
 public class GCEva extends GCEvaComp {
 	Garbler gb;
 	GCSignal[][] gtt = new GCSignal[2][2];
 
-	public GCEva(InputStream is, OutputStream os) {
-		super(is, os);
+	public GCEva(Network w) {
+		super(w);
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
 	}
@@ -20,9 +18,9 @@ public class GCEva extends GCEvaComp {
 	private void receiveGTT() {
 		try {
 			Flag.sw.startGCIO();
-			gtt[0][1] = GCSignal.receive(is);
-			gtt[1][0] = GCSignal.receive(is);
-			gtt[1][1] = GCSignal.receive(is);
+			gtt[0][1] = GCSignal.receive(w);
+			gtt[1][0] = GCSignal.receive(w);
+			gtt[1][1] = GCSignal.receive(w);
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();

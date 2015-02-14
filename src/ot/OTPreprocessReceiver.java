@@ -7,9 +7,9 @@ import flexsc.Flag;
 import gc.GCSignal;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
+
+import network.Network;
 
 public class OTPreprocessReceiver  extends OTReceiver {
 	GCSignal[] buffer = new GCSignal[OTPreprocessSender.bufferSize];
@@ -17,12 +17,12 @@ public class OTPreprocessReceiver  extends OTReceiver {
 	int bufferusage = 0;
 
 	public void fillup() {
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			os.flush();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		while(bufferusage < OTPreprocessSender.bufferSize) {
 			int l = Math.min(OTPreprocessSender.fillLength, OTPreprocessSender.bufferSize-bufferusage);
 			
@@ -42,9 +42,9 @@ public class OTPreprocessReceiver  extends OTReceiver {
 	}
 
 	OTExtReceiver reciever;
-	public OTPreprocessReceiver(InputStream in, OutputStream out) {
-		super(in, out);
-		reciever = new OTExtReceiver(in, out);
+	public OTPreprocessReceiver(Network w) {
+		super(w);
+		reciever = new OTExtReceiver(w);
 		fillup();
 	}
 
@@ -53,9 +53,10 @@ public class OTPreprocessReceiver  extends OTReceiver {
 		bufferusage--;
 		byte z = (b^choose[bufferusage]) ? (byte)1 : (byte)0;
 		Flag.sw.startOTIO();
-		os.write(z);
-		os.flush();
-		GCSignal[] y = new GCSignal[]{GCSignal.receive(is),  GCSignal.receive(is)};
+//		os.write(z);
+		w.writeByte(new byte[]{z});
+//		os.flush();
+		GCSignal[] y = new GCSignal[]{GCSignal.receive(w),  GCSignal.receive(w)};
 		Flag.sw.stopOTIO();
 		if(bufferusage == 0)
 			fillup();
@@ -72,14 +73,15 @@ public class OTPreprocessReceiver  extends OTReceiver {
 			z[i] = (b[i]^choose[tmp]) ? (byte)1 : (byte)0;
 		}
 		Flag.sw.startOTIO();
-		os.write(z);
-		os.flush();
+//		os.write(z);
+		w.writeByte(z);
+//		os.flush();
 		Flag.sw.stopOTIO();
 		GCSignal[] ret = new GCSignal[b.length];
 		for(int i = 0; i < b.length; ++i) {
 			bufferusage--;
 			Flag.sw.startOTIO();
-			GCSignal[] y = new GCSignal[]{GCSignal.receive(is),  GCSignal.receive(is)};
+			GCSignal[] y = new GCSignal[]{GCSignal.receive(w),  GCSignal.receive(w)};
 			Flag.sw.stopOTIO();
 			ret[i] = y[b[i]?1:0].xor(buffer[bufferusage]);
 		}

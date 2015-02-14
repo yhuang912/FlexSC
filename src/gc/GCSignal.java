@@ -3,6 +3,8 @@
 
 package gc;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
@@ -59,13 +61,33 @@ public class GCSignal {
 		bytes[0] |= 1;
 	}
 
+	// 'send' and 'receive' are supposed to be used only for secret signals
+		public void send(OutputStream os) {
+			try {
+				os.write(bytes);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		// 'send' and 'receive' are supposed to be used only for secret signals
+		public static GCSignal receive(InputStream ois) {
+			byte[] b = null;
+			try {
+				b = Network.readBytes(ois, len);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return new GCSignal(b);
+		}
+		
 	public boolean getLSB() {
 		return (bytes[0] & 1) == 1;
 	}
 
 	// 'send' and 'receive' are supposed to be used only for secret signals
 	public void send(Network w) {
-		w.writeByte(bytes);
+		w.writeByte(bytes, len);
 	}
 
 	// 'send' and 'receive' are supposed to be used only for secret signals

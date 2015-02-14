@@ -6,14 +6,12 @@ import flexsc.Flag;
 import gc.GCSignal;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
 
-import network.RWBigInteger;
+import network.Network;
 import rand.ISAACProvider;
 
 public class NPOTReceiver extends OTReceiver {
@@ -38,8 +36,8 @@ public class NPOTReceiver extends OTReceiver {
 
 	Cipher cipher;
 
-	public NPOTReceiver(InputStream in, OutputStream out) throws Exception {
-		super(in, out);
+	public NPOTReceiver(Network w) throws Exception {
+		super(w);
 
 		cipher = new Cipher();
 
@@ -58,12 +56,12 @@ public class NPOTReceiver extends OTReceiver {
 
 	private void initialize() throws Exception {
 		Flag.sw.startOTIO();
-		C = RWBigInteger.readBI(is);
-		p = RWBigInteger.readBI(is);
-		q = RWBigInteger.readBI(is);
-		g = RWBigInteger.readBI(is);
-		gr = RWBigInteger.readBI(is);
-		msgBitLength = is.read();
+		C = w.readBI();
+		p = w.readBI();
+		q = w.readBI();
+		g = w.readBI();
+		gr =w.readBI();
+		msgBitLength = w.readInt();
 		Flag.sw.stopOTIO();
 	}
 
@@ -86,8 +84,8 @@ public class NPOTReceiver extends OTReceiver {
 
 		Flag.sw.startOTIO();
 		for (int i = 0; i < choices.length; i++)
-			RWBigInteger.writeBI(os, pk0[i]);
-		os.flush();
+			w.writeBI(pk0[i]);//RWBigInteger.writeBI(os, pk0[i]);
+//		os.flush();
 		Flag.sw.stopOTIO();
 
 	}
@@ -96,8 +94,8 @@ public class NPOTReceiver extends OTReceiver {
 		BigInteger[][] msg = new BigInteger[choices.length][2];
 		Flag.sw.startOTIO();
 		for (int i = 0; i < choices.length; i++) {
-			msg[i][0] = RWBigInteger.readBI(is);
-			msg[i][1] = RWBigInteger.readBI(is);
+			msg[i][0] = w.readBI();//RWBigInteger.readBI(is);
+			msg[i][1] = w.readBI();//RWBigInteger.readBI(is);
 		}
 		Flag.sw.stopOTIO();
 

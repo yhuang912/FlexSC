@@ -3,16 +3,14 @@ package gc.halfANDs;
 import flexsc.Flag;
 import gc.GCGenComp;
 import gc.GCSignal;
-
-import java.io.InputStream;
-import java.io.OutputStream;
+import network.Network;
 
 public class GCGen extends GCGenComp {
 	Garbler gb;
 
 	public long ands = 0;
-	public GCGen(InputStream is, OutputStream os){
-		super(is, os);
+	public GCGen(Network w){
+		super(w);
 		gb = new Garbler();
 	}
 
@@ -43,8 +41,8 @@ public class GCGen extends GCGenComp {
 		// send the encrypted gate
 		try {
 			Flag.sw.startGCIO();
-			TG.send(os);
-			TE.send(os);
+			TG.send(w);
+			TE.send(w);
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();

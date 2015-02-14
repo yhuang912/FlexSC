@@ -7,17 +7,15 @@ import gc.GCGenComp;
 import gc.GCSignal;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 
-import network.Server;
+import network.Network;
 
 public class OTPreprocessSender  extends OTSender {
 	OTExtSender sender;
-	public OTPreprocessSender(int msgBitLength, InputStream in, OutputStream out) {
-		super(msgBitLength, in, out);
-		sender = new OTExtSender(msgBitLength, in, out);
+	public OTPreprocessSender(int msgBitLength, Network w) {
+		super(msgBitLength, w);
+		sender = new OTExtSender(msgBitLength, w);
 		fillup();
 	}
 
@@ -27,12 +25,12 @@ public class OTPreprocessSender  extends OTSender {
 	int bufferusage = 0;
 
 	public void fillup () {
-		try {
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+////			os.flush();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		while(bufferusage < bufferSize) {
 			int l = Math.min(fillLength, bufferSize-bufferusage);
 			for(int i = bufferusage; i < bufferusage+l; ++i)
@@ -51,16 +49,16 @@ public class OTPreprocessSender  extends OTSender {
 
 	public  void send(GCSignal[] m) throws IOException {
 		Flag.sw.startOTIO();
-		byte z = Server.readBytes(is, 1)[0];
+		byte z = w.readBytes(1)[0];//Server.readBytes(is, 1)[0];
 		Flag.sw.stopOTIO();
 		bufferusage--;
 		if(z == 0) {
-			m[0].xor(buffer[bufferusage][0]).send(os);
-			m[1].xor(buffer[bufferusage][1]).send(os);
+			m[0].xor(buffer[bufferusage][0]).send(w);
+			m[1].xor(buffer[bufferusage][1]).send(w);
 		}
 		else {
-			m[0].xor(buffer[bufferusage][1]).send(os);
-			m[1].xor(buffer[bufferusage][0]).send(os);
+			m[0].xor(buffer[bufferusage][1]).send(w);
+			m[1].xor(buffer[bufferusage][0]).send(w);
 		}
 		if(bufferusage == 0)
 			fillup();
@@ -71,17 +69,17 @@ public class OTPreprocessSender  extends OTSender {
 		if(bufferusage < m.length)
 			fillup();
 		Flag.sw.startOTIO();
-		byte[] z = Server.readBytes(is, m.length);
+		byte[] z = w.readBytes(m.length);//Server.readBytes(is, m.length);
 		Flag.sw.stopOTIO();
 		for(int i = 0; i < m.length; ++i) {
 			bufferusage--;
 			if(z[i] == 0) {
-				m[i][0].xor(buffer[bufferusage][0]).send(os);
-				m[i][1].xor(buffer[bufferusage][1]).send(os);
+				m[i][0].xor(buffer[bufferusage][0]).send(w);
+				m[i][1].xor(buffer[bufferusage][1]).send(w);
 			}
 			else {
-				m[i][0].xor(buffer[bufferusage][1]).send(os);
-				m[i][1].xor(buffer[bufferusage][0]).send(os);
+				m[i][0].xor(buffer[bufferusage][1]).send(w);
+				m[i][1].xor(buffer[bufferusage][0]).send(w);
 			}
 		}
 	}

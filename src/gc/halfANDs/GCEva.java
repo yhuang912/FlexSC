@@ -3,15 +3,13 @@ package gc.halfANDs;
 import flexsc.Flag;
 import gc.GCEvaComp;
 import gc.GCSignal;
-
-import java.io.InputStream;
-import java.io.OutputStream;
+import network.Network;
 
 public class GCEva extends GCEvaComp {
 	Garbler gb;
 
-	public GCEva(InputStream is, OutputStream os) {
-		super(is, os);
+	public GCEva(Network w) {
+		super(w);
 		gb = new Garbler();
 	}
 
@@ -32,8 +30,8 @@ public class GCEva extends GCEvaComp {
 			GCSignal TG = GCSignal.ZERO, WG, TE = GCSignal.ZERO, WE;
 			try {
 				Flag.sw.startGCIO();
-				TG = GCSignal.receive(is);
-				TE = GCSignal.receive(is);
+				TG = GCSignal.receive(w);
+				TE = GCSignal.receive(w);
 				Flag.sw.stopGCIO();
 			} catch (Exception e) {
 				e.printStackTrace();

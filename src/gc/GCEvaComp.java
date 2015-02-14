@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import network.Network;
 import ot.FakeOTReceiver;
+import ot.OTExtReceiver;
 import ot.OTReceiver;
 import flexsc.Flag;
 import flexsc.Party;
@@ -19,6 +20,10 @@ public abstract class GCEvaComp extends GCCompEnv{
 
 		if (Flag.FakeOT)
 			rcv = new FakeOTReceiver(w);
+//		else if(Flag.PreProcessOT)
+//			rcv = new OTPreprocessReceiver(is, os);
+		else
+			rcv = new OTExtReceiver(w);
 	}
 
 	public GCSignal inputOfAlice(boolean in) {
@@ -59,7 +64,6 @@ public abstract class GCEvaComp extends GCCompEnv{
 		GCSignal[] result = new GCSignal[x.length];
 		for (int i = 0; i < x.length; ++i)
 			result[i] = GCSignal.receive(w);
-		System.out.println("...evq");
 		return result;
 	}
 

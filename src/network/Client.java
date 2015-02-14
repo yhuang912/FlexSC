@@ -10,5 +10,14 @@ public class Client extends Network {
 		while(!socketChannel.isConnected()) {
 			socketChannel.connect(new InetSocketAddress("localhost", 54321));
 		}
+		socketChannel.configureBlocking(false);
+
+	}
+
+	@Override
+	public void disconnect() throws Exception {
+				while(socketChannel.isConnected()) {
+					socketChannel.close();
+				}
 	}
 }

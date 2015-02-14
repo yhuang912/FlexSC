@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+import network.Network;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.Party;
@@ -18,6 +19,7 @@ public abstract class OramParty<T> {
 	public int lengthOfPos;
 	public int lengthOfData;
 
+	public Network w;
 	protected InputStream is;
 	protected OutputStream os;
 	public CompEnv<T> env;
@@ -29,8 +31,7 @@ public abstract class OramParty<T> {
 
 	public OramParty(CompEnv<T> env, int N, int dataSize) {
 		this.env = env;
-		this.is = env.is;
-		this.os = env.os;
+		this.w = env.w;
 
 		this.dataSize = dataSize;
 		long a = 1;
@@ -53,8 +54,7 @@ public abstract class OramParty<T> {
 
 	public OramParty(CompEnv<T> env, int N, int dataSize, int lengthOfPos) {
 		this.env = env;
-		this.is = env.is;
-		this.os = env.os;
+		this.w = env.w;
 
 		this.dataSize = dataSize;
 		int a = 1;

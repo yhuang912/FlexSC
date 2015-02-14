@@ -6,7 +6,6 @@ import util.Utils;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
-import flexsc.PMCompEnv;
 import flexsc.Party;
 
 public class Test_2Input1Output extends TestHarness {
@@ -44,18 +43,17 @@ public class Test_2Input1Output extends TestHarness {
 				System.out.println(socketChannel);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, this);
-
+				System.out.println("gen1");
 				T[] a = gen.inputOfAlice(h.a);
-
+				System.out.println("gen2");
 				T[] b = gen.inputOfBob(new boolean[32]);
+				System.out.println("gen3");
 				flush();
 				T[] d = h.secureCompute(a, b, gen);
+				System.out.println("gen4");
 				flush();
-				System.out.println("...");
 
 				z = gen.outputToAlice(d);
-				System.out.println("...");
-
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -80,19 +78,16 @@ public class Test_2Input1Output extends TestHarness {
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Party.Bob, this);
 
-				System.out.println("...1");
-
+				System.out.println("eva1");
 				T[] a = env.inputOfAlice(new boolean[32]);
-
-				System.out.println("...2");
+				System.out.println("eva2");
 				T[] b = env.inputOfBob(h.b);
+				System.out.println("eva3");
 				flush();
-				System.out.println("...3");
-
 
 				T[] d = h.secureCompute(a, b, env);
+				System.out.println("eva4");
 				flush();
-				System.out.println("...4");
 
 				env.outputToAlice(d);
 				flush();

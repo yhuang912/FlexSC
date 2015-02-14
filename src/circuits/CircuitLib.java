@@ -75,7 +75,7 @@ public class CircuitLib<T> {
 			return new boolean[x.length];
 		}
 		boolean[] pos = env.outputToAlice(x);
-		try {
+
 			if (env.getParty() == Party.Alice) {
 
 				//env.os.write(new byte[] { (byte) pos.length });
@@ -83,22 +83,19 @@ public class CircuitLib<T> {
 				for (int i = 0; i < pos.length; ++i)
 					tmp[i] = (byte) (pos[i] ? 1 : 0);
 				//env.os.write(tmp);
-				Server.writeByte(env.os, tmp);
+				env.w.writeByte(tmp, pos.length);
 				env.flush();
 			} else {
 				//byte[] l = new byte[1];
 				//env.is.read(l);
-				byte tmp[] = Server.readBytes(env.is);//new byte[l[0]];
+				byte tmp[] = env.w.readBytes(pos.length);//new byte[l[0]];
 				//env.is.read(tmp);
 				pos = new boolean[tmp.length];
 				for (int k = 0; k < tmp.length; ++k) {
 					pos[k] = ((tmp[k] - 1) == 0);
 				}
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		return pos;
 	}
 

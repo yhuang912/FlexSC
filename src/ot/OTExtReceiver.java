@@ -3,19 +3,16 @@
 
 package ot;
 
-import flexsc.Flag;
 import gc.GCSignal;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Arrays;
 
-import network.RWBigInteger;
+import network.Network;
 import ot.OTExtSender.SecurityParameter;
 import rand.ISAACProvider;
 
@@ -39,8 +36,8 @@ public class OTExtReceiver extends OTReceiver {
 
 	Cipher cipher;
 
-	public OTExtReceiver(InputStream in, OutputStream out) {
-		super(in, out);
+	public OTExtReceiver(Network w) {
+		super(w);
 
 		cipher = new Cipher();
 
@@ -63,8 +60,7 @@ public class OTExtReceiver extends OTReceiver {
 		for (int i = SecurityParameter.k1; i < c.length; i++)
 			c[i] = choices[i - SecurityParameter.k1];
 
-		GCSignal[] received = reverseAndExtend(keyPairs, c, msgBitLength, is,
-				os, cipher);
+		GCSignal[] received = reverseAndExtend(keyPairs, c, msgBitLength, w, cipher);
 
 		for (int i = 0; i < OTExtSender.SecurityParameter.k1; i++) {
 			keys[i] = received[i];
@@ -74,7 +70,7 @@ public class OTExtReceiver extends OTReceiver {
 			keyPairs[i][0] = GCSignal.freshLabel(rnd);
 			keyPairs[i][1] = GCSignal.freshLabel(rnd);
 		}
-		OTExtSender.reverseAndExtend(s, keys, msgBitLength, keyPairs, is, os,
+		OTExtSender.reverseAndExtend(s, keys, msgBitLength, keyPairs, w,
 				cipher);
 
 		return Arrays.copyOfRange(received, SecurityParameter.k1,
@@ -82,8 +78,7 @@ public class OTExtReceiver extends OTReceiver {
 	}
 
 	static GCSignal[] reverseAndExtend(GCSignal[][] keyPairs,
-			boolean[] choices, int msgBitLength, InputStream is,
-			OutputStream os, Cipher cipher) throws IOException {
+			boolean[] choices, int msgBitLength, Network w, Cipher cipher) throws IOException {
 		BigInteger[][] msgPairs = new BigInteger[SecurityParameter.k1][2];
 		BigInteger[][] cphPairs = new BigInteger[SecurityParameter.k1][2];
 
@@ -100,13 +95,15 @@ public class OTExtReceiver extends OTReceiver {
 			cphPairs[i][1] = cipher.encrypt(keyPairs[i][1].bytes,
 					msgPairs[i][1], choices.length);
 //			Flag.sw.startOTIO();
-			RWBigInteger.writeBI(os, cphPairs[i][0]);
-			RWBigInteger.writeBI(os, cphPairs[i][1]);
+			w.writeBI(cphPairs[i][0]);
+			w.writeBI(cphPairs[i][1]);
+//			RWBigInteger.writeBI(os, cphPairs[i][0]);
+//			RWBigInteger.writeBI(os, cphPairs[i][1]);
 //			Flag.sw.stopOTIO();
 		}
 
 //		Flag.sw.startOTIO();
-		os.flush();
+//		os.flush();
 //		Flag.sw.stopOTIO();
 //		for (int i = 0; i < SecurityParameter.k1; i++) {
 //			RWBigInteger.writeBI(os, cphPairs[i][0]);
@@ -122,8 +119,8 @@ public class OTExtReceiver extends OTReceiver {
 		for (int i = 0; i < choices.length; i++) {
 //			GCSignal tmp =  GCSignal.newInstance(T.getRow(i).toByteArray());
 //			Flag.sw.startOTIO();
-			y[i][0] = GCSignal.receive(is);
-			y[i][1] = GCSignal.receive(is);
+			y[i][0] = GCSignal.receive(w);
+			y[i][1] = GCSignal.receive(w);
 //			Flag.sw.stopOTIO();
 			int sigma = choices[i] ? 1 : 0;
 			res[i] = cipher.dec(GCSignal.newInstance(tT.data[i].toByteArray()),
@@ -142,10 +139,10 @@ public class OTExtReceiver extends OTReceiver {
 
 	private void initialize() throws Exception {
 //		Flag.sw.startOTIO();
-		msgBitLength = is.read();
+		msgBitLength = w.readInt();//is.read();
 //		Flag.sw.stopOTIO();
 
-		snder = new NPOTSender(OTExtSender.SecurityParameter.k1, is, os);
+		snder = new NPOTSender(OTExtSender.SecurityParameter.k1, w);
 
 		keyPairs = new GCSignal[OTExtSender.SecurityParameter.k1][2];
 		for (int i = 0; i < OTExtSender.SecurityParameter.k1; i++) {
@@ -154,7 +151,7 @@ public class OTExtReceiver extends OTReceiver {
 		}
 
 		snder.send(keyPairs);
-		os.flush();
+//		os.flush();
 	}
 
 	GCSignal[] pool;

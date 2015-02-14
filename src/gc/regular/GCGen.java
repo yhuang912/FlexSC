@@ -3,10 +3,6 @@ package gc.regular;
 import flexsc.Flag;
 import gc.GCGenComp;
 import gc.GCSignal;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import network.Network;
 
 public class GCGen extends GCGenComp {

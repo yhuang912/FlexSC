@@ -1,15 +1,12 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package flexsc;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
+import network.Network;
 import util.Utils;
 
 public class CVCompEnv extends BooleanCompEnv {
-	public CVCompEnv(InputStream is, OutputStream os, Party p) {
-		super(is, os, p, Mode.VERIFY);
+	public CVCompEnv(Network w, Party p) {
+		super(w, p, Mode.VERIFY);
 		this.p = p;
 	}
 
@@ -17,39 +14,36 @@ public class CVCompEnv extends BooleanCompEnv {
 	@Override
 	public Boolean inputOfAlice(boolean in) {
 		Boolean res = null;
-		try {
+		
 			res = in;
 			if (p == Party.Alice)
-				os.write(in ? 1 : 0);
+				w.writeInt(in ? 1 : 0);
 			else {
-				int re = is.read();
+				int re = w.readInt();
 				res = re == 1;
 			}
 			flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		return res;
 	}
 
 	@Override
 	public Boolean inputOfBob(boolean in) {
 		Boolean res = null;
-		try {
-			os.flush();
+//		try {
+//			os.flush();
 			res = in;
 			if (p == Party.Bob)
-				os.write(in ? 1 : 0);
+				w.writeInt(in ? 1 : 0);
 			else {
-				int re = is.read();
+				int re = w.readInt();
 				res = re == 1;
 			}
-			os.flush();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//			os.flush();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 		return res;
 	}

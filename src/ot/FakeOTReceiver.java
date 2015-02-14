@@ -3,8 +3,8 @@
 
 package ot;
 
-import network.Network;
 import gc.GCSignal;
+import network.Network;
 
 public class FakeOTReceiver extends OTReceiver {
 	public FakeOTReceiver(Network w) {

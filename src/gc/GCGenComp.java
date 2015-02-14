@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import network.Network;
 import ot.FakeOTSender;
+import ot.OTExtSender;
 import ot.OTSender;
 import flexsc.CompEnv;
 import flexsc.Flag;
@@ -27,8 +28,8 @@ public abstract class GCGenComp extends GCCompEnv{
 			snd = new FakeOTSender(80, w);
 //		else if(Flag.PreProcessOT)
 //			snd = new OTPreprocessSender(80, is, os);
-//		else
-//			snd = new OTExtSender(80, is, os);
+		else
+			snd = new OTExtSender(80, w);
 	}
 
 	public static GCSignal[] genPairForLabel() {
@@ -85,7 +86,6 @@ public abstract class GCGenComp extends GCCompEnv{
 		}
 		for (int i = 0; i < x.length; ++i)
 			pairs[i][x[i] ? 1 : 0].send(w);
-		System.out.println("...gen");
 		w.flush();
 		return result;
 	}
@@ -113,7 +113,6 @@ public abstract class GCGenComp extends GCCompEnv{
 //			gatesRemain = false;
 			w.flush();
 //		}
-		System.out.println("!");
 		if (out.isPublic())
 			return out.v;
 

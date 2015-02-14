@@ -1,12 +1,11 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package oram;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import network.Network;
 import oram.noOTORAM.CircuitOramNOOT;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
@@ -21,8 +20,7 @@ public class RecursiveOptCircuitOram<T> {
 	int capacity;
 
 	SecureRandom rng = new SecureRandom();
-	protected InputStream is;
-	protected OutputStream os;
+	protected Network w;
 	Party p;
 	CompEnv<T> env;
 IntegerLib<T> lib ;
@@ -40,8 +38,7 @@ IntegerLib<T> lib ;
 			int capacity, int sp) {
 		this.env = env;
 		lib = new IntegerLib<T>(env);
-		this.is = env.is;
-		this.os = env.os;
+		this.w = env.w;
 		this.p = env.p;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;

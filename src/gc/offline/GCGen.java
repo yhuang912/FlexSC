@@ -11,8 +11,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+
+import network.Network;
 
 public class GCGen extends GCGenComp {
 	Garbler gb;
@@ -36,8 +36,8 @@ public class GCGen extends GCGenComp {
 		}
 
 	}
-	public GCGen(InputStream is, OutputStream os) {
-		super(is, os);
+	public GCGen(Network w) {
+		super(w);
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.freshLabel(CompEnv.rnd);
 		gtt[1][0] = GCSignal.freshLabel(CompEnv.rnd);
@@ -110,9 +110,9 @@ public class GCGen extends GCGenComp {
 	private void sendGTT() {
 		try {
 			Flag.sw.startGCIO();
-			gtt[0][1].send(os);
-			gtt[1][0].send(os);
-			gtt[1][1].send(os);
+			gtt[0][1].send(w);
+			gtt[1][0].send(w);
+			gtt[1][1].send(w);
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();

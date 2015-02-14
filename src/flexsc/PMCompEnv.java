@@ -1,9 +1,7 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package flexsc;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-
+import network.Network;
 import util.Utils;
 
 /*
@@ -60,8 +58,8 @@ public class PMCompEnv extends BooleanCompEnv {
 	public Statistics statistic;
 
 
-	public PMCompEnv(InputStream is, OutputStream os, Party p) {
-		super(is, os, p, Mode.COUNT);
+	public PMCompEnv(Network w, Party p) {
+		super(w, p, Mode.COUNT);
 		this.p = p;
 		t = true;
 		f = false;

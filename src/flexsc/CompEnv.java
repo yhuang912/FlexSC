@@ -35,14 +35,37 @@ public abstract class CompEnv<T> {
 			if (p == Party.Bob)
 				return new gc.regular.GCEva(w);
 			else
-				return new gc.regular.GCGen(w);
-		else return null;
+				return new gc.regular.GCGen(w);		
+		else if (Flag.mode == Mode.OPT)
+			if (p == Party.Bob)
+				return new gc.halfANDs.GCEva(w);
+			else
+				return new gc.halfANDs.GCGen(w);
+		else if (Flag.mode == Mode.OFFLINE)
+			if (p == Party.Bob)
+				return new gc.offline.GCEva(w);
+			else
+				return new gc.offline.GCGen(w);
+		else if (Flag.mode == Mode.VERIFY)
+			return new CVCompEnv(w, p);
+		else if (Flag.mode == Mode.COUNT)
+			return new PMCompEnv(w, p);
+		else {
+			try {
+				throw new Exception("not a supported Mode!");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return null;
+		}
 	}
 
-	protected Network w;
+	public Network w;
 	public Party p;
 	public Mode m;
 
+	public void flush(){}
 	public CompEnv(Network w, Party p, Mode m) {
 		this.w = w;
 		this.m = m;
