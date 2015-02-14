@@ -1,6 +1,9 @@
 package oram;
 
 //import orambs.BSCircuitOram;
+import java.nio.ByteBuffer;
+
+import network.Server;
 import orambs.BSCircuitOram;
 import util.Utils;
 import flexsc.CompEnv;
@@ -12,7 +15,7 @@ public class TestCircuitOramRecOpt {
 
 	public  static void main(String args[]) throws Exception {
 //			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 1024-32, 8, 6);
-		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 8, 6);
+		GenRunnable gen = new GenRunnable(12345, 20, 3, 1024-32, 8, 6);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
@@ -59,7 +62,7 @@ public class TestCircuitOramRecOpt {
 				os.write(recurFactor);
 				os.write(logCutoff);
 				os.write(capacity);
-				os.write(dataSize);
+				os.write(ByteBuffer.allocate(4).putInt(dataSize).array());
 				os.flush();
 
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
@@ -140,7 +143,7 @@ if(i == 9){Flag.sw.flush(); t1 = System.nanoTime();}
 				int logCutoff = is.read();
 				int cutoff = 1 << logCutoff;
 				int capacity = is.read();
-				int dataSize = is.read();
+				int dataSize = ByteBuffer.wrap(Server.readBytes(is, 4)).getInt();
 
 				int N = 1 << logN;
 				System.out
