@@ -6,8 +6,8 @@ int32 OMap.read(int32 id) = native read;
 struct MEM{};
 
 int32 MEM.getInst(OMap instBank, int32 pc, public int32 pcOffset){
-	int32 index = (pc-pcOffset) >> 2;
-	int32 newInst = instBank.read(index);
+	//int32 index = (pc-pcOffset) >> 2;
+	int32 newInst = instBank.read(pc);
 	return newInst;
 }
 

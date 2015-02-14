@@ -58,4 +58,9 @@ public class SecureMap<T> {
 			return null;
 		}
 	}
+	public void print(){
+		if (useTrivialOMap)
+			tmap.print();
+	}
+	
 }

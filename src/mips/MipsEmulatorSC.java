@@ -279,7 +279,7 @@ public class MipsEmulatorSC {
 				MemorySet<GCSignal> currentSet = sets.get(0);
 				SecureArray<GCSignal> currentBank;
 				while (true) {
-					currentBank = currentSet.getOramBank().getArray();
+					currentBank = currentSet.getOramBank().getMap();
 					//	System.out.println("count: " + count);
 					count++;
 //					System.out.println("execution step: " + currentSet.getExecutionStep());
@@ -362,7 +362,7 @@ public class MipsEmulatorSC {
 				MemorySet<GCSignal> currentSet = sets2.get(0);
 				SecureArray<GCSignal> currentBank;
 				while (true){
-					currentBank = currentSet.getOramBank().getArray();
+					currentBank = currentSet.getOramBank().getMap();
 					if (MULTIPLE_BANKS)
 						pcOffset = (int) currentSet.getOramBank().getMinAddress();
 					//printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());

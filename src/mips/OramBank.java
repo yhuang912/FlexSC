@@ -23,7 +23,7 @@ public class OramBank<T> {
 		bank = bankInp;
 	}
 	public int getLengthOfIden(){ return bank.lengthOfIden; }
-	public SecureMap<T> getArray() { return bank; } 
+	public SecureMap<T> getMap() { return bank; } 
 	/**
 	 * @return the span of the address range.  This is the necessary size of the 
 	 * SecureArray, if we do not have access to an oblivious associative map.

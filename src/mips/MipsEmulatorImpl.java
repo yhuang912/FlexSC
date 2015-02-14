@@ -41,7 +41,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final int RECURSE_THRESHOLD = 512;
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
-	static final int Alice_input = 5;
+	static final int Alice_input = 6;
 	static final int Bob_input = 2;
 	
 	protected LocalConfiguration config;
@@ -207,11 +207,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			MemorySet<T> currentSet = sets.get(0);
 			SecureMap<T> currentBank;
 			while (true) {
-				currentBank = currentSet.getOramBank().getArray();
+				currentBank = currentSet.getOramBank().getMap();
 				EmulatorUtils.print("count: " + count, lib, false);
 				count++;
 				//				System.out.println("execution step: " + currentSet.getExecutionStep());
-				EmulatorUtils.printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
+				currentSet.getOramBank().getMap().print();
 				if (config.isMultipleBanks())
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
 				newInst = mem.getInst(currentBank, pc, pcOffset);
@@ -336,7 +336,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				if (!config.isMultipleBanks())
 					instructionBank = singleBank;
 				else {
-					instructionBank = new SecureMap<T>(env, (int)((maxAddr - minAddr)/4 + 1), WORD_SIZE);
+					instructionBank = new SecureMap<T>(env, s.size(), WORD_SIZE);
 					int count = 0;
 					if (config.getMode() == Mode.VERIFY){
 						for( Map.Entry<Long, boolean[]> entry : m.entrySet()) {
@@ -374,7 +374,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 						//							// once the indices are correct, write here. 
 						//							instructionBank.write(index, data);
 						//						}
-						EmulatorUtils.printOramBank(instructionBank, lib, (int)((maxAddr - minAddr)/4 + 1));
+						instructionBank.print();
 					
 
 				}

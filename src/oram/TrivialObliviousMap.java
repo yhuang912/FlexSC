@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
+import flexsc.Mode;
 import flexsc.Party;
 
 public class TrivialObliviousMap<T> {
@@ -65,6 +66,24 @@ public class TrivialObliviousMap<T> {
 			res = lib.mux(res, value[i], match);
 		}
 		return res;
+	}
+	
+	public void print(){
+		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
+			return;
+		String output = "";
+		
+		for (int i = 0; i < capacity; i++){
+			boolean[] tmp = lib.getEnv().outputToAlice(value[i]); 
+			output += "item number " + String.valueOf(i) +": ";
+			for (int j = tmp.length-1 ; j >= 0 ; j--){
+				output += (tmp[j] ? "1" : "0");
+			}	
+			output += "\n";
+			if (lib.getEnv().getParty() == Party.Alice)
+				System.out.println(output);
+		}
+		
 	}
 }
 

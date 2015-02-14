@@ -290,11 +290,11 @@ public class MipsEmulatorVerify {
 				MemorySet<Boolean> currentSet = sets.get(0);
 				SecureArray<Boolean> currentBank;
 				while (true) {
-					currentBank = currentSet.getOramBank().getArray();
+					currentBank = currentSet.getOramBank().getMap();
 					System.out.println("count: " + count);
 					count++;
 					System.out.println("execution step: " + currentSet.getExecutionStep());
-					printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
+					printOramBank(currentSet.getOramBank().getMap(), lib, currentSet.getOramBank().getBankSize());
 					if (MULTIPLE_BANKS)
 						pcOffset = (int) currentSet.getOramBank().getMinAddress();
 					newInst = mem.getInst(currentBank, pc, pcOffset);
@@ -375,8 +375,8 @@ public class MipsEmulatorVerify {
 				MemorySet<Boolean> currentSet = sets.get(0);
 				SecureArray<Boolean> currentBank;
 				while (true){
-					currentBank = currentSet.getOramBank().getArray();
-					printOramBank(currentSet.getOramBank().getArray(), lib, currentSet.getOramBank().getBankSize());
+					currentBank = currentSet.getOramBank().getMap();
+					printOramBank(currentSet.getOramBank().getMap(), lib, currentSet.getOramBank().getBankSize());
 					newInst = mem.getInst(currentBank, pc, pcOffset); 
 					mem.func(reg, memBank, newInst, dataOffset);
 					testHalt = testTerminate(reg, newInst, lib);
