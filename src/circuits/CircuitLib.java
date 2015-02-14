@@ -1,11 +1,7 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package circuits;
 
-import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Arrays;
-
-import network.Server;
 
 import flexsc.CompEnv;
 import flexsc.Mode;
@@ -30,12 +26,12 @@ public class CircuitLib<T> {
 			return Arrays.copyOfRange(a, 0, length);
 	}
 
-	 public T[] enforceBits(T a, int length) {
-         T[] ret = zeros(length);
-         ret[0] = a;
-         return ret;
-   }
-	 
+	public T[] enforceBits(T a, int length) {
+		T[] ret = zeros(length);
+		ret[0] = a;
+		return ret;
+	}
+
 	public T[] toSignals(int a, int width) {
 		T[] result = env.newTArray(width);
 		for (int i = 0; i < width; ++i) {
@@ -75,29 +71,20 @@ public class CircuitLib<T> {
 			return new boolean[x.length];
 		}
 		boolean[] pos = env.outputToAlice(x);
-		try {
-			if (env.getParty() == Party.Alice) {
 
-				//env.os.write(new byte[] { (byte) pos.length });
-				byte[] tmp = new byte[pos.length];
-				for (int i = 0; i < pos.length; ++i)
-					tmp[i] = (byte) (pos[i] ? 1 : 0);
-				//env.os.write(tmp);
-				Server.writeByte(env.os, tmp);
-				env.flush();
-			} else {
-				//byte[] l = new byte[1];
-				//env.is.read(l);
-				byte tmp[] = Server.readBytes(env.is);//new byte[l[0]];
-				//env.is.read(tmp);
-				pos = new boolean[tmp.length];
-				for (int k = 0; k < tmp.length; ++k) {
-					pos[k] = ((tmp[k] - 1) == 0);
-				}
+		if (env.getParty() == Party.Alice) {
+
+			byte[] tmp = new byte[pos.length];
+			for (int i = 0; i < pos.length; ++i)
+				tmp[i] = (byte) (pos[i] ? 1 : 0);
+			env.w.writeByte(tmp, pos.length);//Server.writeByte(env.os, tmp);
+			env.flush();
+		} else {
+			byte tmp[] = env.w.readBytes(pos.length);//Server.readBytes(env.is);//new byte[l[0]];
+			pos = new boolean[tmp.length];
+			for (int k = 0; k < tmp.length; ++k) {
+				pos[k] = ((tmp[k] - 1) == 0);
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		return pos;
 	}

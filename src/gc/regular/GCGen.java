@@ -3,15 +3,13 @@ package gc.regular;
 import flexsc.Flag;
 import gc.GCGenComp;
 import gc.GCSignal;
-
-import java.io.InputStream;
-import java.io.OutputStream;
+import network.Network;
 
 public class GCGen extends GCGenComp {
 	Garbler gb;
 
-	public GCGen(InputStream is, OutputStream os) {
-		super(is, os);
+	public GCGen(Network w) {
+		super(w);
 		gb = new Garbler();
 	}
 
@@ -58,9 +56,9 @@ public class GCGen extends GCGenComp {
 	private void sendGTT() {
 		try {
 			Flag.sw.startGCIO();
-			gtt[0][1].send(os);
-			gtt[1][0].send(os);
-			gtt[1][1].send(os);
+			gtt[0][1].send(w);
+			gtt[1][0].send(w);
+			gtt[1][1].send(w);
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();

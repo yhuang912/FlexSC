@@ -20,7 +20,7 @@ public class TestCircuitLib extends TestHarness {
 	@Test
 	public void testHammingDistance() throws Exception {
 		
-		for (int i = 0; i < testCases; i++) {
+		for (int i = 0; i < 1; i++) {
 			BigInteger a = new BigInteger(TestBigInteger.LENGTH, rnd);
 			BigInteger b = new BigInteger(TestBigInteger.LENGTH, rnd);
 			TestBigInteger.runThreads(new TestBigInteger.Helper(a, b) {

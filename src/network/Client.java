@@ -12,10 +12,9 @@ import org.apache.commons.io.output.CountingOutputStream;
 
 import flexsc.Flag;
 
-public class Client {
+public class Client extends Network{
+
 	private Socket sock = null;
-	public InputStream is;
-	public OutputStream os;
 	CountingOutputStream cos;
 	CountingInputStream cis;
 
@@ -43,6 +42,7 @@ public class Client {
 					Server.bufferSize);
 
 		}
+		setUpThread();
 	}
 
 	public void disconnect() throws Exception {

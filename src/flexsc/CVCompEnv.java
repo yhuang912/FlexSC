@@ -2,14 +2,13 @@
 package flexsc;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
+import network.Network;
 import util.Utils;
 
 public class CVCompEnv extends BooleanCompEnv {
-	public CVCompEnv(InputStream is, OutputStream os, Party p) {
-		super(is, os, p, Mode.VERIFY);
+	public CVCompEnv(Network w, Party p) {
+		super(w, p, Mode.VERIFY);
 		this.p = p;
 	}
 

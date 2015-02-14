@@ -1,11 +1,8 @@
 package gc;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.concurrent.ArrayBlockingQueue;
 
-import network.ThreadedIO;
+import network.Network;
 import ot.FakeOTSender;
 import ot.OTExtSender;
 import ot.OTPreprocessSender;
@@ -25,21 +22,16 @@ public abstract class GCGenComp extends GCCompEnv{
 
 	OTSender snd;
 	protected long gid = 0;
-	public ArrayBlockingQueue<GCSignal> queue;
-	ThreadedIO threadedio;
-	
-	public GCGenComp(InputStream is, OutputStream os) {
-		super(is, os, Party.Alice);
 
-		queue = new ArrayBlockingQueue<GCSignal>(1000);
-		threadedio = new ThreadedIO(queue, os);
-		new Thread(threadedio).start();
+	public GCGenComp(Network w) {
+		super(w, Party.Alice);
+
 		if (Flag.FakeOT)
-			snd = new FakeOTSender(80, is, os);
-		else if(Flag.PreProcessOT)
-			snd = new OTPreprocessSender(80, is, os);
-		else
-			snd = new OTExtSender(80, is, os);
+			snd = new FakeOTSender(80, w);
+//		else if(Flag.PreProcessOT)
+//			snd = new OTPreprocessSender(80, this);
+//		else
+//			snd = new OTExtSender(80, this);
 	}
 
 	public static GCSignal[] genPairForLabel() {
@@ -68,7 +60,7 @@ public abstract class GCGenComp extends GCCompEnv{
 		Flag.sw.startOT();
 		GCSignal[] label = genPairForLabel();
 		Flag.sw.startOTIO();
-		label[in ? 1 : 0].send(os);
+		label[in ? 1 : 0].send(w);
 		flush();
 		Flag.sw.stopOTIO();
 		Flag.sw.stopOT();
@@ -98,7 +90,7 @@ public abstract class GCGenComp extends GCCompEnv{
 		}
 		Flag.sw.startOTIO();
 		for (int i = 0; i < x.length; ++i)
-			pairs[i][x[i] ? 1 : 0].send(os);
+			pairs[i][x[i] ? 1 : 0].send(w);
 		flush();
 		Flag.sw.stopOTIO();
 		Flag.sw.stopOT();
@@ -133,7 +125,7 @@ public abstract class GCGenComp extends GCCompEnv{
 		if (out.isPublic())
 			return out.v;
 
-		GCSignal lb = GCSignal.receive(is);
+		GCSignal lb = GCSignal.receive(w);
 		if (lb.equals(out))
 			return false;
 		else if (lb.equals(R.xor(out)))
@@ -150,7 +142,7 @@ public abstract class GCGenComp extends GCCompEnv{
 
 	public boolean outputToBob(GCSignal out) {
 		if (!out.isPublic())
-			out.send(os);
+			out.send(w);
 		return false;
 	}
 
@@ -159,7 +151,7 @@ public abstract class GCGenComp extends GCCompEnv{
 
 		for (int i = 0; i < result.length; ++i) {
 			if (!out[i].isPublic())
-				out[i].send(os);
+				out[i].send(w);
 		}
 		flush();
 

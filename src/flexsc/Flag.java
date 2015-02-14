@@ -11,8 +11,8 @@ public class Flag {
 	public static boolean countIO = false;
 	public static boolean FakeOT = true;
 	public static boolean PreProcessOT = true;
-	public static boolean offline = false;
-	public static Mode mode = Mode.OFFLINE;
+	public static boolean offline = true;
+	public static Mode mode = Mode.REAL;
 	
 
 	public Flag() {
