@@ -9,9 +9,9 @@ public class Flag {
 	public static boolean CountTime = true;
 	public static StopWatch sw = new StopWatch(CountTime);
 	public static boolean countIO = false;
-	public static boolean FakeOT = false;
+	public static boolean FakeOT = true;
 	public static boolean PreProcessOT = true;
-	public static boolean offline = true;
+	public static boolean offline = false;
 	public static Mode mode = Mode.OFFLINE;
 	
 

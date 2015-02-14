@@ -15,7 +15,7 @@ import flexsc.Party;
 
 
 public class TestBigInteger extends TestHarness{
-	public static final int LENGTH = 4096;
+	public static final int LENGTH = 40960;
 	final static int RANGE = LENGTH/2;
 	public static abstract class Helper {
 		BigInteger intA, intB;

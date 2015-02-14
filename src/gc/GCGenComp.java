@@ -3,7 +3,9 @@ package gc;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.ArrayBlockingQueue;
 
+import network.ThreadedIO;
 import ot.FakeOTSender;
 import ot.OTExtSender;
 import ot.OTPreprocessSender;
@@ -23,10 +25,15 @@ public abstract class GCGenComp extends GCCompEnv{
 
 	OTSender snd;
 	protected long gid = 0;
-
+	public ArrayBlockingQueue<GCSignal> queue;
+	ThreadedIO threadedio;
+	
 	public GCGenComp(InputStream is, OutputStream os) {
 		super(is, os, Party.Alice);
 
+		queue = new ArrayBlockingQueue<GCSignal>(1000);
+		threadedio = new ThreadedIO(queue, os);
+		new Thread(threadedio).start();
 		if (Flag.FakeOT)
 			snd = new FakeOTSender(80, is, os);
 		else if(Flag.PreProcessOT)

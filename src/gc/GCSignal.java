@@ -73,7 +73,17 @@ public class GCSignal {
 			e.printStackTrace();
 		}
 	}
-
+	
+	// 'send' and 'receive' are supposed to be used only for secret signals
+	public void send(GCGenComp env) {
+		try {
+			env.queue.put(this);
+//			os.write(bytes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	// 'send' and 'receive' are supposed to be used only for secret signals
 	public static GCSignal receive(InputStream ois) {
 		byte[] b = null;

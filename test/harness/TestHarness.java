@@ -10,7 +10,7 @@ public class TestHarness {
 			testCases = 1;
 		}
 		else if (Flag.mode == Mode.REAL || Flag.mode == Mode.OPT || Flag.mode == Mode.OFFLINE) {
-			testCases = 10;
+			testCases = 1000;
 		}
 		else if (Flag.mode == Mode.VERIFY)
 			testCases = 1000;
