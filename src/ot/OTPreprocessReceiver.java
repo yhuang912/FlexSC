@@ -3,6 +3,7 @@
 package ot;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import gc.GCSignal;
 
 import java.io.IOException;
@@ -51,9 +52,11 @@ public class OTPreprocessReceiver  extends OTReceiver {
 	public GCSignal receive(boolean b) throws IOException {
 		bufferusage--;
 		byte z = (b^choose[bufferusage]) ? (byte)1 : (byte)0;
+		Flag.sw.startOTIO();
 		os.write(z);
 		os.flush();
 		GCSignal[] y = new GCSignal[]{GCSignal.receive(is),  GCSignal.receive(is)};
+		Flag.sw.startOTIO();
 		if(bufferusage == 0)
 			fillup();
 		return y[b?1:0].xor(buffer[bufferusage]);
@@ -68,12 +71,16 @@ public class OTPreprocessReceiver  extends OTReceiver {
 			--tmp;
 			z[i] = (b[i]^choose[tmp]) ? (byte)1 : (byte)0;
 		}
+		Flag.sw.startOTIO();
 		os.write(z);
 		os.flush();
+		Flag.sw.startOTIO();
 		GCSignal[] ret = new GCSignal[b.length];
 		for(int i = 0; i < b.length; ++i) {
 			bufferusage--;
+			Flag.sw.startOTIO();
 			GCSignal[] y = new GCSignal[]{GCSignal.receive(is),  GCSignal.receive(is)};
+			Flag.sw.startOTIO();
 			ret[i] = y[b[i]?1:0].xor(buffer[bufferusage]);
 		}
 		return ret;
