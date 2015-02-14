@@ -57,8 +57,8 @@ public class Network {
 
 	public void writeByte(byte[] data, int length) {
 		try {
-//			os.write(data);
-			queue.put(data);
+			os.write(data);
+//			queue.put(data);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
