@@ -21,7 +21,8 @@ public class Network {
 	}
 
 	public void flush(){
-//		!!!
+		while(!queue.isEmpty()) {
+		}
 	}
 	public byte[] readBytes(int len) {
 		byte[] temp = new byte[len];

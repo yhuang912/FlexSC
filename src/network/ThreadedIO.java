@@ -13,20 +13,23 @@ public class ThreadedIO implements Runnable {
 	}
 	public void run() {
 		byte[] t = null;
-		while(true) {
-			try {
-			 t = queue.poll();
-			while(t != null) {
+		try {
+			while(true) {
+				t = queue.poll();
+				while(t != null) {
 					os.write(t);
-			}
-				Thread.sleep(10);
-			} catch (Exception e) {
-				System.out.println(Arrays.toString(t));
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.exit(1);
-			}
+					os.flush();
+					t = queue.poll();
+				}
+				//				Thread.sleep(1);
 				
+			}
+			
+		} catch (Exception e) {
+			System.out.println(Arrays.toString(t));
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 }

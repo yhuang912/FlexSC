@@ -15,8 +15,8 @@ import flexsc.Party;
 
 
 
-public class TestBigInteger extends TestHarness{
-	public static final int LENGTH = 4096000;
+public class TestBigInteger extends TestHarness {
+	public static final int LENGTH = 40960;
 	final static int RANGE = LENGTH/2;
 	public static abstract class Helper {
 		BigInteger intA, intB;
@@ -47,11 +47,14 @@ public class TestBigInteger extends TestHarness{
 				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, this);
 				
 				T [] a = gen.inputOfAlice(h.a);
+				System.out.println("gen1");
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
-//				T[] d = h.secureCompute(a, b, gen);
+				System.out.println("gen2");
+
+				T[] d = h.secureCompute(a, b, gen);
 				os.flush();
 		          
-//				z = gen.outputToAlice(d);
+				z = gen.outputToAlice(d);
 				Flag.sw.print();
 				disconnect();
 			} catch (Exception e) {
@@ -76,19 +79,23 @@ public class TestBigInteger extends TestHarness{
 				CompEnv<T> env = CompEnv.getEnv(Party.Bob, this);
 				
 				T [] a = env.inputOfAlice(new boolean[h.a.length]);
+				System.out.println("eva1");
 				T [] b = env.inputOfBob(h.b);
+				System.out.println("eva2");
+				flush();
 				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
-//				T[] d = h.secureCompute(a, b, env);
+				
+				T[] d = h.secureCompute(a, b, env);
 //				if (Flag.mode == Mode.COUNT) {
 //					((PMCompEnv) env).statistic.finalize();
 //					andgates = ((PMCompEnv) env).statistic.andGate;
 //					encs = ((PMCompEnv) env).statistic.NumEncAlice;
 //				}
 				
-//				env.outputToAlice(d);
+				env.outputToAlice(d);
 				os.flush();
 				Flag.sw.print();
 				disconnect();
@@ -98,7 +105,6 @@ public class TestBigInteger extends TestHarness{
 			}
 		}
 	}
-
 
 	static public <T>void runThreads(Helper h) throws Exception {
 		GenRunnable<T> gen = new GenRunnable<T>(h);
@@ -124,7 +130,7 @@ public class TestBigInteger extends TestHarness{
 		Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toBigInteger(gen.z));
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		BigInteger a = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
 		BigInteger b = new BigInteger(TestBigInteger.LENGTH, CompEnv.rnd);
 
@@ -142,6 +148,16 @@ public class TestBigInteger extends TestHarness{
 				return res;
 				}
 		};
+//		if(1 == 1) {
+//			GenRunnable gen = new GenRunnable(h);
+//			EvaRunnable eva = new EvaRunnable(h);
+//
+//			Thread tGen = new Thread(gen);
+//			Thread tEva = new Thread(eva);
+//			tGen.start(); Thread.sleep(5);
+//			tEva.start();
+//			tGen.join();
+//		}
 		if(new Integer(args[0]) == 0) {
 			GenRunnable gen = new GenRunnable(h);
 			Thread tGen = new Thread(gen);
