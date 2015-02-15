@@ -9,13 +9,13 @@ public class Flag {
 	public static boolean CountTime = true;
 	public static StopWatch sw = new StopWatch(CountTime);
 
-	public static OTMODE otMode = OTMODE.FAKEOT;
+	public static OTMODE otMode = OTMODE.PREPROCESSOT;
 	public static Mode mode = Mode.OFFLINERUN;
 	public static boolean THREADEDIO = true;
 	
 
 	//preprocessot
-	static public int PreProcessOTbufferSize = 1024*1024*6;
+	static public int PreProcessOTbufferSize = 1024*1024*2;
 	static public int PreProcessOTRefillLength = 300000;
 
 	//network
