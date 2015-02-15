@@ -4,10 +4,13 @@ import java.io.IOException;
 
 import network.Network;
 import ot.FakeOTSender;
+import ot.OTExtSender;
+import ot.OTPreprocessSender;
 import ot.OTSender;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
+import flexsc.OTMODE;
 import flexsc.Party;
 
 public abstract class GCGenComp extends GCCompEnv{
@@ -24,12 +27,12 @@ public abstract class GCGenComp extends GCCompEnv{
 	public GCGenComp(Network w) {
 		super(w, Party.Alice);
 
-		if (Flag.FakeOT)
+		if (Flag.otMode == OTMODE.FAKEOT)
 			snd = new FakeOTSender(80, w);
-//		else if(Flag.PreProcessOT)
-//			snd = new OTPreprocessSender(80, this);
-//		else
-//			snd = new OTExtSender(80, this);
+		else if (Flag.otMode == OTMODE.PREPROCESSOT)
+			snd = new OTPreprocessSender(80, w);
+		else if (Flag.otMode == OTMODE.EXTENSIONOT)
+			snd = new OTExtSender(80, w);
 	}
 
 	public static GCSignal[] genPairForLabel() {

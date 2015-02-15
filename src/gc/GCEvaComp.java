@@ -4,8 +4,11 @@ import java.io.IOException;
 
 import network.Network;
 import ot.FakeOTReceiver;
+import ot.OTExtReceiver;
+import ot.OTPreprocessReceiver;
 import ot.OTReceiver;
 import flexsc.Flag;
+import flexsc.OTMODE;
 import flexsc.Party;
 
 public abstract class GCEvaComp extends GCCompEnv{
@@ -17,12 +20,12 @@ public abstract class GCEvaComp extends GCCompEnv{
 	public GCEvaComp(Network w) {
 		super(w, Party.Bob);
 
-		if (Flag.FakeOT)
+		if (Flag.otMode == OTMODE.FAKEOT)
 			rcv = new FakeOTReceiver(w);
-//		else if(Flag.PreProcessOT)
-//			rcv = new OTPreprocessReceiver(is, os);
-//		else
-//			rcv = new OTExtReceiver(is, os);
+		else if (Flag.otMode == OTMODE.PREPROCESSOT)
+			rcv = new OTPreprocessReceiver(w);
+		else if (Flag.otMode == OTMODE.EXTENSIONOT)
+			rcv = new OTExtReceiver(w);
 		
 	}
 

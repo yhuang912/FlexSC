@@ -75,23 +75,28 @@ public class Network {
 			else {
 				os.write(data);
 			}
-			//			os.write(data);
-			//			queue.add(data);
-			//			queue.insert(data);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public static void writeBI(Network w, BigInteger bi) {
-		w.writeByte(bi.toByteArray());
+	public void writeBI(BigInteger bi) {
+		writeByte(bi.toByteArray());
 	}
 
-	public static BigInteger readBI(Network w) {
-		byte[] rep = w.readBytes();
+	public BigInteger readBI() {
+		byte[] rep = readBytes();
 
 		return (rep == null) ? BigInteger.ZERO : new BigInteger(rep);
 	}
+	
+	public void writeInt(int i) {
+		writeByte(ByteBuffer.allocate(4).putInt(i).array(), 4);
+	}
+
+	public int readInt() {
+		return ByteBuffer.wrap(readBytes(4)).getInt();
+	}	
 
 }
