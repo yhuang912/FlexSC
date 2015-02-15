@@ -34,15 +34,14 @@ public abstract class GCGenComp extends GCCompEnv{
 
 	public static GCSignal[] genPairForLabel() {
 		GCSignal[] label = new GCSignal[2];
-		if(Flag.mode != Mode.OFFLINE || !Flag.offline)
+		if(Flag.mode != Mode.OFFLINERUN)
 			label[0] = GCSignal.freshLabel(rnd);
-		if(Flag.mode == Mode.OFFLINE) {
-			if(Flag.offline) {
-				label[0] = GCSignal.receive(gc.offline.GCGen.fin);
-			}
-			else 
-				label[0].send(gc.offline.GCGen.fout);
-		}
+		
+		if(Flag.mode == Mode.OFFLINERUN)
+			label[0] = GCSignal.receive(gc.offline.GCGen.fin);
+		else if(Flag.mode == Mode.OFFLINEPREPARE)
+			label[0].send(gc.offline.GCGen.fout);
+
 		label[1] = R.xor(label[0]);
 		return label;
 	}
@@ -79,6 +78,7 @@ public abstract class GCGenComp extends GCCompEnv{
 	}
 
 	public GCSignal[] inputOfAlice(boolean[] x) {
+
 		Flag.sw.startOT();
 		GCSignal[][] pairs = new GCSignal[x.length][2];
 		GCSignal[] result = new GCSignal[x.length];
@@ -87,9 +87,10 @@ public abstract class GCGenComp extends GCCompEnv{
 			result[i] = pairs[i][0];
 		}
 		Flag.sw.startOTIO();
+		System.out.println("!!");
 		for (int i = 0; i < x.length; ++i)
 			pairs[i][x[i] ? 1 : 0].send(w);
-		flush();
+		w.flush();
 		Flag.sw.stopOTIO();
 		Flag.sw.stopOT();
 		return result;

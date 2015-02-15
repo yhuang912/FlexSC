@@ -1,33 +1,30 @@
 package network;
 
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ThreadedIO implements Runnable {
-	public ConcurrentLinkedQueue<byte[]> queue;
+	public CustomizedConcurrentQueue2 queue;
 	OutputStream os;
-	public ThreadedIO(ConcurrentLinkedQueue<byte[]> queue, OutputStream os) {
+	public ThreadedIO(CustomizedConcurrentQueue2 queue, OutputStream os) {
 		this.queue = queue;
 		this.os = os;
 	}
-	
+
+	byte[] res = new byte[Network.queuesize];
 	public void run() {	
-		byte[] t = null;
-		try {
+		try {			
 			while(true) {
-				t = queue.poll();
-				while(t != null) {
-					if(t.length == 0)return;
-					os.write(t);
+				int len  = queue.pop(res);
+				if(len == -1)return;
+				if(len != 0) {
+//					System.out.println(len);
+					os.write(res, 0, len);
 					os.flush();
-					t = queue.poll();
+					Thread.sleep(2);
 				}
-				//				Thread.sleep(1);
 			}
 			
 		} catch (Exception e) {
-			System.out.println(Arrays.toString(t));
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.exit(1);

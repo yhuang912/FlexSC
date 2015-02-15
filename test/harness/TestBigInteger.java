@@ -16,7 +16,7 @@ import flexsc.Party;
 
 
 public class TestBigInteger extends TestHarness {
-	public static final int LENGTH = 409600;
+	public static final int LENGTH = 1000000;
 	final static int RANGE = LENGTH/2;
 	public static abstract class Helper {
 		BigInteger intA, intB;
@@ -45,7 +45,7 @@ public class TestBigInteger extends TestHarness {
 				listen(54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, this);
-
+				System.out.println("gen0");
 				T [] a = gen.inputOfAlice(h.a);
 				System.out.println("gen1");
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
@@ -56,6 +56,8 @@ public class TestBigInteger extends TestHarness {
 				os.flush();
 
 				z = gen.outputToAlice(d);
+				System.out.println("gen4");
+
 				Flag.sw.print();
 				disconnect();
 			} catch (Exception e) {
@@ -78,7 +80,7 @@ public class TestBigInteger extends TestHarness {
 				connect("localhost", 54321);				
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Party.Bob, this);
-
+				System.out.println("eva0");
 				T [] a = env.inputOfAlice(new boolean[h.a.length]);
 				System.out.println("eva1");
 				T [] b = env.inputOfBob(h.b);
@@ -98,6 +100,7 @@ public class TestBigInteger extends TestHarness {
 				//				}
 
 				env.outputToAlice(d);
+				System.out.println("eva4");
 				os.flush();
 				Flag.sw.print();
 				disconnect();
@@ -150,7 +153,7 @@ public class TestBigInteger extends TestHarness {
 				return res;
 			}
 		};
-		if(args.length > 0) {
+		if(args.length == 0) {
 			GenRunnable gen = new GenRunnable(h);
 			EvaRunnable eva = new EvaRunnable(h);
 

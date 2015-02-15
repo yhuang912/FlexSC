@@ -44,7 +44,7 @@ public class Client extends Network{
 	}
 
 	public void disconnect() throws Exception {
-		queue.add(new byte[0]);
+		queue.destory();
 		thd.join();
 		os.write(0);
 		os.flush();

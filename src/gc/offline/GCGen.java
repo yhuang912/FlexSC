@@ -2,6 +2,7 @@ package gc.offline;
 
 import flexsc.CompEnv;
 import flexsc.Flag;
+import flexsc.Mode;
 import gc.GCGenComp;
 import gc.GCSignal;
 
@@ -21,12 +22,12 @@ public class GCGen extends GCGenComp {
 	public static BufferedOutputStream fout = null;
 	static{
 		try {
-			if(Flag.offline) {
+			if(Flag.mode== Mode.OFFLINERUN) {
 				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*10);
 				R = GCSignal.receive(fin);
 				R.setLSB();
 			}
-			else {
+			else  if(Flag.mode == Mode.OFFLINERUN){
 				fout = new BufferedOutputStream(new FileOutputStream("table"), 1024*1024*10);
 				R.send(fout);
 			}
@@ -132,13 +133,13 @@ public class GCGen extends GCGenComp {
 		else if (b.isPublic())
 			res = b.v ? a : new GCSignal(false);
 		else {
-			if(Flag.offline) {
+			if(Flag.mode == Mode.OFFLINERUN) {
 				res = readGateFromFile();
-			} else {
+			} else if(Flag.mode == Mode.OFFLINEPREPARE){
 				res = garble(a, b);
 				writeGateToFile(res);
+				sendGTT();
 			}
-			sendGTT();
 			gid++;
 			gatesRemain = true;
 		}

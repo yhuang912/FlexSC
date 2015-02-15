@@ -2,7 +2,6 @@ package network;
 
 
 public class CustomizedConcurrentQueue {
-
 	int capacity;
 	int size = 0;
 	byte[] data;
@@ -11,17 +10,29 @@ public class CustomizedConcurrentQueue {
 		data = new byte[capacity];
 	}
 	
-	public synchronized void insert (byte[] in) {
-		while (in.length+size > capacity){}
-		System.arraycopy(in, 0, data, size, in.length);
-		size +=in.length;
-		
+	public  void insert (byte[] in) {
+		while (in.length+atomic(null, 3) > capacity){}
+		atomic(in, 1);
 	}
 	
-	public synchronized int pop(byte[] d) {
-		System.arraycopy(data, 0, d, 0, size);
-		int oldsize = size;
-		size = 0;
-		return oldsize;
+	public synchronized int atomic(byte[] in, int op) {
+		if(op == 1) {
+			System.arraycopy(in, 0, data, size, in.length);
+			size +=in.length;
+			return 0;
+		}
+		else if(op == 3) {
+			return size;
+		}
+		else {
+			System.arraycopy(data, 0, in, 0, size);
+			int oldsize = size;
+			size = 0;
+			return oldsize;
+		}
+	}
+	
+	public  int pop(byte[] d) {
+		return atomic(d, 2);
 	}
 }

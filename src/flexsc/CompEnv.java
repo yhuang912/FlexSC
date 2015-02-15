@@ -39,7 +39,7 @@ public abstract class CompEnv<T> {
 				return new gc.halfANDs.GCEva(w);
 			else
 				return new gc.halfANDs.GCGen(w);
-		else if (Flag.mode == Mode.OFFLINE)
+		else if (Flag.mode == Mode.OFFLINEPREPARE || Flag.mode == Mode.OFFLINERUN)
 			if (p == Party.Bob)
 				return new gc.offline.GCEva(w);
 			else

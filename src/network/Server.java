@@ -25,14 +25,14 @@ public class Server extends Network{
 
 
 	public void disconnect() throws Exception {
-		queue.add(new byte[0]);
+		queue.destory();
 		thd.join();
 		is.read();
 		os.write(0);
 		os.flush(); // dummy I/O to prevent dropping connection earlier than
 					// protocol payloads are received.
 		sock.close();
-		if(Flag.mode == Mode.OFFLINE && !Flag.offline) {
+		if(Flag.mode == Mode.OFFLINEPREPARE ) {
 			try {
 				gc.offline.GCGen.fout.flush();
 			} catch (Exception e) {

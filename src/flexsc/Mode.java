@@ -13,5 +13,6 @@ public enum Mode {
 	//Half Gates
 	OPT,
 	//
-	OFFLINE;
+	OFFLINEPREPARE,
+	OFFLINERUN;
 }

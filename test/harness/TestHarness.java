@@ -9,7 +9,8 @@ public class TestHarness {
 		if (Flag.mode == Mode.COUNT) {
 			testCases = 1;
 		}
-		else if (Flag.mode == Mode.REAL || Flag.mode == Mode.OPT || Flag.mode == Mode.OFFLINE) {
+		else if (Flag.mode == Mode.REAL || Flag.mode == Mode.OPT || 
+				Flag.mode == Mode.OFFLINEPREPARE || Flag.mode == Mode.OFFLINERUN) {
 			testCases = 1000;
 		}
 		else if (Flag.mode == Mode.VERIFY)
