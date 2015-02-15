@@ -150,7 +150,7 @@ public class TestBigInteger extends TestHarness {
 				return res;
 			}
 		};
-		if(1 == 1) {
+		if(args.length > 0) {
 			GenRunnable gen = new GenRunnable(h);
 			EvaRunnable eva = new EvaRunnable(h);
 
@@ -159,6 +159,15 @@ public class TestBigInteger extends TestHarness {
 			tGen.start(); Thread.sleep(5);
 			tEva.start();
 			tGen.join();
+			if(!h.plainCompute(h.intA, h.intB).equals(Utils.toBigInteger(gen.z))) 
+			{
+				System.out.println(Arrays.toString(h.a));
+				System.out.println(Arrays.toString(h.b));
+				System.out.println(Arrays.toString( Utils.fromBigInteger(h.plainCompute(h.intA, h.intB),gen.z.length)));
+				System.out.println(Arrays.toString(Utils.fromBigInteger(Utils.toBigInteger(gen.z),gen.z.length)));
+			}
+
+			Assert.assertEquals(h.plainCompute(h.intA, h.intB), Utils.toBigInteger(gen.z));
 		}
 		else {
 			if(new Integer(args[0]) == 0) {
