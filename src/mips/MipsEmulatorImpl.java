@@ -194,7 +194,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			if (!config.isMultipleBanks()){
 				singleInstructionBank = loadInstructionsSingleBank(env, instData);				
 			}
-			loadInstructionsMultiBanks(env, singleInstructionBank, sets, instData);
+			loadInstructionsMultiBanks(env, singleInstructionBank, sets);
 			SecureArray<T> memBank = getMemory(env, memData);
 
 			T[] pc = lib.toSignals(pcOffset, WORD_SIZE);
@@ -310,7 +310,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			return instBank;
 		}			
 
-		private void loadInstructionsMultiBanks(CompEnv<T> env, SecureMap<T> singleBank, List<MemorySet<T>> sets, DataSegment instData) throws Exception {
+		private void loadInstructionsMultiBanks(CompEnv<T> env, SecureMap<T> singleBank, List<MemorySet<T>> sets) throws Exception {
 			System.out.println("entering loadInstructions");
 			IntegerLib<T> lib = new IntegerLib<T>(env);
 			T[] data; 
@@ -322,7 +322,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
 				EmulatorUtils.print("step: " + i + " size: " + s.size(), lib);
 
-				TreeMap<Long,boolean[]> m = s.getAddressMap(instData);	  
+				TreeMap<Long,boolean[]> m = s.getAddressMap();	  
 				long maxAddr = m.lastEntry().getKey();
 				if (maxAddr == 0)
 					break;
