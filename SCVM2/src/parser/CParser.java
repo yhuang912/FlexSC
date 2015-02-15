@@ -404,7 +404,7 @@ public class CParser implements CParserConstants {
     jj_consume_token(53);
     v = jj_consume_token(IDENTIFIER);
     exp = Expression();
-                System.out.println(v.image+"\u005ct=\u005ct"+exp);
+                // System.out.println(v.image+"\u005ct=\u005ct"+exp);
                 def.put(v.image, exp);
   }
 

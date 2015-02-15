@@ -278,7 +278,7 @@ public class TypeChecker extends DefaultStatementExpressionVisitor<Boolean, List
 					type = (ASTFunctionType)resolver.visit(type);
 				}
 				for(int i=0; i<type.inputTypes.size(); ++i) {
-					System.out.println(funcExpression);
+					// System.out.println(funcExpression);
 					ASTType t = assertOne(visit(exp.inputs.get(i).right));
 					if(!type.inputTypes.get(i).match(t))
 						return null;
