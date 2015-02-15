@@ -12,14 +12,14 @@ import java.util.Arrays;
 import network.Network;
 
 public class OTPreprocessReceiver  extends OTReceiver {
-	GCSignal[] buffer = new GCSignal[OTPreprocessSender.bufferSize];
-	boolean[] choose = new boolean[OTPreprocessSender.bufferSize];
+	GCSignal[] buffer = new GCSignal[Flag.PreProcessOTbufferSize];
+	boolean[] choose = new boolean[Flag.PreProcessOTbufferSize];
 	int bufferusage = 0;
 
 	public void fillup() {
 			w.flush();
-		while(bufferusage < OTPreprocessSender.bufferSize) {
-			int l = Math.min(OTPreprocessSender.fillLength, OTPreprocessSender.bufferSize-bufferusage);
+		while(bufferusage < Flag.PreProcessOTbufferSize) {
+			int l = Math.min(Flag.PreProcessOTRefillLength, Flag.PreProcessOTbufferSize-bufferusage);
 			
 			for(int i = bufferusage; i < bufferusage+l; ++i)
 				choose[i] = CompEnv.rnd.nextBoolean();

@@ -31,21 +31,23 @@ public class Client extends Network{
 		if (Flag.countIO) {
 			cos = new CountingOutputStream(sock.getOutputStream());
 			cis = new CountingInputStream(sock.getInputStream());
-			os = new BufferedOutputStream(cos, Server.bufferSize);
-			is = new BufferedInputStream(cis, Server.bufferSize);
+			os = new BufferedOutputStream(cos, Flag.NetowrkBufferSize);
+			is = new BufferedInputStream(cis, Flag.NetowrkBufferSize);
 		} else {
 			os = new BufferedOutputStream(sock.getOutputStream(),
-					Server.bufferSize);
+					Flag.NetowrkBufferSize);
 			is = new BufferedInputStream(sock.getInputStream(),
-					Server.bufferSize);
+					Flag.NetowrkBufferSize);
 
 		}
 		setUpThread();
 	}
 
 	public void disconnect() throws Exception {
-		queue.destory();
-		thd.join();
+		if(Flag.THREADEDIO) {
+			queue.destory();
+			thd.join();
+		}
 		os.write(0);
 		os.flush();
 		is.read(); // dummy write to prevent dropping connection earlier than

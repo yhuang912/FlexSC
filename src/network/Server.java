@@ -17,16 +17,18 @@ public class Server extends Network{
 		sock = new ServerSocket(port); // create socket and bind to port
 		clientSock = sock.accept(); // wait for client to connect
 
-		os = new BufferedOutputStream(clientSock.getOutputStream(), bufferSize);
-		is = new BufferedInputStream(clientSock.getInputStream(), bufferSize);
+		os = new BufferedOutputStream(clientSock.getOutputStream(), Flag.NetowrkBufferSize);
+		is = new BufferedInputStream(clientSock.getInputStream(), Flag.NetowrkBufferSize);
 		setUpThread();
 	}
 	
 
 
 	public void disconnect() throws Exception {
-		queue.destory();
-		thd.join();
+		if(Flag.THREADEDIO) {
+			queue.destory();
+			thd.join();
+		}
 		is.read();
 		os.write(0);
 		os.flush(); // dummy I/O to prevent dropping connection earlier than

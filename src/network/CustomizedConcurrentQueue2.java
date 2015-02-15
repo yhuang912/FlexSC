@@ -16,7 +16,14 @@ public class CustomizedConcurrentQueue2 {
 		finished = true;
 	}
 
-	public  void insert (byte[] in) {
+	public  int insert (byte[] in) {
+		int s = size();
+		if(s > msize) {
+			msize = s;
+			System.out.println(msize);
+		}
+//		if(s < in.length)return -1;
+//		while(size() < in.length){}
 		int remains = capacity - head;
 		if(remains >= in.length) {
 			System.arraycopy(in, 0, data, head, in.length);
@@ -27,7 +34,10 @@ public class CustomizedConcurrentQueue2 {
 			System.arraycopy(in, remains, data, 0, in.length-remains);
 			head = in.length-remains;
 		}
+ 
+		return 0;
 	}
+	int msize = -1;
 
 	public int sizeop(int number, int op) {
 		if(op == 0) {

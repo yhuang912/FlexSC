@@ -19,16 +19,14 @@ public class OTPreprocessSender  extends OTSender {
 		fillup();
 	}
 
-	final static public int bufferSize = 1024*1024*6;
-	final static public int fillLength = 300000;
-	GCSignal[][] buffer = new GCSignal[bufferSize][2];
+	GCSignal[][] buffer = new GCSignal[Flag.PreProcessOTbufferSize][2];
 	int bufferusage = 0;
 
 	public void fillup () {
 
 		w.flush();
-		while(bufferusage < bufferSize) {
-			int l = Math.min(fillLength, bufferSize-bufferusage);
+		while(bufferusage < Flag.PreProcessOTbufferSize) {
+			int l = Math.min(Flag.PreProcessOTRefillLength, Flag.PreProcessOTbufferSize-bufferusage);
 			for(int i = bufferusage; i < bufferusage+l; ++i)
 				buffer[i] = GCGenComp.genPair();
 			try {
@@ -38,7 +36,7 @@ public class OTPreprocessSender  extends OTSender {
 				e.printStackTrace();
 			}
 			bufferusage +=l;
-			System.out.println(bufferusage/(double)bufferSize);
+			System.out.println(bufferusage/(double)Flag.PreProcessOTbufferSize);
 		}
 	}
 

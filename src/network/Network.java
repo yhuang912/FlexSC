@@ -9,17 +9,14 @@ import java.nio.ByteBuffer;
 import flexsc.Flag;
 
 public class Network {
-	//	public ConcurrentLinkedQueue<byte[]> queue;
 	public CustomizedConcurrentQueue2 queue;
 	ThreadedIO threadedio;
 	public InputStream is;
 	protected OutputStream os;
-	static int bufferSize = 1024*1024*10;
-	static int queuesize = 1024*1024*300;
 	Thread thd;
 	public void setUpThread() {
 		if(Flag.THREADEDIO) {
-			queue = new CustomizedConcurrentQueue2(queuesize);
+			queue = new CustomizedConcurrentQueue2(Flag.NetworkThreadedQueueSize);
 			threadedio = new ThreadedIO(queue, os);
 			thd = new Thread(threadedio);
 			thd.start();
