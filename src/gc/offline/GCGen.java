@@ -27,7 +27,7 @@ public class GCGen extends GCGenComp {
 				R = GCSignal.receive(fin);
 				R.setLSB();
 			}
-			else  if(Flag.mode == Mode.OFFLINERUN){
+			else  if(Flag.mode == Mode.OFFLINEPREPARE){
 				fout = new BufferedOutputStream(new FileOutputStream("table"), 1024*1024*10);
 				R.send(fout);
 			}
@@ -138,8 +138,8 @@ public class GCGen extends GCGenComp {
 			} else if(Flag.mode == Mode.OFFLINEPREPARE){
 				res = garble(a, b);
 				writeGateToFile(res);
-				sendGTT();
 			}
+			sendGTT();
 			gid++;
 			gatesRemain = true;
 		}

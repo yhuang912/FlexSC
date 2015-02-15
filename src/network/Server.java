@@ -27,6 +27,7 @@ public class Server extends Network{
 	public void disconnect() throws Exception {
 		if(Flag.THREADEDIO) {
 			queue.destory();
+			os.flush();
 			thd.join();
 		}
 		is.read();

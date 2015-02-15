@@ -29,6 +29,8 @@ public class GCEva extends GCEvaComp {
 	}
 
 	public GCSignal and(GCSignal a, GCSignal b) {
+		++Flag.sw.ands;
+
 		Flag.sw.startGC();
 
 		GCSignal res;

@@ -17,17 +17,17 @@ public class CustomizedConcurrentQueue2 {
 	}
 
 	public  int insert (byte[] in) {
-		int s = size();
-		if(s > msize) {
-			msize = s;
-			System.out.println(msize);
-		}
+//		int s = size();
+//		if(s > msize) {
+//			msize = s;
+//			System.out.println(msize);
+//		}
 //		if(s < in.length)return -1;
 //		while(size() < in.length){}
 		int remains = capacity - head;
 		if(remains >= in.length) {
 			System.arraycopy(in, 0, data, head, in.length);
-			head +=in.length;//!
+			head +=in.length;
 		}
 		else {
 			System.arraycopy(in, 0, data, head, remains);

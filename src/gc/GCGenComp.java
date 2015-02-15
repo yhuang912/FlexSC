@@ -90,7 +90,6 @@ public abstract class GCGenComp extends GCCompEnv{
 			result[i] = pairs[i][0];
 		}
 		Flag.sw.startOTIO();
-		System.out.println("!!");
 		for (int i = 0; i < x.length; ++i)
 			pairs[i][x[i] ? 1 : 0].send(w);
 		w.flush();

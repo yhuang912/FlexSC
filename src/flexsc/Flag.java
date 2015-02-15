@@ -10,7 +10,7 @@ public class Flag {
 	public static StopWatch sw = new StopWatch(CountTime);
 
 	public static OTMODE otMode = OTMODE.FAKEOT;
-	public static Mode mode = Mode.REAL;
+	public static Mode mode = Mode.OFFLINERUN;
 	public static boolean THREADEDIO = true;
 	
 

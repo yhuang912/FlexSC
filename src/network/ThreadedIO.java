@@ -22,7 +22,7 @@ public class ThreadedIO implements Runnable {
 //					System.out.println(len);
 					os.write(res, 0, len);
 					os.flush();
-					Thread.sleep(2);
+//					Thread.sleep(2);
 				}
 			}
 			

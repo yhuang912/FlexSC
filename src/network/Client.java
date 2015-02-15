@@ -46,6 +46,7 @@ public class Client extends Network{
 	public void disconnect() throws Exception {
 		if(Flag.THREADEDIO) {
 			queue.destory();
+			os.flush();
 			thd.join();
 		}
 		os.write(0);

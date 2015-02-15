@@ -22,7 +22,6 @@ public class FakeOTSender extends OTSender {
 
 	@Override
 	public void send(GCSignal[][] m) throws IOException {
-		System.out.println("\t"+m.length);
 		for (int i = 0; i < m.length; i++) {
 			m[i][0].send(w);
 			m[i][1].send(w);
