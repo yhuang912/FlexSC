@@ -188,7 +188,7 @@ public class MipsEmulatorVerify {
 	        
 	        if (env.getParty() == Party.Alice)
 	        	System.out.println("step: " + i + " size: " + s.size());
-	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
+	        TreeMap<Long,boolean[]> m = s.getAddressMap();	  
 	        long maxAddr = m.lastEntry().getKey();
 	        if (maxAddr == 0)
 	        	break;

@@ -190,7 +190,7 @@ public class MipsEmulatorSC {
 		for(MemorySet<GCSignal> s:ownSet) {
 	        int i = s.getExecutionStep();
 	        //System.out.println(i);
-	        TreeMap<Long,boolean[]> m = s.getAddressMap(this.instData);	  
+	        TreeMap<Long,boolean[]> m = s.getAddressMap();	  
 	        long maxAddr = m.lastEntry().getKey();
 	        if (maxAddr == 0)
 	        	break;
