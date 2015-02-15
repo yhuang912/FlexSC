@@ -1,3 +1,5 @@
 CPU.java
+Cpu_*.java
+CpuImpl_*.java
 MEM.java
 NoClass.java

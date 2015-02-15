@@ -43,11 +43,18 @@ public abstract class MipsProgram {
 		CmdLineParser.Option.StringOption oB = new CmdLineParser.Option.StringOption('b', Configuration.READER_PATH_PROPERTY);
 		CmdLineParser.Option.IntegerOption oM = new CmdLineParser.Option.IntegerOption('m', Configuration.MAX_PROGRAM_STEPS_PROPERTY);
 		CmdLineParser.Option.BooleanOption oD = new CmdLineParser.Option.BooleanOption('d', Configuration.HONOR_DELAY_SLOTS_PROPERTY);
+		CmdLineParser.Option.StringOption oC = new CmdLineParser.Option.StringOption('c', Configuration.CLASS_NAME_ROOT_PROPERTY);
+		CmdLineParser.Option.StringOption oP = new CmdLineParser.Option.StringOption('p', Configuration.PACKAGE_NAME_PROPERTY);
+		CmdLineParser.Option.StringOption oO = new CmdLineParser.Option.StringOption('o', Configuration.OUTPUT_DIRECTORY_PROPERTY);
+		
 		parser.addOption(oE);
 		parser.addOption(oL);
 		parser.addOption(oB);
 		parser.addOption(oM);
 		parser.addOption(oD);
+		parser.addOption(oC);
+		parser.addOption(oP);
+		parser.addOption(oO);
 
 		parser.parse(args);
 		
@@ -82,6 +89,12 @@ public abstract class MipsProgram {
 			config.setMaxProgramSteps((Integer)o);
 		if((o = parser.getOptionValue(oD)) != null)
 			config.setHonorDelaySlots((Boolean) o);
+		if((o = parser.getOptionValue(oC)) != null)
+			config.setClassNameRoot((String) o);
+		if((o = parser.getOptionValue(oP)) != null)
+			config.setPackageName((String) o);
+		if((o = parser.getOptionValue(oO)) != null)
+			config.setOutputDirectory((String) o);
 		if((o = parser.getOptionValue(oB)) != null)
 			setBinaryFileName((String)o);
 	}

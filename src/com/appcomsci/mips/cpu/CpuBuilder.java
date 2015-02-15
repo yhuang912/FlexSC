@@ -234,16 +234,15 @@ public class CpuBuilder {
 			} else if(s.startsWith("%PACKAGE")) {
 				sb.append("package ");
 				sb.append(packageName);
-				sb.append(lineSeparator);
-			} else if(s.contains("%CLASS")) {
-				String parts[] = s.split("%CLASS");
-				for(int i = 0; i < parts.length-1; i++) {
-					sb.append(parts[i]);
-					sb.append(className);
-				}
-				sb.append(parts[parts.length-1]);
+				sb.append(";");
 				sb.append(lineSeparator);
 			} else {
+				if(s.contains("%CLASS")) {
+					s = s.replace("%CLASS", className);
+				}
+				if(s.contains("%WRAPPERCLASS")) {
+					s = s.replace("%WRAPPERCLASS", className);
+				}
 				sb.append(s);
 				sb.append(lineSeparator);
 			}
@@ -260,12 +259,13 @@ public class CpuBuilder {
 	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String packageName, String className, File f) throws FileNotFoundException {
 		PrintStream w = new PrintStream(f);
 		buildCpu(operations, packageName, className, w);
+		w.close();
 	}
 	
 	/** Build a CPU
 	 * 
 	 * @param operations The set of operations to be implemented
-	 * @param w Write the CPU program here
+	 * @param w Write the CPU program here.  Note that w is <b>not</b> closed on exit.
 	 */
 	
 	public void buildCpu(Set<MipsInstructionSet.Operation>operations, String packageName, String className, PrintStream w) {
@@ -292,9 +292,10 @@ public class CpuBuilder {
 		for(MipsInstructionSet.Operation o : operations) {
 			switch(o.getType()) {
 			case I:
-			case MR:	// Lump these in with I's
-			case MW:
 				I_ops.add(o.toString());
+				break;
+			case MR:	// Ignore these
+			case MW:
 				break;
 			case FUNCT:
 				R_ops.add(o.toString());
@@ -349,15 +350,10 @@ public class CpuBuilder {
 				codeWritten = emitActions(sb, codeWritten, J_ops, MipsInstructionSet.OperationType.J);
 				codeWritten = emitActions(sb, codeWritten, R_ops, MipsInstructionSet.OperationType.FUNCT);
 				emitActions(sb, codeWritten, REGIMM_ops, MipsInstructionSet.OperationType.REGIMM);
-			} else if(s.contains("%CLASS")) {
-				String parts[] = s.split("%CLASS");
-				for(int i = 0; i < parts.length-1; i++) {
-					sb.append(parts[i]);
-					sb.append(className);
-				}
-				sb.append(parts[parts.length-1]);
-				sb.append(lineSeparator);
 			} else {
+				if(s.contains("%CLASS")) {
+					s = s.replace("%CLASS", className);
+				}
 				sb.append(s);
 				sb.append(lineSeparator);
 			}

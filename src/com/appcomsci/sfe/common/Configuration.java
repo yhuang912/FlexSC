@@ -48,6 +48,15 @@ public class Configuration {
 	
 	public static final String MULTIPLE_BANKS_PROPERTY = "multiple.banks";
 	public static final boolean DEFAULT_MULTIPLE_BANKS = true;
+	
+	public static final String CLASS_NAME_ROOT_PROPERTY = "class";
+	public static final String DEFAULT_CLASS_NAME_ROOT = "Cpu";
+	
+	public static final String PACKAGE_NAME_PROPERTY = "package";
+	public static final String DEFAULT_PACKAGE_NAME = "compiledlib.dov";
+	
+	public static final String OUTPUT_DIRECTORY_PROPERTY = "output.directory";
+	public static final String DEFAULT_OUTPUT_DIRECTORY = ".";
 
 	private String entryPoint;
 	private String emulatorClientDir;
@@ -57,6 +66,9 @@ public class Configuration {
 	private int maxProgramSteps;
 	private boolean honorDelaySlots;
 	private boolean multipleBanks;
+	private String classNameRoot;
+	private String packageName;
+	private String outputDirectory;
 	
 	private ArrayList<String> functionLoadList;	
 	
@@ -92,6 +104,9 @@ public class Configuration {
 		maxProgramSteps = properties.getProperty(MAX_PROGRAM_STEPS_PROPERTY, DEFAULT_MAX_PROGRAM_STEPS);
 		honorDelaySlots = properties.getProperty(HONOR_DELAY_SLOTS_PROPERTY, DEFAULT_HONOR_DELAY_SLOTS);
 		multipleBanks = properties.getProperty(MULTIPLE_BANKS_PROPERTY, DEFAULT_MULTIPLE_BANKS);
+		classNameRoot = properties.getProperty(CLASS_NAME_ROOT_PROPERTY, DEFAULT_CLASS_NAME_ROOT);
+		packageName = properties.getProperty(PACKAGE_NAME_PROPERTY, DEFAULT_PACKAGE_NAME);
+		outputDirectory = properties.getProperty(OUTPUT_DIRECTORY_PROPERTY, DEFAULT_OUTPUT_DIRECTORY);
 		initFunctionLoadList(properties);	
 	}
 	
@@ -103,6 +118,9 @@ public class Configuration {
 		this.setBinaryReaderPath(that.getBinaryReaderPath());
 		this.setMaxProgramSteps(that.getMaxProgramSteps());
 		this.setHonorDelaySlots(that.isHonorDelaySlots());
+		this.setClassNameRoot(that.getClassNameRoot());
+		this.setPackageName(that.getPackageName());
+		this.setOutputDirectory(that.getOutputDirectory());
 		functionLoadList = new ArrayList<String>();
 		for(String s:that.getFunctionLoadList()) {
 			functionLoadList.add(s);
@@ -228,6 +246,48 @@ public class Configuration {
 	 */
 	public SfeProperties getProperties() {
 		return properties;
+	}
+
+	/**
+	 * @return the className
+	 */
+	public String getClassNameRoot() {
+		return classNameRoot;
+	}
+
+	/**
+	 * @param classNameRoot the classNameRoot to set
+	 */
+	public void setClassNameRoot(String classNameRoot) {
+		this.classNameRoot = classNameRoot;
+	}
+
+	/**
+	 * @return the packageName
+	 */
+	public String getPackageName() {
+		return packageName;
+	}
+
+	/**
+	 * @param packageName the packageName to set
+	 */
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	/**
+	 * @return the outputDirectory
+	 */
+	public String getOutputDirectory() {
+		return outputDirectory;
+	}
+
+	/**
+	 * @param outputDirectory the outputDirectory to set
+	 */
+	public void setOutputDirectory(String outputDirectory) {
+		this.outputDirectory = outputDirectory;
 	}
 
 }

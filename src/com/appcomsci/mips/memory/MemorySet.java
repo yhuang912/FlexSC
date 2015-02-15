@@ -3,13 +3,22 @@
  */
 package com.appcomsci.mips.memory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import mips.OramBank;
 
 import com.appcomsci.mips.binary.DataSegment;
+import com.appcomsci.mips.cpu.Utils;
+
+import compiledlib.dov.CPU;
+import flexsc.CompEnv;
+import flexsc.CpuFcn;
 
 /**
  * A set of memory addresses that might be executed at a particular
@@ -37,12 +46,20 @@ public class MemorySet<T> {
 	 ** Oram Bank for storing the instructions securely
 	 */
 	private OramBank<T> oramBank = null;
+	
+	/** The data segment containing the memory addresses.
+	 * This is not externally visible.
+	 */
+	private DataSegment dataSegment;
+	
+	private CpuFcn<T> cpu;
 	/**
 	 * Build a memory set consisting of the current addresses of a list of threads.
 	 * @param executionStep The number of the execution step
 	 * @param threads The list of threads.
 	 */
-	public MemorySet(final int executionStep, List<ThreadState>threads) {
+	public MemorySet(final int executionStep, List<ThreadState>threads, DataSegment dataSegment) {
+		this.dataSegment = dataSegment;
 		this.executionStep = executionStep;
 		addresses = new TreeSet<Long>();
 		for(ThreadState t:threads) {
@@ -52,13 +69,14 @@ public class MemorySet<T> {
 	/**
 	 * Initialize memory set to be every address in the data segment
 	 * @param executionStep The number of the execution step
-	 * @param seg The data segment
+	 * @param dataSegment The data segment
 	 */
-	public MemorySet(final int executionStep, DataSegment seg) {
+	public MemorySet(final int executionStep, DataSegment dataSegment) {
+		this.dataSegment = dataSegment;
 		this.executionStep = executionStep;
 		addresses = new TreeSet<Long>();
-		for(int i = 0; i < seg.getDataLength(); i++)
-			addresses.add(seg.getStartAddress() + 4*i);
+		for(int i = 0; i < dataSegment.getDataLength(); i++)
+			addresses.add(dataSegment.getStartAddress() + 4*i);
 	}
 	/**
 	 * Get the set of addresses associated with this step
@@ -68,15 +86,23 @@ public class MemorySet<T> {
 		return addresses;
 	}
 	
+	public List<Long> getInstructions() {
+		ArrayList<Long> rslt = new ArrayList<Long>();
+		for(Long addr:getAddresses()) {
+			rslt.add(dataSegment.getDatum(addr));
+		}
+		return rslt;
+	}
+	
 	/**
 	 * Get a map from addresses in this set to the data at those addresses
 	 * @param dseg A DataSegment containing the data
 	 * @return The map.
 	 */
-	public TreeMap<Long,boolean[]> getAddressMap(DataSegment dseg) {
+	public TreeMap<Long,boolean[]> getAddressMap() {
 		TreeMap<Long, boolean[]> rslt = new TreeMap<Long, boolean[]>();
 		for(Long addr:addresses) {
-			rslt.put(addr, dseg.getDatumAsBoolean(addr));
+			rslt.put(addr, dataSegment.getDatumAsBoolean(addr));
 		}
 		return rslt;
 	}
@@ -129,6 +155,10 @@ public class MemorySet<T> {
 	}
 	
 	public String toString() {
+		return toString(false);
+	}
+	
+	public String toString(boolean includeOpcode) {
 		StringBuilder sb = new StringBuilder("Memory Set " + executionStep + ":");
 		if(nextMemorySet != null) {
 			sb.append(" Next: " + nextMemorySet.getExecutionStep());
@@ -136,6 +166,15 @@ public class MemorySet<T> {
 		sb.append(" [" + addresses.size() + "] ");
 		for(Long l:addresses) {
 			sb.append(" " + Long.toHexString(l));
+			if(includeOpcode) {
+				sb.append(" ");
+				MipsInstructionSet.Operation op = MipsInstructionSet.Operation.valueOf(dataSegment.getDatum(l));
+				if(op == null) {
+					sb.append(String.format("0x%08x", l));
+				} else {
+					sb.append(op.toString());
+				}
+			}
 		}
 		return sb.toString();
 	}
@@ -189,6 +228,20 @@ public class MemorySet<T> {
 	 */
 	public void setOramBank(OramBank<T> oramBank) {
 		this.oramBank = oramBank;
+	}
+	
+	/**
+	 * @return the cpu
+	 */
+	public CpuFcn<T> getCpu() {
+		return cpu;
+	}
+	
+	public CpuFcn<T> findCpu(CompEnv<T> env, String packageName, String classNameRoot, boolean check) {
+		CpuFcn<T> cpu = Utils.findCpu(this, env, packageName, classNameRoot, check);
+		if(cpu != null)
+			this.cpu = cpu;
+		return cpu;
 	}
 
 }

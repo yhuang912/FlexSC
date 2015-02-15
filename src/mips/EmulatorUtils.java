@@ -54,6 +54,7 @@ public class EmulatorUtils {
 		for (int i = array.length -1 ; i >= 0;  i--){
 					output += temp[i] ? "1" : "0"; 
 		}
+output+=" ";for(int i=array.length;i>0;i-=4)output+=String.format("%x", (temp[i-1]?8:0)|(temp[i-2]?4:0)|(temp[i-3]?2:0)|(temp[i-4]?1:0));
 		if(lib.getEnv().getParty() == Party.Alice)
 			System.out.println(output);
 		

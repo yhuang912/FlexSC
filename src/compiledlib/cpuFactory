@@ -1,0 +1,13 @@
+CP="../../build/classes:../../lib/*"
+CP="../../bin:../../lib/*"
+
+D=../../src
+
+# uncomment to clean up
+# rm -rf $D/compiledlib/dov/*.cpp $D/compiledlib/dov/Cpu_*.java $D/compiledlib/dov/CpuImpl_*.java
+
+java -classpath $CP \
+	com.appcomsci.mips.cpu.CpuFactory \
+	--output.directory=$D \
+	--entry.point=sfe_main \
+	--function.load.list=sfe_main,func_a,func_b ../../SimpleBinaryReader/data/func1

@@ -170,7 +170,7 @@ public class MemSetBuilder<T> extends MipsProgram {
 			// Create a memory set that contains the current step number, and
 			// the address of all currently running threads.
 			
-			MemorySet<T> currentSet = new MemorySet<T>(executionStep, threads);
+			MemorySet<T> currentSet = new MemorySet<T>(executionStep, threads, instructions);
 			
 			// Have we seen this set before?
 			

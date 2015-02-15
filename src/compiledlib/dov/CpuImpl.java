@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import oram.SecureArray;
 import flexsc.CompEnv;
 import flexsc.CpuFcn;
 
@@ -14,9 +15,13 @@ import flexsc.CpuFcn;
  * @author mcintosh
  *
  */
-public class CpuImpl<T> extends CPU<T> implements CpuFcn<T> {
+public class CpuImpl<T> implements CpuFcn<T> {
+	private CPU<T>cpu = null;
+	
 	public CpuImpl(CompEnv<T> env) throws Exception {
-		super(env);
+		this.cpu = new CPU<T>(env);
+	}
+	public CpuImpl() {
 	}
 
 	public static String opcodes[] = {
@@ -40,9 +45,13 @@ public class CpuImpl<T> extends CPU<T> implements CpuFcn<T> {
 		"BEQ"
 	};
 	
-	Set<String> opcodeSet = new HashSet<String>(Arrays.asList(opcodes));
+	static Set<String> opcodeSet = new HashSet<String>(Arrays.asList(opcodes));
 
 	public Set<String> getOpcodesImplemented() {
 		return opcodeSet;
+	}
+	public T[] function(SecureArray<T> reg, T[] inst, T[] pc) throws Exception {
+		if(cpu == null) return null;
+		return cpu.function(reg,  inst,  pc);
 	}
 }
