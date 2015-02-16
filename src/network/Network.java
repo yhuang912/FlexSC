@@ -85,7 +85,7 @@ public class Network {
 	public BigInteger readBI() {
 		byte[] rep = readBytes();
 
-		return (rep == null) ? BigInteger.ZERO : new BigInteger(rep);
+		return new BigInteger(rep);
 	}
 	
 	public void writeInt(int i) {
