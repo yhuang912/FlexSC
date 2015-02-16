@@ -7,26 +7,13 @@ import flexsc.Party;
 
 public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 	public PlainBlock[][] tree;
-	public Block<T>[][] treeNOOT;
 	protected int capacity;
-	Block<T> blo;
 
-	public TreeBasedOramParty(CompEnv<T> env, int N, int dataSize, int capacity, boolean NOOT) {
+	public TreeBasedOramParty(CompEnv<T> env, int N, int dataSize, int capacity) {
 		super(env, N, dataSize);
 		this.capacity = capacity;
 
 		if (env.m != Mode.COUNT) {
-			if(NOOT) {
-				treeNOOT = new Block[this.N][capacity];
-
-				PlainBlock b = getDummyBlock(p == Party.Alice);
-				blo = prepareBlock(b, b);
-
-				for (int i = 0; i < this.N; ++i)
-					for (int j = 0; j < capacity; ++j)
-						treeNOOT[i][j] = blo;
-			}
-			else {
 			tree = new PlainBlock[this.N][capacity];
 
 			PlainBlock b = getDummyBlock(p == Party.Alice);
@@ -34,7 +21,6 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 			for (int i = 0; i < this.N; ++i)
 				for (int j = 0; j < capacity; ++j)
 					tree[i][j] = b;
-			}
 		}
 	}
 
@@ -99,40 +85,6 @@ public abstract class TreeBasedOramParty<T> extends OramParty<T> {
 				result[i][j] = tmpResult[cnt++];
 		}
 		return result;
-	}
-	
-	protected Block<T>[][] getPathNOOT(boolean[] path) {
-		Block<T>[][] result = new Block[logN][];
-		if (env.m == Mode.COUNT) {
-			for (int i = 0; i < logN; ++i) {
-				result[i] = new Block[capacity];
-				for (int j = 0; j < capacity; ++j)
-					result[i][j] = blo;
-			}
-			return result;
-		}
-		int index = 1;
-		result[0] = treeNOOT[index];
-		for (int i = 1; i < logN; ++i) {
-			index *= 2;
-			if (path[lengthOfPos - i])
-				++index;
-			result[i] = treeNOOT[index];
-		}
-		return result;
-	}
-
-	protected void putPathNOOT(Block<T>[][] blocks, boolean[] path) {
-		if (env.m == Mode.COUNT)
-			return;
-		int index = 1;
-		treeNOOT[index] = blocks[0];
-		for (int i = 1; i < logN; ++i) {
-			index *= 2;
-			if (path[lengthOfPos - i])
-				++index;
-			treeNOOT[index] = blocks[i];
-		}
 	}
 
 	public Block<T>[][] inputPathOfServer(PlainBlock[][] b) {

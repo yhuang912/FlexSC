@@ -71,7 +71,6 @@ public class TestCircuitOramRecOpt {
 						this);
 //				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
 //						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
-
 				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
 						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 				double t1 = 0, t2;

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import network.Network;
+import oram.noOTORAM.CircuitOramNOOT;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Party;
@@ -42,15 +43,21 @@ IntegerLib<T> lib ;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		CircuitOram<T> oram = new CircuitOram<T>(env, N, dataSize, capacity, sp, false);
+		CircuitOram<T> oram = new CircuitOram<T>(env, N, dataSize, capacity, sp);
 		lengthOfIden = oram.lengthOfIden;
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1 << oram.lengthOfIden)
 				/ recurFactor;
 		while (newN > cutoff) {
-			boolean NOOT = newN < 1<< 20; 
-			CircuitORAMInterface<T> o = new CircuitOram<T>(env, newN, newDataSize, capacity, sp, NOOT);			
-
+			CircuitORAMInterface<T> o;
+			if(newN < 1<< 20) {
+				o = new CircuitOramNOOT<T>(env, newN, newDataSize, capacity, sp);
+				clients.add(o);
+			}
+			else {
+				o = new CircuitOram<T>(env, newN, newDataSize, capacity, sp);
+				clients.add(o);
+			}
 			newDataSize = o.getLengthOfPos()* recurFactor;
 			newN = (1 << o.getLengthOfIndex()) / recurFactor;
 		}
@@ -79,6 +86,7 @@ IntegerLib<T> lib ;
 
 	public T[][] travelToDeep(T[] iden, int level) {
 		if (level == clients.size()) {
+
 			T[] baseMap = baseOram.readAndRemove(lib.padSignal(iden, baseOram.lengthOfIden));
 			T[] ithPos = baseOram.lib.rightPublicShift(iden,
 					baseOram.lengthOfIden);// iden>>baseOram.lengthOfIden;
@@ -89,7 +97,9 @@ IntegerLib<T> lib ;
 			T[] newPos = baseOram.lib
 					.randBools(clients.get(level - 1).getLengthOfPos());
 			put(baseMap, ithPos, newPos);
+
 			baseOram.putBack(lib.padSignal(iden, baseOram.lengthOfIden), baseMap);
+
 			T[][] result = baseOram.env.newTArray(2, 0);
 			result[0] = pos;
 			result[1] = newPos;

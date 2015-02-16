@@ -41,13 +41,13 @@ public class RecursiveCircuitOram<T> {
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
 		this.capacity = capacity;
-		CircuitOram<T> oram = new CircuitOram<T>(env, N, dataSize, capacity, sp, false);
+		CircuitOram<T> oram = new CircuitOram<T>(env, N, dataSize, capacity, sp);
 		lengthOfIden = oram.lengthOfIden;
 		clients.add(oram);
 		int newDataSize = oram.lengthOfPos * recurFactor, newN = (1 << oram.lengthOfIden)
 				/ recurFactor;
 		while (newN > cutoff) {
-			oram = new CircuitOram<T>(env, newN, newDataSize, capacity, sp, false);
+			oram = new CircuitOram<T>(env, newN, newDataSize, capacity, sp);
 			clients.add(oram);
 			newDataSize = oram.lengthOfPos * recurFactor;
 			newN = (1 << oram.lengthOfIden) / recurFactor;

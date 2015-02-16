@@ -4,6 +4,7 @@ package oram;
 import java.util.Arrays;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Party;
 
 public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAMInterface<T>{
@@ -23,11 +24,9 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAM
 		cnt = (cnt + 1) % N;
 		return res;
 	}
-	boolean NOOT;
 
-	public CircuitOram(CompEnv<T> env, int N, int dataSize, int cap, int sp, boolean NOOT) {
-		super(env, N, dataSize, cap, NOOT);
-		this.NOOT = NOOT;
+	public CircuitOram(CompEnv<T> env, int N, int dataSize, int cap, int sp) {
+		super(env, N, dataSize, cap);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData,
 				logN, capacity, env);
 		queueCapacity = 30;
@@ -39,9 +38,8 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAM
 		scQueue = prepareBlocks(queue, queue);
 	}
 
-	public CircuitOram(CompEnv<T> env, int N, int dataSize, boolean NOOT) {
-		super(env, N, dataSize, 3, NOOT);
-		this.NOOT = NOOT;
+	public CircuitOram(CompEnv<T> env, int N, int dataSize) {
+		super(env, N, dataSize, 3);
 		lib = new CircuitOramLib<T>(lengthOfIden, lengthOfPos, lengthOfData,
 				logN, capacity, env);
 		queueCapacity = 30;
@@ -51,6 +49,7 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAM
 			queue[i] = getDummyBlock(p == Party.Alice);
 
 		scQueue = prepareBlocks(queue, queue);
+
 	}
 
 	protected void ControlEviction() {
@@ -59,26 +58,13 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAM
 	}
 
 	public void flushOneTime(boolean[] pos) {
-		PlainBlock[][] blocks = null;
-		Block<T>[][] scPath = null;
-		if(NOOT) {
-			scPath = getPathNOOT(pos);
-		} else {
-			blocks = getPath(pos);
-			preparePath(blocks, blocks);	
-		}
-		
+		PlainBlock[][] blocks = getPath(pos);
+		Block<T>[][] scPath = preparePath(blocks, blocks);
 
 		lib.flush(scPath, pos, scQueue);
 
-		if(NOOT) {
-			putPathNOOT(scPath, pos);
-			scPath = getPathNOOT(pos);
-		} else {
-			blocks = preparePlainPath(scPath);
-			putPath(blocks, pos);	
-		}
-		
+		blocks = preparePlainPath(scPath);
+		putPath(blocks, pos);
 	}
 
 	int initalValue = 0;
@@ -87,31 +73,21 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAM
 	}
 	public T[] readAndRemove(T[] scIden, boolean[] pos,
 			boolean RandomWhenNotFound) {
-		PlainBlock[][] blocks = null;
-		Block<T>[][] scPath = null;
-		if(NOOT) {
-			scPath = getPathNOOT(pos);
-		} else {
-			blocks = getPath(pos);
-			preparePath(blocks, blocks);	
-		}
+		PlainBlock[][] blocks = getPath(pos);
+		Block<T>[][] scPath = preparePath(blocks, blocks);
 
 		Block<T> res = lib.readAndRemove(scPath, scIden);
 		Block<T> res2 = lib.readAndRemove(scQueue, scIden);
 		res = lib.mux(res, res2, res.isDummy);
 
-		if(NOOT) {
-			putPathNOOT(scPath, pos);
-			scPath = getPathNOOT(pos);
-		} else {
-			blocks = preparePlainPath(scPath);
-			putPath(blocks, pos);	
-		}
+		blocks = preparePlainPath(scPath);
+		putPath(blocks, pos);
 
 		if (RandomWhenNotFound) {
 			PlainBlock b = randomBlock();
 			Block<T> scb = inputBlockOfClient(b);
 			Block<T> finalRes = lib.mux(res, scb, res.isDummy);
+
 			return finalRes.data;
 		} else {
 			return lib.mux(res.data, lib.zeros(res.data.length), res.isDummy);
@@ -155,27 +131,17 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAM
 		T[] posToUse = lib.mux(randbools, scPos, condition);
 
 		boolean[] path = lib.declassifyToBoth(posToUse);
-		PlainBlock[][] blocks = null;
-		Block<T>[][] scPath = null;
-		if(NOOT) {
-			scPath = getPathNOOT(path);
-		} else {
-			blocks = getPath(path);
-			preparePath(blocks, blocks);	
-		}
+
+		PlainBlock[][] blocks = getPath(path);
+		Block<T>[][] scPath = preparePath(blocks, blocks);
 
 		Block<T> res = lib.conditionalReadAndRemove(scPath, scIden, condition);
 		Block<T> res2 = lib
 				.conditionalReadAndRemove(scQueue, scIden, condition);
 		res = lib.mux(res, res2, res.isDummy);
 
-		if(NOOT) {
-			putPathNOOT(scPath, path);
-			scPath = getPathNOOT(path);
-		} else {
-			blocks = preparePlainPath(scPath);
-			putPath(blocks, path);	
-		}
+		blocks = preparePlainPath(scPath);
+		putPath(blocks, path);
 		env.flush();
 		return lib.mux(res.data, lib.toSignals(initalValue, res.data.length), res.isDummy);
 	}
@@ -183,6 +149,10 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAM
 	public int cnttt = 0;
 	public void conditionalPutBack(T[] scIden, T[] scNewPos, T[] scData,
 			T condition) {
+		
+//		 Utils.print(env, "pb:iden:", scIden, scNewPos, condition);
+		cnttt++;
+//		System.out.println(cnttt);
 		env.flush();
 		scIden = Arrays.copyOf(scIden, lengthOfIden);
 
