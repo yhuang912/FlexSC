@@ -10,18 +10,19 @@ public class Flag {
 	public static StopWatch sw = new StopWatch(CountTime);
 
 	public static OTMODE otMode = OTMODE.PREPROCESSOT;
-	public static Mode mode = Mode.OFFLINEPREPARE;
+//	public static Mode mode = Mode.OFFLINEPREPARE;
+	public static Mode mode = Mode.OFFLINERUN;
 	public static boolean THREADEDIO = true;
 	
 
 	//preprocessot
-	static public int PreProcessOTbufferSize = 1024*1024*10;
+	static public int PreProcessOTbufferSize = 1000000;//1024*1024*10;
 	static public int PreProcessOTRefillLength = 300000;
 
 	//network
 	public static boolean countIO = false;
 	public static int NetowrkBufferSize = 1024*1024;
-	public static int NetworkThreadedQueueSize = 1024*1024*10;
+	public static int NetworkThreadedQueueSize = 1024*1024*100;
 
 
 	public Flag() {

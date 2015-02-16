@@ -45,18 +45,20 @@ public class TestBigInteger extends TestHarness {
 				listen(54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, this);
-				System.out.println("gen0");
+//				System.out.println("gen0");
+				Flag.sw.startTotal();
 				T [] a = gen.inputOfAlice(h.a);
-				System.out.println("gen1");
+//				System.out.println("gen1");
 				T[]b = gen.inputOfBob(new boolean[h.b.length]);
-				System.out.println("gen2");
+//				System.out.println("gen2");
 
 				T[] d = h.secureCompute(a, b, gen);
-				System.out.println("gen3");
-				os.flush();
+//				System.out.println("gen3");
+				flush();
 
 				z = gen.outputToAlice(d);
-				System.out.println("gen4");
+				Flag.sw.stopTotal();
+//				System.out.println("gen4");
 
 				Flag.sw.print();
 				disconnect();
@@ -80,11 +82,12 @@ public class TestBigInteger extends TestHarness {
 				connect("localhost", 54321);				
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Party.Bob, this);
-				System.out.println("eva0");
+//				System.out.println("eva0");
+				Flag.sw.startTotal();
 				T [] a = env.inputOfAlice(new boolean[h.a.length]);
-				System.out.println("eva1");
+//				System.out.println("eva1");
 				T [] b = env.inputOfBob(h.b);
-				System.out.println("eva2");
+//				System.out.println("eva2");
 				flush();
 				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
@@ -100,8 +103,9 @@ public class TestBigInteger extends TestHarness {
 				//				}
 
 				env.outputToAlice(d);
-				System.out.println("eva4");
-				os.flush();
+				Flag.sw.stopTotal();
+//				System.out.println("eva4");
+//				os.flush();
 				Flag.sw.print();
 				disconnect();
 			} catch (Exception e) {
