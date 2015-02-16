@@ -209,7 +209,8 @@ int32 %CLASS.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	// ~ operator is not implemented
 	// reg_rd_w = ~(reg_rs_r | reg_rt_r);
 	// UGLINESS
-	reg_rd_w = 0xffffffff ^ (reg_rs_r | reg_rt_r);
+	int32 bugWorkaround = 0xffffffff;
+	reg_rd_w = bugWorkaround ^ (reg_rs_r | reg_rt_r);
 %OP_SLT
 	if(reg_rs_r < reg_rt_r) reg_rd_w = 1; else reg_rd_w = 0;
 %OP_SLTU
@@ -294,8 +295,10 @@ public class %CLASSImpl<T> implements CpuFcn<T> {
 		return opcodeSet;
 	}
 
-	public T[] function(SecureArray<T> reg, T[] inst, T[] pc) throws Exception {
+	public T[] function(SecureArray<T> reg, T[] inst, T[] pc, SecureArray<T> hiLo) throws Exception {
 		if(cpu == null) return null;
-		return cpu.function(reg,  inst,  pc);
+		return cpu.function(reg,  inst,  pc
+%HILO_REG
+		);
 	}
 }

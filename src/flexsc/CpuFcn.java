@@ -12,6 +12,6 @@ import oram.SecureArray;
  *
  */
 public interface CpuFcn<T> {
-	public T[] function(SecureArray<T> reg, T[] inst, T[]pc) throws Exception;
+	public T[] function(SecureArray<T> reg, T[] inst, T[]pc, SecureArray<T> hiLo) throws Exception;
 	public Set<String> getOpcodesImplemented();
 }

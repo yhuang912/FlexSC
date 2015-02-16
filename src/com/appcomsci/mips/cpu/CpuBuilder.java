@@ -222,6 +222,7 @@ public class CpuBuilder {
 	}
 	
 	public void buildWrapper(Set<MipsInstructionSet.Operation>operations, String packageName, String className, StringBuilder sb) {
+		setNeedMult(operations);
 		for(String s:wrapper) {
 			if(s.startsWith("%OPCODES")) {
 				// Write out list of operations
@@ -231,6 +232,10 @@ public class CpuBuilder {
 					sb.append("\",");
 					sb.append(lineSeparator);
 				}
+			} else if(s.startsWith("%HILO_REG")) {
+				// Arcane knowledge of the name of the mult regs.
+				if(needMult)
+					sb.append("\t, hiLo");
 			} else if(s.startsWith("%PACKAGE")) {
 				sb.append("package ");
 				sb.append(packageName);
@@ -239,9 +244,6 @@ public class CpuBuilder {
 			} else {
 				if(s.contains("%CLASS")) {
 					s = s.replace("%CLASS", className);
-				}
-				if(s.contains("%WRAPPERCLASS")) {
-					s = s.replace("%WRAPPERCLASS", className);
 				}
 				sb.append(s);
 				sb.append(lineSeparator);
@@ -283,8 +285,8 @@ public class CpuBuilder {
 
 		// Build sets of ops by type.
 		// Also keep track of whether there were any multiplies or divides
+		setNeedMult(operations);
 		
-		boolean needMult = false;
 		Set<String> I_ops = new HashSet<String>();
 		Set<String> R_ops = new HashSet<String>();
 		Set<String> REGIMM_ops = new HashSet<String>();
@@ -305,20 +307,6 @@ public class CpuBuilder {
 				break;
 			case J:
 				J_ops.add(o.toString());
-			}
-			switch(o) {
-			case MFHI:
-			case MTHI:
-			case MFLO:
-			case MTLO:
-			case MULT:
-			case MULTU:
-			case DIV:
-			case DIVU:
-				needMult = true;
-				break;
-			default:		// Shut compiler up
-				break;
 			}
 		}
 		for(String s:text) {
@@ -359,6 +347,27 @@ public class CpuBuilder {
 			}
 		}
 	}
+	
+	private boolean needMult = false;
+	
+	private void setNeedMult(Set<MipsInstructionSet.Operation>operations) {
+		for(MipsInstructionSet.Operation o : operations) {
+			switch(o) {
+			case MFHI:
+			case MTHI:
+			case MFLO:
+			case MTLO:
+			case MULT:
+			case MULTU:
+			case DIV:
+			case DIVU:
+				needMult = true;
+				break;
+			default:		// Shut compiler up
+				break;
+			}
+		}
+	}
 
 	/** Main program for testing
 	 * 
@@ -367,19 +376,28 @@ public class CpuBuilder {
 	 */
 	public static void main(String args[]) {
 		Set<MipsInstructionSet.Operation> operations = new HashSet<MipsInstructionSet.Operation>();
-		if(args.length == 0) {
+		String className = null;
+		switch(args.length) {
+		case 0:
+			System.err.println("Must specify class name");
+			System.exit(1);
+		case 1:
+			className = args[0];
 			// No args means do them all
 			for(MipsInstructionSet.Operation op: MipsInstructionSet.Operation.values())
 				operations.add(op);
-		} else {
-			for(String s:args) {
-				MipsInstructionSet.Operation op = MipsInstructionSet.Operation.valueOf(s);
+			break;
+		default:
+			className = args[0];
+			for(int i = 1; i < args.length; i++) {
+				MipsInstructionSet.Operation op = MipsInstructionSet.Operation.valueOf(args[i]);
 				if(op == null) {
-					System.err.println("Invalid operation: " + s);
+					System.err.println("Invalid operation: " + args[i]);
 				} else {
 					operations.add(op);
 				}
 			}
+			break;
 		}
 		if(operations.size() == 0) {
 			System.err.println("No valid operations, giving up");
@@ -396,13 +414,11 @@ public class CpuBuilder {
 			bldr = new CpuBuilder(new InputStreamReader(new FileInputStream(f)));
 			*/
 			bldr = new CpuBuilder();
-			StringBuilder code = new StringBuilder();
-			bldr.buildCpu(operations, "compiledlib.dov", "Cpu", code);
-			System.out.print(code.toString());
+			File cpuFile = new File(className + ".cpp");
+			bldr.buildCpu(operations, "compiledlib.dov", className, cpuFile);
 			
-			StringBuilder wrapper = new StringBuilder();
-			bldr.buildWrapper(operations, "compiledlib.dov", "Cpu", wrapper);
-			System.out.print(wrapper.toString());
+			File wrapperFile = new File(className + "Impl.java");
+			bldr.buildWrapper(operations, "compiledlib.dov", className, wrapperFile);
 		} catch(FileNotFoundException e) {
 			System.err.println("No " + CPU_FILE_NAME + " despite existence check");
 		} catch(IOException e) {

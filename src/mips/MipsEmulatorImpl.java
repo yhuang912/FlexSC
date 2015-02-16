@@ -21,6 +21,8 @@ import com.appcomsci.mips.memory.MemSetBuilder;
 import com.appcomsci.mips.memory.MemorySet;
 import com.appcomsci.mips.memory.MipsInstructionSet;
 import com.appcomsci.sfe.common.Configuration;
+import static com.appcomsci.mips.cpu.Utils.consistentHashString;
+import static com.appcomsci.mips.cpu.Utils.consistentHash;
 
 import compiledlib.dov.CPU;
 import compiledlib.dov.CpuImpl;
@@ -43,6 +45,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final int NUMBER_OF_STEPS = 1;
 	static final int Alice_input = 6;
 	static final int Bob_input = 2;
+	
+	// Should we blither about missing CPUs?
+	static final boolean blither = false;
 	
 	protected LocalConfiguration config;
 	
@@ -185,9 +190,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		public void mainloop(CompEnv<T> env) throws Exception{
 			//testInstruction(env);
 			lib = new IntegerLib<T>(env);
-			CpuFcn<T> cpu = new CpuImpl<T>(env);
+			CpuFcn<T> defaultCpu = new CpuImpl<T>(env);
 			MEM<T> mem = new MEM<T>(env);
 			reg = loadInputsToRegister(env);
+			
+			loadCpus(sets, env);
 
 			SecureMap<T> singleInstructionBank = null;
 
@@ -229,7 +236,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
 				//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
 				//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101001, 32));
-				pc = cpu.function(reg, newInst, pc);
+				CpuFcn<T> cpu = currentSet.getCpu();
+				if(cpu == null)
+					pc = defaultCpu.function(reg, newInst, pc, null);
+				else
+					pc = cpu.function(reg, newInst, pc, null);
 
 				EmulatorUtils.printRegisters(reg, lib);
 
@@ -243,6 +254,26 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			System.out.println("Run time: " + runTime);
 			System.out.println("Average time / instruction: " + runTime / count );
 			EmulatorUtils.printBooleanArray("Rsult", reg.read(lib.toSignals(2, 32)), lib, false);
+		}
+		
+		private void loadCpus(List<MemorySet<T>> sets, CompEnv<T>env) {
+			if(!config.isMultipleBanks()) {
+				System.out.println("Not loading CPUs for single bank execution");
+				return;
+			}
+			System.out.println("Entering loadCpus");
+			// Uses arcane knowledge. FIXME
+			String packageName = CPU.class.getPackage().getName();
+			String classNameRoot = "Cpu";
+			for(MemorySet<T>s:sets) {
+				CpuFcn<T> cpu = s.findCpu(env, packageName, classNameRoot, true);
+				if(cpu == null && blither) {
+					System.err.println("Could not find cpu for: [" +
+							consistentHash(cpu.getOpcodesImplemented()) + "]"+
+							consistentHashString(cpu.getOpcodesImplemented()));
+				}
+			}
+			System.out.println("Exiting loadCpus");
 		}
 
 		private boolean testTerminate(SecureArray<T> reg, T[] ins, IntegerLib<T> lib) {

@@ -50,7 +50,7 @@ public class CpuImpl<T> implements CpuFcn<T> {
 	public Set<String> getOpcodesImplemented() {
 		return opcodeSet;
 	}
-	public T[] function(SecureArray<T> reg, T[] inst, T[] pc) throws Exception {
+	public T[] function(SecureArray<T> reg, T[] inst, T[] pc, SecureArray<T> hiLo) throws Exception {
 		if(cpu == null) return null;
 		return cpu.function(reg,  inst,  pc);
 	}
