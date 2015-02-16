@@ -69,11 +69,11 @@ public class TestCircuitOramRecOpt {
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Party.Alice,
 						this);
-//				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
-//						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
+				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
+						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
 
-				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
-						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
+//				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
+//						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 double t1 = 0, t2;
 				for (int i = 0; i < writeCount; ++i) {
 					System.out.println(i);
@@ -141,7 +141,7 @@ if(i == 9){Flag.sw.flush(); t1 = System.nanoTime();}
 				int cutoff = 1 << logCutoff;
 				int capacity = is.read();
 				int dataSize = is.read();
-
+dataSize = 992;
 				int N = 1 << logN;
 				System.out
 						.println("\nlogN recurFactor  cutoff capacity dataSize");
@@ -151,11 +151,11 @@ if(i == 9){Flag.sw.flush(); t1 = System.nanoTime();}
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Party.Bob,
 						this);
-//				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
-//						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
+				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
+						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
 				
-				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
-						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
+//				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
+//						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 
 				
 				for (int i = 0; i < writeCount; ++i) {
