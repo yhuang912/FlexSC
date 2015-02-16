@@ -24,13 +24,11 @@ public class Network {
 	}
 
 	public void flush(){
-		if(! Flag.THREADEDIO) {
 			try {
 				os.flush();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
 		}
 	}
 	

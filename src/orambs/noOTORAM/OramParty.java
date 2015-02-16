@@ -51,7 +51,6 @@ public abstract class OramParty<T> {
 	public OramParty(int indexsize, CompEnv<T> env, int N, int dataSize, int lengthOfPos) {
 		this.env = env;
 		this.w = env.w;
-
 		this.dataSize = dataSize;
 		int a = 1;
 		logN = 1;

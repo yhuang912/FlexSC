@@ -9,6 +9,7 @@ import network.Network;
 import oram.noOTORAM.CircuitOramNOOT;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Party;
 
 public class RecursiveOptCircuitOram<T> {
@@ -86,7 +87,6 @@ IntegerLib<T> lib ;
 
 	public T[][] travelToDeep(T[] iden, int level) {
 		if (level == clients.size()) {
-
 			T[] baseMap = baseOram.readAndRemove(lib.padSignal(iden, baseOram.lengthOfIden));
 			T[] ithPos = baseOram.lib.rightPublicShift(iden,
 					baseOram.lengthOfIden);// iden>>baseOram.lengthOfIden;
@@ -94,12 +94,12 @@ IntegerLib<T> lib ;
 			T[] pos = extract(baseMap, ithPos,
 					clients.get(level - 1).getLengthOfPos());
 
+
 			T[] newPos = baseOram.lib
 					.randBools(clients.get(level - 1).getLengthOfPos());
 			put(baseMap, ithPos, newPos);
 
 			baseOram.putBack(lib.padSignal(iden, baseOram.lengthOfIden), baseMap);
-
 			T[][] result = baseOram.env.newTArray(2, 0);
 			result[0] = pos;
 			result[1] = newPos;

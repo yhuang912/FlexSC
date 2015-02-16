@@ -26,7 +26,7 @@ public abstract class CompEnv<T> {
 		Flag.mode = m;
 		return getEnv(p, w);
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public static CompEnv getEnv(Party p, Network w) {
 		if (Flag.mode == Mode.REAL)
@@ -44,10 +44,10 @@ public abstract class CompEnv<T> {
 				return new gc.offline.GCEva(w);
 			else
 				return new gc.offline.GCGen(w);
-//		else if (Flag.mode == Mode.VERIFY)
-//			return new CVCompEnv(w, p);
-//		else if (Flag.mode == Mode.COUNT)
-//			return new PMCompEnv(w, p);
+		//		else if (Flag.mode == Mode.VERIFY)
+		//			return new CVCompEnv(w, p);
+		//		else if (Flag.mode == Mode.COUNT)
+		//			return new PMCompEnv(w, p);
 		else {
 			try {
 				throw new Exception("not a supported Mode!");
@@ -140,26 +140,21 @@ public abstract class CompEnv<T> {
 	}
 
 	public void flush() {
-//		try {
-//			os.flush();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		w.flush();
 	}
 
-//	public void sync() throws IOException {
-//		if (getParty() == Party.Alice) {
-//			is.read();
-//			os.write(0);
-//			os.flush(); // dummy I/O to prevent dropping connection earlier than
-//			// protocol payloads are received.
-//		} else {
-//			os.write(0);
-//			os.flush();
-//			is.read(); // dummy write to prevent dropping connection earlier
-//			// than
-//			// protocol payloads are received.
-//		}
-//	}
+	//	public void sync() throws IOException {
+	//		if (getParty() == Party.Alice) {
+	//			is.read();
+	//			os.write(0);
+	//			os.flush(); // dummy I/O to prevent dropping connection earlier than
+	//			// protocol payloads are received.
+	//		} else {
+	//			os.write(0);
+	//			os.flush();
+	//			is.read(); // dummy write to prevent dropping connection earlier
+	//			// than
+	//			// protocol payloads are received.
+	//		}
+	//	}
 }

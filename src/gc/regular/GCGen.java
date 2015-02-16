@@ -59,6 +59,7 @@ public class GCGen extends GCGenComp {
 			gtt[0][1].send(w);
 			gtt[1][0].send(w);
 			gtt[1][1].send(w);
+
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();

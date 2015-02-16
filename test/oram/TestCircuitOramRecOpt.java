@@ -11,19 +11,19 @@ import gc.GCSignal;
 public class TestCircuitOramRecOpt {
 
 	public  static void main(String args[]) throws Exception {
-//		GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 1024-32, 8, 6);
-				GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 8, 6);
-		EvaRunnable eva = new EvaRunnable("localhost", 12345);
-		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start();
-		Thread.sleep(10);
-		tEva.start();
-		tGen.join();
-		Flag.sw.print();
-		System.out.print("\n");
+//			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 1024-32, 8, 6);
+		GenRunnable gen = new GenRunnable(54321, 20, 3, 32, 8, 6);
+			EvaRunnable eva = new EvaRunnable("localhost", 54321);
+			Thread tGen = new Thread(gen);
+			Thread tEva = new Thread(eva);
+			tGen.start();
+			Thread.sleep(10);
+			tEva.start();
+			tGen.join();
+			Flag.sw.print();
+			System.out.print("\n");
 	}
-
+	
 	final static int writeCount = 10;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
@@ -55,11 +55,11 @@ public class TestCircuitOramRecOpt {
 			try {
 				listen(port);
 
-				writeInt(logN);
-				writeInt(recurFactor);
-				writeInt(logCutoff);
-				writeInt(capacity);
-				writeInt(dataSize);
+				os.write(logN);
+				os.write(recurFactor);
+				os.write(logCutoff);
+				os.write(capacity);
+				os.write(dataSize);
 				os.flush();
 
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
@@ -71,13 +71,14 @@ public class TestCircuitOramRecOpt {
 						this);
 //				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
 //						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
+
 				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
 						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
-				double t1 = 0, t2;
+double t1 = 0, t2;
 				for (int i = 0; i < writeCount; ++i) {
 					System.out.println(i);
 					int element = i % N;
-					if(i == 7){Flag.sw.flush(); t1 = System.nanoTime();}
+if(i == 9){Flag.sw.flush(); t1 = System.nanoTime();}
 
 					Flag.sw.ands = 0;
 					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils
@@ -88,13 +89,13 @@ public class TestCircuitOramRecOpt {
 					client.write(client.baseOram.lib.toSignals(element), scData);
 					System.out.println((System.nanoTime()-t11)/1000000000.0+" "+Flag.sw.ands);
 					double t = Flag.sw.stopTotal();
-					//					System.out.println(Flag.sw.ands + " " + t / 1000000000.0
-					//							+ " " + Flag.sw.ands / t * 1000);
+//					System.out.println(Flag.sw.ands + " " + t / 1000000000.0
+//							+ " " + Flag.sw.ands / t * 1000);
 					Flag.sw.addCounter();
 
-					//					Runtime rt = Runtime.getRuntime();
-					//					double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
-					//					System.out.println("mem: " + usedMB);
+//					Runtime rt = Runtime.getRuntime();
+//					double usedMB = (rt.totalMemory() - rt.freeMemory()) / 1024.0 / 1024.0;
+//					System.out.println("mem: " + usedMB);
 				}
 				System.out.println((System.nanoTime()-t1)/1000000000.0/(writeCount-10));
 
@@ -134,16 +135,16 @@ public class TestCircuitOramRecOpt {
 			try {
 				connect(host, port);
 
-				int logN = readInt();
-				int recurFactor = readInt();
-				int logCutoff = readInt();
+				int logN = is.read();
+				int recurFactor = is.read();
+				int logCutoff = is.read();
 				int cutoff = 1 << logCutoff;
-				int capacity = readInt();
-				int dataSize = readInt();
+				int capacity = is.read();
+				int dataSize = is.read();
 
 				int N = 1 << logN;
 				System.out
-				.println("\nlogN recurFactor  cutoff capacity dataSize");
+						.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN + " " + recurFactor + " " + cutoff
 						+ " " + capacity + " " + dataSize);
 
@@ -152,21 +153,20 @@ public class TestCircuitOramRecOpt {
 						this);
 //				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
 //						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
-
+				
 				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
 						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 
-
+				
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
-					if(i == 7){Flag.sw.flush();}
 					GCSignal[] scData = server.baseOram.env
 							.inputOfAlice(new boolean[dataSize]);
 					Flag.sw.startTotal();
 					server.write(server.baseOram.lib.toSignals(element), scData);
-					Flag.sw.stopTotal();
-					Flag.sw.addCounter();
-					//					printStatistic();
+					 Flag.sw.stopTotal();
+					 Flag.sw.addCounter();
+//					printStatistic();
 				}
 
 				int cnt = 0;
