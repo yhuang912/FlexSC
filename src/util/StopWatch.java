@@ -1,6 +1,8 @@
 // Copyright (C) 2014 by Xiao Shaun Wang <wangxiao@cs.umd.edu>
 package util;
 
+import flexsc.CompEnv;
+
 public class StopWatch {
 	public long ands = 0;
 	double startTimeOT = 0;
@@ -116,6 +118,10 @@ public class StopWatch {
 
 	}
 
+	public void print(CompEnv env) {
+		System.out.println(env.getParty());
+		print();
+	}
 	public void print() {
 		if(counter == 0)++counter;
 		System.out
