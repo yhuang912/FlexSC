@@ -118,8 +118,7 @@ public class MemSetBuilder<T> extends MipsProgram {
 	 */
 	public List<MemorySet<T>> build()
 			throws FileNotFoundException, IllegalArgumentException, IOException, MemSetBuilderException {
-
-		Reader rdr = new Reader(new File(getBinaryFileName()), getConfiguration());
+		Reader rdr = new Reader(new File(getMipsBinaryPath()), getConfiguration());
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(getEntryPoint());	
 		DataSegment inst = rdr.getInstructions(getFunctionLoadList());
 		

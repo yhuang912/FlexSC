@@ -18,7 +18,10 @@ import com.appcomsci.sfe.common.Configuration;
  */
 public abstract class MipsProgram {
 	
-	private String binaryFileName;
+	/** This is the name of the program to run to dissect binaries */
+	private String binaryReaderPath;
+	/** This is the name of the mips binary */
+	private String mipsBinaryPath;
 //	private String entryPoint;
 //	List<String>functionLoadList;
 //	private int maxProgramSteps;
@@ -26,9 +29,9 @@ public abstract class MipsProgram {
 	
 	private Configuration config;
 	
-	public MipsProgram(Configuration config, String binaryFileName) {
+	public MipsProgram(Configuration config, String mipsBinaryPath) {
 		this.config = config;
-		this.binaryFileName = binaryFileName;
+		this.mipsBinaryPath = mipsBinaryPath;
 	}
 	
 	public MipsProgram(String args[]) throws IOException, CmdLineParser.OptionException {
@@ -64,11 +67,16 @@ public abstract class MipsProgram {
 		// This is probably an error.
 
 		String rest[] = parser.getRemainingArgs();
-		if(rest.length > 1 || rest.length == 0) {
+		switch(rest.length) {
+		case 1:
+			mipsBinaryPath = rest[0];
+			break;
+		case 0:
+			break;
+		default:
 			printUsage();
 			System.exit(2);
 		}
-		binaryFileName = rest[0];
 		
 		// Finally, pick off options
 		
@@ -96,24 +104,10 @@ public abstract class MipsProgram {
 		if((o = parser.getOptionValue(oO)) != null)
 			config.setOutputDirectory((String) o);
 		if((o = parser.getOptionValue(oB)) != null)
-			setBinaryFileName((String)o);
+			setBinaryReaderPath((String)o);
 	}
 	
 	protected abstract void printUsage();
-
-	/**
-	 * @return the binaryFileName
-	 */
-	public String getBinaryFileName() {
-		return binaryFileName;
-	}
-
-	/**
-	 * @param binaryFileName the binaryFileName to set
-	 */
-	public void setBinaryFileName(String binaryFileName) {
-		this.binaryFileName = binaryFileName;
-	}
 
 	/**
 	 * @return the entryPoint
@@ -177,5 +171,33 @@ public abstract class MipsProgram {
 	
 	protected Configuration getConfiguration() {
 		return config;
+	}
+
+	/**
+	 * @return the binaryReaderPath
+	 */
+	public String getBinaryReaderPath() {
+		return binaryReaderPath;
+	}
+
+	/**
+	 * @param binaryReaderProgramName the binaryReaderProgramName to set
+	 */
+	public void setBinaryReaderPath(String binaryReaderPath) {
+		this.binaryReaderPath = binaryReaderPath;
+	}
+
+	/**
+	 * @return the mipsBinaryFileName
+	 */
+	public String getMipsBinaryPath() {
+		return mipsBinaryPath;
+	}
+
+	/**
+	 * @param mipsBinaryFileName the mipsBinaryFileName to set
+	 */
+	public void setMipsBinaryPath(String mipsBinaryPath) {
+		this.mipsBinaryPath = mipsBinaryPath;
 	}
 }

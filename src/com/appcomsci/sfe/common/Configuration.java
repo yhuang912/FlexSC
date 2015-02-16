@@ -57,6 +57,8 @@ public class Configuration {
 	
 	public static final String OUTPUT_DIRECTORY_PROPERTY = "output.directory";
 	public static final String DEFAULT_OUTPUT_DIRECTORY = ".";
+	
+	public static final String MIPS_BINARY_PATH_PROPERTY = "mips.binary.path";
 
 	private String entryPoint;
 	private String emulatorClientDir;
@@ -69,6 +71,7 @@ public class Configuration {
 	private String classNameRoot;
 	private String packageName;
 	private String outputDirectory;
+	private String mipsBinaryPath;
 	
 	private ArrayList<String> functionLoadList;	
 	
@@ -107,6 +110,7 @@ public class Configuration {
 		classNameRoot = properties.getProperty(CLASS_NAME_ROOT_PROPERTY, DEFAULT_CLASS_NAME_ROOT);
 		packageName = properties.getProperty(PACKAGE_NAME_PROPERTY, DEFAULT_PACKAGE_NAME);
 		outputDirectory = properties.getProperty(OUTPUT_DIRECTORY_PROPERTY, DEFAULT_OUTPUT_DIRECTORY);
+		mipsBinaryPath = properties.getProperty(MIPS_BINARY_PATH_PROPERTY);
 		initFunctionLoadList(properties);	
 	}
 	
@@ -121,6 +125,7 @@ public class Configuration {
 		this.setClassNameRoot(that.getClassNameRoot());
 		this.setPackageName(that.getPackageName());
 		this.setOutputDirectory(that.getOutputDirectory());
+		this.setMipsBinaryPath(that.getMipsBinaryPath());
 		functionLoadList = new ArrayList<String>();
 		for(String s:that.getFunctionLoadList()) {
 			functionLoadList.add(s);
@@ -288,6 +293,20 @@ public class Configuration {
 	 */
 	public void setOutputDirectory(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
+	}
+
+	/**
+	 * @return the mipsBinaryPath
+	 */
+	public String getMipsBinaryPath() {
+		return mipsBinaryPath;
+	}
+
+	/**
+	 * @param mipsBinaryPath the mipsBinaryPath to set
+	 */
+	public void setMipsBinaryPath(String mipsBinaryPath) {
+		this.mipsBinaryPath = mipsBinaryPath;
 	}
 
 }

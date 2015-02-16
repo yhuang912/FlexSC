@@ -50,7 +50,7 @@ public class OpcodeCounter extends MipsProgram {
 		
 		TreeMap<Long, OpCount> countTable = new TreeMap<Long, OpCount>();
 		
-		rdr = new Reader(new File(getBinaryFileName()), getConfiguration());
+		rdr = new Reader(new File(getMipsBinaryPath()), getConfiguration());
 		ent = rdr.getSymbolTableEntry(getEntryPoint());	
 		inst = rdr.getInstructions(getFunctionLoadList());
 		for(long instr:inst.getData()) {

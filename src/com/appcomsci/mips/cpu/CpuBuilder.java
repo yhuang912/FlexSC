@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -17,9 +17,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.appcomsci.mips.memory.MipsInstructionSet;
+import backend.flexsc.Config;
+import backend.flexsc.FlexSCCodeGenerator;
 
-public class CpuBuilder {
+import com.appcomsci.mips.binary.DataSegment;
+import com.appcomsci.mips.binary.SymbolTableEntry;
+import com.appcomsci.mips.memory.MipsInstructionSet;
+import com.appcomsci.mips.memory.MipsProgram;
+import com.appcomsci.sfe.common.Configuration;
+
+public class CpuBuilder extends MipsProgram {
 	private static final String CPU_FILE_NAME = "cpu.txt";
 
 	private static final String lineSeparator = System.getProperty("line.separator");
@@ -34,7 +41,17 @@ public class CpuBuilder {
 	/** This constructor takes the CPU template from the classpath
 	 * @throws IOException
 	 */
-	public CpuBuilder() throws IOException {
+	public CpuBuilder(String args[]) throws Exception {
+		super(args);
+		init();
+	}
+	
+	public CpuBuilder(Configuration config, String binaryFileName) throws Exception {
+		super(config, binaryFileName);
+		init();
+	}
+	
+	private void init() throws Exception {
 		// Look for cpu.txt inside jar file (we hope)
 		InputStream is = getClass().getResourceAsStream(CPU_FILE_NAME);
 		if(is == null) // Did it get slightly mislaid?
@@ -49,26 +66,27 @@ public class CpuBuilder {
 	 * Use InputStreamReader to bridge the gap from InputStreams
 	 * @param rdr The reader containing the CPU template
 	 * @throws IOException
-	 */
+
 	public CpuBuilder(Reader rdr) throws IOException {
 		setup(rdr);
 	}
+	*/
 	
 	/**
 	 * This constructor reads the CPU template from a File.
 	 * @param f The file containing the CPU template.
 	 * @throws IOException
-	 */
 	public CpuBuilder(File f) throws IOException {
 		setup(Files.readAllLines(f.toPath(),StandardCharsets.US_ASCII));
 	}
+	*/
 	
 	/**
 	 * Constructor setup
 	 * @param rdr A reader 
 	 * @throws IOException
 	 */
-	private void setup(Reader rdr) throws IOException {
+	private void setup(java.io.Reader rdr) throws IOException {
 		BufferedReader br = new BufferedReader(rdr);
 		List<String> rawLines = new ArrayList<String>();
 		String s;
@@ -78,7 +96,7 @@ public class CpuBuilder {
 	}
 	
 	/**
-	 * Constructor setup
+	 * More onstructor setup.  This organizes the template file.
 	 * @param rawLines A list of lines from the CPU template file
 	 */
 	private void setup(List<String>rawLines) {
@@ -374,55 +392,77 @@ public class CpuBuilder {
 	 * @param args A list of operations to be implemented.  If empty, the complete set of operations
 	 *		defined by MipsInstructionSet.Operation.values() will be implemented.
 	 */
-	public static void main(String args[]) {
+	public static void main(String args[]) throws Exception {
 		Set<MipsInstructionSet.Operation> operations = new HashSet<MipsInstructionSet.Operation>();
-		String className = null;
-		switch(args.length) {
-		case 0:
-			System.err.println("Must specify class name");
-			System.exit(1);
-		case 1:
-			className = args[0];
-			// No args means do them all
-			for(MipsInstructionSet.Operation op: MipsInstructionSet.Operation.values())
-				operations.add(op);
-			break;
-		default:
-			className = args[0];
-			for(int i = 1; i < args.length; i++) {
-				MipsInstructionSet.Operation op = MipsInstructionSet.Operation.valueOf(args[i]);
-				if(op == null) {
-					System.err.println("Invalid operation: " + args[i]);
-				} else {
-					operations.add(op);
-				}
-			}
-			break;
-		}
-		if(operations.size() == 0) {
-			System.err.println("No valid operations, giving up");
-			System.exit(1);
-		}
+		CpuBuilder bldr = null;
 		try {
-			CpuBuilder bldr;
-			/*
-			File f = new File(CPU_FILE_NAME);
-			if(!f.exists()) {
-				System.err.println("No " + CPU_FILE_NAME);
-				return;
-			}
-			bldr = new CpuBuilder(new InputStreamReader(new FileInputStream(f)));
-			*/
-			bldr = new CpuBuilder();
-			File cpuFile = new File(className + ".cpp");
-			bldr.buildCpu(operations, "compiledlib.dov", className, cpuFile);
-			
-			File wrapperFile = new File(className + "Impl.java");
-			bldr.buildWrapper(operations, "compiledlib.dov", className, wrapperFile);
+			bldr = new CpuBuilder(args);
 		} catch(FileNotFoundException e) {
 			System.err.println("No " + CPU_FILE_NAME + " despite existence check");
 		} catch(IOException e) {
 			System.err.println("Error reading " + CPU_FILE_NAME + ": " + e);
 		}
+		bldr.build();
+	}
+	
+	/** This default method uses the root as the full class name.
+	 * 
+	 */
+	// c.f. similar code in CpuFactory.  Should be refactored.
+	public void build() throws Exception {
+		Configuration config = getConfiguration();
+		Set<MipsInstructionSet.Operation>instructions = new HashSet<MipsInstructionSet.Operation>();
+		
+		if(getMipsBinaryPath() == null) {
+			// No args means do them all
+			for(MipsInstructionSet.Operation op: MipsInstructionSet.Operation.values())
+				instructions.add(op);
+
+		} else {
+			com.appcomsci.mips.binary.Reader rdr = new com.appcomsci.mips.binary.Reader(new File(getMipsBinaryPath()), config);
+			SymbolTableEntry ent = rdr.getSymbolTableEntry(getEntryPoint());	
+			DataSegment inst = rdr.getInstructions(getFunctionLoadList());
+			for(long l:inst.getData()) {
+				instructions.add(MipsInstructionSet.Operation.valueOf(l));
+			}
+		}
+
+		String packageName = getConfiguration().getPackageName();
+		String classDirectory = getConfiguration().getOutputDirectory();
+		if(classDirectory == null)
+			throw new Exception("No output directory given");
+		classDirectory += fileSeparator + packageName.replace(".", fileSeparator);
+		Files.createDirectories(FileSystems.getDefault().getPath(classDirectory));
+		
+		String className = config.getClassNameRoot();
+		String wrapperClassName = className + "Impl";
+		
+		File cpuFile = new File(classDirectory + fileSeparator + className + ".cpp");		
+		if(cpuFile.exists()) {
+			System.err.println("Will not overwrite " + cpuFile.getPath());
+			// throw new Exception("File " + cpuFIle.getPath() + " already exists");
+			return;
+		}
+		
+		File wrapperFile = new File(classDirectory + fileSeparator + wrapperClassName + ".java");
+		if(wrapperFile.exists()) {
+			System.err.println("Will not overwrite " + wrapperFile.getPath());
+			// throw new Exception("File " + wrapperFile.getPath() + " already exists");
+			return;
+		}
+		
+		buildCpu(instructions, packageName, className, cpuFile);
+		buildWrapper(instructions, packageName, className, wrapperFile);
+		
+		FlexSCCodeGenerator compiler = new FlexSCCodeGenerator(cpuFile.getAbsolutePath());
+		Config cfg = new Config();
+		cfg.path = classDirectory;
+		cfg.packageName = packageName;
+		compiler.FlexSCCodeGen(cfg, true, false);
+	}
+
+	@Override
+	protected void printUsage() {
+		System.err.println("Usage!");
 	}
 }

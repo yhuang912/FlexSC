@@ -75,7 +75,7 @@ public class CpuFactory extends MipsProgram {
 			System.out.println("Found all required CPUs.  No CPUs to build.");
 			return;
 		}
-		CpuBuilder cb = new CpuBuilder();
+		CpuBuilder cb = new CpuBuilder(getConfiguration(), getMipsBinaryPath());
 		for(Set<MipsInstructionSet.Operation>instructions : cpuSets) {
 			TreeSet<String>opNames = Utils.toStringSet(instructions);
 			int hash = Utils.consistentHash(opNames);
@@ -125,7 +125,7 @@ public class CpuFactory extends MipsProgram {
 	
 	public static void main(String args[]) throws Exception {
 		CpuFactory factory = new CpuFactory(args);
-		MemSetBuilder<Boolean> b = new MemSetBuilder<Boolean>(factory.getConfiguration(), factory.getBinaryFileName());
+		MemSetBuilder<Boolean> b = new MemSetBuilder<Boolean>(factory.getConfiguration(), factory.getMipsBinaryPath());
 		List<MemorySet<Boolean>> sets = b.build();
 		factory.build(sets);
 	}
