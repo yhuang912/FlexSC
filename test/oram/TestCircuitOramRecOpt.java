@@ -27,7 +27,7 @@ public class TestCircuitOramRecOpt {
 			System.out.print("\n");
 	}
 	
-	final static int writeCount = 10;//1 << 7;
+	final static int writeCount = 30;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
 	public TestCircuitOramRecOpt() { }
@@ -64,7 +64,7 @@ public class TestCircuitOramRecOpt {
 				os.write(capacity);
 				os.write(ByteBuffer.allocate(4).putInt(dataSize).array());
 				os.flush();
-
+System.out.println("OTPreProcessing");
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN + " " + recurFactor + " " + cutoff
 						+ " " + capacity + " " + dataSize);
@@ -74,26 +74,26 @@ public class TestCircuitOramRecOpt {
 						is, os);
 				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
 						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
-
+System.gc();
 //				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
 //						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 double t1 = 0, t2;
 				for (int i = 0; i < writeCount; ++i) {
-					System.out.println(i);
 					int element = i % N;
-if(i == 5){Flag.sw.flush(); t1 = System.nanoTime();}
 
 					Flag.sw.ands = 0;
 					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils
 							.fromInt(element, dataSize));
 					os.flush();
+	System.out.println("Access: "+i +" start. currentTime" + System.nanoTime());
 					Flag.sw.startTotal();
 					double t11 = System.nanoTime();
 					client.write(client.baseOram.lib.toSignals(element), scData);
-					System.out.println((System.nanoTime()-t11)/1000000000.0+" "+Flag.sw.ands);
+	System.out.println("Access: "+i +" finish. currentTime" + System.nanoTime());
+System.out.println("Running time for the access:\t"+(System.nanoTime()-t11)/1000000000.0+" "+Flag.sw.ands+"\n");
 					double t = Flag.sw.stopTotal();
-					System.out.println(( (gc.offline.GCGen)env ).t);
-//					System.out.println(Flag.sw.ands + " " + t / 1000000000.0
+//					System.out.println(( (gc.offline.GCGen)env ).t);
+//		:			System.out.println(Flag.sw.ands + " " + t / 1000000000.0
 //							+ " " + Flag.sw.ands / t * 1000);
 					Flag.sw.addCounter();
 
@@ -158,13 +158,13 @@ if(i == 5){Flag.sw.flush(); t1 = System.nanoTime();}
 				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
 						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
 				
+System.gc();
 //				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
 //						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 
 				
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
-if(i == 5){Flag.sw.flush();}
 					GCSignal[] scData = server.baseOram.env
 							.inputOfAlice(new boolean[dataSize]);
 					Flag.sw.startTotal();
