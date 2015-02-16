@@ -72,7 +72,7 @@ public class OTPreprocessSender  extends OTSender {
 			fillup();
 		Flag.sw.startOTIO();
 		byte[] z = Server.readBytes(is, m.length);
-		Flag.sw.startOTIO();
+		Flag.sw.stopOTIO();
 		for(int i = 0; i < m.length; ++i) {
 			bufferusage--;
 			if(z[i] == 0) {
