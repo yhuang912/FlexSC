@@ -55,11 +55,12 @@ public class TestCircuitOramRecOpt {
 			try {
 				listen(port);
 
-				os.write(logN);
-				os.write(recurFactor);
-				os.write(logCutoff);
-				os.write(capacity);
-				os.write(dataSize);
+				writeInt(logN);
+				writeInt(recurFactor);
+				writeInt(logCutoff);
+				writeInt(capacity);
+				writeInt(dataSize);
+
 				os.flush();
 
 				System.out.println("\nlogN recurFactor  cutoff capacity dataSize");
@@ -135,12 +136,12 @@ if(i == 9){Flag.sw.flush(); t1 = System.nanoTime();}
 			try {
 				connect(host, port);
 
-				int logN = is.read();
-				int recurFactor = is.read();
-				int logCutoff = is.read();
+				int logN = readInt();
+				int recurFactor = readInt();
+				int logCutoff = readInt();
 				int cutoff = 1 << logCutoff;
-				int capacity = is.read();
-				int dataSize = is.read();
+				int capacity = readInt();
+				int dataSize = readInt();
 
 				int N = 1 << logN;
 				System.out
