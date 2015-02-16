@@ -2,7 +2,6 @@
 
 # Where things go
 OUTDIR=../../src
-LIBDIR=../../lib
 
 if test ! -d $OUTDIR/compiledlib/dov
 then
@@ -13,68 +12,75 @@ then
 	echo "The output directory $OUTDIR/compiledlib/dov does not exist either.  Exiting."
     	exit 1
     fi
-    # If the source is in the wrong place, assume the libraries are also displaced.
-    LIBDIR=../../../lib
 fi
 
-C=../../bin
-if test -d $C
+F=SCVM2.jar
+LIBS="../lib ../../lib ../../../lib"
+for L in $LIBS
+do
+    if test -d $L
+    then
+	if test -f $L/$F
+	then
+	    LIBDIR=$L
+	    break
+	fi
+    fi
+done
+
+if test "X$LIBDIR" = "X"
 then
-	if test ! -d $LIBDIR
-	then
-		echo "Found $C but not $LIBDIR.  This is too confusing."
-		exit 1
-	fi
-else
-	C2=../../build/classes
-	if test -d $C2
-	then
-		if test -d $LIBDIR
-		then
-			echo "Warning - $C is missing.  Trying $C2" 
-			C="$C2"
-		else
-			echo "Found $C2 but not $LIBDIR.  This is too confusing."
-			exit 1
-		fi
-	else
-		echo "$C and $C2 both missing.  Giving up"
-		exit 1
-	fi
+    echo "Unable to find $F in $LIBS.  Exiting."
+    exit 1
 fi
 
 F=CpuFactory.class
-X=`find $C -name "$F" -print -quit`
-if test "X$X" = "X"
+BINS="../../bin ../bin ../../build/classes"
+
+for C in $BINS
+do
+    if test -d $C
+    then
+	X=`find $C -name "$F" -print -quit`
+	if test "X$X" != "X"
+	then
+	    BINDIR=$C
+	    break
+	fi
+    fi
+done
+
+if test "X$BINDIR" = "X"
 then
-    echo "Did not find $F in $C.  This may not work."
+   echo "Unable to find $F in $BINS.  Exiting"
 fi
 
-J=SCVM2.jar
-if test ! -f $LIBDIR/$J
-then
-    echo "Did not find $J in $LIBDIR.  This may not work.  Did you build the compiler?"
-fi
-
-CP="$C:$LIBDIR/*"
+CP="$BINDIR:$LIBDIR/*"
 
 
 # Binary
-B="$1"
-if test "X$B" = "X"
+PROG="$1"
+if test "X$PROG" != "X"
 then
-    B=../../SimpleBinaryReader/data/func1
-    if test ! -f $B
+    if test ! -f "$PROG"
     then
-	echo "$B does not exist. Are you running this in the right place?"
-	B=../SimpleBinaryReader/data/func1
-	if test -f $B
+	echo "$PROG does not exist."
+	exit 1
+    fi
+else
+    PROGS="../../SimpleBinaryReader/data/func1 ../SimpleBinaryReader/data/func1"
+    for P in $PROGS
+    do
+	if test -f $P
 	then
-	    echo "OK.  Found $B.  You could still be in trouble though."
-	else
-	    echo "Did not find $B either.  Giving up."
-	    exit 1
+	    PROG=$P
+	    break
 	fi
+    done
+    if test "X$PROG" = "X"
+    then
+	echo "Unable to open $PROGS.  Please specify a file to open."
+	exit 1
     fi
 fi
 
@@ -104,6 +110,7 @@ fi
 
 fi
 
+
 # Now build a complete CPU for the binary
 
 java -classpath $CP \
@@ -111,7 +118,7 @@ java -classpath $CP \
 	--class=BigCpu \
 	--output.directory=$OUTDIR \
 	--entry.point=sfe_main \
-	--function.load.list=sfe_main,func_a,func_b $B
+	--function.load.list=sfe_main,func_a,func_b $PROG
 
 # Now build individual CPUs
 
@@ -123,4 +130,4 @@ java -classpath $CP \
 	com.appcomsci.mips.cpu.CpuFactory \
 	--output.directory=$OUTDIR \
 	--entry.point=sfe_main \
-	--function.load.list=sfe_main,func_a,func_b $B
+	--function.load.list=sfe_main,func_a,func_b $PROG
