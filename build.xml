@@ -43,6 +43,7 @@
         <fileset dir="${generated.dir}" includes="*.cpp" />
 	<fileset dir="${generated.dir}" includes="Cpu_*.java" />
 	<fileset dir="${generated.dir}" includes="Big*.java" />
+	<fileset dir="${generated.dir}" includes="All*.java" />
     </delete>
   </target>
 
