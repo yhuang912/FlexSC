@@ -50,6 +50,12 @@ then
     echo "Did not find $F in $C.  This may not work."
 fi
 
+J=SCVM2.jar
+if test ! -f $LIBDIR/$J
+then
+    echo "Did not find $J in $LIBDIR.  This may not work.  Did you build the compiler?"
+fi
+
 CP="$C:$LIBDIR/*"
 
 
