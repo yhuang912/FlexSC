@@ -36,7 +36,7 @@ public class RecursiveCircuitOram<T> {
 	}
 	void init(CompEnv<T> env, int N, int dataSize, int cutoff, int recurFactor,
 			int capacity, int sp) {
-		this.w = this.w;
+		this.w = env.w;
 		this.p = env.p;
 		this.cutoff = cutoff;
 		this.recurFactor = recurFactor;
