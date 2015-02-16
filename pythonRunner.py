@@ -1,13 +1,17 @@
+#!/usr/bin/python
 import subprocess
 import os.path
 import time
-inputLength = 32
+inputLength = 256
 subprocess.call("./clear_ports.sh", shell=True)
-subprocess.call("./kill_process.sh", shell=True)
-while (inputLength < 32):
-  for i in range(1, 2):
-    subprocess.call(["./start_process.sh /home/kartik/code/flexsc_final_workspace/first/bin " + str(1 << i) + " " + str(inputLength) + " out1.out"], shell=True)
+out_dir = 'pr_var_12'
+it = 100
+if not os.path.exists('out/' + out_dir):
+    os.makedirs('out/' + out_dir)
+while (inputLength <= 32768):
+  for i in range(2, 5):
+    subprocess.call(["./start_process.sh ../lib " + str(1 << i) + " " + str(inputLength) + " " + out_dir + " PageRank 12 REAL 100 " + str(it)], shell=True)
     while(not os.path.isfile('mutex.txt')):
-      time.sleep(60)
+       time.sleep(60)
     os.remove('mutex.txt')
   inputLength = inputLength * 2
