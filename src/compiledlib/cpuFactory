@@ -1,7 +1,21 @@
-CP="../../build/classes:../../lib/*"
-CP="../../bin:../../lib/*"
+CP='../../build/classes:../../lib/*'
+CP='../../bin:../../lib/*'
+CP2='../../lib/*'
 
 D=../../src
+
+# First, some hacking to build an omnibus CPU
+
+java -classpath $CP \
+	com/appcomsci.mips.cpu.CpuBuilder BigCpu
+
+sed 's+MISSING+// MISSING+' <BigCpu.cpp >dov/BigCpu.cpp
+rm BigCpu.cpp
+mv BigCpuImpl.java dov/BigCpuImpl.java
+
+java -cp "$CP2" backend.flexsc.CommandTool dov/BigCpu.cpp compiledlib.dov true ..
+
+# Now build individual CPUs
 
 # uncomment to clean up
 # rm -rf $D/compiledlib/dov/*.cpp $D/compiledlib/dov/Cpu_*.java $D/compiledlib/dov/CpuImpl_*.java
