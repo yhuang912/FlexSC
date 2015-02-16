@@ -28,4 +28,10 @@ public class TestGarbler {
 		double t2 = System.nanoTime();
 		System.out.println(len/(t2-t1)*1000000000.0);
 	}
+	
+	
+	public static void main(String[] args) {
+		TestGarbler a = new TestGarbler();
+		a.test1000();
+	}
 }
