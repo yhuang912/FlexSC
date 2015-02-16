@@ -21,7 +21,11 @@ public class TestGarbler {
 
 	@Test
 	public void test1000() {
-		for(int i = 0; i<10000; i++)
+		double t1 = System.nanoTime();
+		int len = 1000000;
+		for(int i = 0; i<len; i++)
 			test();
+		double t2 = System.nanoTime();
+		System.out.println(len/(t2-t1)*1000000000.0);
 	}
 }
