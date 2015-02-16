@@ -245,7 +245,8 @@ public class PageRankInsecure {
 			main.connectToServer();
 		}
 		int inputLength = Integer.parseInt(args[0]);
-		BufferedReader br = new BufferedReader(new FileReader("/home/kartik/code/scratch/pr/PageRank" + inputLength + ".in"));
+//		BufferedReader br = new BufferedReader(new FileReader("/home/kartik/code/scratch/pr/PageRank" + inputLength + ".in"));
+		BufferedReader br = new BufferedReader(new FileReader("in/PageRank" + inputLength + ".in"));
 //		BufferedReader br = new BufferedReader(new FileReader("/home/kartik/code/scratch/pr/PageRank.in"));
 		PageRankNode[] nodes = new PageRankNode[inputLength / PROCESSORS];
 		
