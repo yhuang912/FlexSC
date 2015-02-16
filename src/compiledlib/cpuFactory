@@ -1,5 +1,5 @@
-CP='../../bin:../../lib/*'
 CP='../../build/classes:../../lib/*'
+CP='../../bin:../../lib/*'
 
 # Where things go
 D=..
