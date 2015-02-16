@@ -4,6 +4,7 @@
 package ot;
 
 import flexsc.Flag;
+import flexsc.OTMODE;
 import gc.GCSignal;
 
 import java.io.IOException;
@@ -101,14 +102,16 @@ public class OTExtSender extends OTSender {
 		int numOfPairs = msgPairs.length;
 
 		BitMatrix Q = new BitMatrix(numOfPairs, SecurityParameter.k1);
-//		BitMatrix tQ = new BitMatrix(SecurityParameter.k1, numOfPairs);
+		//		BitMatrix tQ = new BitMatrix(SecurityParameter.k1, numOfPairs);
 
 
 		for (int i = 0; i < SecurityParameter.k1; i++) {
-			Flag.sw.startOTIO();
+			if(Flag.otMode == OTMODE.EXTENSIONOT)
+				Flag.sw.startOTIO();
 			cphPairs[i][0] = w.readBI();
 			cphPairs[i][1] = w.readBI();
-			Flag.sw.stopOTIO();
+			if(Flag.otMode == OTMODE.EXTENSIONOT)
+				Flag.sw.stopOTIO();
 			if (s[i]) {
 				Q.data[i] = cipher.decrypt(keys[i].bytes, cphPairs[i][1],
 						numOfPairs);
@@ -131,14 +134,18 @@ public class OTExtSender extends OTSender {
 			y[i][1] = cipher.enc(
 					GCSignal.newInstance(tQ.data[i].xor(biS).toByteArray()),
 					msgPairs[i][1], i);
-			Flag.sw.startOTIO();
+			if(Flag.otMode == OTMODE.EXTENSIONOT)
+				Flag.sw.startOTIO();
 			y[i][0].send(w);
 			y[i][1].send(w);
-			Flag.sw.stopOTIO();
+			if(Flag.otMode == OTMODE.EXTENSIONOT)
+				Flag.sw.stopOTIO();
 		}
-		Flag.sw.startOTIO();
+		if(Flag.otMode == OTMODE.EXTENSIONOT)
+			Flag.sw.startOTIO();
 		w.flush();
-		Flag.sw.stopOTIO();
+		if(Flag.otMode == OTMODE.EXTENSIONOT)
+			Flag.sw.stopOTIO();
 
 	}
 
