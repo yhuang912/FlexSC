@@ -21,7 +21,7 @@ public class Flag {
 	//network
 	public static boolean countIO = false;
 	public static int NetowrkBufferSize = 1024*1024*10;
-	public static int NetworkThreadedQueueSize = 1024*1024*300;
+	public static int NetworkThreadedQueueSize = 1024*1024*3;
 
 
 	public Flag() {
