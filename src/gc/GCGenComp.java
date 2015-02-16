@@ -40,8 +40,11 @@ public abstract class GCGenComp extends GCCompEnv{
 		if(Flag.mode != Mode.OFFLINERUN)
 			label[0] = GCSignal.freshLabel(rnd);
 		
-		if(Flag.mode == Mode.OFFLINERUN)
+		if(Flag.mode == Mode.OFFLINERUN){
+//			Flag.sw.stopOT();Flag.sw.stopTotal();
 			label[0] = GCSignal.receive(gc.offline.GCGen.fin);
+//			Flag.sw.startTotal();Flag.sw.startOT();
+		}
 		else if(Flag.mode == Mode.OFFLINEPREPARE)
 			label[0].send(gc.offline.GCGen.fout);
 

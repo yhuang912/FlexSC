@@ -23,7 +23,7 @@ public class GCGen extends GCGenComp {
 	static{
 		try {
 			if(Flag.mode== Mode.OFFLINERUN) {
-				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*10);
+				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*150);
 				R = GCSignal.receive(fin);
 				R.setLSB();
 			}
@@ -94,7 +94,7 @@ public class GCGen extends GCGenComp {
 		return lb[0];
 	}
 
-	private GCSignal readGateFromFile(){
+	private GCSignal readGateFromFile() {
 		gtt[0][1] = GCSignal.receive(fin);
 		gtt[1][0] = GCSignal.receive(fin);
 		gtt[1][1] = GCSignal.receive(fin);
@@ -134,7 +134,9 @@ public class GCGen extends GCGenComp {
 			res = b.v ? a : new GCSignal(false);
 		else {
 			if(Flag.mode == Mode.OFFLINERUN) {
+				Flag.sw.stopGC();Flag.sw.stopTotal();
 				res = readGateFromFile();
+				Flag.sw.startTotal();Flag.sw.startGC();
 			} else if(Flag.mode == Mode.OFFLINEPREPARE){
 				res = garble(a, b);
 				writeGateToFile(res);
