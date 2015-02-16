@@ -92,6 +92,7 @@ if(i == 5){Flag.sw.flush(); t1 = System.nanoTime();}
 					client.write(client.baseOram.lib.toSignals(element), scData);
 					System.out.println((System.nanoTime()-t11)/1000000000.0+" "+Flag.sw.ands);
 					double t = Flag.sw.stopTotal();
+					System.out.println(( (gc.offline.GCGen)env ).t);
 //					System.out.println(Flag.sw.ands + " " + t / 1000000000.0
 //							+ " " + Flag.sw.ands / t * 1000);
 					Flag.sw.addCounter();

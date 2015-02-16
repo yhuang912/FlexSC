@@ -3,6 +3,12 @@ package util;
 
 public class StopWatch {
 	public long ands = 0;
+	public static int TOTAL = 0;
+	public static int GC = 0;
+	public static int OTIO = 0;
+	public static int GCIO = 0;
+	public static int OT = 0;
+	
 	double startTimeOT = 0;
 	double stopTimeOT = 0;
 	public double elapsedTimeOT = 0;
@@ -38,6 +44,25 @@ public class StopWatch {
 		if (countTime) {
 			stopTimeOT = System.nanoTime();
 			elapsedTimeOT += stopTimeOT - startTimeOT;
+		}
+	}
+	
+	double[] start = new double[10];
+	double[] stop = new double[10];
+	double[] elapsed = new double[10];
+	int[] cnt = new int[10];
+	public void start(int i) {
+		if (countTime) {
+			start[i] = System.nanoTime();
+			cnt[i]++;
+		}
+	}
+
+	public void stop(int i) {
+		if (countTime) {
+			stop[i] = System.nanoTime();
+			elapsed[i] += stop[i] - start[i];
+			cnt[i]--;
 		}
 	}
 
@@ -125,6 +150,14 @@ public class StopWatch {
 				+ "\t" + elapsedTimeGCIO / 1000000000.0 / counter + " "
 				+ (elapsedTimeOT - elapsedTimeOTIO) / 1000000000.0 / counter
 				+ "\t" + elapsedTimeOTIO / 1000000000.0 / counter + "\n");
+		
+		for(int i = 0; i < 10; ++i) {
+			if(cnt[i] != 0) {
+				System.out.println(i+"-th counter is not correct");
+			} else {
+				System.out.println(i+"th counter:" + (elapsedTimeGC - elapsedTimeGCIO) / 1000000000.0 / counter);
+			}
+		}
 	}
 
 	public void print(int i) {
