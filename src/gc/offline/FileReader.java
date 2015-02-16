@@ -23,7 +23,7 @@ public class FileReader {
 	}
 	
 	
-	public void read(byte[] a){
+	public void read(byte[] a) {
 		System.arraycopy(data, pos, a, 0, a.length);
 		pos += a.length;
 	}

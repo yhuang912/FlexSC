@@ -4,10 +4,10 @@ package util;
 public class StopWatch {
 	public long ands = 0;
 	public static int TOTAL = 0;
-	public static int GC = 0;
-	public static int OTIO = 0;
-	public static int GCIO = 0;
-	public static int OT = 0;
+	public static int GC = 1;
+	public static int OTIO = 2;
+	public static int GCIO = 3;
+	public static int OT = 4;
 	
 	double startTimeOT = 0;
 	double stopTimeOT = 0;
@@ -151,11 +151,11 @@ public class StopWatch {
 				+ (elapsedTimeOT - elapsedTimeOTIO) / 1000000000.0 / counter
 				+ "\t" + elapsedTimeOTIO / 1000000000.0 / counter + "\n");
 		
-		for(int i = 0; i < 10; ++i) {
+		for(int i = 5; i < 10; ++i) {
 			if(cnt[i] != 0) {
 				System.out.println(i+"-th counter is not correct");
 			} else {
-				System.out.println(i+"th counter:" + (elapsedTimeGC - elapsedTimeGCIO) / 1000000000.0 / counter);
+				System.out.println(i+"th counter:" + (elapsed[i]) / 1000000000.0 / counter);
 			}
 		}
 	}

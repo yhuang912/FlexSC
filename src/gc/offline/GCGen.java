@@ -96,12 +96,12 @@ public class GCGen extends GCGenComp {
 
 	public double t;
 	private GCSignal readGateFromFile() {
-		double t1 = System.nanoTime();
+//		double t1 = System.nanoTime();
 		fread.read(gtt[0][1].bytes);
 		fread.read(gtt[1][0].bytes);
 		fread.read(gtt[1][1].bytes);
 		GCSignal a = new GCSignal(fread.read(10));
-		t += (System.nanoTime() - t1);
+//		t += (System.nanoTime() - t1);
 		return a;
 //		gtt[0][1] = GCSignal.receive(fin);
 //		gtt[1][0] = GCSignal.receive(fin);
