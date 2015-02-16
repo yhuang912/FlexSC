@@ -18,6 +18,7 @@ public class PageRankInsecure {
 	public static String LOCALHOST = "localhost";
 	static int PROCESSORS = 2;
 	int id;
+	long time;
 
 	private ObjectOutputStream outStream;
 	private ObjectInputStream inStream;
@@ -26,6 +27,7 @@ public class PageRankInsecure {
 
 	public PageRankInsecure(int id) {
 		this.id = id;
+		this.time = 0;
 	}
 
 	private static final class OutgoingVertexLast implements
@@ -97,9 +99,11 @@ public class PageRankInsecure {
 		if (print) {
 			print(nodes);
 		}
+		long one = System.nanoTime();
 		outStream.writeObject(nodes.clone());
 		outStream.flush();
 		PageRankNode[] otherNodes  = (PageRankNode[]) inStream.readObject();
+		time = time + (System.nanoTime() - one);
 		int i = 0, j = 0;
 		PageRankNode[] res = new PageRankNode[otherNodes.length + nodes.length];
 		int k = 0;
@@ -146,6 +150,7 @@ public class PageRankInsecure {
 		}
 		int nodeToSend = nodes[nodes.length - 1].u;
 		int cntToReceive = 0, nodeToReceive = -1;
+		long one = System.nanoTime();
 		if (id == 0) {
 			outStream.writeObject(new Integer(cntToSend));
 			outStream.writeObject(new Integer(nodeToSend));
@@ -160,6 +165,7 @@ public class PageRankInsecure {
 				cntToReceive = 0;
 			}
 		}
+		time = time + (System.nanoTime() - one);
 
 		for (int i = 0; i < nodes.length; i++) {
 			if (nodes[i].isVertex == 1) {
@@ -182,6 +188,7 @@ public class PageRankInsecure {
 		}
 
 		double valToReceive = 0;
+		long one = System.nanoTime();
 		if (id == 0) {
 			outStream.writeDouble(valToSend);
 			outStream.flush();
@@ -189,7 +196,7 @@ public class PageRankInsecure {
 		} else if (id == 1) {
 			valToReceive = inStream.readDouble();
 		}
-
+		time = time + (System.nanoTime() - one);
 		for (int i = 0; i < nodes.length; i++) {
 			if (nodes[i].isVertex == 1) {
 				valToReceive = nodes[i].pageRank / nodes[i].l;
@@ -212,6 +219,7 @@ public class PageRankInsecure {
 		double aggToReceive = 0;
 		int nodeToSend = nodes[nodes.length - 1].u;
 		int nodeToReceive = -1;
+		long one = System.nanoTime();
 		if (id == 0) {
 			outStream.writeDouble(aggToSend);
 			outStream.writeObject(new Integer(nodeToSend));
@@ -224,6 +232,7 @@ public class PageRankInsecure {
 			}
 		}
 
+		time = time + (System.nanoTime() - one);
 		for (int i = 0; i < nodes.length; i++) {
 			if (nodes[i].isVertex == 1) {
 				nodes[i].pageRank = aggToReceive;
@@ -274,7 +283,7 @@ public class PageRankInsecure {
 			main.prGather(nodes);
 		}
 		long endTime = System.nanoTime();
-		System.out.println("2," + id + "," + 1.0 * (endTime - startTime)/(1000 * 1000 * 1000));
+		System.out.println("2," + id + "," + inputLength + "," + 1.0 * (endTime - startTime)/(1000 * 1000 * 1000) + "," + main.time/(1000 * 1000 * 1000));
 		main.outStream.reset();
 		main.sort(nodes, new AllVertexFirst(), false);
 //		main.print(nodes);
