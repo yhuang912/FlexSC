@@ -4,7 +4,6 @@ package orambs;
 import java.util.Arrays;
 
 import flexsc.CompEnv;
-import flexsc.Flag;
 import flexsc.Party;
 
 public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAMInterface<T>{

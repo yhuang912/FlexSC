@@ -1,5 +1,6 @@
 package testlibs;
 
+import flexsc.CompEnv;
 import harness.TestFixedPoint;
 
 import java.util.Random;
@@ -7,7 +8,6 @@ import java.util.Random;
 import org.junit.Test;
 
 import circuits.arithmetic.FixedPointLib;
-import flexsc.CompEnv;
 
 //import gc.T;
 

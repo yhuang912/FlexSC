@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import util.Utils;
 import flexsc.CompEnv;
-import flexsc.Mode;
 import flexsc.Party;
 import gc.GCSignal;
 

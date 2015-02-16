@@ -1,5 +1,7 @@
 package testlibs;
 
+import flexsc.CompEnv;
+import flexsc.Comparator;
 import harness.TestHarness;
 import harness.TestSortHarness;
 import harness.TestSortHarness.Helper;
@@ -11,8 +13,6 @@ import org.junit.Test;
 
 import circuits.SortLib;
 import circuits.arithmetic.IntegerLib;
-import flexsc.CompEnv;
-import flexsc.Comparator;
 
 public class TestSortLib extends TestHarness {
 
