@@ -1,12 +1,11 @@
 package gc.offline;
 
+import flexsc.CompEnv;
 import flexsc.Flag;
 import gc.GCGenComp;
 import gc.GCSignal;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,13 +15,16 @@ import java.io.OutputStream;
 public class GCGen extends GCGenComp {
 	Garbler gb;
 
-	public static BufferedInputStream fin = null;
+//	public static BufferedInputStream fin = null;
 	public static BufferedOutputStream fout = null;
+	public static FileReader fread = null;
 	static{
 		try {
 			if(Flag.offline) {
-				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*1024);
-				R = GCSignal.receive(fin);
+//				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*1024);
+//				R = GCSignal.receive(fin);
+				fread = new FileReader("table");
+				R = new GCSignal(fread.read(10));
 				R.setLSB();
 			}
 			else {
@@ -37,6 +39,9 @@ public class GCGen extends GCGenComp {
 	}
 	public GCGen(InputStream is, OutputStream os) {
 		super(is, os);
+		gtt[0][1] = GCSignal.freshLabel(CompEnv.rnd);
+		gtt[1][0] = GCSignal.freshLabel(CompEnv.rnd);
+		gtt[1][1] = GCSignal.freshLabel(CompEnv.rnd);
 		gb = new Garbler();
 	}
 	
@@ -51,6 +56,7 @@ public class GCGen extends GCGenComp {
 	}
 
 	private GCSignal[][] gtt = new GCSignal[2][2];
+	
 	private GCSignal labelL[] = new GCSignal[2];
 	private GCSignal labelR[] = new GCSignal[2];
 	GCSignal[] lb = new GCSignal[2];;
@@ -89,10 +95,14 @@ public class GCGen extends GCGenComp {
 	}
 
 	private GCSignal readGateFromFile(){
-		gtt[0][1] = GCSignal.receive(fin);
-		gtt[1][0] = GCSignal.receive(fin);
-		gtt[1][1] = GCSignal.receive(fin);
-		return GCSignal.receive(fin);
+		fread.read(gtt[0][1].bytes);
+		fread.read(gtt[1][0].bytes);
+		fread.read(gtt[1][1].bytes);
+		return new GCSignal(fread.read(10));
+//		gtt[0][1] = GCSignal.receive(fin);
+//		gtt[1][0] = GCSignal.receive(fin);
+//		gtt[1][1] = GCSignal.receive(fin);
+//		return GCSignal.receive(fin);
 	}
 
 	private void writeGateToFile(GCSignal a){
