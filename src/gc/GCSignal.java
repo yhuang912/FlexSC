@@ -16,7 +16,7 @@ public class GCSignal extends Signal {
 	public static final GCSignal ZERO = new GCSignal(new byte[len]);
 
 	public GCSignal(byte[] b) { bytes = b; }
-	
+
 	public GCSignal(boolean b) { v = b; }
 	
 	public static GCSignal freshLabel(SecureRandom rnd) {
