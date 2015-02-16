@@ -2,32 +2,39 @@
 
 # Where things go
 OUTDIR=../../src
+LIBDIR=../../lib
 
 if test ! -d $OUTDIR/compiledlib/dov
 then
     echo "The output directory $OUTDIR/compiledlib/dov does not exist"
-    exit 1
+    OUTDIR=../../../src
+    if test ! -d $OUTDIR/compiledlib/dov
+    then
+	echo "The output directory $OUTDIR/compiledlib/dov does not exist either.  Exiting."
+    	exit 1
+    fi
+    # If the source is in the wrong place, assume the libraries are also displaced.
+    LIBDIR=../../../lib
 fi
 
 C=../../bin
-L=../../lib
 if test -d $C
 then
-	if test ! -d $L
+	if test ! -d $LIBDIR
 	then
-		echo "Found $C but not $L.  This is too confusing."
+		echo "Found $C but not $LIBDIR.  This is too confusing."
 		exit 1
 	fi
 else
 	C2=../../build/classes
 	if test -d $C2
 	then
-		if test -d $L
+		if test -d $LIBDIR
 		then
 			echo "Warning - $C is missing.  Trying $C2" 
 			C="$C2"
 		else
-			echo "Found $C2 but not $L.  This is too confusing."
+			echo "Found $C2 but not $LIBDIR.  This is too confusing."
 			exit 1
 		fi
 	else
@@ -43,7 +50,7 @@ then
     echo "Did not find $F in $C.  This may not work."
 fi
 
-CP="$C:$L/*"
+CP="$C:$LIBDIR/*"
 
 
 # Binary
