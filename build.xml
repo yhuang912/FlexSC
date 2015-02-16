@@ -8,6 +8,7 @@
   <property name="src.dir" value="src" />
   <property name="test.dir" value="test" />
   <property name="lib.dir" value="lib" />
+  <property name="generated.dir" value="${src.dir}/compiledlib/dov" />
 
   <target name="init" >
     <mkdir dir="${class.dir}" />
@@ -32,6 +33,16 @@
   <target name="clean" depends="init" >
     <delete dir="${build.dir}" />
     <delete dir="${dist.dir}" />
+  </target>
+
+  <target name="cleanall" depends="distclean" />
+  <target name="reallyclean" depends="distclean" />
+  <target name="distclean" depends="clean" >
+    <delete>
+        <fileset dir="${generated.dir}" includes="*.cpp" />
+	<fileset dir="${generated.dir}" includes="Cpu_*.java" />
+	<fileset dir="${generated.dir}" includes="Big*.java" />
+    </delete>
   </target>
 
   <target name="dist" depends="compile">
