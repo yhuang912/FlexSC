@@ -55,19 +55,17 @@ public class GCSignal {
 //		byte[] b = new byte[len];
 		byte[] b = buffer[buffersize++];
 		Arrays.fill(b, (byte) ((bs[0] < 0) ? 0xff : 0));
-		System.arraycopy(bs, 0, b, len - Math.min(len, bs.length),
-				Math.min(len, bs.length));
-		Arrays.copyOf(bs, len);
-//		return new GCSignal(b);
+		int mini = len > bs.length ? bs.length : len;
+		System.arraycopy(bs, 0, b, len - mini, mini);
 		GCSignal ret = buffer2[buffersize2++];
 		ret.bytes = b;
 		return ret;
 	}
 
-	public GCSignal(GCSignal lb) {
-		v = lb.v;
-		bytes = (lb.bytes == null) ? null : Arrays.copyOf(lb.bytes, len);
-	}
+//	public GCSignal(GCSignal lb) {
+//		v = lb.v;
+//		bytes = (lb.bytes == null) ? null : Arrays.copyOf(lb.bytes, len);
+//	}
 
 	public boolean isPublic() {
 		return bytes == null;
