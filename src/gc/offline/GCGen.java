@@ -13,16 +13,20 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class GCGen extends GCGenComp {
-	Garbler gb;
+	Garbler gb =  new Garbler();
 
 //	public static BufferedInputStream fin = null;
 	public static BufferedOutputStream fout = null;
 	public static FileReader fread = null;
+	private GCSignal[][] gtt = new GCSignal[2][2];
+	
+	private GCSignal labelL[] = new GCSignal[2];
+	private GCSignal labelR[] = new GCSignal[2];
+	byte[] tmp = new byte[10];
+	GCSignal[] lb = new GCSignal[2];;
 	static{
 		try {
 			if(Flag.offline) {
-//				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*1024);
-//				R = GCSignal.receive(fin);
 				fread = new FileReader("table");
 				R = new GCSignal(fread.read(10));
 				R.setLSB();
@@ -42,7 +46,6 @@ public class GCGen extends GCGenComp {
 		gtt[0][1] = GCSignal.freshLabel(CompEnv.rnd);
 		gtt[1][0] = GCSignal.freshLabel(CompEnv.rnd);
 		gtt[1][1] = GCSignal.freshLabel(CompEnv.rnd);
-		gb = new Garbler();
 	}
 	
 	@Override
@@ -55,11 +58,7 @@ public class GCGen extends GCGenComp {
 		}
 	}
 
-	private GCSignal[][] gtt = new GCSignal[2][2];
-	
-	private GCSignal labelL[] = new GCSignal[2];
-	private GCSignal labelR[] = new GCSignal[2];
-	GCSignal[] lb = new GCSignal[2];;
+
 	private GCSignal garble(GCSignal a, GCSignal b) {
 		labelL[0] = a;
 		labelL[1] = R.xor(labelL[0]);
@@ -94,21 +93,13 @@ public class GCGen extends GCGenComp {
 		return lb[0];
 	}
 
-	public double t;
-	byte[] tmp = new byte[10];
+
 	private GCSignal readGateFromFile() {
-//		double t1 = System.nanoTime();
 		fread.read(gtt[0][1].bytes);
 		fread.read(gtt[1][0].bytes);
 		fread.read(gtt[1][1].bytes);
 		fread.read(tmp);
-		GCSignal a = new GCSignal(tmp);
-//		t += (System.nanoTime() - t1);
-		return a;
-//		gtt[0][1] = GCSignal.receive(fin);
-//		gtt[1][0] = GCSignal.receive(fin);
-//		gtt[1][1] = GCSignal.receive(fin);
-//		return GCSignal.receive(fin);
+		return GCSignal.newInstance(tmp);
 	}
 
 	private void writeGateToFile(GCSignal a){
@@ -139,9 +130,9 @@ public class GCGen extends GCGenComp {
 		if (a.isPublic() && b.isPublic())
 			res = (a.v && b.v) ? true_Signal : false_Signal;
 		else if (a.isPublic())
-			res = a.v ? b : new GCSignal(false);
+			res = a.v ? b : false_Signal;//new GCSignal(false);
 		else if (b.isPublic())
-			res = b.v ? a : new GCSignal(false);
+			res = b.v ? a : false_Signal;//new GCSignal(false);
 		else {
 			if(Flag.offline) {
 				res = readGateFromFile();

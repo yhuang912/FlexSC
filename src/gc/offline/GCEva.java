@@ -8,12 +8,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class GCEva extends GCEvaComp {
-	Garbler gb;
+	Garbler gb =  new Garbler();
 	GCSignal[][] gtt = new GCSignal[2][2];
 
 	public GCEva(InputStream is, OutputStream os) {
 		super(is, os);
-		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
 	}
 
@@ -35,11 +34,11 @@ public class GCEva extends GCEvaComp {
 
 		GCSignal res;
 		if (a.isPublic() && b.isPublic())
-			res = new GCSignal(a.v && b.v);
+			res = (a.v && b.v) ? true_Signal : false_Signal;
 		else if (a.isPublic())
-			res = a.v ? b : new GCSignal(false);
+			res = a.v ? b : false_Signal;
 		else if (b.isPublic())
-			res = b.v ? a : new GCSignal(false);
+			res = b.v ? a : false_Signal;
 		else {
 			receiveGTT();
 
