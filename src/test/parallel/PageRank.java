@@ -282,17 +282,17 @@ public class PageRank<T> implements ParallelGadget<T> {
 		if (Mode.REAL.equals(env.getMode())) {
 			long communicate = communicate1 + communicate2 + communicateBootstrap + communicateSort;
 //			Flag.sw.printGC(machine.machineId, machine.totalMachines, machine.inputLength, communicate, env.getParty());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootStrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter - bootStrap)/1000000000.0 + "," + "Scatter" + "," + env.getParty().name());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - scatter)/1000000000.0 + "," + "Gather" + "," + env.getParty().name());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootStrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (scatter - bootStrap)/1000000000.0 + "," + "Scatter" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - scatter)/1000000000.0 + "," + "Gather" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - gather)/1000000000.0 + "," + "Final sort" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (endTime - startTime)/1000000000.0 + "," + "Total time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather - bootStrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name() + "," + Machine.ITERATION);
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap)/1000000000.0 + "," + "Communication bootstrap time" + "," + env.getParty().name());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate1)/1000000000.0 + "," + "Communication scatter time" + "," + env.getParty().name());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate2)/1000000000.0 + "," + "Communication gather time" + "," + env.getParty().name());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication sort time" + "," + env.getParty().name());
-//			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap + communicate1 + communicate2 + communicateSort)/1000000000.0 + "," + "Communication total time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap)/1000000000.0 + "," + "Communication bootstrap time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate1)/1000000000.0 + "," + "Communication scatter time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate2)/1000000000.0 + "," + "Communication gather time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication sort time" + "," + env.getParty().name());
+			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap + communicate1 + communicate2 + communicateSort)/1000000000.0 + "," + "Communication total time" + "," + env.getParty().name());
 		} else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
 			// Thread.sleep(10000);
 			Statistics a = ((PMCompEnv) env).statistic;
