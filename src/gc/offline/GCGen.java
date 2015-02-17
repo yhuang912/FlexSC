@@ -137,7 +137,7 @@ public class GCGen extends GCGenComp {
 		Flag.sw.startGC();
 		GCSignal res = null;
 		if (a.isPublic() && b.isPublic())
-			res = new GCSignal(a.v && b.v);
+			res = (a.v && b.v) ? true_Signal : false_Signal;
 		else if (a.isPublic())
 			res = a.v ? b : new GCSignal(false);
 		else if (b.isPublic())
