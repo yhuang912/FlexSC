@@ -15,17 +15,15 @@ public class GCSignal {
 	public static final int buffercap2 = 10000000;
 	public static int buffersize = 0;
 	public static int buffersize2 = 0;
-	static byte[][] buffer = new byte[buffercap][];
+	static byte[][] buffer = new byte[buffercap][10];
 	static GCSignal[] buffer2 = new GCSignal[buffercap];
 	
 	static {
 		for(int i = 0; i < buffercap; ++i) {
-			buffer[i] = new byte[10];
-		}
-		for(int i = 0; i < buffercap; ++i) {
 			buffer2[i] = new GCSignal(false);
 		}
 	}
+	
 	
 	public static final int len = 10;
 	public byte[] bytes;
