@@ -13,8 +13,8 @@ import network.Server;
 public class GCSignal {
 	public static final int buffercap = 10000000;
 	public static final int buffercap2 = 10000000;
-	public static int buffersize = 0;
-	public static int buffersize2 = 0;
+	 static int buffersize = 0;
+	static int buffersize2 = 0;
 	static byte[][] buffer = new byte[buffercap][10];
 	static GCSignal[] buffer2 = new GCSignal[buffercap];
 	
@@ -39,11 +39,22 @@ public class GCSignal {
 		v = b;
 	}
 
+	public static int increment1 () {
+		int size = buffersize;
+		buffersize = (buffersize+1) % buffercap;
+		return size;
+	}
+	
+	public static int increment2 () {
+		int size = buffersize2;
+		buffersize2 = (buffersize2+1) % buffercap2;
+		return size;
+	}	
 	public static GCSignal freshLabel(SecureRandom rnd) {
 //		byte[] b = new byte[len];
-		byte[] b = buffer[buffersize++];
+		byte[] b = buffer[increment1()];
 		rnd.nextBytes(b);
-		GCSignal ret = buffer2[buffersize2++];
+		GCSignal ret = buffer2[increment2()];
 		ret.bytes = b;
 		return ret;
 	}
@@ -51,11 +62,11 @@ public class GCSignal {
 	public static GCSignal newInstance(byte[] bs) {
 		assert (bs.length <= len) : "Losing entropy when constructing signals.";
 //		byte[] b = new byte[len];
-		byte[] b = buffer[buffersize++];
+		byte[] b = buffer[increment1()];
 		Arrays.fill(b, (byte) ((bs[0] < 0) ? 0xff : 0));
 		int mini = len > bs.length ? bs.length : len;
 		System.arraycopy(bs, 0, b, len - mini, mini);
-		GCSignal ret = buffer2[buffersize2++];
+		GCSignal ret = buffer2[increment2 ()];
 		ret.bytes = b;
 		return ret;
 	}
@@ -71,11 +82,11 @@ public class GCSignal {
 
 	public GCSignal xor(GCSignal lb) {
 //		byte[] nb = new byte[len];
-		byte[] nb = buffer[buffersize++];
+		byte[] nb = buffer[increment1()];
 		for (int i = 0; i < len; i++)
 			nb[i] = (byte) (bytes[i] ^ lb.bytes[i]);
 //		return new GCSignal(nb);
-		GCSignal ret = buffer2[buffersize2++];
+		GCSignal ret = buffer2[increment2 ()];
 		ret.bytes = nb;
 		return ret;
 	}
@@ -99,14 +110,14 @@ public class GCSignal {
 
 	// 'send' and 'receive' are supposed to be used only for secret signals
 	public static GCSignal receive(InputStream ois) {
-		byte[] b = buffer[buffersize++];
+		byte[] b = buffer[increment1()];
 		try {
 			Server.readBytes(ois, b);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 //		return new GCSignal(b);
-		GCSignal ret = buffer2[buffersize2++];
+		GCSignal ret = buffer2[increment2 ()];
 		ret.bytes = b;
 		return ret;
 	}

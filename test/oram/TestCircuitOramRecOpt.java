@@ -4,6 +4,7 @@ package oram;
 import java.nio.ByteBuffer;
 
 import network.Server;
+import orambs.BSCircuitOram;
 import util.Utils;
 import flexsc.CompEnv;
 import flexsc.Flag;
@@ -71,11 +72,11 @@ System.out.println("OTPreProcessing");
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Party.Alice,
 						is, os);
-//				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
-//						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
+				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
+						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
 //System.gc();
-				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
-						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
+//				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
+//						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 double t1 = 0, t2;
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
@@ -137,12 +138,12 @@ System.out.println("Running time for the access:\t"+(System.nanoTime()-t11)/1000
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Party.Bob,
 						is, os);
-//				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
-//						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
+				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
+						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
 				
 //System.gc();
-				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
-						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
+//				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
+//						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 
 				
 				for (int i = 0; i < writeCount; ++i) {
