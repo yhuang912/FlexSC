@@ -162,7 +162,6 @@ public class PageRank<T> implements ParallelGadget<T> {
 			throws ClassNotFoundException, InstantiationException,
 			IllegalAccessException, InterruptedException, IOException,
 			BadCommandException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
-		System.out.println("Starting");
 		T[][] u = (T[][]) ((Object[]) machine.input)[0];
 		T[][] v = (T[][]) ((Object[]) machine.input)[1];
 		T[] isVertex = (T[]) ((Object[]) machine.input)[2];
@@ -207,7 +206,6 @@ public class PageRank<T> implements ParallelGadget<T> {
 			}
 		}.setInputs(aa).compute();
 
-		System.out.println("Done with bootstrap");
 		long bootStrap = System.nanoTime();
 		for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges
@@ -237,7 +235,6 @@ public class PageRank<T> implements ParallelGadget<T> {
 				}
 			}.setInputs(aa).compute();
 
-			System.out.println("Done with scatter");
 			scatter = System.nanoTime();
 			// 3. Compute PR based on edges
 			communicate2 = (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new PageRankNode<T>(env)) {
