@@ -66,8 +66,8 @@ public class GCGen extends GCGenComp {
 		labelR[0] = b;
 		labelR[1] = R.xor(labelR[0]);
 
-		int cL = a.getLSB() ? 1 : 0;
-		int cR = b.getLSB() ? 1 : 0;
+		int cL = a.getLSB();
+		int cR = b.getLSB();
 
 		lb[cL & cR] = gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO);
 		lb[1 - (cL & cR)] = R.xor(lb[cL & cR]);
@@ -95,12 +95,14 @@ public class GCGen extends GCGenComp {
 	}
 
 	public double t;
+	byte[] tmp = new byte[10];
 	private GCSignal readGateFromFile() {
 //		double t1 = System.nanoTime();
 		fread.read(gtt[0][1].bytes);
 		fread.read(gtt[1][0].bytes);
 		fread.read(gtt[1][1].bytes);
-		GCSignal a = new GCSignal(fread.read(10));
+		fread.read(tmp);
+		GCSignal a = new GCSignal(tmp);
 //		t += (System.nanoTime() - t1);
 		return a;
 //		gtt[0][1] = GCSignal.receive(fin);

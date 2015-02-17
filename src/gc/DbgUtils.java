@@ -24,18 +24,18 @@ public class DbgUtils {
 				x = 0;
 			else if (bs.equals(R.xor(glb)))
 				x = 1;
-			else
-				throw new Exception(String.format("bad label: %s",
-						bs.toHexStr()));
-			System.out.println(String.format("%s = %d", msg, x));
+//			else
+//				throw new Exception(String.format("bad label: %s",
+//						bs.toHexStr()));
+//			System.out.println(String.format("%s = %d", msg, x));
 
 		}
 	}
 
 	static void debugLabel(CompEnv<GCSignal> env, GCSignal bs, String msg) {
-		if (env instanceof GCGen) {
-			System.err.println(String.format("[%s] %s, %s",  msg, bs.toHexStr(), ((GCGen) env).R.xor(bs).toHexStr()));
-		} else
-			System.out.println(String.format("[%s] %s",  msg, bs.toHexStr()));
+//		if (env instanceof GCGen) {
+//			System.err.println(String.format("[%s] %s, %s",  msg, bs.toHexStr(), ((GCGen) env).R.xor(bs).toHexStr()));
+//		} else
+//			System.out.println(String.format("[%s] %s",  msg, bs.toHexStr()));
 	}
 }

@@ -66,8 +66,8 @@ public class TestNPOT {
 		tRcv.start(); 
 		tSnd.join();
 
-		System.out.println(m[c?1:0].toHexStr());
-		System.out.println(rcvd.toHexStr());
+//		System.out.println(m[c?1:0].toHexStr());
+//	w	System.out.println(rcvd.toHexStr());
 		Assert.assertEquals(rcvd, m[c?1:0]);
 	}
 

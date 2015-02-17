@@ -12,12 +12,15 @@ public abstract class GCCompEnv extends CompEnv<GCSignal> {
 		super(is, os, p, Mode.OPT);
 	}
 
+	protected GCSignal false_Signal = new GCSignal(false);
+	protected GCSignal true_Signal = new GCSignal(true);
+
 	public GCSignal ONE() {
-		return new GCSignal(true);
+		return true_Signal;
 	}
 	
 	public GCSignal ZERO() {
-		return new GCSignal(false);
+		return false_Signal;
 	}
 	
 	public GCSignal[] newTArray(int len) {
@@ -33,6 +36,6 @@ public abstract class GCCompEnv extends CompEnv<GCSignal> {
 	}
 	
 	public GCSignal newT(boolean v) {
-		return new GCSignal(v);
+		return v? true_Signal: false_Signal;
 	}
 }

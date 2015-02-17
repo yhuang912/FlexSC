@@ -94,8 +94,8 @@ public class TestOTPreMany {
 			try {
 				Assert.assertEquals(rcvd[i], m[i][c[i]?1:0]);
 			} catch (AssertionError e) {
-				System.out.println("rcvd[" + i + "]: " + rcvd[i].toHexStr());
-				System.out.println("m[" + i + "][c[" + i + "]]: " + m[i][c[i]?1:0].toHexStr());
+//				System.out.println("rcvd[" + i + "]: " + rcvd[i].toHexStr());
+//				System.out.println("m[" + i + "][c[" + i + "]]: " + m[i][c[i]?1:0].toHexStr());
 
 				System.out.println("rcvd[" + i + "]: " + Arrays.toString(rcvd[i].bytes));
 				System.out.println("m[" + i + "][c[" + i + "]]: " + Arrays.toString(m[i][c[i]?1:0].bytes));

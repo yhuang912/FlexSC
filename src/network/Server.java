@@ -11,7 +11,6 @@ import java.nio.ByteBuffer;
 
 import flexsc.Flag;
 import flexsc.Mode;
-import flexsc.Party;
 
 public class Server {
 	static int bufferSize = 655360;
@@ -45,9 +44,20 @@ public class Server {
 			}
 		}
 	}
+	
+	static public void readBytes(InputStream is, byte[] array) throws IOException {
+		int remain = array.length;
+		while (0 < remain) {
+			int readBytes = is.read(array, array.length - remain, remain);
+			if (readBytes != -1) {
+				remain -= readBytes;
+			}
+		}
+	}
 
+
+	
 	static public byte[] readBytes(InputStream is, int len) throws IOException {
-
 		byte[] temp = new byte[len];
 		int remain = len;
 		while (0 < remain) {
