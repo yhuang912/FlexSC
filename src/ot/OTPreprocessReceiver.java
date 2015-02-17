@@ -55,13 +55,17 @@ public class OTPreprocessReceiver  extends OTReceiver {
 		Flag.sw.startOTIO();
 		os.write(z);
 		os.flush();
-		GCSignal[] y = new GCSignal[]{GCSignal.receive(is),  GCSignal.receive(is)};
+		y[0] = GCSignal.receive(is);
+		y[1] = GCSignal.receive(is);
+
+//		GCSignal[] y = new GCSignal[]{GCSignal.receive(is),  GCSignal.receive(is)};
 		Flag.sw.stopOTIO();
 		if(bufferusage == 0)
 			fillup();
 		return y[b?1:0].xor(buffer[bufferusage]);
 	}
 
+	GCSignal[] y = new GCSignal[2];
 	public GCSignal[] receive(boolean[] b) throws IOException {
 		if(bufferusage < b.length)
 			fillup();
@@ -79,7 +83,9 @@ public class OTPreprocessReceiver  extends OTReceiver {
 		for(int i = 0; i < b.length; ++i) {
 			bufferusage--;
 			Flag.sw.startOTIO();
-			GCSignal[] y = new GCSignal[]{GCSignal.receive(is),  GCSignal.receive(is)};
+			y[0] = GCSignal.receive(is);
+			y[1] = GCSignal.receive(is);
+//			GCSignal[] y = new GCSignal[]{,  GCSignal.receive(is)};
 			Flag.sw.stopOTIO();
 			ret[i] = y[b[i]?1:0].xor(buffer[bufferusage]);
 		}
