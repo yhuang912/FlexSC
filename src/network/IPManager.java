@@ -29,7 +29,7 @@ public class IPManager {
 		ips[10] = "54.153.64.43"; // second_amazon cali
 		ips[11] = "52.1.245.193"; // third_amazon virg
 		ips[12] = "52.10.79.24"; // first_amazon_large oregon
-		ips[13] = "52.10.79.24"; // second_amazon_large cali
+		ips[13] = "54.153.72.244"; // second_amazon_large cali
 		IPManager ipManager = new IPManager();
 		BufferedReader br = null;
 		try {
