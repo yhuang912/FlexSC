@@ -283,7 +283,7 @@ public class PageRankInsecure {
 			main.prGather(nodes);
 		}
 		long endTime = System.nanoTime();
-		System.out.println("2," + id + "," + inputLength + "," + 1.0 * (endTime - startTime)/(1000 * 1000 * 1000) + "," + main.time/(1000 * 1000 * 1000));
+		System.out.println("2," + id + "," + inputLength + "," + 1.0 * (endTime - startTime)/(1000 * 1000 * 1000) + "," + 1.0 * main.time/(1000 * 1000 * 1000));
 		main.outStream.reset();
 		main.sort(nodes, new AllVertexFirst(), false);
 //		main.print(nodes);

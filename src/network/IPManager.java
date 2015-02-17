@@ -25,6 +25,8 @@ public class IPManager {
 		ips[6] = "10.42.120.26";
 		ips[7] = "10.42.120.27";
 		ips[8] = "10.42.120.30";
+		ips[9] = "54.149.48.132"; // first_amazon
+		ips[10] = "54.153.64.43"; // second_amazon
 		IPManager ipManager = new IPManager();
 		BufferedReader br = null;
 		try {
