@@ -36,15 +36,38 @@ import flexsc.Party;
 import gc.GCSignal;
 
 public class MipsEmulatorImpl<ET> implements MipsEmulator {
-
-	static final int REGISTER_SIZE = 32;
-	static final int MEM_SIZE = 72;// 160 < threshold for func1
 	static final int THRESHOLD = 1024;
 	static final int RECURSE_THRESHOLD = 512;
 	static final int WORD_SIZE = 32;
 	static final int NUMBER_OF_STEPS = 1;
+	static final int REGISTER_SIZE = 32;
+	
+	/*
+	 * XXInputIsRef indicates whether that user's inputs will fit into the two registers allocated to them.  
+	 * I suppose it is possible they have 3 and 1 input values: that case isn't currently handled.
+	 * If a user's value does not fit into the register space, the address is placed there (loadInputToRegisters).
+	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
+	 * also be loaded.  
+	 */
+	static final boolean aliceInputIsRef = true;
+	static final boolean bobInputIsRef = false;
 	static final int Alice_input = 6;
 	static final int Bob_input = 2;
+	static final int Alice_input2 = -1;
+	static final int Bob_input2 = 3;
+	static final int stackSize = 300;
+	static final int aliceInputSize = 100;
+	static final int bobInputSize = 0;
+	static final int MEM_SIZE = stackSize + aliceInputSize + bobInputSize;// 160 < threshold for func1
+	static final int mainStackSize = 136;
+	static final int[][] aliceLongInput = {{0,3,2,10,11},
+		{3,0,1,18,6},
+		{2,1,0,1,6},
+		{10,18,1,0,16},
+		{11,6,6,16,0},
+		};
+
+	
 	
 	// Should we blither about missing CPUs?
 	static final boolean blither = false;
@@ -208,8 +231,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			T[] newInst = lib.toSignals(0, WORD_SIZE);
 			boolean testHalt;
 			int count = 0; 
-			if (!config.isMultipleBanks())
-				EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
+			//if (!config.isMultipleBanks())
+				//EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
 			long startTime = System.nanoTime();
 			MemorySet<T> currentSet = sets.get(0);
 			SecureMap<T> currentBank;
@@ -217,8 +240,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				currentBank = currentSet.getOramBank().getMap();
 				EmulatorUtils.print("count: " + count, lib, false);
 				count++;
-				//				System.out.println("execution step: " + currentSet.getExecutionStep());
-				currentSet.getOramBank().getMap().print();
+				System.out.println("execution step: " + currentSet.getExecutionStep());
+				if (config.isMultipleBanks())
+					currentSet.getOramBank().getMap().print();
 				if (config.isMultipleBanks())
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
 				newInst = mem.getInst(currentBank, pc, pcOffset);
@@ -294,20 +318,48 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
 		private SecureArray<T> loadInputsToRegister(CompEnv<T> env)
 				throws Exception {
-
+			int aliceReg = 4; 
+			int bobReg = 5;
 			// inital registers are all 0's. no need to set value.
 			SecureArray<T> oram = new SecureArray<T>(env,
 					REGISTER_SIZE, WORD_SIZE);
 			for(int i = 0; i < REGISTER_SIZE; ++i)
 				oram.write(env.inputOfAlice(Utils.fromInt(i, oram.lengthOfIden)),
 						env.inputOfAlice(Utils.fromInt(0, WORD_SIZE)));
-			// for testing purpose.
-			// reg[4]=5 reg[5] = 6;
-			oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-					env.inputOfAlice(Utils.fromInt(Alice_input, WORD_SIZE)));
-			oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-					env.inputOfAlice(Utils.fromInt(Bob_input, WORD_SIZE)));
+			if (!aliceInputIsRef){
+				oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
+						env.inputOfAlice(Utils.fromInt(Alice_input, WORD_SIZE)));
+				if (Alice_input2 >= 0){
+					bobReg = 6;
+					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(Alice_input2, WORD_SIZE)));
+				}
+			}
+			else { 
+				oram.write(env.inputOfAlice(Utils.fromInt(aliceReg, oram.lengthOfIden)),
+						env.inputOfAlice(Utils.fromInt(stackSize - aliceInputSize, WORD_SIZE)));
+			}
+			if (!bobInputIsRef){
+				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
+						env.inputOfAlice(Utils.fromInt(Bob_input, WORD_SIZE)));
+				if (Bob_input2 >= 0)
+					oram.write(env.inputOfAlice(Utils.fromInt(bobReg+1, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(Bob_input2, WORD_SIZE)));
+			}
+			else { 
+				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
+						env.inputOfAlice(Utils.fromInt(stackSize - aliceInputSize - bobInputSize, WORD_SIZE)));
+			}
 			env.flush();
+			int stackPointer = stackSize - aliceInputSize - bobInputSize - mainStackSize;
+			oram.write(env.inputOfAlice(Utils.fromInt(29, oram.lengthOfIden)),
+					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
+			
+			oram.write(env.inputOfAlice(Utils.fromInt(30, oram.lengthOfIden)),
+					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
+			
+			
+			
 			return oram;
 		}
 
@@ -393,7 +445,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					}
 					else 
 						instructionBank.init(m.size(), 32, 32);
-						//						if (entry.getKey() > 0){
+					
+					instructionBank.print();
+					//						if (entry.getKey() > 0){
 						//							index = lib.toSignals((int)((entry.getKey() - minAddr)/4), instructionBank.lengthOfIden);
 						//							if (env.getParty() == Party.Alice){
 						//								data = env.inputOfAlice(entry.getValue());
@@ -405,7 +459,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 						//							// once the indices are correct, write here. 
 						//							instructionBank.write(index, data);
 						//						}
-						instructionBank.print();
+						
 					
 
 				}
@@ -423,15 +477,30 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			boolean memory[][] = memData.getDataAsBoolean();	
 			IntegerLib<T> lib = new IntegerLib<T>(env);
 			SecureArray<T> memBank = new SecureArray<T>(env, MEM_SIZE, WORD_SIZE, THRESHOLD, RECURSE_THRESHOLD, 4);
+			int dataLen = memData.getDataLength();
+			int aliceInputLen = aliceLongInput.length * aliceLongInput[0].length;
+			
 			T[] index; 
 			T[] data;
-			for (int i = 0; i < memData.getDataLength(); i++){
+			for (int i = 0; i < dataLen; i++){
 				index = lib.toSignals(i, memBank.lengthOfIden);
 				if (env.getParty() == Party.Alice)
 					data = env.inputOfAlice(memory[i]);
 				else 
 					data = env.inputOfAlice(new boolean[WORD_SIZE]);
 				memBank.write(index, data);	
+			}
+			if (aliceInputIsRef){
+				for (int i = 0; i < aliceLongInput.length; i++){
+					for (int j = 0; j < aliceLongInput[0].length; j++){
+						index = lib.toSignals(dataLen + (i * aliceLongInput[0].length)+j, memBank.lengthOfIden);
+						if (env.getParty() == Party.Alice)
+							data = env.inputOfAlice(Utils.fromInt(aliceLongInput[i][j], WORD_SIZE));
+						else 
+							data = env.inputOfAlice(new boolean[WORD_SIZE]);
+						memBank.write(index, data);						
+					}
+				}
 			}
 			System.out.println("exiting getMemoryGen");
 			return memBank;

@@ -62,7 +62,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
 
    reg_rs = reg[rs];
    reg_rt = reg[rt];
-   reg_rd = reg[rd];
+   //reg_rd = reg[rd];
    int2 op_type = this.checkType(op);
    if(op_type == OP_CODE_I) {
       if (op == OP_ADDIU) {

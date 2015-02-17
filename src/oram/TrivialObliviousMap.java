@@ -75,11 +75,12 @@ public class TrivialObliviousMap<T> {
 		
 		for (int i = 0; i < capacity; i++){
 			boolean[] tmp = lib.getEnv().outputToAlice(value[i]); 
+			output = "";
 			output += "item number " + String.valueOf(i) +": ";
 			for (int j = tmp.length-1 ; j >= 0 ; j--){
 				output += (tmp[j] ? "1" : "0");
 			}	
-			output += "\n";
+			//output += "\n";
 			if (lib.getEnv().getParty() == Party.Alice)
 				System.out.println(output);
 		}

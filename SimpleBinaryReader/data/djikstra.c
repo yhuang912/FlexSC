@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define MAX 40
+#define MAX 5
 #define INFINITE 998
 
 int allselected(int *selected)
@@ -54,13 +54,22 @@ int sfe_main(int cost[][MAX], int startID, int endID)
 int main()
 {
   int cost[MAX][MAX]= 
-     {{INFINITE,2,4,7,INFINITE,5,INFINITE},
-      {2,INFINITE,INFINITE,6,3,INFINITE,8},
-      {4,INFINITE,INFINITE,INFINITE,INFINITE,6,INFINITE},
-      {7,6,INFINITE,INFINITE,INFINITE,1,6},
-      {INFINITE,3,INFINITE,INFINITE,INFINITE,INFINITE,7},
-      {5,INFINITE,6,1,INFINITE,INFINITE,6},
-      {INFINITE,8,INFINITE,6,7,6,INFINITE}};
+{{0,65,74,14,4},
+{65,0,96,12,97},
+{74,96,0,100,76},
+{14,12,100,0,97},
+{4,97,76,97,0},
+};
+
+
+  
+   /* {{INFINITE,2,4,7,INFINITE,5,INFINITE}, */
+     /*  {2,INFINITE,INFINITE,6,3,INFINITE,8}, */
+     /*  {4,INFINITE,INFINITE,INFINITE,INFINITE,6,INFINITE}, */
+     /*  {7,6,INFINITE,INFINITE,INFINITE,1,6}, */
+     /*  {INFINITE,3,INFINITE,INFINITE,INFINITE,INFINITE,7}, */
+     /*  {5,INFINITE,6,1,INFINITE,INFINITE,6}, */
+     /*  {INFINITE,8,INFINITE,6,7,6,INFINITE}}; */
 
   /* int cost[MAX][MAX]= 
    {{INFINITE, 6, 9},
@@ -70,7 +79,7 @@ int main()
  int i;
   int ret = sfe_main(cost, 1, 2);
   //for(i=0;i<MAX;i++)
-    // printf("%d\n",distance[i]);
-  //printf("\nreturned value: %d", ret); printf("\n");
+  //printf("%d\n",distance[i]);
+  printf("\nreturned value: %d", ret); printf("\n");
   return 0;
 }
