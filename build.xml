@@ -27,6 +27,7 @@
       </classpath>
       <exclude name="*/MipsEmulatorSC.java" />
       <exclude name="*/MipsEmulatorVerify.java" />
+      <exclude name="arithcircuit2/**" />
     </javac>
   </target>
 
