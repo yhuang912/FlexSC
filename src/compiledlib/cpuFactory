@@ -35,7 +35,7 @@ then
 fi
 
 F=CpuFactory.class
-BINS="../../bin ../bin ../../build/classes"
+BINS="../../bin ../bin ../../SimpleBinaryReader/bin ../../build/classes"
 
 for C in $BINS
 do
