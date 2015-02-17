@@ -1,0 +1,1900 @@
+JAVA PROFILE 1.0.1, created Tue Feb 17 18:09:49 2015
+
+Copyright (c) 2003, 2005, Oracle and/or its affiliates. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+  - Neither the name of Oracle nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Header for -agentlib:hprof (or -Xrunhprof) ASCII Output (JDK 5.0 JVMTI based)
+
+WARNING!  This file format is under development, and is subject to
+change without notice.
+
+This file contains the following types of records:
+
+THREAD START
+THREAD END      mark the lifetime of Java threads
+
+TRACE           represents a Java stack trace.  Each trace consists
+                of a series of stack frames.  Other records refer to
+                TRACEs to identify (1) where object allocations have
+                taken place, (2) the frames in which GC roots were
+                found, and (3) frequently executed methods.
+
+HEAP DUMP       is a complete snapshot of all live objects in the Java
+                heap.  Following distinctions are made:
+
+                ROOT    root set as determined by GC
+                CLS     classes 
+                OBJ     instances
+                ARR     arrays
+
+SITES           is a sorted list of allocation sites.  This identifies
+                the most heavily allocated object types, and the TRACE
+                at which those allocations occurred.
+
+CPU SAMPLES     is a statistical profile of program execution.  The VM
+                periodically samples all running threads, and assigns
+                a quantum to active TRACEs in those threads.  Entries
+                in this record are TRACEs ranked by the percentage of
+                total quanta they consumed; top-ranked TRACEs are
+                typically hot spots in the program.
+
+CPU TIME        is a profile of program execution obtained by measuring
+                the time spent in individual methods (excluding the time
+                spent in callees), as well as by counting the number of
+                times each method is called. Entries in this record are
+                TRACEs ranked by the percentage of total CPU time. The
+                "count" field indicates the number of times each TRACE 
+                is invoked.
+
+MONITOR TIME    is a profile of monitor contention obtained by measuring
+                the time spent by a thread waiting to enter a monitor.
+                Entries in this record are TRACEs ranked by the percentage
+                of total monitor contention time and a brief description
+                of the monitor.  The "count" field indicates the number of 
+                times the monitor was contended at that TRACE.
+
+MONITOR DUMP    is a complete snapshot of all the monitors and threads in 
+                the System.
+
+HEAP DUMP, SITES, CPU SAMPLES|TIME and MONITOR DUMP|TIME records are generated 
+at program exit.  They can also be obtained during program execution by typing 
+Ctrl-\ (on Solaris) or by typing Ctrl-Break (on Win32).
+
+--------
+
+THREAD START (obj=5000016f, id = 200001, name="main", group="main")
+THREAD END (id = 200001)
+THREAD START (obj=5000016f, id = 200004, name="DestroyJavaVM", group="main")
+THREAD END (id = 200004)
+TRACE 300319:
+	java.math.BigInteger.trustedStripLeadingZeroInts(BigInteger.java:2826)
+	java.math.BigInteger.<init>(BigInteger.java:215)
+	java.math.BigInteger.valueOf(BigInteger.java:988)
+	java.math.BigInteger.setBit(BigInteger.java:2305)
+	ot.OTExtSender.fromBoolArray(OTExtSender.java:189)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:93)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+TRACE 300341:
+	java.math.BigInteger.intLength(BigInteger.java:2994)
+	java.math.BigInteger.setBit(BigInteger.java:2298)
+	ot.BitMatrix.NaiveTranspose(BitMatrix.java:54)
+	ot.BitMatrix.transpose(BitMatrix.java:28)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:117)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+TRACE 300376:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:125)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+TRACE 300342:
+	java.math.BigInteger.trustedStripLeadingZeroInts(BigInteger.java:2826)
+	java.math.BigInteger.<init>(BigInteger.java:215)
+	java.math.BigInteger.valueOf(BigInteger.java:988)
+	java.math.BigInteger.setBit(BigInteger.java:2305)
+	ot.BitMatrix.NaiveTranspose(BitMatrix.java:54)
+	ot.BitMatrix.transpose(BitMatrix.java:28)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:117)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+TRACE 300461:
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	gc.offline.Garbler.getPadding(Garbler.java:31)
+	gc.offline.Garbler.dec(Garbler.java:26)
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+TRACE 300430:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:85)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+TRACE 300343:
+	ot.BitMatrix.NaiveTranspose(BitMatrix.java:52)
+	ot.BitMatrix.transpose(BitMatrix.java:28)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:117)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300446:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:69)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:14)
+TRACE 300354:
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	ot.Cipher.getPadding(Cipher.java:94)
+	ot.Cipher.dec(Cipher.java:88)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:129)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+TRACE 300447:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+TRACE 300331:
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	ot.Cipher.getPaddingOfLength(Cipher.java:48)
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:100)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+TRACE 300332:
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	ot.Cipher.getPaddingOfLength(Cipher.java:48)
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:98)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+TRACE 300233:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:254)
+	ot.OTExtReceiver.initialize(OTExtReceiver.java:145)
+	ot.OTExtReceiver.<init>(OTExtReceiver.java:48)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:47)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+TRACE 300344:
+	ot.BitMatrix.NaiveTranspose(BitMatrix.java:54)
+	ot.BitMatrix.transpose(BitMatrix.java:28)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:117)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300472:
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:171)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	gc.offline.Garbler.getPadding(Garbler.java:31)
+	gc.offline.Garbler.dec(Garbler.java:26)
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+TRACE 300356:
+	ot.Cipher.getPadding(Cipher.java:92)
+	ot.Cipher.dec(Cipher.java:88)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:129)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300483:
+	sun.security.provider.SHA.implCompress(SHA.java:117)
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	gc.offline.Garbler.getPadding(Garbler.java:31)
+	gc.offline.Garbler.dec(Garbler.java:26)
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+TRACE 300368:
+	java.math.BigInteger.toByteArray(BigInteger.java:2704)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:129)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300357:
+	sun.security.provider.SHA.implCompress(SHA.java:117)
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	ot.Cipher.getPadding(Cipher.java:94)
+	ot.Cipher.dec(Cipher.java:88)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:129)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+TRACE 300316:
+	rand.ISAACEngine.numberOfLeadingZeros(ISAACEngine.java:143)
+	rand.ISAACEngine.toByteArray(ISAACEngine.java:119)
+	rand.ISAACEngine.engineNextBytes(ISAACEngine.java:72)
+	java.security.SecureRandom.nextBytes(SecureRandom.java:455)
+	java.math.BigInteger.randomBits(BigInteger.java:504)
+	java.math.BigInteger.<init>(BigInteger.java:493)
+	ot.BitMatrix.initialize(BitMatrix.java:24)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:91)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+TRACE 300367:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:125)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+TRACE 300369:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:126)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+TRACE 300512:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:85)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:63)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+TRACE 300378:
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:129)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300531:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:25)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+TRACE 300595:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	network.Server.readBytes(Server.java:63)
+	circuits.CircuitLib.declassifyToBoth(CircuitLib.java:91)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:86)
+TRACE 300521:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+TRACE 300510:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:85)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:122)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+TRACE 300364:
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:100)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300308:
+	java.util.Random.nextBoolean(Random.java:358)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:30)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300314:
+	rand.ISAACEngine.engineNextBytes(ISAACEngine.java:78)
+	java.security.SecureRandom.nextBytes(SecureRandom.java:455)
+	java.math.BigInteger.randomBits(BigInteger.java:504)
+	java.math.BigInteger.<init>(BigInteger.java:493)
+	ot.BitMatrix.initialize(BitMatrix.java:24)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:91)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+TRACE 300336:
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:98)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300484:
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	gc.offline.Garbler.getPadding(Garbler.java:31)
+	gc.offline.Garbler.dec(Garbler.java:26)
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.arithmetic.IntegerLib.eq(IntegerLib.java:373)
+TRACE 300470:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:24)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+TRACE 300522:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:24)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+TRACE 300328:
+	sun.security.provider.SHA.implCompress(SHA.java:117)
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	ot.Cipher.getPaddingOfLength(Cipher.java:48)
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:100)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+TRACE 300471:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+TRACE 300462:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:25)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+TRACE 300335:
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:96)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300380:
+	ot.Cipher.getPadding(Cipher.java:93)
+	ot.Cipher.dec(Cipher.java:88)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:129)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300329:
+	sun.security.provider.SHA.implCompress(SHA.java:117)
+	sun.security.provider.SHA.implDigest(SHA.java:98)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:173)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	ot.Cipher.getPaddingOfLength(Cipher.java:48)
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:98)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+TRACE 300333:
+	network.RWBigInteger.writeBI(RWBigInteger.java:13)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:104)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300362:
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:100)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300334:
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:98)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300346:
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:119)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300519:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:85)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:63)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:77)
+TRACE 300387:
+	network.RWBigInteger.writeBI(RWBigInteger.java:13)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:103)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300315:
+	java.math.BigInteger.<init>(BigInteger.java:237)
+	java.math.BigInteger.<init>(BigInteger.java:493)
+	ot.BitMatrix.initialize(BitMatrix.java:24)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:91)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+TRACE 300563:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:196)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:56)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:87)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+TRACE 300383:
+	ot.OTExtSender.fromBoolArray(OTExtSender.java:189)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:93)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300511:
+	java.net.SocketOutputStream.socketWrite0(SocketOutputStream.java:Unknown line)
+	java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:113)
+	java.net.SocketOutputStream.write(SocketOutputStream.java:159)
+	java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	java.io.BufferedOutputStream.flush(BufferedOutputStream.java:140)
+	gc.GCEvaComp.outputToAlice(GCEvaComp.java:100)
+	gc.GCEvaComp.outputToAlice(GCEvaComp.java:14)
+	orambs.OramParty.outputBlock(OramParty.java:161)
+	orambs.OramParty.outputBucket(OramParty.java:170)
+	orambs.OramParty.outputBuckets(OramParty.java:177)
+TRACE 300513:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:86)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:63)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+TRACE 300527:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:85)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:122)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:83)
+TRACE 300476:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:178)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:56)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:87)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+TRACE 300547:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:86)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:122)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+TRACE 300491:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:178)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:55)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:87)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+TRACE 300371:
+	rand.ISAACEngine.numberOfLeadingZeros(ISAACEngine.java:143)
+	rand.ISAACEngine.toByteArray(ISAACEngine.java:119)
+	rand.ISAACEngine.engineNextBytes(ISAACEngine.java:72)
+	java.security.SecureRandom.nextBytes(SecureRandom.java:455)
+	java.security.SecureRandom.next(SecureRandom.java:477)
+	java.util.Random.nextBoolean(Random.java:358)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:30)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+TRACE 300377:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:125)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300365:
+	ot.Cipher.getPaddingOfLength(Cipher.java:47)
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:98)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300696:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:178)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+TRACE 300320:
+	java.math.BigInteger.intLength(BigInteger.java:2994)
+	java.math.BigInteger.setBit(BigInteger.java:2298)
+	ot.OTExtSender.fromBoolArray(OTExtSender.java:189)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:93)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+TRACE 300366:
+	ot.Cipher.getPaddingOfLength(Cipher.java:47)
+	ot.Cipher.encrypt(Cipher.java:31)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:100)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300601:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.add(BucketLib.java:104)
+	orambs.CircuitOram.putBack(CircuitOram.java:99)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300317:
+	rand.ISAACAlgorithm.nextInt(ISAACAlgorithm.java:245)
+	rand.ISAACEngine.engineNextBytes(ISAACEngine.java:72)
+	java.security.SecureRandom.nextBytes(SecureRandom.java:455)
+	java.math.BigInteger.randomBits(BigInteger.java:504)
+	java.math.BigInteger.<init>(BigInteger.java:493)
+	ot.BitMatrix.initialize(BitMatrix.java:24)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:91)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+TRACE 300282:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	network.Server.readBytes(Server.java:63)
+	network.RWBigInteger.readBI(RWBigInteger.java:26)
+	ot.NPOTSender.step1(NPOTSender.java:146)
+TRACE 300370:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:126)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300548:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.xor(CircuitLib.java:160)
+	orambs.BucketLib.xor(BucketLib.java:148)
+	orambs.BucketLib.xor(BucketLib.java:167)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:124)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+TRACE 300592:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:24)
+	gc.offline.GCEva.and(GCEva.java:44)
+TRACE 300499:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:86)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:122)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:83)
+TRACE 300693:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:178)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+TRACE 300318:
+	java.util.Arrays.copyOfRange(Arrays.java:2622)
+	java.math.BigInteger.trustedStripLeadingZeroInts(BigInteger.java:2826)
+	java.math.BigInteger.<init>(BigInteger.java:215)
+	java.math.BigInteger.valueOf(BigInteger.java:988)
+	java.math.BigInteger.setBit(BigInteger.java:2305)
+	ot.OTExtSender.fromBoolArray(OTExtSender.java:189)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:93)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+TRACE 300432:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:86)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+TRACE 300372:
+	java.math.BigInteger.randomBits(BigInteger.java:500)
+	java.math.BigInteger.<init>(BigInteger.java:493)
+	ot.BitMatrix.initialize(BitMatrix.java:24)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:91)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+TRACE 300540:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.xor(CircuitLib.java:160)
+	orambs.BucketLib.xor(BucketLib.java:148)
+	orambs.BucketLib.xor(BucketLib.java:167)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:124)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+TRACE 300584:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalAdd(BucketLib.java:89)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:203)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+TRACE 300642:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:86)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:63)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:77)
+TRACE 300653:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:25)
+	gc.offline.GCEva.and(GCEva.java:44)
+TRACE 300373:
+	java.math.BigInteger.setBit(BigInteger.java:2298)
+	ot.OTExtSender.fromBoolArray(OTExtSender.java:189)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:93)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300389:
+	ot.Cipher.getPadding(Cipher.java:94)
+	ot.Cipher.dec(Cipher.java:88)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:129)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300503:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:69)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfClient(OramParty.java:152)
+	orambs.TreeBasedOramParty.inputPathOfClient(TreeBasedOramParty.java:79)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:64)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+TRACE 300556:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.add(BucketLib.java:104)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:84)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+TRACE 300712:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalAdd(BucketLib.java:89)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:203)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:56)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:87)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+TRACE 300534:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+TRACE 300516:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:196)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+TRACE 300542:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:69)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfClient(OramParty.java:152)
+	orambs.TreeBasedOramParty.inputPathOfClient(TreeBasedOramParty.java:79)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:64)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+TRACE 300558:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:196)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:55)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:87)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+TRACE 300704:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:74)
+	orambs.noOTORAM.CircuitOramNOOT.readAndRemove(CircuitOramNOOT.java:69)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:112)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+TRACE 300488:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:74)
+	orambs.noOTORAM.CircuitOramNOOT.readAndRemove(CircuitOramNOOT.java:69)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:112)
+TRACE 300659:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalAdd(BucketLib.java:89)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:203)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+TRACE 300398:
+	java.lang.System.arraycopy(System.java:Unknown line)
+	java.io.BufferedOutputStream.write(BufferedOutputStream.java:128)
+	java.io.FilterOutputStream.write(FilterOutputStream.java:97)
+	network.Server.writeByte(Server.java:70)
+	network.RWBigInteger.writeBI(RWBigInteger.java:13)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:104)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+TRACE 300524:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.BucketLib.readAndRemove(BucketLib.java:74)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:79)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+TRACE 300535:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalAdd(BucketLib.java:89)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:203)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+TRACE 300546:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalAdd(BucketLib.java:89)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:203)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+TRACE 300604:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:196)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+TRACE 300614:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.noOTORAM.CircuitOramNOOT.readAndRemove(CircuitOramNOOT.java:70)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:112)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+TRACE 300508:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:196)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+TRACE 300523:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.BucketLib.readAndRemove(BucketLib.java:74)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:79)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+TRACE 300392:
+	java.net.SocketInputStream.socketRead0(SocketInputStream.java:Unknown line)
+	java.net.SocketInputStream.read(SocketInputStream.java:152)
+	java.net.SocketInputStream.read(SocketInputStream.java:122)
+	java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	java.io.BufferedInputStream.read1(BufferedInputStream.java:275)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:126)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+TRACE 300536:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:25)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+TRACE 300545:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:196)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+TRACE 300637:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.xor(CircuitLib.java:160)
+	orambs.BucketLib.xor(BucketLib.java:148)
+	orambs.BucketLib.xor(BucketLib.java:167)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:124)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+TRACE 300650:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.xor(CircuitLib.java:160)
+	orambs.BucketLib.xor(BucketLib.java:148)
+	orambs.BucketLib.xor(BucketLib.java:167)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:65)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+TRACE 300784:
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:171)
+	sun.security.provider.DigestBase.engineDigest(DigestBase.java:152)
+	java.security.MessageDigest$Delegate.engineDigest(MessageDigest.java:576)
+	java.security.MessageDigest.digest(MessageDigest.java:353)
+	gc.offline.Garbler.getPadding(Garbler.java:31)
+	gc.offline.Garbler.dec(Garbler.java:26)
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.arithmetic.IntegerLib.add(IntegerLib.java:62)
+TRACE 300528:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.xor(CircuitLib.java:160)
+	orambs.BucketLib.xor(BucketLib.java:148)
+	orambs.BucketLib.xor(BucketLib.java:167)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:124)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:83)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300609:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.xor(CircuitLib.java:160)
+	orambs.BucketLib.xor(BucketLib.java:148)
+	orambs.BucketLib.xor(BucketLib.java:167)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:65)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+TRACE 300631:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:80)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:112)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300724:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.BucketLib.readAndRemove(BucketLib.java:75)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:79)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+TRACE 300726:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:80)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300480:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.add(BucketLib.java:104)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:84)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+TRACE 300482:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+TRACE 300564:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.noOTORAM.CircuitOramNOOT.readAndRemove(CircuitOramNOOT.java:70)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:112)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+TRACE 300654:
+	rand.ISAACEngine.numberOfLeadingZeros(ISAACEngine.java:143)
+	rand.ISAACEngine.toByteArray(ISAACEngine.java:119)
+	rand.ISAACEngine.engineNextBytes(ISAACEngine.java:72)
+	java.security.SecureRandom.nextBytes(SecureRandom.java:455)
+	java.security.SecureRandom.next(SecureRandom.java:477)
+	java.util.Random.nextBoolean(Random.java:358)
+	orambs.OramParty.randomBlock(OramParty.java:211)
+	orambs.OramParty.randomBucket(OramParty.java:219)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:118)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+TRACE 300395:
+	rand.ISAACEngine.engineNextBytes(ISAACEngine.java:78)
+	java.security.SecureRandom.nextBytes(SecureRandom.java:455)
+	java.security.SecureRandom.next(SecureRandom.java:477)
+	java.util.Random.nextBoolean(Random.java:358)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:30)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+	gc.offline.GCEva.<init>(GCEva.java:15)
+	flexsc.CompEnv.getEnv(CompEnv.java:48)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:156)
+TRACE 300405:
+	java.lang.System.arraycopy(System.java:Unknown line)
+	java.io.BufferedOutputStream.write(BufferedOutputStream.java:128)
+	java.io.FilterOutputStream.write(FilterOutputStream.java:97)
+	network.Server.writeByte(Server.java:70)
+	network.RWBigInteger.writeBI(RWBigInteger.java:13)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:103)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+	ot.OTPreprocessReceiver.fillup(OTPreprocessReceiver.java:33)
+	ot.OTPreprocessReceiver.<init>(OTPreprocessReceiver.java:48)
+	gc.GCEvaComp.<init>(GCEvaComp.java:26)
+TRACE 300517:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.xor(CircuitLib.java:160)
+	orambs.BucketLib.xor(BucketLib.java:148)
+	orambs.BucketLib.xor(BucketLib.java:167)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:124)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+TRACE 300520:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:69)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfClient(OramParty.java:152)
+	orambs.TreeBasedOramParty.inputPathOfClient(TreeBasedOramParty.java:79)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:64)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:77)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+TRACE 300772:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:25)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+TRACE 300330:
+	java.net.SocketOutputStream.socketWrite0(SocketOutputStream.java:Unknown line)
+	java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:113)
+	java.net.SocketOutputStream.write(SocketOutputStream.java:159)
+	java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:82)
+	java.io.BufferedOutputStream.write(BufferedOutputStream.java:126)
+	java.io.FilterOutputStream.write(FilterOutputStream.java:97)
+	network.Server.writeByte(Server.java:71)
+	network.RWBigInteger.writeBI(RWBigInteger.java:13)
+	ot.OTExtReceiver.reverseAndExtend(OTExtReceiver.java:103)
+	ot.OTExtReceiver.receive(OTExtReceiver.java:66)
+TRACE 300489:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.add(BucketLib.java:104)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:84)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+TRACE 300539:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:25)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalAdd(BucketLib.java:89)
+TRACE 300567:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalAdd(BucketLib.java:89)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:203)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:56)
+TRACE 300568:
+	java.net.PlainSocketImpl.socketAvailable(PlainSocketImpl.java:Unknown line)
+	java.net.AbstractPlainSocketImpl.available(AbstractPlainSocketImpl.java:478)
+	java.net.SocketInputStream.available(SocketInputStream.java:245)
+	java.io.BufferedInputStream.read(BufferedInputStream.java:342)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+TRACE 300571:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.noOTORAM.CircuitOramNOOT.readAndRemove(CircuitOramNOOT.java:70)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:112)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+TRACE 300719:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.add(BucketLib.java:104)
+	orambs.CircuitOram.putBack(CircuitOram.java:99)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300723:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.xor(CircuitLib.java:160)
+	orambs.BucketLib.xor(BucketLib.java:148)
+	orambs.BucketLib.xor(BucketLib.java:167)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:65)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:77)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300786:
+	java.util.Random.nextBoolean(Random.java:358)
+	orambs.OramParty.randomBlock(OramParty.java:211)
+	orambs.OramParty.randomBucket(OramParty.java:219)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:118)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+TRACE 300800:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.noOTORAM.CircuitOramNOOT.readAndRemove(CircuitOramNOOT.java:70)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:112)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+TRACE 300829:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:24)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:57)
+TRACE 300429:
+	orambs.TreeBasedOramParty.<init>(TreeBasedOramParty.java:21)
+	orambs.CircuitOram.<init>(CircuitOram.java:29)
+	orambs.BSCircuitOram.init(BSCircuitOram.java:49)
+	orambs.BSCircuitOram.<init>(BSCircuitOram.java:31)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:158)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+TRACE 300495:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:205)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:178)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:56)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:87)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+TRACE 300569:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:138)
+TRACE 300589:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:178)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+TRACE 300626:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.add(BucketLib.java:104)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:84)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:108)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+TRACE 300721:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:24)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalAdd(BucketLib.java:89)
+TRACE 300781:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:198)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+TRACE 300818:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+TRACE 300833:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalAdd(BucketLib.java:89)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:203)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:55)
+	orambs.noOTORAM.CircuitOramNOOT.putBack(CircuitOramNOOT.java:87)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:118)
+TRACE 300526:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:80)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+TRACE 300541:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:86)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:63)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+TRACE 300577:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:178)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:56)
+TRACE 300583:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.CircuitOramLib.flush(CircuitOramLib.java:178)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:64)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+TRACE 300586:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:69)
+	gc.GCEvaComp.inputOfAlice(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfClient(OramParty.java:152)
+	orambs.TreeBasedOramParty.inputPathOfClient(TreeBasedOramParty.java:79)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:64)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:57)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+TRACE 300622:
+	gc.offline.GCEva.and(GCEva.java:49)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+	orambs.noOTORAM.CircuitOramLib.flush(CircuitOramLib.java:196)
+	orambs.noOTORAM.CircuitOramNOOT.flushOneTime(CircuitOramNOOT.java:61)
+	orambs.noOTORAM.CircuitOramNOOT.ControlEviction(CircuitOramNOOT.java:55)
+TRACE 300649:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:86)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePath(TreeBasedOramParty.java:63)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:62)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+TRACE 300664:
+	java.io.BufferedInputStream.read(BufferedInputStream.java:334)
+	network.Server.readBytes(Server.java:54)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:23)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:138)
+TRACE 300668:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:25)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.readAndRemove(BucketLib.java:57)
+TRACE 300735:
+	java.util.Random.nextBoolean(Random.java:358)
+	orambs.OramParty.randomBlock(OramParty.java:211)
+	orambs.OramParty.randomBucket(OramParty.java:219)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:118)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+	orambs.CircuitOram.putBack(CircuitOram.java:102)
+	orambs.CircuitOram.write(CircuitOram.java:115)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+TRACE 300807:
+	circuits.CircuitLib.xor(CircuitLib.java:152)
+	circuits.CircuitLib.mux(CircuitLib.java:203)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.BucketLib.mux(BucketLib.java:140)
+	orambs.BucketLib.readAndRemove(BucketLib.java:57)
+	orambs.BucketLib.readAndRemove(BucketLib.java:74)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:79)
+	orambs.BSCircuitOram.travelToDeep(BSCircuitOram.java:112)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:83)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+TRACE 300828:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	gc.offline.GCEva.receiveGTT(GCEva.java:24)
+	gc.offline.GCEva.and(GCEva.java:44)
+	gc.offline.GCEva.and(GCEva.java:10)
+	circuits.CircuitLib.and(CircuitLib.java:136)
+	circuits.CircuitLib.mux(CircuitLib.java:204)
+	circuits.CircuitLib.mux(CircuitLib.java:214)
+	orambs.noOTORAM.BucketLib.mux(BucketLib.java:140)
+	orambs.noOTORAM.BucketLib.conditionalReadAndRemove(BucketLib.java:46)
+TRACE 300906:
+	network.Server.readBytes(Server.java:58)
+	gc.GCSignal.receive(GCSignal.java:81)
+	ot.OTPreprocessReceiver.receive(OTPreprocessReceiver.java:86)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:56)
+	gc.GCEvaComp.inputOfBob(GCEvaComp.java:14)
+	orambs.OramParty.inputBucketOfServer(OramParty.java:145)
+	orambs.TreeBasedOramParty.inputPathOfServer(TreeBasedOramParty.java:100)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:122)
+	orambs.CircuitOram.flushOneTime(CircuitOram.java:66)
+	orambs.CircuitOram.ControlEviction(CircuitOram.java:56)
+TRACE 301011:
+	java.util.Random.nextBoolean(Random.java:358)
+	orambs.OramParty.randomBlock(OramParty.java:211)
+	orambs.OramParty.randomBucket(OramParty.java:219)
+	orambs.TreeBasedOramParty.preparePlainPath(TreeBasedOramParty.java:118)
+	orambs.CircuitOram.readAndRemove(CircuitOram.java:83)
+	orambs.CircuitOram.write(CircuitOram.java:114)
+	orambs.BSCircuitOram.write(BSCircuitOram.java:87)
+	oram.TestCircuitOramRecOpt$EvaRunnable.run(TestCircuitOramRecOpt.java:171)
+	oram.TestCircuitOramRecClient.main(TestCircuitOramRecClient.java:12)
+CPU SAMPLES BEGIN (total = 75054) Tue Feb 17 18:17:08 2015
+rank   self  accum   count trace method
+   1 45.38% 45.38%   34059 300319 java.math.BigInteger.trustedStripLeadingZeroInts
+   2 11.43% 56.81%    8579 300341 java.math.BigInteger.intLength
+   3 10.60% 67.41%    7956 300376 java.net.SocketInputStream.socketRead0
+   4  8.34% 75.75%    6263 300342 java.math.BigInteger.trustedStripLeadingZeroInts
+   5  2.95% 78.70%    2212 300461 sun.security.provider.SHA.implDigest
+   6  2.44% 81.14%    1833 300430 java.net.SocketInputStream.socketRead0
+   7  2.03% 83.18%    1526 300343 ot.BitMatrix.NaiveTranspose
+   8  1.90% 85.08%    1429 300446 java.net.SocketInputStream.socketRead0
+   9  1.43% 86.51%    1074 300354 sun.security.provider.SHA.implDigest
+  10  0.71% 87.23%     535 300447 java.net.SocketInputStream.socketRead0
+  11  0.71% 87.94%     534 300331 sun.security.provider.SHA.implDigest
+  12  0.70% 88.64%     528 300332 sun.security.provider.SHA.implDigest
+  13  0.64% 89.28%     483 300233 java.net.SocketInputStream.socketRead0
+  14  0.51% 89.79%     381 300344 ot.BitMatrix.NaiveTranspose
+  15  0.49% 90.29%     371 300472 sun.security.provider.DigestBase.engineDigest
+  16  0.47% 90.75%     351 300356 ot.Cipher.getPadding
+  17  0.32% 91.07%     240 300483 sun.security.provider.SHA.implCompress
+  18  0.29% 91.37%     221 300368 java.math.BigInteger.toByteArray
+  19  0.25% 91.61%     185 300357 sun.security.provider.SHA.implCompress
+  20  0.25% 91.86%     184 300316 rand.ISAACEngine.numberOfLeadingZeros
+  21  0.20% 92.06%     149 300367 java.io.BufferedInputStream.read
+  22  0.19% 92.25%     145 300369 java.io.BufferedInputStream.read
+  23  0.18% 92.43%     138 300512 java.io.BufferedInputStream.read
+  24  0.17% 92.60%     126 300378 ot.OTExtReceiver.reverseAndExtend
+  25  0.17% 92.77%     125 300531 java.io.BufferedInputStream.read
+  26  0.17% 92.94%     125 300595 java.net.SocketInputStream.socketRead0
+  27  0.16% 93.10%     123 300521 java.io.BufferedInputStream.read
+  28  0.16% 93.26%     120 300510 java.io.BufferedInputStream.read
+  29  0.16% 93.42%     118 300364 ot.Cipher.encrypt
+  30  0.15% 93.56%     111 300308 java.util.Random.nextBoolean
+  31  0.14% 93.71%     107 300314 rand.ISAACEngine.engineNextBytes
+  32  0.14% 93.85%     107 300336 ot.Cipher.encrypt
+  33  0.14% 93.99%     107 300484 sun.security.provider.SHA.implDigest
+  34  0.14% 94.13%     106 300470 java.io.BufferedInputStream.read
+  35  0.14% 94.27%     104 300522 java.io.BufferedInputStream.read
+  36  0.13% 94.40%      97 300328 sun.security.provider.SHA.implCompress
+  37  0.13% 94.53%      97 300471 java.io.BufferedInputStream.read
+  38  0.12% 94.65%      91 300462 java.io.BufferedInputStream.read
+  39  0.11% 94.76%      84 300335 ot.OTExtReceiver.reverseAndExtend
+  40  0.11% 94.87%      83 300380 ot.Cipher.getPadding
+  41  0.11% 94.98%      82 300329 sun.security.provider.SHA.implCompress
+  42  0.11% 95.09%      82 300333 network.RWBigInteger.writeBI
+  43  0.11% 95.20%      81 300362 ot.Cipher.encrypt
+  44  0.10% 95.30%      76 300334 ot.Cipher.encrypt
+  45  0.09% 95.40%      70 300346 ot.OTExtReceiver.reverseAndExtend
+  46  0.09% 95.48%      64 300519 java.io.BufferedInputStream.read
+  47  0.08% 95.56%      59 300387 network.RWBigInteger.writeBI
+  48  0.07% 95.63%      53 300315 java.math.BigInteger.<init>
+  49  0.07% 95.70%      50 300563 circuits.CircuitLib.xor
+  50  0.07% 95.76%      49 300383 ot.OTExtSender.fromBoolArray
+  51  0.06% 95.82%      45 300511 java.net.SocketOutputStream.socketWrite0
+  52  0.06% 95.88%      44 300513 java.io.BufferedInputStream.read
+  53  0.06% 95.94%      44 300527 java.io.BufferedInputStream.read
+  54  0.05% 95.99%      39 300476 circuits.CircuitLib.xor
+  55  0.05% 96.04%      39 300547 java.io.BufferedInputStream.read
+  56  0.05% 96.09%      36 300491 circuits.CircuitLib.xor
+  57  0.04% 96.13%      33 300371 rand.ISAACEngine.numberOfLeadingZeros
+  58  0.04% 96.18%      32 300377 network.Server.readBytes
+  59  0.04% 96.22%      31 300365 ot.Cipher.getPaddingOfLength
+  60  0.04% 96.26%      31 300696 circuits.CircuitLib.xor
+  61  0.04% 96.30%      30 300320 java.math.BigInteger.intLength
+  62  0.04% 96.34%      29 300366 ot.Cipher.getPaddingOfLength
+  63  0.04% 96.38%      29 300601 circuits.CircuitLib.xor
+  64  0.04% 96.41%      28 300317 rand.ISAACAlgorithm.nextInt
+  65  0.04% 96.45%      27 300282 java.net.SocketInputStream.socketRead0
+  66  0.03% 96.49%      26 300370 network.Server.readBytes
+  67  0.03% 96.52%      26 300548 circuits.CircuitLib.xor
+  68  0.03% 96.55%      26 300592 java.net.SocketInputStream.socketRead0
+  69  0.03% 96.59%      25 300499 java.io.BufferedInputStream.read
+  70  0.03% 96.62%      25 300693 circuits.CircuitLib.xor
+  71  0.03% 96.65%      24 300318 java.util.Arrays.copyOfRange
+  72  0.03% 96.69%      24 300432 java.net.SocketInputStream.socketRead0
+  73  0.03% 96.71%      22 300372 java.math.BigInteger.randomBits
+  74  0.03% 96.74%      22 300540 circuits.CircuitLib.xor
+  75  0.03% 96.77%      22 300584 gc.offline.GCEva.and
+  76  0.03% 96.80%      22 300642 java.io.BufferedInputStream.read
+  77  0.03% 96.83%      22 300653 java.net.SocketInputStream.socketRead0
+  78  0.03% 96.86%      21 300373 java.math.BigInteger.setBit
+  79  0.03% 96.89%      21 300389 ot.Cipher.getPadding
+  80  0.03% 96.92%      21 300503 java.io.BufferedInputStream.read
+  81  0.03% 96.94%      21 300556 circuits.CircuitLib.xor
+  82  0.03% 96.97%      21 300712 circuits.CircuitLib.xor
+  83  0.03% 97.00%      20 300534 network.Server.readBytes
+  84  0.03% 97.02%      19 300516 gc.offline.GCEva.and
+  85  0.03% 97.05%      19 300542 java.io.BufferedInputStream.read
+  86  0.03% 97.07%      19 300558 circuits.CircuitLib.xor
+  87  0.02% 97.10%      18 300704 circuits.CircuitLib.xor
+  88  0.02% 97.12%      17 300488 gc.offline.GCEva.and
+  89  0.02% 97.14%      17 300659 circuits.CircuitLib.xor
+  90  0.02% 97.16%      16 300398 java.lang.System.arraycopy
+  91  0.02% 97.19%      16 300524 circuits.CircuitLib.xor
+  92  0.02% 97.21%      16 300535 circuits.CircuitLib.xor
+  93  0.02% 97.23%      16 300546 gc.offline.GCEva.and
+  94  0.02% 97.25%      16 300604 circuits.CircuitLib.xor
+  95  0.02% 97.27%      16 300614 circuits.CircuitLib.xor
+  96  0.02% 97.29%      15 300508 gc.offline.GCEva.and
+  97  0.02% 97.31%      15 300523 gc.offline.GCEva.and
+  98  0.02% 97.33%      14 300392 java.net.SocketInputStream.socketRead0
+  99  0.02% 97.35%      14 300536 network.Server.readBytes
+ 100  0.02% 97.37%      14 300545 circuits.CircuitLib.xor
+ 101  0.02% 97.39%      14 300637 circuits.CircuitLib.xor
+ 102  0.02% 97.40%      14 300650 circuits.CircuitLib.xor
+ 103  0.02% 97.42%      14 300784 sun.security.provider.DigestBase.engineDigest
+ 104  0.02% 97.44%      13 300528 circuits.CircuitLib.xor
+ 105  0.02% 97.46%      13 300609 circuits.CircuitLib.xor
+ 106  0.02% 97.48%      13 300631 circuits.CircuitLib.xor
+ 107  0.02% 97.49%      13 300724 circuits.CircuitLib.xor
+ 108  0.02% 97.51%      13 300726 circuits.CircuitLib.xor
+ 109  0.02% 97.53%      12 300480 circuits.CircuitLib.xor
+ 110  0.02% 97.54%      12 300482 network.Server.readBytes
+ 111  0.02% 97.56%      12 300564 circuits.CircuitLib.xor
+ 112  0.02% 97.57%      12 300654 rand.ISAACEngine.numberOfLeadingZeros
+ 113  0.01% 97.59%      11 300395 rand.ISAACEngine.engineNextBytes
+ 114  0.01% 97.60%      11 300405 java.lang.System.arraycopy
+ 115  0.01% 97.62%      11 300517 circuits.CircuitLib.xor
+ 116  0.01% 97.63%      11 300520 java.io.BufferedInputStream.read
+ 117  0.01% 97.65%      11 300772 network.Server.readBytes
+ 118  0.01% 97.66%      10 300330 java.net.SocketOutputStream.socketWrite0
+ 119  0.01% 97.67%      10 300489 gc.offline.GCEva.and
+ 120  0.01% 97.69%      10 300539 network.Server.readBytes
+ 121  0.01% 97.70%      10 300567 gc.offline.GCEva.and
+ 122  0.01% 97.71%      10 300568 java.net.PlainSocketImpl.socketAvailable
+ 123  0.01% 97.73%      10 300571 gc.offline.GCEva.and
+ 124  0.01% 97.74%      10 300719 circuits.CircuitLib.xor
+ 125  0.01% 97.75%      10 300723 circuits.CircuitLib.xor
+ 126  0.01% 97.77%      10 300786 java.util.Random.nextBoolean
+ 127  0.01% 97.78%      10 300800 circuits.CircuitLib.xor
+ 128  0.01% 97.79%      10 300829 network.Server.readBytes
+ 129  0.01% 97.81%       9 300429 orambs.TreeBasedOramParty.<init>
+ 130  0.01% 97.82%       9 300495 circuits.CircuitLib.xor
+ 131  0.01% 97.83%       9 300569 java.io.BufferedInputStream.read
+ 132  0.01% 97.84%       9 300589 circuits.CircuitLib.xor
+ 133  0.01% 97.85%       9 300626 circuits.CircuitLib.xor
+ 134  0.01% 97.87%       9 300721 network.Server.readBytes
+ 135  0.01% 97.88%       9 300781 circuits.CircuitLib.xor
+ 136  0.01% 97.89%       9 300818 network.Server.readBytes
+ 137  0.01% 97.90%       9 300833 circuits.CircuitLib.xor
+ 138  0.01% 97.91%       8 300526 gc.offline.GCEva.and
+ 139  0.01% 97.92%       8 300541 network.Server.readBytes
+ 140  0.01% 97.93%       8 300577 gc.offline.GCEva.and
+ 141  0.01% 97.94%       8 300583 gc.offline.GCEva.and
+ 142  0.01% 97.95%       8 300586 network.Server.readBytes
+ 143  0.01% 97.97%       8 300622 gc.offline.GCEva.and
+ 144  0.01% 97.98%       8 300649 network.Server.readBytes
+ 145  0.01% 97.99%       8 300664 java.io.BufferedInputStream.read
+ 146  0.01% 98.00%       8 300668 network.Server.readBytes
+ 147  0.01% 98.01%       8 300735 java.util.Random.nextBoolean
+ 148  0.01% 98.02%       8 300807 circuits.CircuitLib.xor
+ 149  0.01% 98.03%       8 300828 network.Server.readBytes
+ 150  0.01% 98.04%       8 300906 network.Server.readBytes
+ 151  0.01% 98.05%       8 301011 java.util.Random.nextBoolean
+CPU SAMPLES END
