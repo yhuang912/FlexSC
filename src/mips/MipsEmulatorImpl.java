@@ -23,6 +23,9 @@ import com.appcomsci.mips.memory.MipsInstructionSet;
 import com.appcomsci.sfe.common.Configuration;
 import static com.appcomsci.mips.cpu.Utils.consistentHashString;
 import static com.appcomsci.mips.cpu.Utils.consistentHash;
+import static com.appcomsci.mips.cpu.Utils.makeInstructionSet;
+import static com.appcomsci.mips.cpu.Utils.toStringSet;
+
 
 import compiledlib.dov.CPU;
 import compiledlib.dov.CpuImpl;
@@ -294,8 +297,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				CpuFcn<T> cpu = s.findCpu(env, packageName, classNameRoot, true);
 				if(cpu == null && blither) {
 					System.err.println("Could not find cpu for: [" +
-							consistentHash(cpu.getOpcodesImplemented()) + "]"+
-							consistentHashString(cpu.getOpcodesImplemented()));
+							consistentHash(toStringSet(makeInstructionSet(s))) +
+							"] " + consistentHashString(toStringSet(makeInstructionSet(s)))
+							);
 				}
 			}
 			System.out.println("Exiting loadCpus");
