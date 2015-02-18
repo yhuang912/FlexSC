@@ -44,7 +44,6 @@ public class TestCircuitOramRecOpt {
 
 		GenRunnable(int port, int logN, int capacity, int dataSize,
 				int recurFactor, int logCutoff) {
-			Flag.tableName = "table_"+logN;
 			this.port = port;
 			this.logN = logN;
 			this.N = 1 << logN;

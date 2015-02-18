@@ -6,12 +6,14 @@ import flexsc.Flag;
 public class TestCircuitOramRecServer {
 
 	public  static void main(String args[]) throws Exception {
-		for(int i = 1; i <=26 ; i++) {
+//		for(int i = 1; i <=26 ; i++) {
+		int i = new Integer(args[0]);
+			Flag.tableName = "table"+i;
 			Flag.sw.flush();
 			GenRunnable gen = new GenRunnable(54321, i, 3, 1024-32, 8, 6);
 			gen.run();
 			Flag.sw.print();
 			System.out.print("\n");
-		}
+//		}
 	}
 }

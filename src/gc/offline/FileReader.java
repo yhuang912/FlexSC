@@ -8,7 +8,7 @@ import java.util.Arrays;
 public class FileReader {
 	byte[] data;
 	int pos = 0;
-	public FileReader(String name){
+	public FileReader(String name) {
 		try {
 			File file = new File(name);
 			FileInputStream fis;
