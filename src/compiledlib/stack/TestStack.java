@@ -27,7 +27,7 @@ public class TestStack {
 	static{
 		op = new int[10];
 		for (int i = 0; i < op.length; ++i)
-			op[i] = rnd.nextInt(2);
+			op[i] = 0;//rnd.nextInt(2);
 		int size = 0;
 		for (int i = 0; i < 10; ++i) {
 			if (size == 0) {
@@ -69,6 +69,7 @@ public class TestStack {
 		double[] time = new double[op.length];
 
 		for (int i = 0; i < op.length; ++i) {
+System.out.println(i);
 			if (op[i] == 1 && Flag.mode == Mode.VERIFY) {
 				int res = 0;
 				if (env.getParty() == Party.Alice) {
@@ -90,7 +91,7 @@ public class TestStack {
 				}
 				BoolArray tmp = new BoolArray(env);
 				tmp.data = env.inputOfAlice(Utils.fromInt(rand, 32));
-				if(Flag.mode == Mode.REAL && env.getParty() == Party.Alice) {
+				if(env.getParty() == Party.Alice) {
 					System.gc();
 					double a = System.nanoTime();
 					ostack.stack_op(tmp, lib.SIGNAL_ZERO);
@@ -179,9 +180,11 @@ public class TestStack {
 				connect(host, port);
 				CompEnv env = CompEnv.getEnv(Party.Bob, is, os);
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
+System.out.println("..");
 				Stack<BoolArray> ostack = new Stack<BoolArray>(env,
 						logN, new BoolArray(env), new CircuitOram<GCSignal>(env,
 								1 << logN, 32 + logN));
+System.out.println("..");
 				compute(env, ostack, lib);
 				disconnect();
 			} catch (Exception e) {
@@ -223,14 +226,14 @@ public class TestStack {
 		int logN = new Integer(args[1]);
 		if(new Integer(args[0]) == 1) {
 			TestStack a = new TestStack();
-			a.getInput(40);
+			a.getInput(5);
 			GenRunnable gen = new GenRunnable(logN, args[2], new Integer(args[3]));
 			Thread tGen = new Thread(gen);
 			tGen.run();		
 		}
 		else {
 			TestStack a = new TestStack();
-			a.getInput(40);
+			a.getInput(5);
 			EvaRunnable eva = new EvaRunnable(logN, args[2], new Integer(args[3]));
 			Thread tEva = new Thread(eva);
 			tEva.run();
