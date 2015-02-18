@@ -6,6 +6,7 @@ import flexsc.Flag;
 public class TestCircuitOramRecServer {
 
 	public  static void main(String args[]) throws Exception {
+
 //		for(int i = 1; i <=26 ; i++) {
 		int i = new Integer(args[0]);
 			Flag.tableName = "table"+i;
