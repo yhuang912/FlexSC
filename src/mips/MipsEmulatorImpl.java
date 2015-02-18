@@ -478,8 +478,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			IntegerLib<T> lib = new IntegerLib<T>(env);
 			SecureArray<T> memBank = new SecureArray<T>(env, MEM_SIZE, WORD_SIZE, THRESHOLD, RECURSE_THRESHOLD, 4);
 			int dataLen = memData.getDataLength();
-			int aliceInputLen = aliceLongInput.length * aliceLongInput[0].length;
+			int neededMem = dataLen;
+			if (aliceInputIsRef)
+				neededMem += (aliceLongInput.length * aliceLongInput[0].length * 4);
 			
+				
 			T[] index; 
 			T[] data;
 			for (int i = 0; i < dataLen; i++){
