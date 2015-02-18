@@ -27,7 +27,7 @@ public class TestCircuitOramRecOpt {
 			System.out.print("\n");
 	}
 	
-	final static int writeCount = 5;//1 << 7;
+	final static int writeCount = 4;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
 	public TestCircuitOramRecOpt() { }
