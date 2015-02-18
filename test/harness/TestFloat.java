@@ -14,9 +14,20 @@ public class TestFloat extends TestHarness {
 	public static int widthV = 24, widthP = 8;
 
 	public static abstract class Helper {
-		double a, b;
+		public String host;
+		public int port;
+		public double a, b;
 
 		public Helper(double a, double b) {
+			host = "localhost";
+			port = 54321;
+			this.b = b;
+			this.a = a;
+		}
+		
+		public Helper(double a, double b, String s, int p) {
+			host = s;
+			port = p;
 			this.b = b;
 			this.a = a;
 		}
@@ -37,7 +48,7 @@ public class TestFloat extends TestHarness {
 
 		public void run() {
 			try {
-				listen(54321);
+				listen(h.port);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
@@ -67,7 +78,7 @@ public class TestFloat extends TestHarness {
 
 		public void run() {
 			try {
-				connect("localhost", 54321);
+				connect(h.host, h.port);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
@@ -121,6 +132,37 @@ public class TestFloat extends TestHarness {
 						+ h.plainCompute(h.a, h.b) + " " + h.a + " " + h.b
 						+ "\n");
 			Assert.assertTrue(error <= 1E-3);
+		}
+	}
+	
+	static public void main(String[] arg) {
+		double a = CompEnv.rnd.nextDouble() * (1 << 20) - (1 << 19);
+		double b = CompEnv.rnd.nextDouble() * (1 << 20) - (1 << 19);
+		Helper h = new Helper(a, b, arg[1], new Integer(arg[2])) {
+			@Override
+			public double plainCompute(double a, double b) {
+				return a+b;
+			}
+			@Override
+			public <T> T[] secureCompute(T[] a, T[] b, FloatLib<T> env)
+					throws Exception {
+				double t1 = System.nanoTime();
+				for(int i = 0; i < 1000; ++i)
+//					a = env.add(a, b);
+					a = env.multiply(a, b);
+				System.out.println((System.nanoTime() - t1)/1000/1000000000);
+				return a;
+			}
+		};
+		if(new Integer(arg[0]) == 0) {
+			GenRunnable gen = new GenRunnable(h);
+			Thread tGen = new Thread(gen);
+			tGen.run();
+
+		} else {
+			EvaRunnable env = new EvaRunnable(h);
+			Thread tEva = new Thread(env);
+			tEva.run();
 		}
 	}
 }

@@ -67,10 +67,10 @@ public class Dijkstra extends TestHarness {
 		dis.setInitialValue(2000);
 
 		BoolArray ba = new BoolArray(lib.getEnv());
-		PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(lib.getEnv(), logoramsize, ba);
+		PriorityQueueNode<Boolean, BoolArray<Boolean>> node = new PriorityQueueNode<Boolean, BoolArray<Boolean>>(lib.getEnv(), logoramsize, ba);
 		CircuitOram<Boolean> oram = new CircuitOram<Boolean>(lib.getEnv(), v+e, node.numBits());
 //System.out.println(node.keyvalue.value.numBits());
-		PriorityQueue<BoolArray> pq = new PriorityQueue<BoolArray>(lib.getEnv(), logoramsize, 
+		PriorityQueue<Boolean, BoolArray<Boolean>> pq = new PriorityQueue<Boolean, BoolArray<Boolean>>(lib.getEnv(), logoramsize, 
 				new BoolArray(lib.getEnv()), oram);
 
 		BoolArray tmp1 = new BoolArray(lib.getEnv());
@@ -90,7 +90,7 @@ public class Dijkstra extends TestHarness {
 		for(int i = 0; i < 1; ++i) {
 			Boolean traNd = traversingNode;
 			Boolean NtraNd = lib.not(traversingNode);
-			compiledlib.priority_queue.KeyValue<BoolArray> t = pq.pop(NtraNd);
+			compiledlib.priority_queue.KeyValue<Boolean, BoolArray<Boolean>> t = pq.pop(NtraNd);
 			t.key = lib.sub(lib.toSignals(1000, bitLength), t.key);
 			Boolean[] disvalue = dis.read(t.value.data);
 			Boolean newNode = lib.geq(disvalue, t.key);

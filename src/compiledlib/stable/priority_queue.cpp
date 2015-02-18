@@ -9,8 +9,8 @@ typedef intr_ = rnd;
 typedef PORAM<T> = native CircuitOram;
 
 intr_@m RND(intp_@m bit) = native intLib.randBools;
-dummy PriorityQueueNode@m<T> PORAM<T>.poram_retrieve(ints_@m id, intr_@m pos) = native conditionalReadAndRemove;
-dummy void PORAM<T>.poram_write(ints_@m id, intr_@m pos, PriorityQueueNode@m<T> node) = native conditionalPutBack;
+phantom PriorityQueueNode@m<T> PORAM<T>.poram_retrieve(ints_@m id, intr_@m pos) = native conditionalReadAndRemove;
+phantom void PORAM<T>.poram_write(ints_@m id, intr_@m pos, PriorityQueueNode@m<T> node) = native conditionalPutBack;
 struct BoolArray{ints_32 data;};
 struct NodeId@m {
    ints_@m id;

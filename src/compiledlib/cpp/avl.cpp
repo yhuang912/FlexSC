@@ -6,8 +6,8 @@ typedef intp_ = public int;
 typedef intr_ = rnd;
 typedef PORAM@m = native CircuitOram;
 intr_@m RND(intp_32 m) = native intLib.randBools;
-dummy IntStackNode@m PORAM@m@n.poram_retrieve(int@m id, rnd@m pos) = native conditionalReadAndRemove;
-dummy void PORAM@m.poram_write(int@m id, int@m pos, IntStackNode@m node) = native conditionalPutBack;
+phantom IntStackNode@m PORAM@m@n.poram_retrieve(int@m id, rnd@m pos) = native conditionalReadAndRemove;
+phantom void PORAM@m.poram_write(int@m id, int@m pos, IntStackNode@m node) = native conditionalPutBack;
 
 struct BoolArray{int32 data;};
 struct IntStackNode@m {
@@ -47,8 +47,8 @@ dummy int@m IntStack@m.stack_op(int@m operand, int1 op, int1 dum) {
 }
 
 typedef AORAM@m<K, V> = native CircuitOram;
-dummy AVLNode@m<K, V> AORAM@m<K, V>.aoram_retrieve(int@m id, rnd@m pos) = native conditionalReadAndRemove;
-dummy void AORAM@m<K, V>.aoram_write(int@m id, int@m pos, AVLNode@m<K, V> node) = native conditionalPutBack;
+phantom AVLNode@m<K, V> AORAM@m<K, V>.aoram_retrieve(int@m id, rnd@m pos) = native conditionalReadAndRemove;
+phantom void AORAM@m<K, V>.aoram_write(int@m id, int@m pos, AVLNode@m<K, V> node) = native conditionalPutBack;
 
 struct Int@m {
 	ints_@m val;
