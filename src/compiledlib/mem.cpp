@@ -12,7 +12,7 @@ int32 MEM.getInst(OMap instBank, int32 pc, public int32 pcOffset){
 }
 
 void MEM.func(int32[32]reg,
-      int32[2048]mem,
+	  int32[2048]mem,
       int32 inst,
       public int32 dataOffset){
 

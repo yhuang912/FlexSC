@@ -36,6 +36,7 @@ import flexsc.Party;
 import gc.GCSignal;
 
 public class MipsEmulatorImpl<ET> implements MipsEmulator {
+	static final boolean muteLoadInstructions = true;
 	static final int THRESHOLD = 1024;
 	static final int RECURSE_THRESHOLD = 512;
 	static final int WORD_SIZE = 32;
@@ -52,11 +53,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final boolean aliceInputIsRef = true;
 	static final boolean bobInputIsRef = false;
 	static final int Alice_input = 6;
-	static final int Bob_input = 2;
+	static final int Bob_input = 3;
 	static final int Alice_input2 = -1;
-	static final int Bob_input2 = 3;
-	static final int stackSize = 300;
-	static final int aliceInputSize = 100;
+	static final int Bob_input2 = 4;
+	static final int stackSize = 300/4;
+	static final int aliceInputSize = 25;
 	static final int bobInputSize = 0;
 	static final int MEM_SIZE = stackSize + aliceInputSize + bobInputSize;// 160 < threshold for func1
 	static final int mainStackSize = 136;
@@ -70,7 +71,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	
 	// Should we blither about missing CPUs?
-	static final boolean blither = false;
+	static final boolean blither = true;
 	
 	protected LocalConfiguration config;
 	
@@ -215,7 +216,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			lib = new IntegerLib<T>(env);
 			CpuFcn<T> defaultCpu = new CpuImpl<T>(env);
 			MEM<T> mem = new MEM<T>(env);
-			reg = loadInputsToRegister(env);
+			reg = loadInputsToRegister(env, this.dataOffset);
 			
 			loadCpus(sets, env);
 
@@ -247,7 +248,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
 				newInst = mem.getInst(currentBank, pc, pcOffset);
 				//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
-				mem.func(reg, memBank, newInst, dataOffset);
+				mem.func(reg, memBank, newInst, dataOffset-(stackSize*4));
 
 
 				testHalt = testTerminate(reg, newInst, lib);
@@ -316,7 +317,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			return lib.declassifyToBoth(res)[0]; 
 		}
 
-		private SecureArray<T> loadInputsToRegister(CompEnv<T> env)
+		private SecureArray<T> loadInputsToRegister(CompEnv<T> env, int dataOffset)
 				throws Exception {
 			int aliceReg = 4; 
 			int bobReg = 5;
@@ -351,11 +352,14 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 						env.inputOfAlice(Utils.fromInt(stackSize - aliceInputSize - bobInputSize, WORD_SIZE)));
 			}
 			env.flush();
-			int stackPointer = stackSize - aliceInputSize - bobInputSize - mainStackSize;
+			int stackPointer = dataOffset - 4*(stackSize - aliceInputSize - bobInputSize - 8);
 			oram.write(env.inputOfAlice(Utils.fromInt(29, oram.lengthOfIden)),
 					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
 			
 			oram.write(env.inputOfAlice(Utils.fromInt(30, oram.lengthOfIden)),
+					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
+			//global pointer? 
+			oram.write(env.inputOfAlice(Utils.fromInt(28, oram.lengthOfIden)),
 					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
 			
 			
@@ -426,7 +430,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 							if (env.getParty() == Party.Alice) {
 								EmulatorUtils.print("count: " + count + " key: " + entry.getKey() +
 										" (0x" + Long.toHexString(entry.getKey()) + ")" +
-										" value: " , lib);
+										" value: " , lib, muteLoadInstructions);
 								String output = "";
 								for (int j = 31 ; j >= 0;  j--){
 									if (entry.getValue()[j])
@@ -434,7 +438,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 									else 
 										output += "0";
 								}
-								EmulatorUtils.print(output, lib);
+								EmulatorUtils.print(output, lib, muteLoadInstructions);
 							}
 							count++;
 						}
@@ -446,7 +450,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					else 
 						instructionBank.init(m.size(), 32, 32);
 					
-					instructionBank.print();
+					if (!muteLoadInstructions)
+						instructionBank.print();
 					//						if (entry.getKey() > 0){
 						//							index = lib.toSignals((int)((entry.getKey() - minAddr)/4), instructionBank.lengthOfIden);
 						//							if (env.getParty() == Party.Alice){
@@ -476,17 +481,14 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			System.out.println("entering getMemoryGen");
 			boolean memory[][] = memData.getDataAsBoolean();	
 			IntegerLib<T> lib = new IntegerLib<T>(env);
-			SecureArray<T> memBank = new SecureArray<T>(env, MEM_SIZE, WORD_SIZE, THRESHOLD, RECURSE_THRESHOLD, 4);
 			int dataLen = memData.getDataLength();
-			int neededMem = dataLen;
-			if (aliceInputIsRef)
-				neededMem += (aliceLongInput.length * aliceLongInput[0].length * 4);
 			
-				
+			SecureArray<T> memBank = new SecureArray<T>(env, MEM_SIZE, WORD_SIZE, THRESHOLD, RECURSE_THRESHOLD, 4);
+			
 			T[] index; 
 			T[] data;
 			for (int i = 0; i < dataLen; i++){
-				index = lib.toSignals(i, memBank.lengthOfIden);
+				index = lib.toSignals(i + stackSize, memBank.lengthOfIden);
 				if (env.getParty() == Party.Alice)
 					data = env.inputOfAlice(memory[i]);
 				else 
@@ -496,7 +498,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			if (aliceInputIsRef){
 				for (int i = 0; i < aliceLongInput.length; i++){
 					for (int j = 0; j < aliceLongInput[0].length; j++){
-						index = lib.toSignals(dataLen + (i * aliceLongInput[0].length)+j, memBank.lengthOfIden);
+						index = lib.toSignals(stackSize - aliceInputSize + (i * aliceLongInput[0].length)+j, memBank.lengthOfIden);
 						if (env.getParty() == Party.Alice)
 							data = env.inputOfAlice(Utils.fromInt(aliceLongInput[i][j], WORD_SIZE));
 						else 
@@ -505,7 +507,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					}
 				}
 			}
+			EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
 			System.out.println("exiting getMemoryGen");
+			
 			return memBank;
 		}
 	}

@@ -31,7 +31,7 @@ public class EmulatorUtils {
 	}
 	
 	public static<T> void print(String s, IntegerLib<T> lib, boolean smart) {
-		if((lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT ) && smart)
+		if((lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT ) || smart)
 			return;
 		if(lib.getEnv().getParty() == Party.Alice)
 			System.out.println(s);
@@ -82,6 +82,27 @@ output+=" ";for(int i=array.length;i>0;i-=4)output+=String.format("%x", (temp[i-
 	}
 	
 	public static<T> void printOramBank(SecureMap<T> oramBank, IntegerLib<T> lib, int numItems){
+		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
+			return;
+		String output = "";
+		T[] temp; 
+		
+		for (int i = 0 ; i < numItems; i++){
+			output += "item number " + String.valueOf(i) +": ";
+			temp = oramBank.read(lib.toSignals(i, oramBank.lengthOfIden));
+			boolean[] tmp = lib.getEnv().outputToAlice(temp);
+			//if (lib.getEnv().getParty() == Party.Alice)
+				//System.out.println(Utils.toInt(tmp));
+			for (int j = tmp.length-1 ; j >= 0 ; j--){
+				output += (tmp[j] ? "1" : "0");
+			}	
+			output += "\n";
+		}
+		if(lib.getEnv().getParty() == Party.Alice)
+			System.out.println(output);
+	}
+	
+	public static<T> void printOramBank(SecureArray<T> oramBank, IntegerLib<T> lib, int numItems){
 		if(lib.getEnv().m == Mode.REAL || lib.getEnv().m == Mode.OPT)
 			return;
 		String output = "";
