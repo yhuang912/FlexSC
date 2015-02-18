@@ -36,7 +36,7 @@ int@log(n+1) countOnes@n(int@n x) {
   return r;
 }
 
-dummy int@log(n) leadingZero@n(int@n x) {
+phantom int@log(n) leadingZero@n(int@n x) {
 	int@n y = 1 << n - 1;
 	for(public int32 i=n-2; i>=0; i=i-1)
 		y$i$ = y$i+1$ & (y$i+1$ ^ x$i$);

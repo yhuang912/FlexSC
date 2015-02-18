@@ -11,8 +11,8 @@ import java.util.Arrays;
 import network.Server;
 
 public class GCSignal {
-	public static final int buffercap = 10000000;
-	public static final int buffercap2 = 10000000;
+	public static final int buffercap = 20000000;
+	public static final int buffercap2 = 20000000;
 	 static int buffersize = 0;
 	static int buffersize2 = 0;
 	static byte[][] buffer = new byte[buffercap][10];

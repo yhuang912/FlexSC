@@ -1,0 +1,216 @@
+#define BUCKETSIZE 4
+#define STASHSIZE 30
+
+typedef bit = int1;
+typedef pint = public int32;
+
+struct Block@n<T> {
+	int@n id;
+	int@n pos;
+	T data;
+};
+
+struct CircuitOram@n<T> {
+	dummy Block@n<T>[public 1<<n+1][public BUCKETSIZE] buckets;
+	dummy Block@n<T>[STASHSIZE] stash;
+
+	pint cnt;
+};
+
+struct Result@n {
+	int@n maxId;
+	int@log(n+1) maxDepth;
+};
+
+
+int@(n+1) add@n(int@n x, int@n y) {
+	bit cin;
+	int@(n+1) ret = 0;
+	bit t1, t2;
+	for(public int32 i=0; i<n; i = i+1) {
+		t1 = x$i$ ^ cin;
+		t2 = y$i$ ^ cin;
+		ret$i$ = x$i$ ^ t2;
+		t1 = t1 & t2;
+		cin = cin ^ t1;
+	}
+	ret$n$ = cin;
+	return ret;
+}
+
+int@log(n+1) countOnes@n(int@n x) {
+  if(n==1) return x;
+  int@log(n-n/2+1) first = countOnes@(n/2)(x$0~n/2$);
+  int@log(n-n/2+1) second = countOnes@(n-n/2)(x$n/2~n$);
+  int@log(n+1) ret = add@log(n-n/2+1)(first, second);
+  return ret;
+}
+
+int@log(n) leadingZero@n(int@n x) {
+	int@n y = 1 << n - 1;
+	for(public int32 i=n-2; i>=0; i=i-1)
+		y$i$ = y$i+1$ & (y$i+1$ ^ x$i$);
+	return countOnes@n(y);
+}
+
+void CircuitOram@n<T>.initialize() {
+	for(pint i=0; i<(1<<n+1); i=i+1) {
+		for(pint j=0; j<4; j=j+1) {
+			buckets[i][j] = null;
+		}
+	}
+	for(pint i=0; i<STASHSIZE; i=i+1)
+		stash[i] = null;
+}
+
+phantom T CircuitOram@n<T>.ReadAndRemove(int@n id, rnd@n pos) {
+	pint p_pos = pos;
+	pint lvl = (1 << n) - 1;
+	T res;
+	dummy Block@n<T> tmp = null;
+	pint f = 1;
+	for(pint i = lvl + p_pos; i>=0 && f==1; i=(i-1)/2) {
+		pint idx = lvl + p_pos;
+		for(pint j=0; j<BUCKETSIZE; j=j+1) {
+			ONREAL(b = blocks[i][j]) {
+				if(b.id == id) {
+					tmp = b;
+					b = null;
+				}
+			}
+		}
+		if(i==0) f=0;
+	}
+	for(pint i=0; i<STASHSIZE; i=i+1) {
+		ONREAL(b = stash[i]) {
+			if(b.id == id) {
+				tmp = b;
+				b = null;
+			}
+		}
+	}
+	return tmp.data;
+}
+
+phantom T CircuitOram@n<T>.pushBack(int@n id, int@n pos, T data) {
+	dummy T tdata = data;
+	for(pint i=0; i<STASHSIZE; i=i+1) {
+		ONDUMMY(stash[i]) {
+			stash[i] = Block@n(id, pos, data);
+			data = T;
+		}
+	}
+	
+	flushOneTime();
+	flushOneTime();
+	return data;
+}
+
+
+dummy Result@n CircuitOram@n<T>.dpstBlocks@m(dummy Block@n<T>[public m] blocks, int@n path) {
+	dummy Result@n res = blocks.(id, leadingZeros(pos ^ path));
+	for(pint i=1; i<n; i=i+1) {
+		ONREAL(b = blocks[i], res) {
+			int@log(n+1) dpst = leadingZeros(b.pos ^ path);
+			if(dpst > res.maxDepth) {
+				res = b.(id, leadingZeros(pos ^ path));
+			}
+		}
+	}
+	return res;
+}
+
+T CircuitOram@n<T>.flushOneTime() {
+	cnt = (cnt + 1) & ((1<<n)-1);
+	int@n path = cnt;
+	
+	
+	// Prepare Deepest
+	dummy Result@n res = dpstBlocks@(STASHSIZE)(stash, path);
+	dummy Result@n t;
+	
+	dummy int@log(n+1) src = null;
+	int@log(n+1) goal = 0-1;
+	dummy int@log(n+1)[public n+1] dpst;
+	
+	for(pint i=1; i<=n; i=i+1) {
+		if(goal >= i) {
+			dpst[i]=src;
+		}
+		
+		pint idx = (1 << i-1) - 1 + (path >> n-i);
+		t = dpstBlocks@(BUCKETSIZE)(bukcets[idx], path);
+		
+		ONREAL(t) {
+			if(t.maxDepth > goal) {
+				goal = t.maxDepth;
+				src = i;
+			}
+		}
+	}
+	
+	// Prepare Target
+	dummy int@log(n+1) dest = null;
+	dummy int@log(n+1) src = null;
+	dummy int@log(n+1)[public n+1] target;
+	for(i=n; i>=0; i=i-1) {
+		if(src==i) {
+			target[i] = dest;
+			dest = null;
+			src = null;
+		}
+		
+		pint idx = (1 << i-1) - 1 + (path >> n-i);
+		bit t = ISDUMMY(bukcets[idx][0]);
+		for(j=1; j<BUCKETSIZE; j=j+1) {
+			t = t | ISDUMMY(buckets[idx][j]);
+		}
+		ONREAL(dpst[i]) {
+			if((dest == null && t==1) || target[i] != null) {
+				src = dpst[i];
+				dest=i;
+			}
+		}
+	}
+	dummy T hold, towrite;
+	dest = null;
+	for(i=0; i<=n; i=i+1) {
+		towrite = null;
+		ONREAL(hold) {
+			if(dest==i) {
+				towrite=hold;
+				hold = null; dest = null;
+			}
+		}
+		if(i>0) idx = (1<<i-1) - 1 + (path >> n-i);
+		ONREAL(target[i]) {
+			if(i==0) {
+				for(j=0; j<STASHSIZE; j=j+1) {
+					if(stash[j].id == depst[i].id) {
+						ONREAL(stash[j]) {
+							hold=stash[j].data;
+						}
+					}
+				}
+			} else {
+				for(j=0; j<BUCKETSIZE; j=j+1) {
+					if(dpst[i].maxId == buckets[idx][j].id) {
+						ONREAL(bukcets[idx][j]) {
+							hold=buckets[idx][j].data;
+						}
+					}
+				}
+			}
+		}
+		if(i>0) {
+			for(j=0; j<BUCKETSIZE; j=j+1) {
+				ONDUMMY(buckets[idx][j]) {
+					ONREAL(towrite) {
+						buckets[idx][j] = towrite;
+						towrite = null;
+					}
+				}
+			}
+		}
+	}
+}
