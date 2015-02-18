@@ -15,7 +15,7 @@ public class TestCircuitOramRecOpt {
 
 	public  static void main(String args[]) throws Exception {
 			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 1024-32, 8, 6);
-//		GenRunnable gen = new GenRunnable(12345, 20, 3, 32, 8, 6);
+//		GenRunnable gen = new GenRunnable(12345, 10, 3, 32, 8, 6);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
@@ -27,7 +27,7 @@ public class TestCircuitOramRecOpt {
 			System.out.print("\n");
 	}
 	
-	final static int writeCount = 30;//1 << 7;
+	final static int writeCount = 10;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
 	public TestCircuitOramRecOpt() { }

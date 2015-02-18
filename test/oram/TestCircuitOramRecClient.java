@@ -6,9 +6,9 @@ import flexsc.Flag;
 public class TestCircuitOramRecClient {
 
 	public  static void main(String args[]) throws Exception {
-		for(int i = 26; i <=26 ; i+=2) {
+		for(int i = 15; i <=23 ; i++) {
 			Flag.sw.flush();
-			EvaRunnable eva = new EvaRunnable("localhost", 54321);
+			EvaRunnable eva = new EvaRunnable(args[0], 54321);
 			eva.run();
 			Flag.sw.print();
 			System.out.print("\n");
