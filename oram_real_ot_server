@@ -1,0 +1,1430 @@
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+1 8 64 3 992
+Access: 0 start. currentTime1908526747966
+Access: 0 finish. currentTime1909095536462
+Running time for the access:	0.568764523 142467
+
+Access: 1 start. currentTime1909095946029
+Access: 1 finish. currentTime1909465576065
+Running time for the access:	0.369664886 142467
+
+Access: 2 start. currentTime1909465950485
+Access: 2 finish. currentTime1909823337718
+Running time for the access:	0.357422678 142467
+
+Access: 3 start. currentTime1909823734556
+Access: 3 finish. currentTime1910175577508
+Running time for the access:	0.351877016 142467
+
+Access: 4 start. currentTime1910175952202
+Access: 4 finish. currentTime1910536170436
+Running time for the access:	0.360277319 142467
+
+Access: 5 start. currentTime1910536586201
+Access: 5 finish. currentTime1910895496405
+Running time for the access:	0.35893704 142467
+
+Access: 6 start. currentTime1910895863276
+Access: 6 finish. currentTime1911257921277
+Running time for the access:	0.362090624 142467
+
+Access: 7 start. currentTime1911258300320
+Access: 7 finish. currentTime1911615273467
+Running time for the access:	0.356999511 142467
+
+Access: 8 start. currentTime1911615640432
+Access: 8 finish. currentTime1911995160726
+Running time for the access:	0.379547648 142467
+
+Access: 9 start. currentTime1911995528892
+Access: 9 finish. currentTime1912409046715
+Running time for the access:	0.413545075 142467
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+0.3879666913	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+2 8 64 3 992
+Access: 0 start. currentTime1913908652056
+Access: 0 finish. currentTime1914577425658
+Running time for the access:	0.668774208 162121
+
+Access: 1 start. currentTime1914577829442
+Access: 1 finish. currentTime1915209329597
+Running time for the access:	0.631527804 162121
+
+Access: 2 start. currentTime1915209670009
+Access: 2 finish. currentTime1915840730346
+Running time for the access:	0.631087943 162121
+
+Access: 3 start. currentTime1915841065321
+Access: 3 finish. currentTime1916473241320
+Running time for the access:	0.63221113 162121
+
+Access: 4 start. currentTime1916473586375
+Access: 4 finish. currentTime1917115107731
+Running time for the access:	0.64154995 162121
+
+Access: 5 start. currentTime1917115446824
+Access: 5 finish. currentTime1917751287697
+Running time for the access:	0.635869655 162121
+
+Access: 6 start. currentTime1917751623900
+Access: 6 finish. currentTime1918385137495
+Running time for the access:	0.633542882 162121
+
+Access: 7 start. currentTime1918385474002
+Access: 7 finish. currentTime1919030012252
+Running time for the access:	0.644573879 162121
+
+Access: 8 start. currentTime1919030365926
+Access: 8 finish. currentTime1919672172573
+Running time for the access:	0.641845026 162121
+
+Access: 9 start. currentTime1919672528400
+Access: 9 finish. currentTime1920315501070
+Running time for the access:	0.643008498 162121
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+0.6404444421	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+3 8 64 3 992
+Access: 0 start. currentTime1921682095412
+Access: 0 finish. currentTime1922540314966
+Running time for the access:	0.858161007 182917
+
+Access: 1 start. currentTime1922540657481
+Access: 1 finish. currentTime1923378546341
+Running time for the access:	0.837917079 182917
+
+Access: 2 start. currentTime1923378886967
+Access: 2 finish. currentTime1924217410538
+Running time for the access:	0.838551604 182917
+
+Access: 3 start. currentTime1924217748537
+Access: 3 finish. currentTime1925048861620
+Running time for the access:	0.831141563 182917
+
+Access: 4 start. currentTime1925049199805
+Access: 4 finish. currentTime1925877366854
+Running time for the access:	0.828196519 182917
+
+Access: 5 start. currentTime1925877717553
+Access: 5 finish. currentTime1926706608033
+Running time for the access:	0.828919168 182917
+
+Access: 6 start. currentTime1926706944522
+Access: 6 finish. currentTime1927532182326
+Running time for the access:	0.825266186 182917
+
+Access: 7 start. currentTime1927532518524
+Access: 7 finish. currentTime1928360592311
+Running time for the access:	0.828108488 182917
+
+Access: 8 start. currentTime1928360947743
+Access: 8 finish. currentTime1929187653830
+Running time for the access:	0.826735412 182917
+
+Access: 9 start. currentTime1929187997224
+Access: 9 finish. currentTime1930025990399
+Running time for the access:	0.838029315 182917
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+0.8341496906	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+4 8 64 3 992
+Access: 0 start. currentTime1931255839156
+Access: 0 finish. currentTime1932306617522
+Running time for the access:	1.050775839 203701
+
+Access: 1 start. currentTime1932306956057
+Access: 1 finish. currentTime1933262363466
+Running time for the access:	0.955443815 203701
+
+Access: 2 start. currentTime1933262721889
+Access: 2 finish. currentTime1934231451221
+Running time for the access:	0.968767274 203701
+
+Access: 3 start. currentTime1934231796302
+Access: 3 finish. currentTime1935185150245
+Running time for the access:	0.953366869 203701
+
+Access: 4 start. currentTime1935185489959
+Access: 4 finish. currentTime1936142309826
+Running time for the access:	0.956861069 203701
+
+Access: 5 start. currentTime1936142664740
+Access: 5 finish. currentTime1937098755031
+Running time for the access:	0.956120348 203701
+
+Access: 6 start. currentTime1937099096667
+Access: 6 finish. currentTime1938049061150
+Running time for the access:	0.949992473 203701
+
+Access: 7 start. currentTime1938049396709
+Access: 7 finish. currentTime1939000779629
+Running time for the access:	0.951404005 203701
+
+Access: 8 start. currentTime1939001130592
+Access: 8 finish. currentTime1939954921971
+Running time for the access:	0.953828036 203701
+
+Access: 9 start. currentTime1939955269998
+Access: 9 finish. currentTime1940942660770
+Running time for the access:	0.9874277 203701
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+0.9684452365	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+5 8 64 3 992
+Access: 0 start. currentTime1942359121300
+Access: 0 finish. currentTime1943480590534
+Running time for the access:	1.1214175 226365
+
+Access: 1 start. currentTime1943480930755
+Access: 1 finish. currentTime1944597679582
+Running time for the access:	1.116777127 226365
+
+Access: 2 start. currentTime1944598022557
+Access: 2 finish. currentTime1945714287015
+Running time for the access:	1.116293612 226365
+
+Access: 3 start. currentTime1945714631389
+Access: 3 finish. currentTime1946854975814
+Running time for the access:	1.140373643 226365
+
+Access: 4 start. currentTime1946855315307
+Access: 4 finish. currentTime1948008718529
+Running time for the access:	1.153431935 226365
+
+Access: 5 start. currentTime1948009064879
+Access: 5 finish. currentTime1949160508400
+Running time for the access:	1.151479936 226365
+
+Access: 6 start. currentTime1949160858027
+Access: 6 finish. currentTime1950314035067
+Running time for the access:	1.153206758 226365
+
+Access: 7 start. currentTime1950314383757
+Access: 7 finish. currentTime1951461962870
+Running time for the access:	1.147608354 226365
+
+Access: 8 start. currentTime1951462305262
+Access: 8 finish. currentTime1952713740946
+Running time for the access:	1.251463774 226365
+
+Access: 9 start. currentTime1952714080823
+Access: 9 finish. currentTime1953969591073
+Running time for the access:	1.25553866 226365
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+1.1608047746	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+6 8 64 3 992
+Access: 0 start. currentTime1955384015796
+Access: 0 finish. currentTime1956824507144
+Running time for the access:	1.440495861 250931
+
+Access: 1 start. currentTime1956824852079
+Access: 1 finish. currentTime1958122211866
+Running time for the access:	1.297390883 250931
+
+Access: 2 start. currentTime1958122554807
+Access: 2 finish. currentTime1959431812583
+Running time for the access:	1.30928713 250931
+
+Access: 3 start. currentTime1959432159646
+Access: 3 finish. currentTime1960737891708
+Running time for the access:	1.305760232 250931
+
+Access: 4 start. currentTime1960738233929
+Access: 4 finish. currentTime1962046653817
+Running time for the access:	1.308450473 250931
+
+Access: 5 start. currentTime1962047004535
+Access: 5 finish. currentTime1963345198754
+Running time for the access:	1.298223094 250931
+
+Access: 6 start. currentTime1963345540549
+Access: 6 finish. currentTime1964645785816
+Running time for the access:	1.300274494 250931
+
+Access: 7 start. currentTime1964646122663
+Access: 7 finish. currentTime1965976500806
+Running time for the access:	1.330407101 250931
+
+Access: 8 start. currentTime1965976838787
+Access: 8 finish. currentTime1967318981089
+Running time for the access:	1.342170428 250931
+
+Access: 9 start. currentTime1967319323845
+Access: 9 finish. currentTime1968762456558
+Running time for the access:	1.443165393 250931
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+1.3376085714000001	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+7 8 64 3 992
+Access: 0 start. currentTime1970081654573
+Access: 0 finish. currentTime1971652817762
+Running time for the access:	1.57113363 280881
+
+Access: 1 start. currentTime1971653143694
+Access: 1 finish. currentTime1973145090155
+Running time for the access:	1.491966544 280881
+
+Access: 2 start. currentTime1973145415712
+Access: 2 finish. currentTime1974631391073
+Running time for the access:	1.48599668 280881
+
+Access: 3 start. currentTime1974631721536
+Access: 3 finish. currentTime1976102414330
+Running time for the access:	1.470719756 280881
+
+Access: 4 start. currentTime1976102746655
+Access: 4 finish. currentTime1977583471518
+Running time for the access:	1.480753876 280881
+
+Access: 5 start. currentTime1977583803016
+Access: 5 finish. currentTime1979062771102
+Running time for the access:	1.47899597 280881
+
+Access: 6 start. currentTime1979063106908
+Access: 6 finish. currentTime1980536817415
+Running time for the access:	1.473738855 280881
+
+Access: 7 start. currentTime1980537148580
+Access: 7 finish. currentTime1982042380315
+Running time for the access:	1.505257891 280881
+
+Access: 8 start. currentTime1982042709616
+Access: 8 finish. currentTime1983607298165
+Running time for the access:	1.564619086 280881
+
+Access: 9 start. currentTime1983607629447
+Access: 9 finish. currentTime1985165594827
+Running time for the access:	1.557993815 280881
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+1.5081580521	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+8 8 64 3 992
+Access: 0 start. currentTime1986213780908
+Access: 0 finish. currentTime1988028949378
+Running time for the access:	1.815171075 320479
+
+Access: 1 start. currentTime1988029278982
+Access: 1 finish. currentTime1989742570449
+Running time for the access:	1.713321912 320479
+
+Access: 2 start. currentTime1989742902360
+Access: 2 finish. currentTime1991461867152
+Running time for the access:	1.718993396 320479
+
+Access: 3 start. currentTime1991462195542
+Access: 3 finish. currentTime1993174130693
+Running time for the access:	1.711964382 320479
+
+Access: 4 start. currentTime1993174463910
+Access: 4 finish. currentTime1994872012999
+Running time for the access:	1.697611894 320479
+
+Access: 5 start. currentTime1994872384191
+Access: 5 finish. currentTime1996574753126
+Running time for the access:	1.702397721 320479
+
+Access: 6 start. currentTime1996575082860
+Access: 6 finish. currentTime1998279067035
+Running time for the access:	1.704013861 320479
+
+Access: 7 start. currentTime1998279409816
+Access: 7 finish. currentTime2000004271154
+Running time for the access:	1.724892186 320479
+
+Access: 8 start. currentTime2000004605108
+Access: 8 finish. currentTime2001728575455
+Running time for the access:	1.723999002 320479
+
+Access: 9 start. currentTime2001728904322
+Access: 9 finish. currentTime2003470586243
+Running time for the access:	1.741712187 320479
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+1.7254502025	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+9 8 64 3 992
+Access: 0 start. currentTime2004630289388
+Access: 0 finish. currentTime2006606478559
+Running time for the access:	1.976184502 381197
+
+Access: 1 start. currentTime2006606805106
+Access: 1 finish. currentTime2008583963228
+Running time for the access:	1.977188151 381197
+
+Access: 2 start. currentTime2008584309962
+Access: 2 finish. currentTime2010567617435
+Running time for the access:	1.983337186 381197
+
+Access: 3 start. currentTime2010567965221
+Access: 3 finish. currentTime2012538415805
+Running time for the access:	1.970480893 381197
+
+Access: 4 start. currentTime2012538749885
+Access: 4 finish. currentTime2014512834272
+Running time for the access:	1.974112798 381197
+
+Access: 5 start. currentTime2014513168201
+Access: 5 finish. currentTime2016562444394
+Running time for the access:	2.049304016 381197
+
+Access: 6 start. currentTime2016562777268
+Access: 6 finish. currentTime2018555307563
+Running time for the access:	1.992567215 381197
+
+Access: 7 start. currentTime2018555657332
+Access: 7 finish. currentTime2020597759423
+Running time for the access:	2.042131661 381197
+
+Access: 8 start. currentTime2020598095058
+Access: 8 finish. currentTime2022614976897
+Running time for the access:	2.016911728 381197
+
+Access: 9 start. currentTime2022615305745
+Access: 9 finish. currentTime2024619132282
+Running time for the access:	2.003855975 381197
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+1.9986490808	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+10 8 64 3 992
+Access: 0 start. currentTime2025748538257
+Access: 0 finish. currentTime2028028006403
+Running time for the access:	2.279405989 444553
+
+Access: 1 start. currentTime2028028356545
+Access: 1 finish. currentTime2030311310866
+Running time for the access:	2.282983516 444553
+
+Access: 2 start. currentTime2030311635235
+Access: 2 finish. currentTime2032591103755
+Running time for the access:	2.279490595 444553
+
+Access: 3 start. currentTime2032591436546
+Access: 3 finish. currentTime2034879456867
+Running time for the access:	2.288048539 444553
+
+Access: 4 start. currentTime2034879788318
+Access: 4 finish. currentTime2037171296706
+Running time for the access:	2.291539066 444553
+
+Access: 5 start. currentTime2037171628559
+Access: 5 finish. currentTime2039499809918
+Running time for the access:	2.328209678 444553
+
+Access: 6 start. currentTime2039500143717
+Access: 6 finish. currentTime2041827333720
+Running time for the access:	2.327210933 444553
+
+Access: 7 start. currentTime2041827658077
+Access: 7 finish. currentTime2044145649155
+Running time for the access:	2.318011732 444553
+
+Access: 8 start. currentTime2044145981609
+Access: 8 finish. currentTime2046481522019
+Running time for the access:	2.335568191 444553
+
+Access: 9 start. currentTime2046481867493
+Access: 9 finish. currentTime2048800838346
+Running time for the access:	2.319000341 444553
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+2.3049896518	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+11 8 64 3 992
+Access: 0 start. currentTime2050004451949
+Access: 0 finish. currentTime2052540224543
+Running time for the access:	2.535768572 494866
+
+Access: 1 start. currentTime2052540545112
+Access: 1 finish. currentTime2055104955880
+Running time for the access:	2.56443093 494866
+
+Access: 2 start. currentTime2055105286563
+Access: 2 finish. currentTime2057697033706
+Running time for the access:	2.591776957 494866
+
+Access: 3 start. currentTime2057697362272
+Access: 3 finish. currentTime2060284461554
+Running time for the access:	2.587121123 494866
+
+Access: 4 start. currentTime2060284799652
+Access: 4 finish. currentTime2062876647668
+Running time for the access:	2.591877885 494866
+
+Access: 5 start. currentTime2062876986262
+Access: 5 finish. currentTime2065432489824
+Running time for the access:	2.555533969 494866
+
+Access: 6 start. currentTime2065432816064
+Access: 6 finish. currentTime2067981000048
+Running time for the access:	2.548191136 494866
+
+Access: 7 start. currentTime2067981332615
+Access: 7 finish. currentTime2070561333724
+Running time for the access:	2.580030021 494866
+
+Access: 8 start. currentTime2070561673471
+Access: 8 finish. currentTime2073199525298
+Running time for the access:	2.637881606 494866
+
+Access: 9 start. currentTime2073199848348
+Access: 9 finish. currentTime2075788889064
+Running time for the access:	2.589059301 494866
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+2.5782075843000003	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+12 8 64 3 992
+Access: 0 start. currentTime2077033435344
+Access: 0 finish. currentTime2079969793863
+Running time for the access:	2.936358354 566155
+
+Access: 1 start. currentTime2079970137406
+Access: 1 finish. currentTime2082852344176
+Running time for the access:	2.8822356 566155
+
+Access: 2 start. currentTime2082852679304
+Access: 2 finish. currentTime2085730512818
+Running time for the access:	2.877862571 566155
+
+Access: 3 start. currentTime2085730847089
+Access: 3 finish. currentTime2088612653836
+Running time for the access:	2.881834507 566155
+
+Access: 4 start. currentTime2088612989199
+Access: 4 finish. currentTime2091515568887
+Running time for the access:	2.902607111 566155
+
+Access: 5 start. currentTime2091515901341
+Access: 5 finish. currentTime2094397145268
+Running time for the access:	2.881271147 566155
+
+Access: 6 start. currentTime2094397466372
+Access: 6 finish. currentTime2097276814052
+Running time for the access:	2.879369203 566155
+
+Access: 7 start. currentTime2097277154006
+Access: 7 finish. currentTime2100143311116
+Running time for the access:	2.86618475 566155
+
+Access: 8 start. currentTime2100143631406
+Access: 8 finish. currentTime2103025429119
+Running time for the access:	2.881819971 566155
+
+Access: 9 start. currentTime2103025758878
+Access: 9 finish. currentTime2105878482541
+Running time for the access:	2.852743972 566155
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+2.8842695524	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+13 8 64 3 992
+Access: 0 start. currentTime2107097861050
+Access: 0 finish. currentTime2110323522694
+Running time for the access:	3.225672037 640970
+
+Access: 1 start. currentTime2110323863485
+Access: 1 finish. currentTime2113561571576
+Running time for the access:	3.23773782 640970
+
+Access: 2 start. currentTime2113561908482
+Access: 2 finish. currentTime2116791807089
+Running time for the access:	3.229927228 640970
+
+Access: 3 start. currentTime2116792146495
+Access: 3 finish. currentTime2120066963925
+Running time for the access:	3.274839743 640970
+
+Access: 4 start. currentTime2120067312000
+Access: 4 finish. currentTime2123284361158
+Running time for the access:	3.217079386 640970
+
+Access: 5 start. currentTime2123284692857
+Access: 5 finish. currentTime2126512416508
+Running time for the access:	3.22775332 640970
+
+Access: 6 start. currentTime2126512750024
+Access: 6 finish. currentTime2129740440197
+Running time for the access:	3.227718754 640970
+
+Access: 7 start. currentTime2129740768972
+Access: 7 finish. currentTime2132978763428
+Running time for the access:	3.238014645 640970
+
+Access: 8 start. currentTime2132979098054
+Access: 8 finish. currentTime2136196318462
+Running time for the access:	3.217250041 640970
+
+Access: 9 start. currentTime2136196655888
+Access: 9 finish. currentTime2139423781811
+Running time for the access:	3.227160978 640970
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+3.2323579073	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+14 8 64 3 992
+Access: 0 start. currentTime2140885974331
+Access: 0 finish. currentTime2144382035931
+Running time for the access:	3.495993019 702550
+
+Access: 1 start. currentTime2144382366178
+Access: 1 finish. currentTime2147886339696
+Running time for the access:	3.50400161 702550
+
+Access: 2 start. currentTime2147886676730
+Access: 2 finish. currentTime2151412401353
+Running time for the access:	3.525754716 702550
+
+Access: 3 start. currentTime2151412729017
+Access: 3 finish. currentTime2154942109842
+Running time for the access:	3.529400483 702550
+
+Access: 4 start. currentTime2154942442926
+Access: 4 finish. currentTime2158445149728
+Running time for the access:	3.502735224 702550
+
+Access: 5 start. currentTime2158445483344
+Access: 5 finish. currentTime2161973114143
+Running time for the access:	3.527661301 702550
+
+Access: 6 start. currentTime2161973453396
+Access: 6 finish. currentTime2165467874205
+Running time for the access:	3.494451265 702550
+
+Access: 7 start. currentTime2165468223482
+Access: 7 finish. currentTime2168972127662
+Running time for the access:	3.50393272 702550
+
+Access: 8 start. currentTime2168972468059
+Access: 8 finish. currentTime2172463791090
+Running time for the access:	3.491353107 702550
+
+Access: 9 start. currentTime2172464136753
+Access: 9 finish. currentTime2175966989648
+Running time for the access:	3.50288173 702550
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+3.5078572547999998	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+15 8 64 3 992
+Access: 0 start. currentTime2177569048618
+Access: 0 finish. currentTime2181382591427
+Running time for the access:	3.813469814 786042
+
+Access: 1 start. currentTime2181382914933
+Access: 1 finish. currentTime2185257167988
+Running time for the access:	3.874274368 786042
+
+Access: 2 start. currentTime2185257492575
+Access: 2 finish. currentTime2189131792358
+Running time for the access:	3.874321959 786042
+
+Access: 3 start. currentTime2189132136072
+Access: 3 finish. currentTime2192960814999
+Running time for the access:	3.828706471 786042
+
+Access: 4 start. currentTime2192961153077
+Access: 4 finish. currentTime2196901749215
+Running time for the access:	3.940626577 786042
+
+Access: 5 start. currentTime2196902079451
+Access: 5 finish. currentTime2200751717030
+Running time for the access:	3.849666013 786042
+
+Access: 6 start. currentTime2200752081246
+Access: 6 finish. currentTime2204616044818
+Running time for the access:	3.864004137 786042
+
+Access: 7 start. currentTime2204616389058
+Access: 7 finish. currentTime2208479649634
+Running time for the access:	3.863281977 786042
+
+Access: 8 start. currentTime2208479985504
+Access: 8 finish. currentTime2212332661778
+Running time for the access:	3.852686899 786042
+
+Access: 9 start. currentTime2212332999564
+Access: 9 finish. currentTime2216232504260
+Running time for the access:	3.899534742 786042
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+3.8660982064000002	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+16 8 64 3 992
+Access: 0 start. currentTime2217552617537
+Access: 0 finish. currentTime2221897687183
+Running time for the access:	4.345075581 872820
+
+Access: 1 start. currentTime2221898015631
+Access: 1 finish. currentTime2226157755675
+Running time for the access:	4.259762329 872820
+
+Access: 2 start. currentTime2226158096256
+Access: 2 finish. currentTime2230405665379
+Running time for the access:	4.247598568 872820
+
+Access: 3 start. currentTime2230406000051
+Access: 3 finish. currentTime2234666587155
+Running time for the access:	4.260609557 872820
+
+Access: 4 start. currentTime2234666919273
+Access: 4 finish. currentTime2238893411960
+Running time for the access:	4.226516171 872820
+
+Access: 5 start. currentTime2238893741042
+Access: 5 finish. currentTime2243126732011
+Running time for the access:	4.233012709 872820
+
+Access: 6 start. currentTime2243127063363
+Access: 6 finish. currentTime2247399238172
+Running time for the access:	4.272196683 872820
+
+Access: 7 start. currentTime2247399569123
+Access: 7 finish. currentTime2251634993643
+Running time for the access:	4.23545304 872820
+
+Access: 8 start. currentTime2251635342395
+Access: 8 finish. currentTime2255874246750
+Running time for the access:	4.238936434 872820
+
+Access: 9 start. currentTime2255874576024
+Access: 9 finish. currentTime2260098785950
+Running time for the access:	4.224231563 872820
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+4.2543800936	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+17 8 64 3 992
+Access: 0 start. currentTime2261902078190
+Access: 0 finish. currentTime2266483551970
+Running time for the access:	4.581482657 947979
+
+Access: 1 start. currentTime2266483881279
+Access: 1 finish. currentTime2271079176221
+Running time for the access:	4.595318658 947979
+
+Access: 2 start. currentTime2271079505631
+Access: 2 finish. currentTime2275675522520
+Running time for the access:	4.596036276 947979
+
+Access: 3 start. currentTime2275675859696
+Access: 3 finish. currentTime2280246881703
+Running time for the access:	4.571051726 947979
+
+Access: 4 start. currentTime2280247219570
+Access: 4 finish. currentTime2284794054048
+Running time for the access:	4.546863273 947979
+
+Access: 5 start. currentTime2284794388204
+Access: 5 finish. currentTime2289382457091
+Running time for the access:	4.588092313 947979
+
+Access: 6 start. currentTime2289382796737
+Access: 6 finish. currentTime2293941672258
+Running time for the access:	4.558903266 947979
+
+Access: 7 start. currentTime2293942008994
+Access: 7 finish. currentTime2298535320629
+Running time for the access:	4.593340165 947979
+
+Access: 8 start. currentTime2298535656190
+Access: 8 finish. currentTime2303096512672
+Running time for the access:	4.560884458 947979
+
+Access: 9 start. currentTime2303096850231
+Access: 9 finish. currentTime2307669161906
+Running time for the access:	4.572342995 947979
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+4.5764724588	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+18 8 64 3 992
+Access: 0 start. currentTime2309558748977
+Access: 0 finish. currentTime2314513176649
+Running time for the access:	4.954435086 1044160
+
+Access: 1 start. currentTime2314513520865
+Access: 1 finish. currentTime2319465819395
+Running time for the access:	4.952327901 1044160
+
+Access: 2 start. currentTime2319466160125
+Access: 2 finish. currentTime2324424150917
+Running time for the access:	4.958027903 1044160
+
+Access: 3 start. currentTime2324424501519
+Access: 3 finish. currentTime2329383676230
+Running time for the access:	4.95920414 1044160
+
+Access: 4 start. currentTime2329384016899
+Access: 4 finish. currentTime2334296661263
+Running time for the access:	4.912673819 1044160
+
+Access: 5 start. currentTime2334296988425
+Access: 5 finish. currentTime2339185205055
+Running time for the access:	4.888240128 1044160
+
+Access: 6 start. currentTime2339185546239
+Access: 6 finish. currentTime2344106064074
+Running time for the access:	4.920549226 1044160
+
+Access: 7 start. currentTime2344106396086
+Access: 7 finish. currentTime2349074934792
+Running time for the access:	4.968558184 1044160
+
+Access: 8 start. currentTime2349075270942
+Access: 8 finish. currentTime2354065773123
+Running time for the access:	4.990533098 1044160
+
+Access: 9 start. currentTime2354066106186
+Access: 9 finish. currentTime2359035234817
+Running time for the access:	4.969151348 1044160
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+4.9474112538	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+19 8 64 3 992
+Access: 0 start. currentTime2360667396328
+Access: 0 finish. currentTime2365962126257
+Running time for the access:	5.294732164 1144659
+
+Access: 1 start. currentTime2365962461445
+Access: 1 finish. currentTime2371279726203
+Running time for the access:	5.317285774 1144659
+
+Access: 2 start. currentTime2371280064383
+Access: 2 finish. currentTime2376550969672
+Running time for the access:	5.270927569 1144659
+
+Access: 3 start. currentTime2376551308576
+Access: 3 finish. currentTime2381896913465
+Running time for the access:	5.345642405 1144659
+
+Access: 4 start. currentTime2381897261135
+Access: 4 finish. currentTime2387197905461
+Running time for the access:	5.30066695 1144659
+
+Access: 5 start. currentTime2387198235872
+Access: 5 finish. currentTime2392492364035
+Running time for the access:	5.294152028 1144659
+
+Access: 6 start. currentTime2392492698454
+Access: 6 finish. currentTime2397798994209
+Running time for the access:	5.306319324 1144659
+
+Access: 7 start. currentTime2397799337658
+Access: 7 finish. currentTime2403172091808
+Running time for the access:	5.372782827 1144659
+
+Access: 8 start. currentTime2403172425727
+Access: 8 finish. currentTime2408524704831
+Running time for the access:	5.352302229 1144659
+
+Access: 9 start. currentTime2408525038745
+Access: 9 finish. currentTime2413879771064
+Running time for the access:	5.354753958 1144659
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+5.3209973855	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+20 8 64 3 992
+Access: 0 start. currentTime2415650720671
+Access: 0 finish. currentTime2421442838807
+Running time for the access:	5.792071198 1233203
+
+Access: 1 start. currentTime2421443170261
+Access: 1 finish. currentTime2427248568588
+Running time for the access:	5.805421539 1233203
+
+Access: 2 start. currentTime2427248907030
+Access: 2 finish. currentTime2432963343274
+Running time for the access:	5.714472923 1233203
+
+Access: 3 start. currentTime2432963715803
+Access: 3 finish. currentTime2438711772086
+Running time for the access:	5.748093101 1233203
+
+Access: 4 start. currentTime2438712132190
+Access: 4 finish. currentTime2444422702102
+Running time for the access:	5.710599403 1233203
+
+Access: 5 start. currentTime2444423038869
+Access: 5 finish. currentTime2450161281559
+Running time for the access:	5.738273151 1233203
+
+Access: 6 start. currentTime2450161625378
+Access: 6 finish. currentTime2455905222726
+Running time for the access:	5.743626882 1233203
+
+Access: 7 start. currentTime2455905552480
+Access: 7 finish. currentTime2461654702500
+Running time for the access:	5.749173389 1233203
+
+Access: 8 start. currentTime2461655038772
+Access: 8 finish. currentTime2467402783500
+Running time for the access:	5.747774438 1233203
+
+Access: 9 start. currentTime2467403124409
+Access: 9 finish. currentTime2473150764247
+Running time for the access:	5.747662794 1233203
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+5.7497613014	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+21 8 64 3 992
+Access: 0 start. currentTime2475510894012
+Access: 0 finish. currentTime2481611266612
+Running time for the access:	6.100306784 1343849
+
+Access: 1 start. currentTime2481611610653
+Access: 1 finish. currentTime2487771383420
+Running time for the access:	6.159801793 1343849
+
+Access: 2 start. currentTime2487771713258
+Access: 2 finish. currentTime2493963246693
+Running time for the access:	6.19156287 1343849
+
+Access: 3 start. currentTime2493963594898
+Access: 3 finish. currentTime2500143297668
+Running time for the access:	6.179730596 1343849
+
+Access: 4 start. currentTime2500143628171
+Access: 4 finish. currentTime2506358134799
+Running time for the access:	6.214529041 1343849
+
+Access: 5 start. currentTime2506358463813
+Access: 5 finish. currentTime2512538859307
+Running time for the access:	6.180419505 1343849
+
+Access: 6 start. currentTime2512539201124
+Access: 6 finish. currentTime2518733598912
+Running time for the access:	6.19442745 1343849
+
+Access: 7 start. currentTime2518733929715
+Access: 7 finish. currentTime2524924673051
+Running time for the access:	6.190762884 1343849
+
+Access: 8 start. currentTime2524924998253
+Access: 8 finish. currentTime2531105431135
+Running time for the access:	6.180454815 1343849
+
+Access: 9 start. currentTime2531105761184
+Access: 9 finish. currentTime2537292167592
+Running time for the access:	6.186431718 1343849
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+6.1778837832999995	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+22 8 64 3 992
+Access: 0 start. currentTime2539894806334
+Access: 0 finish. currentTime2546514767804
+Running time for the access:	6.61992822 1458429
+
+Access: 1 start. currentTime2546515114701
+Access: 1 finish. currentTime2553199319145
+Running time for the access:	6.684235386 1458429
+
+Access: 2 start. currentTime2553199653524
+Access: 2 finish. currentTime2559834880709
+Running time for the access:	6.635248026 1458429
+
+Access: 3 start. currentTime2559835209872
+Access: 3 finish. currentTime2566468201337
+Running time for the access:	6.633017543 1458429
+
+Access: 4 start. currentTime2566468544915
+Access: 4 finish. currentTime2573051011178
+Running time for the access:	6.582495574 1458429
+
+Access: 5 start. currentTime2573051339537
+Access: 5 finish. currentTime2579661639864
+Running time for the access:	6.610323547 1458429
+
+Access: 6 start. currentTime2579661971419
+Access: 6 finish. currentTime2586311447572
+Running time for the access:	6.649499446 1458429
+
+Access: 7 start. currentTime2586311791164
+Access: 7 finish. currentTime2592919701598
+Running time for the access:	6.607940186 1458429
+
+Access: 8 start. currentTime2592920045153
+Access: 8 finish. currentTime2599593165623
+Running time for the access:	6.673145605 1458429
+
+Access: 9 start. currentTime2599593499668
+Access: 9 finish. currentTime2606242070794
+Running time for the access:	6.64859226 1458429
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+6.6344832631	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+23 8 64 3 992
+Access: 0 start. currentTime2610114976524
+Access: 0 finish. currentTime2618315624840
+Running time for the access:	8.200585433 1562234
+
+Access: 1 start. currentTime2618315957514
+Access: 1 finish. currentTime2626536556223
+Running time for the access:	8.220622407 1562234
+
+Access: 2 start. currentTime2626536892561
+Access: 2 finish. currentTime2634745089858
+Running time for the access:	8.208224365 1562234
+
+Access: 3 start. currentTime2634745435270
+Access: 3 finish. currentTime2642960936745
+Running time for the access:	8.215531942 1562234
+
+Access: 4 start. currentTime2642961271233
+Access: 4 finish. currentTime2651104316734
+Running time for the access:	8.143068786 1562234
+
+Access: 5 start. currentTime2651104651551
+Access: 5 finish. currentTime2659223323979
+Running time for the access:	8.118695902 1562234
+
+Access: 6 start. currentTime2659223660418
+Access: 6 finish. currentTime2667377684343
+Running time for the access:	8.15405002 1562234
+
+Access: 7 start. currentTime2667378027839
+Access: 7 finish. currentTime2675582144786
+Running time for the access:	8.204142059 1562234
+
+Access: 8 start. currentTime2675582478729
+Access: 8 finish. currentTime2683849419500
+Running time for the access:	8.266970543 1562234
+
+Access: 9 start. currentTime2683849759553
+Access: 9 finish. currentTime2692046662077
+Running time for the access:	8.19692725 1562234
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+8.1929233018	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+24 8 64 3 992
+Access: 0 start. currentTime2698735844119
+Access: 0 finish. currentTime2707509104533
+Running time for the access:	8.773266502 1687658
+
+Access: 1 start. currentTime2707509444866
+Access: 1 finish. currentTime2716208920409
+Running time for the access:	8.699504317 1687658
+
+Access: 2 start. currentTime2716209251303
+Access: 2 finish. currentTime2724965011945
+Running time for the access:	8.75578457 1687658
+
+Access: 3 start. currentTime2724965353308
+Access: 3 finish. currentTime2733763763110
+Running time for the access:	8.798439487 1687658
+
+Access: 4 start. currentTime2733764109285
+Access: 4 finish. currentTime2742550053549
+Running time for the access:	8.785975396 1687658
+
+Access: 5 start. currentTime2742550389099
+Access: 5 finish. currentTime2751417934768
+Running time for the access:	8.867568891 1687658
+
+Access: 6 start. currentTime2751418270209
+Access: 6 finish. currentTime2760215249796
+Running time for the access:	8.797003147 1687658
+
+Access: 7 start. currentTime2760215583245
+Access: 7 finish. currentTime2769020624132
+Running time for the access:	8.805066187 1687658
+
+Access: 8 start. currentTime2769020960173
+Access: 8 finish. currentTime2777862809426
+Running time for the access:	8.841872231 1687658
+
+Access: 9 start. currentTime2777863146309
+Access: 9 finish. currentTime2786515148847
+Running time for the access:	8.652026875 1687658
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+8.7776920777	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+25 8 64 3 992
+Access: 0 start. currentTime2797596455951
+Access: 0 finish. currentTime2807085235902
+Running time for the access:	9.488766149 1818192
+
+Access: 1 start. currentTime2807085572622
+Access: 1 finish. currentTime2816445730977
+Running time for the access:	9.360179903 1818192
+
+Access: 2 start. currentTime2816446059926
+Access: 2 finish. currentTime2825775573971
+Running time for the access:	9.329536093 1818192
+
+Access: 3 start. currentTime2825775906822
+Access: 3 finish. currentTime2835184450063
+Running time for the access:	9.408565658 1818192
+
+Access: 4 start. currentTime2835184782606
+Access: 4 finish. currentTime2844547793045
+Running time for the access:	9.363034383 1818192
+
+Access: 5 start. currentTime2844548146223
+Access: 5 finish. currentTime2854009505867
+Running time for the access:	9.461388529 1818192
+
+Access: 6 start. currentTime2854009846577
+Access: 6 finish. currentTime2863435014236
+Running time for the access:	9.425204753 1818192
+
+Access: 7 start. currentTime2863435352185
+Access: 7 finish. currentTime2872762051031
+Running time for the access:	9.32672415 1818192
+
+Access: 8 start. currentTime2872762399901
+Access: 8 finish. currentTime2882219873366
+Running time for the access:	9.45750536 1818192
+
+Access: 9 start. currentTime2882220219691
+Access: 9 finish. currentTime2891597650923
+Running time for the access:	9.377455423 1818192
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+9.399877415599999	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
+OTPreProcessing
+
+logN recurFactor  cutoff capacity dataSize
+26 8 64 3 992
+Access: 0 start. currentTime2913910004932
+Access: 0 finish. currentTime2925214104416
+Running time for the access:	11.30410968 1937471
+
+Access: 1 start. currentTime2925214481554
+Access: 1 finish. currentTime2936557012453
+Running time for the access:	11.342563887 1937471
+
+Access: 2 start. currentTime2936557349843
+Access: 2 finish. currentTime2947918675855
+Running time for the access:	11.361351006 1937471
+
+Access: 3 start. currentTime2947919015270
+Access: 3 finish. currentTime2958998923979
+Running time for the access:	11.079932271 1937471
+
+Access: 4 start. currentTime2958999262205
+Access: 4 finish. currentTime2970055991965
+Running time for the access:	11.056765165 1937471
+
+Access: 5 start. currentTime2970056350024
+Access: 5 finish. currentTime2981488299026
+Running time for the access:	11.431982396 1937471
+
+Access: 6 start. currentTime2981488634077
+Access: 6 finish. currentTime2992933335447
+Running time for the access:	11.444724942 1937471
+
+Access: 7 start. currentTime2992933671273
+Access: 7 finish. currentTime3004050364324
+Running time for the access:	11.11671599 1937471
+
+Access: 8 start. currentTime3004050699657
+Access: 8 finish. currentTime3015172260107
+Running time for the access:	11.121583749 1937471
+
+Access: 9 start. currentTime3015172599423
+Access: 9 finish. currentTime3026346163577
+Running time for the access:	11.173592633 1937471
+
+Infinity
+Total Time 	 GC CPU Time	 GCIO Time	 OTCPU Time	 OTIO Time
+
+11.2433778562	0.0	0.0 0.0	0.0
+
+5th counter:0.0
+6th counter:0.0
+7th counter:0.0
+8th counter:0.0
+9th counter:0.0
+
