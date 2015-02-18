@@ -14,8 +14,8 @@ import gc.GCSignal;
 public class TestCircuitOramRecOpt {
 
 	public  static void main(String args[]) throws Exception {
-			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 1024-32, 8, 6);
-//		GenRunnable gen = new GenRunnable(12345, 10, 3, 32, 8, 6);
+//			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 1024-32, 8, 6);
+		GenRunnable gen = new GenRunnable(12345, 10, 3, 32, 8, 6);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(eva);
@@ -44,6 +44,7 @@ public class TestCircuitOramRecOpt {
 
 		GenRunnable(int port, int logN, int capacity, int dataSize,
 				int recurFactor, int logCutoff) {
+			Flag.tableName = "table_"+logN;
 			this.port = port;
 			this.logN = logN;
 			this.N = 1 << logN;
@@ -151,7 +152,6 @@ System.out.println("Running time for the access:\t"+(System.nanoTime()-t11)/1000
 						.println("\nlogN recurFactor  cutoff capacity dataSize");
 				System.out.println(logN + " " + recurFactor + " " + cutoff
 						+ " " + capacity + " " + dataSize);
-
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Party.Bob,
 						is, os);
