@@ -14,7 +14,7 @@ public class IPManager {
 	String[] eIp;
 	int machines;
 
-	public static IPManager loadIPs(int machines, String machineConfig) throws IOException {
+	public static IPManager loadIPs(int machines, String machineConfigFile) throws IOException {
 		ips = new String[20];
 		ips[0] = "127.0.0.1";
 		ips[1] = "10.42.120.15";
@@ -36,7 +36,7 @@ public class IPManager {
 		try {
 			// System.out.println(Constants.MACHINE_IPS);
 //			br = new BufferedReader(new FileReader(Constants.MACHINE_IPS + "." + machines));
-			br = new BufferedReader(new FileReader("machine_spec/" + machineConfig + "." + machines));
+			br = new BufferedReader(new FileReader("machine_spec/" + machineConfigFile + "." + machines));
 			ipManager.masterGarblerIp = ips[Integer.parseInt(br.readLine())];
 			ipManager.masterEvaluatorIp = ips[Integer.parseInt(br.readLine())];
 			ipManager.machines = Integer.parseInt(br.readLine());
