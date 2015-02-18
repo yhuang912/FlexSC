@@ -148,8 +148,8 @@ public class TestFloat extends TestHarness {
 					throws Exception {
 				double t1 = System.nanoTime();
 				for(int i = 0; i < 1000; ++i)
-//					a = env.add(a, b);
-					a = env.multiply(a, b);
+					a = env.add(a, b);
+//					a = env.multiply(a, b);
 				System.out.println((System.nanoTime() - t1)/1000/1000000000);
 				return a;
 			}
