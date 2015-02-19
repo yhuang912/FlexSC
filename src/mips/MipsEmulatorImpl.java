@@ -62,7 +62,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final int stackFrameSize = 300/4;
 	static final int aliceInputSize = 25;
 	static final int bobInputSize = 0;
-	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 32;
+	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
 	
 	static final int mainStackSize = 136;
 	static final int[][] aliceLongInput = {{0,3,2,10,11},
@@ -241,7 +241,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			long startTime = System.nanoTime();
 			MemorySet<T> currentSet = sets.get(0);
 			SecureMap<T> currentBank;
-			dataOffset += (stackSize*4);
+			dataOffset -= (stackSize*4);
 			while (true) {
 				currentBank = currentSet.getOramBank().getMap();
 				EmulatorUtils.print("count: " + count, lib, false);
@@ -513,7 +513,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					}
 				}
 			}
-			//EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
+			EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
 			System.out.println("exiting getMemoryGen");
 			
 			return memBank;
