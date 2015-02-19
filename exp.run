@@ -1,0 +1,2 @@
+java -cp bin/:lib/* compiledlib.stack.TestStack 1 $1 localhost 54321 & 
+java -cp bin/:lib/* compiledlib.stack.TestStack 0 $1 localhost 54321 

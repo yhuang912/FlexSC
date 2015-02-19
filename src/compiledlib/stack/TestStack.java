@@ -69,7 +69,7 @@ public class TestStack {
 		double[] time = new double[op.length];
 
 		for (int i = 0; i < op.length; ++i) {
-System.out.println(i);
+			System.out.println(i);
 			if (op[i] == 1 && Flag.mode == Mode.VERIFY) {
 				int res = 0;
 				if (env.getParty() == Party.Alice) {
@@ -180,11 +180,11 @@ System.out.println(i);
 				connect(host, port);
 				CompEnv env = CompEnv.getEnv(Party.Bob, is, os);
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
-System.out.println("..");
+				System.out.println("..");
 				Stack<BoolArray> ostack = new Stack<BoolArray>(env,
 						logN, new BoolArray(env), new CircuitOram<GCSignal>(env,
 								1 << logN, 32 + logN));
-System.out.println("..");
+				System.out.println("..");
 				compute(env, ostack, lib);
 				disconnect();
 			} catch (Exception e) {
