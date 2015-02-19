@@ -56,20 +56,30 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final boolean aliceInputIsRef = true;
 	static final boolean bobInputIsRef = false;
 	static final int Alice_input = 6;
-	static final int Bob_input = 3;
+	static final int Bob_input = 0;
 	static final int Alice_input2 = -1;
 	static final int Bob_input2 = 4;
-	static final int stackFrameSize = 300/4;
-	static final int aliceInputSize = 25;
+	static final int stackFrameSize = 660/4;
+	static final int aliceInputSize = 100;
 	static final int bobInputSize = 0;
 	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
 	
 	static final int mainStackSize = 136;
-	static final int[][] aliceLongInput = {{0,3,2,10,11},
-		{3,0,1,18,6},
-		{2,1,0,1,6},
-		{10,18,1,0,16},
-		{11,6,6,16,0},
+	static final int[][] aliceLongInput = {{0,30,28,32,1,13,1,5,25,13,7,26,21,1,7},
+		{30,0,21,26,38,17,24,18,10,24,25,38,31,21,22},
+		{28,21,0,27,30,3,26,2,35,35,40,36,17,31,10},
+		{32,26,27,0,6,19,10,34,31,25,37,5,3,15,1},
+		{1,38,30,6,0,19,19,14,20,9,6,38,37,15,1},
+		{13,17,3,19,19,0,36,21,11,26,28,15,13,39,32},
+		{1,24,26,10,19,36,0,28,21,20,17,11,6,18,34},
+		{5,18,2,34,14,21,28,0,23,29,39,29,10,40,32},
+		{25,10,35,31,20,11,21,23,0,36,39,8,40,1,36},
+		{13,24,35,25,9,26,20,29,36,0,25,28,24,26,2},
+		{7,25,40,37,6,28,17,39,39,25,0,14,32,37,14},
+		{26,38,36,5,38,15,11,29,8,28,14,0,25,22,6},
+		{21,31,17,3,37,13,6,10,40,24,32,25,0,25,27},
+		{1,21,31,15,15,39,18,40,1,26,37,22,25,0,22},
+		{7,22,10,1,1,32,34,32,36,2,14,6,27,22,0},
 		};
 
 	

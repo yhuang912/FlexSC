@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define MAX 15
+#define MAX 10
 #define INFINITE 998
 
 int allselected(int *selected)
