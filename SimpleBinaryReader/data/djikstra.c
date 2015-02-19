@@ -1,9 +1,12 @@
 #include <stdio.h>
 
+#define MAX 5
+#define INFINITE 998
+
 #ifndef MAX
 #define MAX 20
 #endif
-#define INFINITE 998
+
 
 int allselected(int *selected)
 {
@@ -261,15 +264,15 @@ int main()
 {38,34,25,19,37,8,10,17,14,19,2,36,36,12,18,1,0,27,18},
 {6,37,25,10,38,17,39,8,20,13,35,40,18,37,15,19,27,0,26},
 {14,38,26,6,35,34,3,28,16,28,26,17,16,3,11,20,18,26,0},
-else
-	WTF
 #endif
+
+
 };
 
  int i;
-  int ret = sfe_main(cost, 3, 4);
+  int ret = sfe_main(cost, 0, 4);
   //for(i=0;i<MAX;i++)
   //printf("%d\n",distance[i]);
-  printf("\nreturned value: %d", ret); printf("\n");
+ printf("\nreturned value: %d", ret); printf("\n");
   return 0;
 }
