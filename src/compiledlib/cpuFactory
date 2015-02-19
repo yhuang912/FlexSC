@@ -130,4 +130,4 @@ java -classpath $CP \
 	com.appcomsci.mips.cpu.CpuFactory \
 	--output.directory=$OUTDIR \
 	--entry.point=sfe_main \
-	--function.load.list=sfe_main,func_a,func_b $PROG
+	--function.load.list=sfe_main,func_a,func_b,allselected $PROG

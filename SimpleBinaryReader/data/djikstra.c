@@ -54,12 +54,12 @@ int sfe_main(int cost[][MAX], int startID, int endID)
 int main()
 {
   int cost[MAX][MAX]= 
-{{0,65,74,14,4},
-{65,0,96,12,97},
-{74,96,0,100,76},
-{14,12,100,0,97},
-{4,97,76,97,0},
-};
+{{0,3,2,10,11},
+		{3,0,1,18,6},
+		{2,1,0,1,6},
+		{10,18,1,0,16},
+		{11,6,6,16,0},
+		};
 
 
   
@@ -77,7 +77,7 @@ int main()
     {9, INFINITE, INFINITE}};*/
 
  int i;
-  int ret = sfe_main(cost, 1, 2);
+  int ret = sfe_main(cost, 3, 4);
   //for(i=0;i<MAX;i++)
   //printf("%d\n",distance[i]);
   printf("\nreturned value: %d", ret); printf("\n");

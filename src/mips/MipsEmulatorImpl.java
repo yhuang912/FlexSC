@@ -59,10 +59,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final int Bob_input = 3;
 	static final int Alice_input2 = -1;
 	static final int Bob_input2 = 4;
-	static final int stackSize = 300/4;
+	static final int stackFrameSize = 300/4;
 	static final int aliceInputSize = 25;
 	static final int bobInputSize = 0;
-	static final int MEM_SIZE = stackSize + aliceInputSize + bobInputSize;// 160 < threshold for func1
+	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 32;
+	
 	static final int mainStackSize = 136;
 	static final int[][] aliceLongInput = {{0,3,2,10,11},
 		{3,0,1,18,6},
@@ -240,18 +241,19 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			long startTime = System.nanoTime();
 			MemorySet<T> currentSet = sets.get(0);
 			SecureMap<T> currentBank;
+			dataOffset += (stackSize*4);
 			while (true) {
 				currentBank = currentSet.getOramBank().getMap();
 				EmulatorUtils.print("count: " + count, lib, false);
 				count++;
 				System.out.println("execution step: " + currentSet.getExecutionStep());
-				if (config.isMultipleBanks())
-					currentSet.getOramBank().getMap().print();
+				//if (config.isMultipleBanks())
+					//currentSet.getOramBank().getMap().print();
 				if (config.isMultipleBanks())
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
 				newInst = mem.getInst(currentBank, pc, pcOffset);
 				//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
-				mem.func(reg, memBank, newInst, dataOffset-(stackSize*4));
+				mem.func(reg, memBank, newInst, dataOffset);
 
 
 				testHalt = testTerminate(reg, newInst, lib);
@@ -342,7 +344,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 			else { 
 				oram.write(env.inputOfAlice(Utils.fromInt(aliceReg, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(stackSize - aliceInputSize, WORD_SIZE)));
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*aliceInputSize), WORD_SIZE)));
 			}
 			if (!bobInputIsRef){
 				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
@@ -353,10 +355,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 			else { 
 				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(stackSize - aliceInputSize - bobInputSize, WORD_SIZE)));
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(aliceInputSize + bobInputSize)), WORD_SIZE)));
 			}
 			env.flush();
-			int stackPointer = dataOffset - 4*(stackSize - aliceInputSize - bobInputSize - 8);
+			int stackPointer = dataOffset - (4*aliceInputSize) - 32;
 			oram.write(env.inputOfAlice(Utils.fromInt(29, oram.lengthOfIden)),
 					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
 			
@@ -486,8 +488,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			boolean memory[][] = memData.getDataAsBoolean();	
 			IntegerLib<T> lib = new IntegerLib<T>(env);
 			int dataLen = memData.getDataLength();
-			
-			SecureArray<T> memBank = new SecureArray<T>(env, MEM_SIZE, WORD_SIZE, THRESHOLD, RECURSE_THRESHOLD, 4);
+			int memSize = stackSize + dataLen;
+			SecureArray<T> memBank = new SecureArray<T>(env, memSize, WORD_SIZE, THRESHOLD, RECURSE_THRESHOLD, 4);
 			
 			T[] index; 
 			T[] data;
@@ -511,7 +513,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					}
 				}
 			}
-			EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
+			//EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
 			System.out.println("exiting getMemoryGen");
 			
 			return memBank;
