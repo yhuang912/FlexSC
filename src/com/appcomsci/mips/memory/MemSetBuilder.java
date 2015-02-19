@@ -260,13 +260,19 @@ public class MemSetBuilder<T> extends MipsProgram {
 							break;
 							// Flying leap with link
 						case OP_JALR:
+							/*
 							currentSet = new MemorySet<T>(executionStep+1, instructions);
 							execSets.add(executionStep+1, currentSet);
 							prevSet.setNextMemorySet(currentSet);
 							currentSet.setNextMemorySet(currentSet);
 							break executionLoop;
+							*/
+							// IGNORE JALR FOR NOW
+							th.advance();
+							break;
 						default:
 							th.advance();
+							break;
 						}
 						break;
 					case OP_REGIMM:
