@@ -47,6 +47,10 @@ import com.appcomsci.mips.binary.Reader;
 import com.appcomsci.mips.binary.SymbolTableEntry;
 import com.appcomsci.sfe.common.Configuration;
 
+import static com.appcomsci.mips.cpu.Utils.makeInstructionSet;
+import static com.appcomsci.mips.cpu.Utils.toStringSet;
+import static com.appcomsci.mips.cpu.Utils.consistentHashString;
+
 /**
  * Create sets of memory locations that can be executed at each
  * program step
@@ -460,6 +464,7 @@ public class MemSetBuilder<T> extends MipsProgram {
 		List<MemorySet<Boolean>> sets = b.build();
 		for(MemorySet<Boolean> m:sets) {
 			System.err.println(m.toString());
+			System.err.println(consistentHashString(toStringSet(makeInstructionSet(m))));
 		}
 	}
 }
