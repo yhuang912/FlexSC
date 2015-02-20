@@ -294,6 +294,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				currentSet = currentSet.getNextMemorySet();
 			}
 			float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
+			System.out.println("Count:"  + count);
 			System.out.println("Run time: " + runTime);
 			System.out.println("Average time / instruction: " + runTime / count );
 			EmulatorUtils.printBooleanArray("Rsult", reg.read(lib.toSignals(2, 32)), lib, false);
