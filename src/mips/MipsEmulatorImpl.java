@@ -53,35 +53,29 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
 	 * also be loaded.  
 	 */
-	static final boolean aliceInputIsRef = true;
-	static final boolean bobInputIsRef = false;
+	static  int CURRENT_PROGRAM = 2;
+	static final int PROG_DJIKSTRA = 1;
+	static final int PROG_SET_INTERSECTION = 2;
+	
+	static boolean aliceInputIsRef = true;
+	static boolean bobInputIsRef = true;
 	static final int Alice_input = 6;
 	static final int Bob_input = 0;
 	static final int Alice_input2 = -1;
 	static final int Bob_input2 = 4;
-	static final int stackFrameSize = 660/4;
-	static final int aliceInputSize = 100;
-	static final int bobInputSize = 0;
+	static final int stackFrameSize = 32/4;
+	static final int aliceInputSize = 50;
+	static final int bobInputSize = 50;
 	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
 	
-	static final int mainStackSize = 136;
-	static final int[][] aliceLongInput = {{0,30,28,32,1,13,1,5,25,13,7,26,21,1,7},
-		{30,0,21,26,38,17,24,18,10,24,25,38,31,21,22},
-		{28,21,0,27,30,3,26,2,35,35,40,36,17,31,10},
-		{32,26,27,0,6,19,10,34,31,25,37,5,3,15,1},
-		{1,38,30,6,0,19,19,14,20,9,6,38,37,15,1},
-		{13,17,3,19,19,0,36,21,11,26,28,15,13,39,32},
-		{1,24,26,10,19,36,0,28,21,20,17,11,6,18,34},
-		{5,18,2,34,14,21,28,0,23,29,39,29,10,40,32},
-		{25,10,35,31,20,11,21,23,0,36,39,8,40,1,36},
-		{13,24,35,25,9,26,20,29,36,0,25,28,24,26,2},
-		{7,25,40,37,6,28,17,39,39,25,0,14,32,37,14},
-		{26,38,36,5,38,15,11,29,8,28,14,0,25,22,6},
-		{21,31,17,3,37,13,6,10,40,24,32,25,0,25,27},
-		{1,21,31,15,15,39,18,40,1,26,37,22,25,0,22},
-		{7,22,10,1,1,32,34,32,36,2,14,6,27,22,0},
-		};
-
+	static final int[][] aliceInputDjikstra = {{0,11,10,9,35},
+		{11,0,17,19,11},
+		{10,17,0,7,29},
+		{9,19,7,0,3},
+		{35,11,29,3,0}};
+	static final int[] aliceInputSetIntersection = {1,1,2,2,2,3,4,4,4,7,8,9,9,9,10,10,11,11,11,12,12,13,13,14,14,16,17,17,18,18,19,20,21,21,22,22,23,25,26,26,26,27,27,28,31,32,35,36,37,38};
+	
+	static final int[] bobInputSetIntersection = {1,2,3,4,7,7,10,14,14,15,15,15,15,16,16,16,17,18,19,19,20,20,21,22,23,23,24,24,26,27,27,28,28,29,30,30,31,31,31,32,34,35,35,35,35,36,38,38,38,40};
 	
 	
 	// Should we blither about missing CPUs?
@@ -91,6 +85,15 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	private MipsEmulatorImpl(LocalConfiguration config) throws Exception {
 		this.config = config;
+		if (CURRENT_PROGRAM == PROG_DJIKSTRA){
+			aliceInputIsRef = true; 
+			bobInputIsRef = false;
+		}
+		if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
+			aliceInputIsRef = true;
+			bobInputIsRef = true;
+		}
+			
 	}
 
 	public void testInstruction (CompEnv<ET> env) throws Exception {
@@ -254,9 +257,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			dataOffset -= (stackSize*4);
 			while (true) {
 				currentBank = currentSet.getOramBank().getMap();
-				EmulatorUtils.print("count: " + count, lib, false);
+				EmulatorUtils.print("count: " + count + "\nexecution step: " + currentSet.getExecutionStep(), lib, false);
 				count++;
-				System.out.println("execution step: " + currentSet.getExecutionStep());
+				if (count % 100 == 0)  System.out.println("count: " + count);
 				//if (config.isMultipleBanks())
 					//currentSet.getOramBank().getMap().print();
 				if (config.isMultipleBanks())
@@ -291,6 +294,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				currentSet = currentSet.getNextMemorySet();
 			}
 			float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
+			System.out.println("Count:"  + count);
 			System.out.println("Run time: " + runTime);
 			System.out.println("Average time / instruction: " + runTime / count );
 			EmulatorUtils.printBooleanArray("Rsult", reg.read(lib.toSignals(2, 32)), lib, false);
@@ -354,7 +358,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 			else { 
 				oram.write(env.inputOfAlice(Utils.fromInt(aliceReg, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(dataOffset - (4*aliceInputSize), WORD_SIZE)));
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(aliceInputSize + bobInputSize)), WORD_SIZE)));
+				if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+					oram.write(env.inputOfAlice(Utils.fromInt(aliceReg+2, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(aliceInputSize, WORD_SIZE)));
+					
 			}
 			if (!bobInputIsRef){
 				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
@@ -365,10 +373,14 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 			else { 
 				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(aliceInputSize + bobInputSize)), WORD_SIZE)));
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*bobInputSize), WORD_SIZE)));
+				if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+					oram.write(env.inputOfAlice(Utils.fromInt(bobReg+2, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(bobInputSize, WORD_SIZE)));
+				
 			}
 			env.flush();
-			int stackPointer = dataOffset - (4*aliceInputSize) - 32;
+			int stackPointer = dataOffset - (4*(aliceInputSize + bobInputSize)) - 32;
 			oram.write(env.inputOfAlice(Utils.fromInt(29, oram.lengthOfIden)),
 					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
 			
@@ -511,16 +523,34 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					data = env.inputOfAlice(new boolean[WORD_SIZE]);
 				memBank.write(index, data);	
 			}
-			if (aliceInputIsRef){
-				for (int i = 0; i < aliceLongInput.length; i++){
-					for (int j = 0; j < aliceLongInput[0].length; j++){
-						index = lib.toSignals(stackSize - aliceInputSize + (i * aliceLongInput[0].length)+j, memBank.lengthOfIden);
+			if (CURRENT_PROGRAM == PROG_DJIKSTRA){
+				for (int i = 0; i < aliceInputDjikstra.length; i++){
+					for (int j = 0; j < aliceInputDjikstra[0].length; j++){
+						index = lib.toSignals(stackSize - aliceInputSize + (i * aliceInputDjikstra[0].length)+j, memBank.lengthOfIden);
 						if (env.getParty() == Party.Alice)
-							data = env.inputOfAlice(Utils.fromInt(aliceLongInput[i][j], WORD_SIZE));
+							data = env.inputOfAlice(Utils.fromInt(aliceInputDjikstra[i][j], WORD_SIZE));
 						else 
 							data = env.inputOfAlice(new boolean[WORD_SIZE]);
 						memBank.write(index, data);						
 					}
+				}
+			}
+			if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
+				for (int i = 0; i < aliceInputSetIntersection.length; i++){
+					index = lib.toSignals(stackSize - aliceInputSize - bobInputSize + i , memBank.lengthOfIden);
+					if (env.getParty() == Party.Alice)
+						data = env.inputOfAlice(Utils.fromInt(aliceInputSetIntersection[i], WORD_SIZE));
+					else 
+						data = env.inputOfAlice(new boolean[WORD_SIZE]);
+					memBank.write(index, data);					
+				}
+				for (int i = 0; i < bobInputSetIntersection.length; i++){
+					index = lib.toSignals(stackSize - bobInputSize + i , memBank.lengthOfIden);
+					if (env.getParty() == Party.Alice)
+						data = env.inputOfAlice(Utils.fromInt(bobInputSetIntersection[i], WORD_SIZE));
+					else 
+						data = env.inputOfAlice(new boolean[WORD_SIZE]);
+					memBank.write(index, data);					
 				}
 			}
 			EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
@@ -583,6 +613,15 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	public void emulate() throws Exception {
 		Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
+		System.out.println("Executing binary file: " + config.getBinaryFileName());
+		String progName = "unkown";
+		if (MipsEmulatorImpl.CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+			progName = "Set Intersection";
+		if (MipsEmulatorImpl.CURRENT_PROGRAM == PROG_DJIKSTRA)
+			progName = "DJIKSTRA";
+		System.out.println("Current_Program: " + progName);
+		System.out.println("Alice input Size: " + aliceInputSize);
+		System.out.println("Bob input Size: " + bobInputSize);
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 		
 		DataSegment instData = rdr.getInstructions(config.getFunctionLoadList());
