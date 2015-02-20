@@ -53,6 +53,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
 	 * also be loaded.  
 	 */
+	static final int PROG_DJIKSTRA = 1;
+	static final int PROG_SET_INTERSECTION = 2;
 	static final boolean aliceInputIsRef = true;
 	static final boolean bobInputIsRef = false;
 	static final int Alice_input = 6;
@@ -151,11 +153,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	private static class LocalConfiguration extends Configuration {
 		
 		private String binaryFileName;
-		private Mode mode = Mode.VERIFY;
+		private Mode mode = Mode.REAL;
 
 		
 		public static final String MODE_PROPERTY = "mode";
-		public static final String DEFAULT_MODE = "VERIFY";
+		public static final String DEFAULT_MODE = "REAL";
 		
 		protected LocalConfiguration() throws IOException {
 			super();
@@ -243,9 +245,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			dataOffset -= (stackSize*4);
 			while (true) {
 				currentBank = currentSet.getOramBank().getMap();
-				EmulatorUtils.print("count: " + count, lib, false);
+				EmulatorUtils.print("count: " + count + "\nexecution step: " + currentSet.getExecutionStep(), lib, false);
 				count++;
-				System.out.println("execution step: " + currentSet.getExecutionStep());
+				if (count % 100 == 0)  System.out.println("count: " + count);
 				//if (config.isMultipleBanks())
 					//currentSet.getOramBank().getMap().print();
 				if (config.isMultipleBanks())
