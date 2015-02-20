@@ -53,30 +53,26 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
 	 * also be loaded.  
 	 */
+	static  int CURRENT_PROGRAM = 1;
 	static final int PROG_DJIKSTRA = 1;
 	static final int PROG_SET_INTERSECTION = 2;
-	static  int CURRENT_PROGRAM = 1;
-	static final boolean aliceInputIsRef = true;
-	static final boolean bobInputIsRef = false;
+	
+	static boolean aliceInputIsRef = true;
+	static boolean bobInputIsRef = true;
 	static final int Alice_input = 6;
 	static final int Bob_input = 0;
 	static final int Alice_input2 = -1;
 	static final int Bob_input2 = 4;
-	static final int stackFrameSize = 220/4;
-	static final int aliceInputSize = 100;
+	static final int stackFrameSize = 164/4;
+	static final int aliceInputSize = 25;
 	static final int bobInputSize = 0;
 	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
 	
-	static final int[][] aliceInputDjikstra = {{0,23,1,5,11,21,40,2,25,18},
-		{23,0,31,26,15,20,16,24,31,9},
-		{1,31,0,17,15,29,17,29,30,35},
-		{5,26,17,0,37,19,12,25,18,40},
-		{11,15,15,37,0,6,25,30,29,8},
-		{21,20,29,19,6,0,17,19,16,15},
-		{40,16,17,12,25,17,0,5,4,5},
-		{2,24,29,25,30,19,5,0,33,17},
-		{25,31,30,18,29,16,4,33,0,1},
-		{18,9,35,40,8,15,5,17,1,0},};
+	static final int[][] aliceInputDjikstra = {{0,11,10,9,35},
+		{11,0,17,19,11},
+		{10,17,0,7,29},
+		{9,19,7,0,3},
+		{35,11,29,3,0}};
 	static final int[] aliceInputSetIntersection = {1, 2 , 3}; 
 	static final int[] bobInputSetIntersection = {2, 3, 5};
 	
@@ -88,6 +84,15 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	private MipsEmulatorImpl(LocalConfiguration config) throws Exception {
 		this.config = config;
+		if (CURRENT_PROGRAM == PROG_DJIKSTRA){
+			aliceInputIsRef = true; 
+			bobInputIsRef = false;
+		}
+		if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
+			aliceInputIsRef = true;
+			bobInputIsRef = true;
+		}
+			
 	}
 
 	public void testInstruction (CompEnv<ET> env) throws Exception {
@@ -351,7 +356,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 			else { 
 				oram.write(env.inputOfAlice(Utils.fromInt(aliceReg, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(dataOffset - (4*aliceInputSize), WORD_SIZE)));
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(aliceInputSize + bobInputSize)), WORD_SIZE)));
 			}
 			if (!bobInputIsRef){
 				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
@@ -362,10 +367,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 			else { 
 				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(aliceInputSize + bobInputSize)), WORD_SIZE)));
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*bobInputSize), WORD_SIZE)));
 			}
 			env.flush();
-			int stackPointer = dataOffset - (4*aliceInputSize) - 32;
+			int stackPointer = dataOffset - (4*(aliceInputSize + bobInputSize)) - 32;
 			oram.write(env.inputOfAlice(Utils.fromInt(29, oram.lengthOfIden)),
 					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
 			
@@ -522,7 +527,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 			if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
 				for (int i = 0; i < aliceInputSetIntersection.length; i++){
-					index = lib.toSignals(stackSize - aliceInputSize + i , memBank.lengthOfIden);
+					index = lib.toSignals(stackSize - aliceInputSize - bobInputSize + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
 						data = env.inputOfAlice(Utils.fromInt(aliceInputSetIntersection[i], WORD_SIZE));
 					else 
@@ -530,7 +535,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					memBank.write(index, data);					
 				}
 				for (int i = 0; i < bobInputSetIntersection.length; i++){
-					index = lib.toSignals(stackSize - aliceInputSize - bobInputSize + i , memBank.lengthOfIden);
+					index = lib.toSignals(stackSize - bobInputSize + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
 						data = env.inputOfAlice(Utils.fromInt(bobInputSetIntersection[i], WORD_SIZE));
 					else 
@@ -598,6 +603,15 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	public void emulate() throws Exception {
 		Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
+		System.out.println("Executing binary file: " + config.getBinaryFileName());
+		String progName = "unkown";
+		if (MipsEmulatorImpl.CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+			progName = "Set Intersection";
+		if (MipsEmulatorImpl.CURRENT_PROGRAM == PROG_DJIKSTRA)
+			progName = "DJIKSTRA";
+		System.out.println("Current_Program: " + progName);
+		System.out.println("Alice input Size: " + aliceInputSize);
+		System.out.println("Bob input Size: " + bobInputSize);
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 		
 		DataSegment instData = rdr.getInstructions(config.getFunctionLoadList());
