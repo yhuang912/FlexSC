@@ -2,7 +2,7 @@ import numpy
 import sys
 
 output = "{\n"
-for graphSize in range(3,20):
+for graphSize in range(3,21):
 
   array = numpy.random.random_integers(1, 40, (graphSize,graphSize))
 
@@ -22,7 +22,7 @@ for graphSize in range(3,20):
     output+= str(array[i][graphSize-1])
     output += "},\n"
 
-output += "else\n\tWTF\n#endif\n"
+output += "#else\n\tWTF\n#endif\n"
 output += "};"
 
 print output
