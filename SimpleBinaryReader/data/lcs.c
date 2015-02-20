@@ -1,26 +1,36 @@
-#include <string.h>
+#ifdef PRINT
+#include <stdio.h>
+#endif
 
 int main(int argc, char **argv) { 
-  char a[] = "aaaaaaaaaa";
-  char b[] = "bbbbbbbbbb"; 
+  char a[] = "aaaaaaaaa";
+  char b[] = "bbaaabaab"; 
+#ifdef PRINT
+  printf("%d\n", sfe_main(a,b));
+#else
   sfe_main(a,b); 
+#endif
   return 0; 
 }
 
 int sfe_main(char * a, char * b){
   int i,j = 0;
-  int aLen = 10;
-  int bLen = 10;
-  int C[aLen][bLen];
-  for (i = 0; i < aLen; i++){
+#ifndef aLen
+  int aLen = 9;
+#endif
+#ifndef bLen
+  int bLen = 9;
+#endif
+  int C[aLen+1][bLen+1];
+  for (i = 0; i <= aLen; i++){
     C[i][0] = 0;
   }
-  for (i = 0; i < bLen; i++){
+  for (i = 0; i <= bLen; i++){
     C[0][i] = 0;
   }
-  for (i = 1; i < aLen; i++){
-    for (j = 1; j< bLen; j++){
-      if (a[i] == b[j])
+  for (i = 1; i <= aLen; i++){
+    for (j = 1; j<= bLen; j++){
+      if (a[i-1] == b[j-1])
 	C[i][j] = C[i-1][j-1] + 1;
       else
 	C[i][j] = (C[i][j-1] >= C[i-1][j]) ? C[i][j-1] : C[i-1][j];
