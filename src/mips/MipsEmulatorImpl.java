@@ -61,17 +61,22 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final int Bob_input = 0;
 	static final int Alice_input2 = -1;
 	static final int Bob_input2 = 4;
-	static final int stackFrameSize = 300/4;
-	static final int aliceInputSize = 25;
+	static final int stackFrameSize = 660/4;
+	static final int aliceInputSize = 100;
 	static final int bobInputSize = 0;
 	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
 	
 	static final int mainStackSize = 136;
-	static final int[][] aliceLongInput = {{0,11,10,9,35},
-		{11,0,17,19,11},
-		{10,17,0,7,29},
-		{9,19,7,0,3},
-		{35,11,29,3,0}};
+	static final int[][] aliceLongInput = {{0,23,1,5,11,21,40,2,25,18},
+		{23,0,31,26,15,20,16,24,31,9},
+		{1,31,0,17,15,29,17,29,30,35},
+		{5,26,17,0,37,19,12,25,18,40},
+		{11,15,15,37,0,6,25,30,29,8},
+		{21,20,29,19,6,0,17,19,16,15},
+		{40,16,17,12,25,17,0,5,4,5},
+		{2,24,29,25,30,19,5,0,33,17},
+		{25,31,30,18,29,16,4,33,0,1},
+		{18,9,35,40,8,15,5,17,1,0},};
 
 	
 	
