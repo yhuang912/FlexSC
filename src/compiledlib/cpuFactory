@@ -68,7 +68,7 @@ then
 	exit 1
     fi
 else
-    PROGS="../../SimpleBinaryReader/data/func1 ../SimpleBinaryReader/data/func1"
+    PROGS="../../SimpleBinaryReader/data/set_intersection ../SimpleBinaryReader/data/set_intersection"
     for P in $PROGS
     do
 	if test -f $P

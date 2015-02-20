@@ -53,7 +53,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
 	 * also be loaded.  
 	 */
-	static  int CURRENT_PROGRAM = 1;
+	static  int CURRENT_PROGRAM = 2;
 	static final int PROG_DJIKSTRA = 1;
 	static final int PROG_SET_INTERSECTION = 2;
 	
@@ -63,9 +63,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final int Bob_input = 0;
 	static final int Alice_input2 = -1;
 	static final int Bob_input2 = 4;
-	static final int stackFrameSize = 164/4;
-	static final int aliceInputSize = 25;
-	static final int bobInputSize = 0;
+	static final int stackFrameSize = 32/4;
+	static final int aliceInputSize = 50;
+	static final int bobInputSize = 50;
 	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
 	
 	static final int[][] aliceInputDjikstra = {{0,11,10,9,35},
@@ -73,8 +73,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		{10,17,0,7,29},
 		{9,19,7,0,3},
 		{35,11,29,3,0}};
-	static final int[] aliceInputSetIntersection = {1, 2 , 3}; 
-	static final int[] bobInputSetIntersection = {2, 3, 5};
+	static final int[] aliceInputSetIntersection = {1,1,2,2,2,3,4,4,4,7,8,9,9,9,10,10,11,11,11,12,12,13,13,14,14,16,17,17,18,18,19,20,21,21,22,22,23,25,26,26,26,27,27,28,31,32,35,36,37,38};
+	
+	static final int[] bobInputSetIntersection = {1,2,3,4,7,7,10,14,14,15,15,15,15,16,16,16,17,18,19,19,20,20,21,22,23,23,24,24,26,27,27,28,28,29,30,30,31,31,31,32,34,35,35,35,35,36,38,38,38,40};
 	
 	
 	// Should we blither about missing CPUs?
@@ -357,6 +358,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			else { 
 				oram.write(env.inputOfAlice(Utils.fromInt(aliceReg, oram.lengthOfIden)),
 						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(aliceInputSize + bobInputSize)), WORD_SIZE)));
+				if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+					oram.write(env.inputOfAlice(Utils.fromInt(aliceReg+2, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(aliceInputSize, WORD_SIZE)));
+					
 			}
 			if (!bobInputIsRef){
 				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
@@ -368,6 +373,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			else { 
 				oram.write(env.inputOfAlice(Utils.fromInt(bobReg, oram.lengthOfIden)),
 						env.inputOfAlice(Utils.fromInt(dataOffset - (4*bobInputSize), WORD_SIZE)));
+				if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+					oram.write(env.inputOfAlice(Utils.fromInt(bobReg+2, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(bobInputSize, WORD_SIZE)));
+				
 			}
 			env.flush();
 			int stackPointer = dataOffset - (4*(aliceInputSize + bobInputSize)) - 32;
