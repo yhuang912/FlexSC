@@ -1,10 +1,9 @@
 #include <stdio.h>
 
-#define MAX 5
 #define INFINITE 998
 
 #ifndef MAX
-#define MAX 20
+#define MAX 5
 #endif
 
 
