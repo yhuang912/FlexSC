@@ -280,7 +280,7 @@ public class Machine {
 	}
 
 	public static <T> void main(String args[]) throws InterruptedException, IOException, BadCommandException, InstantiationException, IllegalAccessException, ClassNotFoundException, BadLabelException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
-//		BW = Integer.parseInt(args[10]);
+		BW = Integer.parseInt(args[10]);
 		ITERATION = Integer.parseInt(args[11]);
 		int machines = Integer.parseInt(args[7]);
 		String machineConfig = args[8];
