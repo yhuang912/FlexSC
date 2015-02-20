@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define MAX 5
+#define MAX 10
 #define INFINITE 998
 
 #ifndef MAX
@@ -273,6 +273,6 @@ int main()
   int ret = sfe_main(cost, 0, 4);
   //for(i=0;i<MAX;i++)
   //printf("%d\n",distance[i]);
- printf("\nreturned value: %d", ret); printf("\n");
+  printf("\nreturned value: %d", ret); printf("\n");
   return 0;
 }

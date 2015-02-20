@@ -55,19 +55,19 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 */
 	static final int PROG_DJIKSTRA = 1;
 	static final int PROG_SET_INTERSECTION = 2;
+	static  int CURRENT_PROGRAM = 1;
 	static final boolean aliceInputIsRef = true;
 	static final boolean bobInputIsRef = false;
 	static final int Alice_input = 6;
 	static final int Bob_input = 0;
 	static final int Alice_input2 = -1;
 	static final int Bob_input2 = 4;
-	static final int stackFrameSize = 660/4;
+	static final int stackFrameSize = 220/4;
 	static final int aliceInputSize = 100;
 	static final int bobInputSize = 0;
 	static final int stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
 	
-	static final int mainStackSize = 136;
-	static final int[][] aliceLongInput = {{0,23,1,5,11,21,40,2,25,18},
+	static final int[][] aliceInputDjikstra = {{0,23,1,5,11,21,40,2,25,18},
 		{23,0,31,26,15,20,16,24,31,9},
 		{1,31,0,17,15,29,17,29,30,35},
 		{5,26,17,0,37,19,12,25,18,40},
@@ -77,7 +77,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		{2,24,29,25,30,19,5,0,33,17},
 		{25,31,30,18,29,16,4,33,0,1},
 		{18,9,35,40,8,15,5,17,1,0},};
-
+	static final int[] aliceInputSetIntersection = {1, 2 , 3}; 
+	static final int[] bobInputSetIntersection = {2, 3, 5};
 	
 	
 	// Should we blither about missing CPUs?
@@ -158,11 +159,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	private static class LocalConfiguration extends Configuration {
 		
 		private String binaryFileName;
-		private Mode mode = Mode.REAL;
+		private Mode mode = Mode.VERIFY;
 
 		
 		public static final String MODE_PROPERTY = "mode";
-		public static final String DEFAULT_MODE = "REAL";
+		public static final String DEFAULT_MODE = "VERIFY";
 		
 		protected LocalConfiguration() throws IOException {
 			super();
@@ -507,16 +508,34 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					data = env.inputOfAlice(new boolean[WORD_SIZE]);
 				memBank.write(index, data);	
 			}
-			if (aliceInputIsRef){
-				for (int i = 0; i < aliceLongInput.length; i++){
-					for (int j = 0; j < aliceLongInput[0].length; j++){
-						index = lib.toSignals(stackSize - aliceInputSize + (i * aliceLongInput[0].length)+j, memBank.lengthOfIden);
+			if (CURRENT_PROGRAM == PROG_DJIKSTRA){
+				for (int i = 0; i < aliceInputDjikstra.length; i++){
+					for (int j = 0; j < aliceInputDjikstra[0].length; j++){
+						index = lib.toSignals(stackSize - aliceInputSize + (i * aliceInputDjikstra[0].length)+j, memBank.lengthOfIden);
 						if (env.getParty() == Party.Alice)
-							data = env.inputOfAlice(Utils.fromInt(aliceLongInput[i][j], WORD_SIZE));
+							data = env.inputOfAlice(Utils.fromInt(aliceInputDjikstra[i][j], WORD_SIZE));
 						else 
 							data = env.inputOfAlice(new boolean[WORD_SIZE]);
 						memBank.write(index, data);						
 					}
+				}
+			}
+			if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
+				for (int i = 0; i < aliceInputSetIntersection.length; i++){
+					index = lib.toSignals(stackSize - aliceInputSize + i , memBank.lengthOfIden);
+					if (env.getParty() == Party.Alice)
+						data = env.inputOfAlice(Utils.fromInt(aliceInputSetIntersection[i], WORD_SIZE));
+					else 
+						data = env.inputOfAlice(new boolean[WORD_SIZE]);
+					memBank.write(index, data);					
+				}
+				for (int i = 0; i < bobInputSetIntersection.length; i++){
+					index = lib.toSignals(stackSize - aliceInputSize - bobInputSize + i , memBank.lengthOfIden);
+					if (env.getParty() == Party.Alice)
+						data = env.inputOfAlice(Utils.fromInt(bobInputSetIntersection[i], WORD_SIZE));
+					else 
+						data = env.inputOfAlice(new boolean[WORD_SIZE]);
+					memBank.write(index, data);					
 				}
 			}
 			EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
