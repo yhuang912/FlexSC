@@ -53,10 +53,6 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
 	 * also be loaded.  
 	 */
-	static final int Alice_input = 0;
-	static final int Bob_input = 2;
-	static final int Alice_input2 = -1;
-	static final int Bob_input2 = 4;
 	static int stackFrameSize;
 	static int stackSize;
 	
@@ -69,6 +65,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	static final int[] bobInputSortedArray_50 = {5,20,28,42,47,50,55,75,88,91,104,104,162,188,191,192,199,218,236,236,253,273,298,301,314,324,331,338,346,349,358,361,369,374,386,393,398,400,412,413,424,442,445,452,457,459,467,468,477,484};
 	static final int[] bobInputSortedArray_20  ={5,19,21,38,46,60,64,65,72,73,77,78,80,120,144,148,156,175,190,196};
+	
 	static final int[] aliceInputUnsortedArray_11 = {20,5,10,4,30,10,32,10,3,22,24};
 	
 	
@@ -144,6 +141,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		private Mode mode = Mode.VERIFY;
 		private int aliceInputSize;
 		private int bobInputSize;
+		private int aliceIntInput;
+		private int bobIntInput;
+		private int aliceIntInput2;
+		private int bobIntInput2;
 				
 		public static final String MODE_PROPERTY = "mode";
 		public static final String DEFAULT_MODE = "VERIFY";
@@ -153,6 +154,14 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		public static final String DEFAULT_ALICE_INPUT_SIZE = "0";
 		public static final String BOB_INPUT_SIZE_PROPERTY = "bob_input_size";
 		public static final String DEFAULT_BOB_INPUT_SIZE = "0";
+		public static final String ALICE_INPUT_PROPERTY = "alice_integer_input";
+		public static final String DEFAULT_ALICE_INPUT = "-1";
+		public static final String ALICE_INPUT2_PROPERTY = "alice_integer_input2";
+		public static final String DEFAULT_ALICE_INPUT2 = "-1";
+		public static final String BOB_INPUT_PROPERTY = "bob_integer_input";
+		public static final String DEFAULT_BOB_INPUT = "2";
+		public static final String BOB_INPUT2_PROPERTY = "bob_integer_input2";
+		public static final String DEFAULT_BOB_INPUT2 = "4";
 		
 		protected LocalConfiguration() throws IOException {
 			super();
@@ -166,6 +175,15 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				aliceInputSize = Integer.parseInt(tmp);
 				tmp = getProperties().getProperty(BOB_INPUT_SIZE_PROPERTY, DEFAULT_BOB_INPUT_SIZE);
 				bobInputSize = Integer.parseInt(tmp);
+				tmp = getProperties().getProperty(ALICE_INPUT_PROPERTY, DEFAULT_ALICE_INPUT);
+				aliceIntInput = Integer.parseInt(tmp);
+				tmp = getProperties().getProperty(BOB_INPUT_PROPERTY, DEFAULT_BOB_INPUT);
+				bobIntInput = Integer.parseInt(tmp);
+				tmp = getProperties().getProperty(ALICE_INPUT2_PROPERTY, DEFAULT_ALICE_INPUT2);
+				aliceIntInput2 = Integer.parseInt(tmp);
+				tmp = getProperties().getProperty(BOB_INPUT2_PROPERTY, DEFAULT_BOB_INPUT2);
+				bobIntInput2 = Integer.parseInt(tmp);
+				
 			} catch(Exception e) {
 				System.err.println("No such mode: " + tmp);
 			}
@@ -181,6 +199,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		public int getAliceInputSize() {return aliceInputSize;}
 		public int getBobInputSize() {return bobInputSize;}
 		public void setBobInputSize(int x) { bobInputSize = x; }
+		public int getAliceIntInput(){ return aliceIntInput; }
+		public int getBobIntInput(){ return bobIntInput; }
+		public int getAliceIntInput2(){ return aliceIntInput2; }
+		public int getBobIntInput2(){ return bobIntInput2; }
 		public void setBinaryFileName(String fileName) {
 			binaryFileName = fileName;
 		}
@@ -411,7 +433,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			// we assume at least one input to the program!
 			else 
 				oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(Alice_input, WORD_SIZE)));
+						env.inputOfAlice(Utils.fromInt(config.getAliceIntInput(), WORD_SIZE)));
 			
 			//REGISTER 5
 			if (config.getBinaryFileName().equals("set_intersection"))
@@ -422,18 +444,18 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 							env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
 				else  
 					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(Bob_input, WORD_SIZE)));
+							env.inputOfAlice(Utils.fromInt(config.getBobIntInput(), WORD_SIZE)));
 				
 			//REGISTER 6
 				if (config.getBinaryFileName().equals("djikstra"))
 					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(Bob_input2, WORD_SIZE)));
+							env.inputOfAlice(Utils.fromInt(config.getBobIntInput2(), WORD_SIZE)));
 				else if (config.getBinaryFileName().equals("set_intersection"))
-				oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
+					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
 							env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
 				else if (config.getBinaryFileName().equals("binary_search"))
 					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(Bob_input, WORD_SIZE)));
+							env.inputOfAlice(Utils.fromInt(config.getBobIntInput(), WORD_SIZE)));
 				
 			//REGISTER 7
 				if (config.getBinaryFileName().equals("set_intersection"))
@@ -667,7 +689,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		// Solution: Subclass Configuration and stash the filename there.  We
 		// use this class to store the mode also
 		LocalConfiguration config = new LocalConfiguration();
-		process_cmdline_args(args, config);
+		//process_cmdline_args(args, config);
 		MipsEmulator emu = null;
 		switch(config.getMode()) {
 		case VERIFY:
@@ -685,9 +707,13 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	public void emulate() throws Exception {
 		Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
-		System.out.println("Executing binary file: " + config.getBinaryFileName());
-		System.out.println("Alice input Size: " + config.getAliceInputSize());
-		System.out.println("Bob input Size: " + config.getBobInputSize());
+		System.err.println("Executing binary file: " + config.getBinaryFileName());
+		System.err.println("Alice input Size: " + config.getAliceInputSize());
+		System.err.println("Bob input Size: " + config.getBobInputSize());
+		System.err.println("Bob integer input: " + config.getBobIntInput());
+		System.err.println("Bob integer input2: " + config.getBobIntInput2());
+		System.err.println("Alice integer input: " + config.getAliceIntInput());
+		System.err.println("Alice integer input2: " + config.getAliceIntInput2());
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 		
 		DataSegment instData = rdr.getInstructions(config.getFunctionLoadList());
