@@ -133,7 +133,7 @@ public class TestStack {
 		public void run() {
 			try {
 				listen(port);
-				CompEnv env = CompEnv.getEnv(Flag.mode, Party.Alice, is, os);
+				CompEnv env = CompEnv.getEnv(Party.Alice, is, os);
 				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				Stack<BoolArray> ostack = new Stack<BoolArray>(env,
 						logN, new BoolArray(env), new CircuitOram<GCSignal>(env,

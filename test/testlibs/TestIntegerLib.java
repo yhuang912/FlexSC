@@ -19,7 +19,7 @@ public class TestIntegerLib extends TestHarness {
 
 	Random rnd = new Random();
 
-	@Test
+//	@Test
 	public void testIntAdd() throws Exception {
 		for (int i = 0; i < testCases; i++) {
 			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 31), rnd.nextInt()
@@ -75,17 +75,21 @@ public class TestIntegerLib extends TestHarness {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testIntMultiplication() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
-			int b = rnd.nextInt() % (1 << 15);
-			int a = 0;//rnd.nextInt() % (1 << 15);
-			b = (b == 0) ? 1 : b;
+			System.out.println(i);
+			int b = rnd.nextInt(1 << 10);
+//			int a = 0;//rnd.nextInt() % (1 << 15);
+//			b = (b == 0) ? 1 : b;
+			int a = rnd.nextInt(1 << 10);
 			Test_2Input1Output.runThreads(new Helper(a, b) {
 				public<T> T[] secureCompute(T[] Signala,
 						T[] Signalb, CompEnv<T> e) throws Exception {
-					return new IntegerLib<T>(e).multiply(Signala, Signalb);
+//					return new IntegerLib<T>(e).multiply(Signala, Signalb);
+					compiledlib.NoClass<T> lib = new compiledlib.NoClass(e);
+					return lib.karatsubaMult(Signala.length, Signala, Signalb);
 				}
 
 				public int plainCompute(int x, int y) {

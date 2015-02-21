@@ -114,6 +114,7 @@ public class Test_2Input1Output extends TestHarness {
 		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
+//			System.out.println(h.plainCompute(h.intA, h.intB)+" "+Utils.toSignedInt(gen.z));
 			Assert.assertEquals(h.plainCompute(h.intA, h.intB),
 					Utils.toSignedInt(gen.z));
 		}
