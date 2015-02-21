@@ -146,7 +146,9 @@ int32 %CLASS.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 %OP_SLTI
 	if(reg_rs_r < unsignExt) reg_rt_w = 1; else reg_rt_w = 0;
 %OP_SLTIU
-	MISSING
+    // This is WRONG
+    if(reg_rs_r < unsignExt) reg_rt_w = 1; else reg_rt_w = 0;
+	// MISSING
 	// See SLTU
 	// if((uint32)reg_rs_r < (unit32)unsignExt) reg_rt_w = 1; else reg_rt_w = 0;
 %OP_ANDI
@@ -222,6 +224,8 @@ int32 %CLASS.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 	// int64 u_reg_rt_r;
 	// u_reg_rs_r = reg_rs_r; u_reg_rs_r = u_reg_rs_r & 0xffffffff;
 	// u_reg_rt_r = reg_rt_r; u_reg_rt_r = u_reg_rt_r & 0xffffffff;
+	// This is WRONG
+	if(reg_rs_r < reg_rt_r) reg_rd_w = 1; else reg_rd_w = 0;
 %OP_J
 	newpc = (newpc&0xf0000000) | ((inst<<2)&0xffffffc);
 %OP_JAL
