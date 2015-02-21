@@ -34,6 +34,7 @@
 struct CPU{};
 int32 SLL(int32 m, int32 n) = native intLib.leftPrivateShift;
 int32 SRL(int32 m, int32 n) = native intLib.rightPrivateShift;
+int32 SRA(int32 m, int32 n) = native intLib.SRA;
 
 
 int2 CPU.checkType(int32 opcode) {
@@ -92,7 +93,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
       } else if (funct == FUNCT_SRL){
       reg_rd = SRL(reg_rt, shamt);//(reg_rt >> shamt);    
       } else if (funct == FUNCT_SRA){
-    	  reg_rd = SRL(reg_rt, shamt);
+    	  reg_rd = SRA(reg_rt, shamt);
     	  if ((reg_rt >> 31) != 0) {
     		  reg_rd = reg_rd | 0xffff0000;
     	  }

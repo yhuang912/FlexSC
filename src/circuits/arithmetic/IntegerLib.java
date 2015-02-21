@@ -273,6 +273,13 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 
 		return res;
 	}
+	
+	public T[] SRA(T[] x, T[] s) {
+		int len = x.length;
+		T[] ret = padSignedSignal(x, x.length*2);
+		ret = rightPrivateShift(ret, s);
+		return Arrays.copyOf(ret, len);
+	}
 
 	public T[] rightPublicShift(T[] x, int s) {
 		assert (x != null && s < x.length) : "rightshift: bad inputs";
