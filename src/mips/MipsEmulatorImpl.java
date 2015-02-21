@@ -53,32 +53,35 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
 	 * also be loaded.  
 	 */
-	static  int CURRENT_PROGRAM = 3;
+	static  int CURRENT_PROGRAM = 4;
 	static final int PROG_DJIKSTRA = 1;
 	static final int PROG_SET_INTERSECTION = 2;
 	static final int PROG_BUBBLE_SORT = 3;
+	static final int PROG_BINARY_SEARCH = 4;
 	
 	static final int Alice_input = 6;
-	static final int Bob_input = 0;
+	static final int Bob_input = 53;
 	static final int Alice_input2 = -1;
-	static final int Bob_input2 = 4;
+	static final int Bob_input2 = -1;
 	static int stackFrameSize;
-	static final int aliceInputSize = 11;
+	static final int aliceInputSize = 30;
 	static int bobInputSize = 0;
 	static int stackSize;
 	
-	static final int[][] aliceInputDjikstra = {{0,11,10,9,35},
-		{11,0,17,19,11},
-		{10,17,0,7,29},
-		{9,19,7,0,3},
-		{35,11,29,3,0}};
-	static final int[] aliceInputSetIntersection = {1,1,2,2,2,3,4,4,4,7,8,9,9,9,10,10,11,11,11,12,12,13,13,14,14,16,17,17,18,18,19,20,21,21,22,22,23,25,26,26,26,27,27,28,31,32,35,36,37,38};
+	static final int[][] aliceInput_2D_25 = {{0,11,10,9,35},{11,0,17,19,11},{10,17,0,7,29},{9,19,7,0,3},{35,11,29,3,0}};
+	static final int[][] aliceInput_2D_100 = {{0,23,1,5,11,21,40,2,25,18},{23,0,31,26,15,20,16,24,31,9},{1,31,0,17,15,29,17,29,30,35},{5,26,17,0,37,19,12,25,18,40},{11,15,15,37,0,6,25,30,29,8},{21,20,29,19,6,0,17,19,16,15},{40,16,17,12,25,17,0,5,4,5},{2,24,29,25,30,19,5,0,33,17},{25,31,30,18,29,16,4,33,0,1},{18,9,35,40,8,15,5,17,1,0}};
 	
-	static final int[] bobInputSetIntersection = {1,2,3,4,7,7,10,14,14,15,15,15,15,16,16,16,17,18,19,19,20,20,21,22,23,23,24,24,26,27,27,28,28,29,30,30,31,31,31,32,34,35,35,35,35,36,38,38,38,40};
+	static final int[] aliceInputSortedArray_50 = {6,37,58,59,78,105,125,138,141,144,148,165,179,197,219,237,240,252,286,287,294,345,348,351,359,363,364,368,368,368,372,382,383,383,389,389,409,439,441,448,452,464,465,468,472,481,486,487,487,491};
+	static final int[] aliceInputSortedArray_30 = {4,5,16,34,36,47,53,59,60,78,82,99,102,133,133,142,148,154,158,171,180,191,195,203,205,238,247,249,268,268};
 	
-	static final int[] aliceInputBubbleSort = {20,5,10,4,30,10,32,10,3,22,24};
+	static final int[] bobInputSortedArray_50 = {5,20,28,42,47,50,55,75,88,91,104,104,162,188,191,192,199,218,236,236,253,273,298,301,314,324,331,338,346,349,358,361,369,374,386,393,398,400,412,413,424,442,445,452,457,459,467,468,477,484};
 	
-	static final int[] aliceInputBinarySearch = {5,15,16,18,24,27,30,34,37,37,41,42,43,43,47,47,48,58,60,64,71,73,75,77,77,77,80,81,84,86};
+	static final int[] aliceInputUnsortedArray_11 = {20,5,10,4,30,10,32,10,3,22,24};
+	
+	
+	static int[] aliceInputArray;
+	static int[][] aliceInput_2D;
+	static int[] bobInputArray;
 	
 	// Should we blither about missing CPUs?
 	static final boolean blither = true;
@@ -91,19 +94,36 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			bobInputSize = 0;
 		}	
 		if (CURRENT_PROGRAM == PROG_DJIKSTRA){
-			if (aliceInputSize == 25)
+			if (aliceInputSize == 25){
 				stackFrameSize = 144;
-			else if (aliceInputSize == 100)
+				aliceInput_2D = aliceInput_2D_25;
+			}
+			else if (aliceInputSize == 100){
 				stackFrameSize = 200;
+				aliceInput_2D = aliceInput_2D_100;
+			}
 		}
 		else if (CURRENT_PROGRAM == PROG_BUBBLE_SORT){
-			if (aliceInputSize == 11)
+			if (aliceInputSize == 11){
 				stackFrameSize = 40;
+				aliceInputArray = aliceInputUnsortedArray_11;
+			}
 		}
 		else if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
-			if (aliceInputSize == 50)
+			if (aliceInputSize == 50){
 				stackFrameSize = 32;
+				aliceInputArray = aliceInputSortedArray_50;
+			}
+			if (bobInputSize == 50)
+				bobInputArray = bobInputSortedArray_50;
 		}	
+		else if (CURRENT_PROGRAM == PROG_BINARY_SEARCH){
+			if (aliceInputSize == 30)
+				aliceInputArray = aliceInputSortedArray_30;	
+			else if (aliceInputSize == 50)
+				aliceInputArray = aliceInputSortedArray_50;
+			stackFrameSize = 32;	
+		}
 		else{
 			System.out.println("no setting for stackFrameSize.  exiting.");
 			System.exit(2);
@@ -112,71 +132,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
 	}
 
-	public void testInstruction (CompEnv<ET> env) throws Exception {
-
-		SecureArray<ET> reg = new SecureArray<ET>(env, REGISTER_SIZE, WORD_SIZE);
-		//int inst = 		0b00000000000000110001011011000010; //SRL
-		int inst = 		0b00000000100100111001100000100101; //OR
-		int rsCont = 	0b00000000000000000000000000000101;
-		int rtCont = 	0b00000000000000000000000000011001;
-		//int rdCont = 	0b00000000000000000000000000000000;
-		ET[] rs = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
-		ET[] rt = env.inputOfAlice(Utils.fromInt(19, reg.lengthOfIden));
-		//Boolean[] rd = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
-		ET[] rsContent = env.inputOfAlice(Utils.fromInt(rsCont, WORD_SIZE));
-		ET[] rtContent = env.inputOfAlice(Utils.fromInt(rtCont, WORD_SIZE));
-		//Boolean[] rdContent = env.inputOfAlice(Utils.fromInt(rdCont, WORD_SIZE));
-		reg.write(rs, rsContent);
-		reg.write(rt, rtContent);
-		//reg.write(rd, rdContent);
-		env.flush();
-
-		CPU<ET> cpu = new CPU<ET>(env);
-		IntegerLib<ET> lib = new IntegerLib<ET>(env);
-		ET[] pc; 
-		pc = cpu.function(reg, env.inputOfAlice(Utils.fromInt(inst, 32)), env.inputOfAlice(Utils.fromInt(0,32)));
-
-		String output = "";
-		for (int i = 31 ; i >= 26;  i--){
-			if ((inst & (1 << i)) != 0)
-				output += "1";
-			else 
-				output += "0";
-		}
-		output += "|";
-		for (int i = 25 ; i >= 21;  i--){
-			if ((inst & (1 << i)) != 0)
-				output += "1";
-			else 
-				output += "0";
-		}
-		output += "|";
-		for (int i = 20 ; i >= 16;  i--){
-			if ((inst & (1 << i)) != 0)
-				output += "1";
-			else 
-				output += "0";
-		}
-		output += "|";
-		for (int i = 15 ; i >= 11;  i--){
-			if ((inst & (1 << i)) != 0)
-				output += "1";
-			else 
-				output += "0";
-		}
-		output += "|";
-		for (int i = 10 ; i >= 0;  i--){
-			if ((inst & (1 << i)) != 0)
-				output += "1";
-			else 
-				output += "0";
-		}
-		if(lib.getEnv().getParty() == Party.Alice)
-			System.out.println("testing instruction: " + output);
-		EmulatorUtils.printRegisters(reg, lib);	
-		if(lib.getEnv().getParty() == Party.Alice)
-			EmulatorUtils.printBooleanArray("PC", pc, lib);
-	}
+	
 	
 	private static class LocalConfiguration extends Configuration {
 		
@@ -245,7 +201,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		}
 		public SecureArray<T> reg;
 		public void mainloop(CompEnv<T> env) throws Exception{
-			//testInstruction(env);
+			testInstruction(env);
 			lib = new IntegerLib<T>(env);
 			CpuFcn<T> defaultCpu = new CpuImpl<T>(env);
 			MEM<T> mem = new MEM<T>(env);
@@ -337,6 +293,71 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			System.out.println("Exiting loadCpus");
 		}
 
+		public void testInstruction (CompEnv<T> env) throws Exception {
+
+			SecureArray<T> reg = new SecureArray<T>(env, REGISTER_SIZE, WORD_SIZE);
+			//int inst = 		0b00000000000000110001011011000010; //SRL
+			int inst = 		0b00000000000000100001000001000011; //OR
+			int rsCont = 	0b00000000000000000000000000000101;
+			int rtCont = 	0b00000000000000000000000000000101;
+			//int rdCont = 	0b00000000000000000000000000000000;
+			T[] rs = env.inputOfAlice(Utils.fromInt(2, reg.lengthOfIden));
+			T[] rt = env.inputOfAlice(Utils.fromInt(2, reg.lengthOfIden));
+			//Boolean[] rd = env.inputOfAlice(Utils.fromInt(4, reg.lengthOfIden));
+			T[] rsContent = env.inputOfAlice(Utils.fromInt(rsCont, WORD_SIZE));
+			T[] rtContent = env.inputOfAlice(Utils.fromInt(rtCont, WORD_SIZE));
+			//Boolean[] rdContent = env.inputOfAlice(Utils.fromInt(rdCont, WORD_SIZE));
+			reg.write(rs, rsContent);
+			reg.write(rt, rtContent);
+			//reg.write(rd, rdContent);
+			env.flush();
+
+			CPU<T> cpu = new CPU<T>(env);
+			IntegerLib<T> lib = new IntegerLib<T>(env);
+			T[] pc; 
+			pc = cpu.function(reg, env.inputOfAlice(Utils.fromInt(inst, 32)), env.inputOfAlice(Utils.fromInt(0,32)));
+
+			String output = "";
+			for (int i = 31 ; i >= 26;  i--){
+				if ((inst & (1 << i)) != 0)
+					output += "1";
+				else 
+					output += "0";
+			}
+			output += "|";
+			for (int i = 25 ; i >= 21;  i--){
+				if ((inst & (1 << i)) != 0)
+					output += "1";
+				else 
+					output += "0";
+			}
+			output += "|";
+			for (int i = 20 ; i >= 16;  i--){
+				if ((inst & (1 << i)) != 0)
+					output += "1";
+				else 
+					output += "0";
+			}
+			output += "|";
+			for (int i = 15 ; i >= 11;  i--){
+				if ((inst & (1 << i)) != 0)
+					output += "1";
+				else 
+					output += "0";
+			}
+			output += "|";
+			for (int i = 10 ; i >= 0;  i--){
+				if ((inst & (1 << i)) != 0)
+					output += "1";
+				else 
+					output += "0";
+			}
+			if(lib.getEnv().getParty() == Party.Alice)
+				System.out.println("testing instruction: " + output);
+			EmulatorUtils.printRegisters(reg, lib);	
+			if(lib.getEnv().getParty() == Party.Alice)
+				EmulatorUtils.printBooleanArray("PC", pc, lib);
+		}
 		private boolean testTerminate(SecureArray<T> reg, T[] ins, IntegerLib<T> lib) {
 			// Look for branch to here.  There are several ways to code this.
 			// Gcc and cousins use BEQ $0,$0,-1
@@ -377,7 +398,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
 					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
 							env.inputOfAlice(Utils.fromInt(dataOffset - (4*bobInputSize), WORD_SIZE)));
-				else if (CURRENT_PROGRAM == PROG_BUBBLE_SORT)
+				else if (CURRENT_PROGRAM == PROG_BUBBLE_SORT || CURRENT_PROGRAM == PROG_BINARY_SEARCH)
 					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
 							env.inputOfAlice(Utils.fromInt(aliceInputSize, WORD_SIZE)));
 				else  
@@ -391,6 +412,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				else if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
 				oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
 							env.inputOfAlice(Utils.fromInt(aliceInputSize, WORD_SIZE)));
+				else if (CURRENT_PROGRAM == PROG_BINARY_SEARCH)
+					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(Bob_input, WORD_SIZE)));
 				
 			//REGISTER 7
 				if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
@@ -543,11 +567,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				memBank.write(index, data);	
 			}
 			if (CURRENT_PROGRAM == PROG_DJIKSTRA){
-				for (int i = 0; i < aliceInputDjikstra.length; i++){
-					for (int j = 0; j < aliceInputDjikstra[0].length; j++){
-						index = lib.toSignals(stackSize - aliceInputSize + (i * aliceInputDjikstra[0].length)+j, memBank.lengthOfIden);
+				for (int i = 0; i < aliceInput_2D.length; i++){
+					for (int j = 0; j < aliceInput_2D[0].length; j++){
+						index = lib.toSignals(stackSize - aliceInputSize + (i * aliceInput_2D[0].length)+j, memBank.lengthOfIden);
 						if (env.getParty() == Party.Alice)
-							data = env.inputOfAlice(Utils.fromInt(aliceInputDjikstra[i][j], WORD_SIZE));
+							data = env.inputOfAlice(Utils.fromInt(aliceInput_2D[i][j], WORD_SIZE));
 						else 
 							data = env.inputOfAlice(new boolean[WORD_SIZE]);
 						memBank.write(index, data);						
@@ -555,28 +579,28 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				}
 			}
 			if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
-				for (int i = 0; i < aliceInputSetIntersection.length; i++){
+				for (int i = 0; i < aliceInputArray.length; i++){
 					index = lib.toSignals(stackSize - aliceInputSize - bobInputSize + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
-						data = env.inputOfAlice(Utils.fromInt(aliceInputSetIntersection[i], WORD_SIZE));
+						data = env.inputOfAlice(Utils.fromInt(aliceInputArray[i], WORD_SIZE));
 					else 
 						data = env.inputOfAlice(new boolean[WORD_SIZE]);
 					memBank.write(index, data);					
 				}
-				for (int i = 0; i < bobInputSetIntersection.length; i++){
+				for (int i = 0; i < bobInputArray.length; i++){
 					index = lib.toSignals(stackSize - bobInputSize + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
-						data = env.inputOfAlice(Utils.fromInt(bobInputSetIntersection[i], WORD_SIZE));
+						data = env.inputOfAlice(Utils.fromInt(bobInputArray[i], WORD_SIZE));
 					else 
 						data = env.inputOfAlice(new boolean[WORD_SIZE]);
 					memBank.write(index, data);					
 				}
 			}
 			if (CURRENT_PROGRAM == PROG_BUBBLE_SORT){
-				for (int i = 0; i < aliceInputBubbleSort.length; i++){
+				for (int i = 0; i < aliceInputArray.length; i++){
 					index = lib.toSignals(stackSize - aliceInputSize + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
-						data = env.inputOfAlice(Utils.fromInt(aliceInputBubbleSort[i], WORD_SIZE));
+						data = env.inputOfAlice(Utils.fromInt(aliceInputArray[i], WORD_SIZE));
 					else 
 						data = env.inputOfAlice(new boolean[WORD_SIZE]);
 					memBank.write(index, data);					

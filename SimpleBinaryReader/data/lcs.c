@@ -30,10 +30,14 @@ int sfe_main(char * a, char * b){
   }
   for (i = 1; i <= aLen; i++){
     for (j = 1; j<= bLen; j++){
-      if (a[i-1] == b[j-1])
+      if (a[i-1] == b[j-1]){
 	C[i][j] = C[i-1][j-1] + 1;
-      else
+	asm("nop #hello");
+      }
+      else{
 	C[i][j] = (C[i][j-1] >= C[i-1][j]) ? C[i][j-1] : C[i-1][j];
+	asm("nop #hello");
+      }
     }
   }
   return C[aLen][bLen];

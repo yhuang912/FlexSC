@@ -164,7 +164,8 @@ int32 %CLASS.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 %OP_SRL
 	reg_rd_w = SRL(reg_rt_r, shamt);//(reg_rt >> shamt);
 %OP_SRA
-	MISSING
+	reg_rd_w = SRL(reg_rt_r, shamt); 
+	if ((reg_rt_r >> 31) != 0) reg_rd_w = reg_rd_w | 0xffff0000;
 %OP_SLLV
 	MISSING
 %OP_SRLV
