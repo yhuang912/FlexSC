@@ -216,7 +216,7 @@ int32 %CLASS.function(secure int32[32] reg, secure int32 inst, secure int32 pc
 %OP_SLT
 	if(reg_rs_r < reg_rt_r) reg_rd_w = 1; else reg_rd_w = 0;
 %OP_SLTU
-	MISSING
+	// MISSING
 	// No casts and no unsigned types
 	//if((uint32)reg_rs_r < (uint32)reg_rt_r) reg_rd_w = 1; else reg_rd_w = 0;
 	// Following code throws compiler into infinite loop
