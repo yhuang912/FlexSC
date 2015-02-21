@@ -20,6 +20,7 @@
 //OP_CODE_R
 #define FUNCT_SLL 0
 #define FUNCT_SRL 2
+#define FUNCT_SRA 3
 #define FUNCT_SLLV 6
 #define FUNCT_JR 8
 #define FUNCT_JALR 9
@@ -88,9 +89,14 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
          else reg_rd = 0;
       } else if (funct == FUNCT_SUBU) {
          reg_rd = reg_rs - reg_rt;
-} else if (funct == FUNCT_SRL){
+      } else if (funct == FUNCT_SRL){
       reg_rd = SRL(reg_rt, shamt);//(reg_rt >> shamt);    
-    } else if (funct == FUNCT_SLL){
+      } else if (funct == FUNCT_SRA){
+    	  reg_rd = SRL(reg_rt, shamt);
+    	  if ((reg_rt >> 31) != 0) {
+    		  reg_rd = reg_rd | 0xffff0000;
+    	  }
+	} else if (funct == FUNCT_SLL){
       reg_rd = SLL(reg_rt, shamt);//(reg_rt << shamt);    
       } else if (funct == FUNCT_OR){
          reg_rd = (reg_rt | reg_rs);    

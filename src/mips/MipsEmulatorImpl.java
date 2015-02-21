@@ -53,19 +53,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
 	 * also be loaded.  
 	 */
-	static  int CURRENT_PROGRAM = 2;
-	static final int PROG_DJIKSTRA = 1;
-	static final int PROG_SET_INTERSECTION = 2;
-	static final int PROG_BUBBLE_SORT = 3;
-	static final int PROG_BINARY_SEARCH = 4;
-	
 	static final int Alice_input = 0;
 	static final int Bob_input = 2;
 	static final int Alice_input2 = -1;
 	static final int Bob_input2 = 4;
 	static int stackFrameSize;
-	static final int aliceInputSize = 20;
-	static int bobInputSize = 20;
 	static int stackSize;
 	
 	static final int[][] aliceInput_2D_25 = {{0,11,10,9,35},{11,0,17,19,11},{10,17,0,7,29},{9,19,7,0,3},{35,11,29,3,0}};
@@ -91,43 +83,48 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	private MipsEmulatorImpl(LocalConfiguration config) throws Exception {
 		this.config = config;
-		if (CURRENT_PROGRAM == PROG_DJIKSTRA || CURRENT_PROGRAM == PROG_BUBBLE_SORT ){
-			bobInputSize = 0;
+		setRunParameters(config);
+		
+	}
+
+	private void setRunParameters(LocalConfiguration config){
+		if (config.getBinaryFileName().equals("djikstra")|| config.getBinaryFileName().equals("bubble_sort")){
+			config.setBobInputSize(0);
 		}	
-		if (CURRENT_PROGRAM == PROG_DJIKSTRA){
-			if (aliceInputSize == 25){
+		if (config.getBinaryFileName().equals("djikstra")){
+			if (config.getAliceInputSize() == 25){
 				stackFrameSize = 164;
 				aliceInput_2D = aliceInput_2D_25;
 			}
-			else if (aliceInputSize == 100){
+			else if (config.getAliceInputSize() == 100){
 				stackFrameSize = 200;
 				aliceInput_2D = aliceInput_2D_100;
 			}
 		}
-		else if (CURRENT_PROGRAM == PROG_BUBBLE_SORT){
-			if (aliceInputSize == 11){
+		else if (config.getBinaryFileName().equals("bubble_sort")){
+			if (config.getAliceInputSize() == 11){
 				stackFrameSize = 40;
 				aliceInputArray = aliceInputUnsortedArray_11;
 			}
 		}
-		else if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
-			if (aliceInputSize == 50){
+		else if (config.getBinaryFileName().equals("set_intersection")){
+			if (config.getAliceInputSize() == 50){
 				stackFrameSize = 32;
 				aliceInputArray = aliceInputSortedArray_50;
 			}
-			if (bobInputSize == 50)
+			if (config.getBobInputSize() == 50)
 				bobInputArray = bobInputSortedArray_50;
-			if (aliceInputSize == 20){
+			if (config.getAliceInputSize() == 20){
 				stackFrameSize = 32;
 				aliceInputArray = aliceInputSortedArray_20;
 			}
-			if (bobInputSize == 20)
+			if (config.getBobInputSize() == 20)
 				bobInputArray = bobInputSortedArray_20;
 		}	
-		else if (CURRENT_PROGRAM == PROG_BINARY_SEARCH){
-			if (aliceInputSize == 30)
+		else if (config.getBinaryFileName().equals("binary_search")){
+			if (config.getAliceInputSize() == 30)
 				aliceInputArray = aliceInputSortedArray_30;	
-			else if (aliceInputSize == 50)
+			else if (config.getAliceInputSize() == 50)
 				aliceInputArray = aliceInputSortedArray_50;
 			stackFrameSize = 32;	
 		}
@@ -136,19 +133,26 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			System.exit(2);
 		}
 		stackFrameSize = stackFrameSize / 4 ;
-		stackSize = stackFrameSize + aliceInputSize + bobInputSize + 8;
+		stackSize = stackFrameSize + config.getAliceInputSize() + config.getBobInputSize() + 8;
+		
 	}
-
 	
 	
 	private static class LocalConfiguration extends Configuration {
 		
 		private String binaryFileName;
 		private Mode mode = Mode.VERIFY;
-
-		
+		private int aliceInputSize;
+		private int bobInputSize;
+				
 		public static final String MODE_PROPERTY = "mode";
 		public static final String DEFAULT_MODE = "VERIFY";
+		public static final String BINARY_NAME_PROPERTY = "binary_name";
+		public static final String DEFAULT_PROG = "djikstra";
+		public static final String ALICE_INPUT_SIZE_PROPERTY = "alice_input_size";
+		public static final String DEFAULT_ALICE_INPUT_SIZE = "0";
+		public static final String BOB_INPUT_SIZE_PROPERTY = "bob_input_size";
+		public static final String DEFAULT_BOB_INPUT_SIZE = "0";
 		
 		protected LocalConfiguration() throws IOException {
 			super();
@@ -156,6 +160,12 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			try {
 				tmp = getProperties().getProperty(MODE_PROPERTY, DEFAULT_MODE);
 				mode = Mode.valueOf(tmp);
+				tmp = getProperties().getProperty(BINARY_NAME_PROPERTY, DEFAULT_PROG);
+				binaryFileName = tmp;
+				tmp = getProperties().getProperty(ALICE_INPUT_SIZE_PROPERTY, DEFAULT_ALICE_INPUT_SIZE);
+				aliceInputSize = Integer.parseInt(tmp);
+				tmp = getProperties().getProperty(BOB_INPUT_SIZE_PROPERTY, DEFAULT_BOB_INPUT_SIZE);
+				bobInputSize = Integer.parseInt(tmp);
 			} catch(Exception e) {
 				System.err.println("No such mode: " + tmp);
 			}
@@ -168,6 +178,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			this.setBinaryFileName(that.getBinaryFileName());
 		}
 		
+		public int getAliceInputSize() {return aliceInputSize;}
+		public int getBobInputSize() {return bobInputSize;}
+		public void setBobInputSize(int x) { bobInputSize = x; }
 		public void setBinaryFileName(String fileName) {
 			binaryFileName = fileName;
 		}
@@ -208,7 +221,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		}
 		public SecureArray<T> reg;
 		public void mainloop(CompEnv<T> env) throws Exception{
-			//testInstruction(env);
+			testInstruction(env);
 			lib = new IntegerLib<T>(env);
 			CpuFcn<T> defaultCpu = new CpuImpl<T>(env);
 			MEM<T> mem = new MEM<T>(env);
@@ -392,44 +405,44 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 						env.inputOfAlice(Utils.fromInt(0, WORD_SIZE)));
 			
 			//REGISTER 4
-			if (aliceInputSize > 2) 
+			if (config.getAliceInputSize() > 2) 
 				oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(aliceInputSize + bobInputSize)), WORD_SIZE)));
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
 			// we assume at least one input to the program!
 			else 
 				oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
 						env.inputOfAlice(Utils.fromInt(Alice_input, WORD_SIZE)));
 			
 			//REGISTER 5
-				if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+			if (config.getBinaryFileName().equals("set_intersection"))
 					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(dataOffset - (4*bobInputSize), WORD_SIZE)));
-				else if (CURRENT_PROGRAM == PROG_BUBBLE_SORT || CURRENT_PROGRAM == PROG_BINARY_SEARCH)
+							env.inputOfAlice(Utils.fromInt(dataOffset - (4*config.getBobInputSize()), WORD_SIZE)));
+				else if (config.getBinaryFileName().equals("bubble_sort") || config.getBinaryFileName().equals("binary_search"))
 					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(aliceInputSize, WORD_SIZE)));
+							env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
 				else  
 					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
 							env.inputOfAlice(Utils.fromInt(Bob_input, WORD_SIZE)));
 				
 			//REGISTER 6
-				if (CURRENT_PROGRAM == PROG_DJIKSTRA)
+				if (config.getBinaryFileName().equals("djikstra"))
 					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
 							env.inputOfAlice(Utils.fromInt(Bob_input2, WORD_SIZE)));
-				else if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+				else if (config.getBinaryFileName().equals("set_intersection"))
 				oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(aliceInputSize, WORD_SIZE)));
-				else if (CURRENT_PROGRAM == PROG_BINARY_SEARCH)
+							env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
+				else if (config.getBinaryFileName().equals("binary_search"))
 					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
 							env.inputOfAlice(Utils.fromInt(Bob_input, WORD_SIZE)));
 				
 			//REGISTER 7
-				if (CURRENT_PROGRAM == PROG_SET_INTERSECTION)
+				if (config.getBinaryFileName().equals("set_intersection"))
 					oram.write(env.inputOfAlice(Utils.fromInt(7, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(bobInputSize, WORD_SIZE)));	
+							env.inputOfAlice(Utils.fromInt(config.getBobInputSize(), WORD_SIZE)));	
 			
 			
 			env.flush();
-			int stackPointer = dataOffset - (4*(aliceInputSize + bobInputSize)) - 32;
+			int stackPointer = dataOffset - (4*(config.getAliceInputSize() + config.getBobInputSize())) - 32;
 			oram.write(env.inputOfAlice(Utils.fromInt(29, oram.lengthOfIden)),
 					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
 			
@@ -572,10 +585,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					data = env.inputOfAlice(new boolean[WORD_SIZE]);
 				memBank.write(index, data);	
 			}
-			if (CURRENT_PROGRAM == PROG_DJIKSTRA){
+			if (config.getBinaryFileName().equals("djikstra")){
 				for (int i = 0; i < aliceInput_2D.length; i++){
 					for (int j = 0; j < aliceInput_2D[0].length; j++){
-						index = lib.toSignals(stackSize - aliceInputSize + (i * aliceInput_2D[0].length)+j, memBank.lengthOfIden);
+						index = lib.toSignals(stackSize - config.getAliceInputSize() + (i * aliceInput_2D[0].length)+j, memBank.lengthOfIden);
 						if (env.getParty() == Party.Alice)
 							data = env.inputOfAlice(Utils.fromInt(aliceInput_2D[i][j], WORD_SIZE));
 						else 
@@ -584,9 +597,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					}
 				}
 			}
-			if (CURRENT_PROGRAM == PROG_SET_INTERSECTION){
+			if (config.getBinaryFileName().equals("set_intersection")){
 				for (int i = 0; i < aliceInputArray.length; i++){
-					index = lib.toSignals(stackSize - aliceInputSize - bobInputSize + i , memBank.lengthOfIden);
+					index = lib.toSignals(stackSize - config.getAliceInputSize() - config.getBobInputSize() + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
 						data = env.inputOfAlice(Utils.fromInt(aliceInputArray[i], WORD_SIZE));
 					else 
@@ -594,7 +607,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					memBank.write(index, data);					
 				}
 				for (int i = 0; i < bobInputArray.length; i++){
-					index = lib.toSignals(stackSize - bobInputSize + i , memBank.lengthOfIden);
+					index = lib.toSignals(stackSize - config.getBobInputSize() + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
 						data = env.inputOfAlice(Utils.fromInt(bobInputArray[i], WORD_SIZE));
 					else 
@@ -602,9 +615,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					memBank.write(index, data);					
 				}
 			}
-			if (CURRENT_PROGRAM == PROG_BUBBLE_SORT){
+			if (config.getBinaryFileName().equals("bubble_sort")){
 				for (int i = 0; i < aliceInputArray.length; i++){
-					index = lib.toSignals(stackSize - aliceInputSize + i , memBank.lengthOfIden);
+					index = lib.toSignals(stackSize - config.getAliceInputSize() + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
 						data = env.inputOfAlice(Utils.fromInt(aliceInputArray[i], WORD_SIZE));
 					else 
@@ -673,14 +686,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	public void emulate() throws Exception {
 		Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
 		System.out.println("Executing binary file: " + config.getBinaryFileName());
-		String progName = "unkown";
-		if (MipsEmulatorImpl.CURRENT_PROGRAM == PROG_SET_INTERSECTION)
-			progName = "Set Intersection";
-		if (MipsEmulatorImpl.CURRENT_PROGRAM == PROG_DJIKSTRA)
-			progName = "DJIKSTRA";
-		System.out.println("Current_Program: " + progName);
-		System.out.println("Alice input Size: " + aliceInputSize);
-		System.out.println("Bob input Size: " + bobInputSize);
+		System.out.println("Alice input Size: " + config.getAliceInputSize());
+		System.out.println("Bob input Size: " + config.getBobInputSize());
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 		
 		DataSegment instData = rdr.getInstructions(config.getFunctionLoadList());
