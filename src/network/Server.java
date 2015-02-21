@@ -53,6 +53,15 @@ public class Server {
 		return readBytes(is, len);
 	}
 
+//	static public byte[] readBytes(InputStream is, int len) throws IOException {
+//		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+//		return s.hasNext() ? s.next().getBytes() : "".getBytes(); 
+//	}
+//	
+//	static public byte[] readBytes(InputStream is) throws IOException {
+//		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+//		return s.hasNext() ? s.next().getBytes() : "".getBytes(); 
+//	}
 	static public void writeByte(OutputStream os, byte[] data)
 			throws IOException {
 		os.write(ByteBuffer.allocate(4).putInt(data.length).array());

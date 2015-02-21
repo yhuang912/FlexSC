@@ -68,7 +68,7 @@ then
 	exit 1
     fi
 else
-    PROGS="../../SimpleBinaryReader/data/set_intersection ../SimpleBinaryReader/data/set_intersection"
+    PROGS="../../SimpleBinaryReader/data/djikstra ../SimpleBinaryReader/data/djikstra"
     for P in $PROGS
     do
 	if test -f $P
@@ -118,7 +118,7 @@ java -classpath $CP \
 	--class=BigCpu \
 	--output.directory=$OUTDIR \
 	--entry.point=sfe_main \
-	--function.load.list=sfe_main,func_a,func_b $PROG
+	--function.load.list=sfe_main,func_a,func_b,allselected $PROG
 
 # Now build individual CPUs
 

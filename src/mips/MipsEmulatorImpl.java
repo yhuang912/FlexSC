@@ -53,19 +53,19 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	 * If the value does fit, and they only have one value, the second input value must be < 0, or it will 
 	 * also be loaded.  
 	 */
-	static  int CURRENT_PROGRAM = 4;
+	static  int CURRENT_PROGRAM = 2;
 	static final int PROG_DJIKSTRA = 1;
 	static final int PROG_SET_INTERSECTION = 2;
 	static final int PROG_BUBBLE_SORT = 3;
 	static final int PROG_BINARY_SEARCH = 4;
 	
-	static final int Alice_input = 6;
-	static final int Bob_input = 53;
+	static final int Alice_input = 0;
+	static final int Bob_input = 2;
 	static final int Alice_input2 = -1;
-	static final int Bob_input2 = -1;
+	static final int Bob_input2 = 4;
 	static int stackFrameSize;
-	static final int aliceInputSize = 30;
-	static int bobInputSize = 0;
+	static final int aliceInputSize = 20;
+	static int bobInputSize = 20;
 	static int stackSize;
 	
 	static final int[][] aliceInput_2D_25 = {{0,11,10,9,35},{11,0,17,19,11},{10,17,0,7,29},{9,19,7,0,3},{35,11,29,3,0}};
@@ -73,9 +73,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	static final int[] aliceInputSortedArray_50 = {6,37,58,59,78,105,125,138,141,144,148,165,179,197,219,237,240,252,286,287,294,345,348,351,359,363,364,368,368,368,372,382,383,383,389,389,409,439,441,448,452,464,465,468,472,481,486,487,487,491};
 	static final int[] aliceInputSortedArray_30 = {4,5,16,34,36,47,53,59,60,78,82,99,102,133,133,142,148,154,158,171,180,191,195,203,205,238,247,249,268,268};
+	static final int[] aliceInputSortedArray_20 = {4,33,54,57,65,70,75,83,111,113,118,124,129,132,144,155,170,175,187,189};
 	
 	static final int[] bobInputSortedArray_50 = {5,20,28,42,47,50,55,75,88,91,104,104,162,188,191,192,199,218,236,236,253,273,298,301,314,324,331,338,346,349,358,361,369,374,386,393,398,400,412,413,424,442,445,452,457,459,467,468,477,484};
-	
+	static final int[] bobInputSortedArray_20  ={5,19,21,38,46,60,64,65,72,73,77,78,80,120,144,148,156,175,190,196};
 	static final int[] aliceInputUnsortedArray_11 = {20,5,10,4,30,10,32,10,3,22,24};
 	
 	
@@ -95,7 +96,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		}	
 		if (CURRENT_PROGRAM == PROG_DJIKSTRA){
 			if (aliceInputSize == 25){
-				stackFrameSize = 144;
+				stackFrameSize = 164;
 				aliceInput_2D = aliceInput_2D_25;
 			}
 			else if (aliceInputSize == 100){
@@ -116,6 +117,12 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 			if (bobInputSize == 50)
 				bobInputArray = bobInputSortedArray_50;
+			if (aliceInputSize == 20){
+				stackFrameSize = 32;
+				aliceInputArray = aliceInputSortedArray_20;
+			}
+			if (bobInputSize == 20)
+				bobInputArray = bobInputSortedArray_20;
 		}	
 		else if (CURRENT_PROGRAM == PROG_BINARY_SEARCH){
 			if (aliceInputSize == 30)
@@ -201,7 +208,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		}
 		public SecureArray<T> reg;
 		public void mainloop(CompEnv<T> env) throws Exception{
-			testInstruction(env);
+			//testInstruction(env);
 			lib = new IntegerLib<T>(env);
 			CpuFcn<T> defaultCpu = new CpuImpl<T>(env);
 			MEM<T> mem = new MEM<T>(env);
@@ -379,8 +386,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			int aliceReg = 4; 
 			int bobReg = 5;
 			// inital registers are all 0's. no need to set value.
-			SecureArray<T> oram = new SecureArray<T>(env,
-					REGISTER_SIZE, WORD_SIZE);
+			SecureArray<T> oram = new SecureArray<T>(env,REGISTER_SIZE, WORD_SIZE);
 			for(int i = 0; i < REGISTER_SIZE; ++i)
 				oram.write(env.inputOfAlice(Utils.fromInt(i, oram.lengthOfIden)),
 						env.inputOfAlice(Utils.fromInt(0, WORD_SIZE)));
