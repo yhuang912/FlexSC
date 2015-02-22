@@ -35,7 +35,11 @@ struct CPU{};
 int32 SLL(int32 m, int32 n) = native intLib.leftPrivateShift;
 int32 SRL(int32 m, int32 n) = native intLib.rightPrivateShift;
 int32 SRA(int32 m, int32 n) = native intLib.SRA;
-
+//multi(x,y,0) is for unsigned mul, (x,y,1) is for signed.
+void multi(int32 m, int32 n, int1 sign, int32 high, int32 low) = native intLib.multiplyMips;
+// usage
+//  int32 h,l;int1 sign = 1;//sign to indicate if you want to use Mult or MultiU
+//  multi(rs,rt,sign, h, l);
 
 int2 CPU.checkType(int32 opcode) {
    int2 ret;

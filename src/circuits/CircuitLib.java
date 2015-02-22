@@ -22,6 +22,12 @@ public class CircuitLib<T> {
 		SIGNAL_ZERO = e.ZERO();
 		SIGNAL_ONE = e.ONE();
 	}
+	
+	public T enforceBits(T a, int length) {
+		T[] ret = zeros(length);
+		ret[0] = a;
+		return ret;
+	}
 
 	//for compiler use
 	public T[] enforceBits(T[] a, int length) {

@@ -76,12 +76,12 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 		return res;
 	}
 	
-	public T[][] multiplyMips(T[] x, T[] y, T signed) {
+	public void multiplyMips(T[] x, T[] y, T signed, T[] high, T[] low) {
 		T[] res = multiplyMipsInternal(x, y, signed);
-		T[][] ret = env.newTArray(2, 0);
-		ret[0] = Arrays.copyOf(res, 32);
-		ret[1] = Arrays.copyOfRange(res, 32,64);
-		return ret;
+		//T[][] ret = env.newTArray(2, 0);
+		low = Arrays.copyOf(res, 32);
+		high = Arrays.copyOfRange(res, 32,64);
+		//return ret;
 	}
 	
 
