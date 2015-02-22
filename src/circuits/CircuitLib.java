@@ -24,9 +24,8 @@ public class CircuitLib<T> {
 	}
 	
 	public T enforceBits(T a, int length) {
-		T[] ret = zeros(length);
-		ret[0] = a;
-		return ret;
+		if(a == null)return SIGNAL_ZERO;
+		else return a;
 	}
 
 	//for compiler use
