@@ -32,11 +32,8 @@ int sfe_main(char * a, char * b){
     for (j = 1; j<= bLen; j++){
       if (a[i-1] == b[j-1]){
 	C[i][j] = C[i-1][j-1] + 1;
-	asm("nop #hello");
-      }
-      else{
+      } else {
 	C[i][j] = (C[i][j-1] >= C[i-1][j]) ? C[i][j-1] : C[i-1][j];
-	asm("nop #hello");
       }
     }
   }
