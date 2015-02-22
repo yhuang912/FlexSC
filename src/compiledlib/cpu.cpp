@@ -94,9 +94,6 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
       reg_rd = SRL(reg_rt, shamt);//(reg_rt >> shamt);    
       } else if (funct == FUNCT_SRA){
     	  reg_rd = SRA(reg_rt, shamt);
-    	  if ((reg_rt >> 31) != 0) {
-    		  reg_rd = reg_rd | 0xffff0000;
-    	  }
 	} else if (funct == FUNCT_SLL){
       reg_rd = SLL(reg_rt, shamt);//(reg_rt << shamt);    
       } else if (funct == FUNCT_OR){

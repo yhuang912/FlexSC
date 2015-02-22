@@ -107,12 +107,20 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 		}
 		else if (config.getBinaryFileName().equals("set_intersection")){
+			if (config.getAliceInputSize() == 300){
+				stackFrameSize = 32;
+				aliceInputArray = aliceInputSortedArray_300;
+			}
+			if (config.getBobInputSize() == 300)
+				bobInputArray = bobInputSortedArray_300;
+			
 			if (config.getAliceInputSize() == 50){
 				stackFrameSize = 32;
 				aliceInputArray = aliceInputSortedArray_50;
 			}
 			if (config.getBobInputSize() == 50)
 				bobInputArray = bobInputSortedArray_50;
+			
 			if (config.getAliceInputSize() == 20){
 				stackFrameSize = 32;
 				aliceInputArray = aliceInputSortedArray_20;

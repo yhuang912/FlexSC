@@ -1,6 +1,6 @@
 #include <stdio.h>
 #ifndef SIZE
-#define SIZE 300
+#define SIZE 20
 #endif
 
 int sfe_main(int arr1[], int arr2[], int m, int n)
@@ -8,10 +8,14 @@ int sfe_main(int arr1[], int arr2[], int m, int n)
   int i = 0, j = 0, total=0;
   while(i < m && j < n)
   {
-    if(arr1[i] < arr2[j])
+    if(arr1[i] < arr2[j]){
       i++;
-    else if(arr2[j] < arr1[i])
+      //ams("nop #hello");
+    }
+    else if(arr2[j] < arr1[i]){
       j++;
+      //ams("nop #hello");
+    }
     else /* if arr1[i] == arr2[j] */
     {
       //     printf(" %d ", arr2[j++]);
@@ -44,7 +48,7 @@ int main()
 
 #endif
   int total = sfe_main(arr1, arr2, num1, num2);
-  printf("total %d\n", total);
+  //printf("total %d\n", total);
   
   return 0;
 }
