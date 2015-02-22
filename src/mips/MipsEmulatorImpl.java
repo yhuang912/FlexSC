@@ -63,7 +63,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static final int[] aliceInputSortedArray_30 = {4,5,16,34,36,47,53,59,60,78,82,99,102,133,133,142,148,154,158,171,180,191,195,203,205,238,247,249,268,268};
 	static final int[] aliceInputSortedArray_20 = {4,33,54,57,65,70,75,83,111,113,118,124,129,132,144,155,170,175,187,189};
 	static final int[] aliceInputSortedArray_300 = {4,12,27,31,42,47,48,49,53,54,55,63,65,70,104,105,106,111,128,142,151,153,172,205,205,216,218,220,246,248,256,272,279,280,341,371,373,376,379,382,386,395,396,402,429,432,438,443,444,464,471,495,500,502,506,512,526,533,541,559,574,578,587,594,601,605,622,625,663,666,667,676,679,688,695,697,707,713,714,719,726,737,740,764,769,776,776,784,785,795,800,819,823,828,830,841,845,852,862,863,867,873,876,881,885,888,898,904,905,907,918,928,940,952,957,962,974,1020,1030,1044,1053,1063,1077,1092,1107,1107,1109,1112,1128,1131,1158,1174,1179,1194,1210,1233,1253,1254,1257,1263,1263,1264,1277,1281,1295,1302,1311,1319,1335,1346,1363,1378,1400,1406,1426,1432,1444,1447,1451,1480,1493,1502,1507,1528,1540,1556,1561,1575,1576,1577,1625,1630,1638,1642,1675,1722,1727,1731,1742,1754,1754,1769,1781,1782,1790,1796,1796,1798,1799,1820,1832,1836,1837,1851,1870,1875,1877,1879,1881,1885,1903,1913,1925,1938,1945,1957,1958,1985,1985,1991,2007,2042,2050,2050,2056,2086,2101,2126,2131,2133,2148,2154,2160,2179,2189,2192,2194,2210,2213,2235,2238,2247,2261,2262,2297,2326,2330,2332,2340,2343,2350,2354,2373,2377,2379,2386,2389,2391,2401,2407,2429,2449,2458,2465,2471,2493,2515,2516,2518,2521,2531,2531,2544,2547,2552,2574,2581,2593,2597,2602,2627,2648,2663,2676,2678,2681,2688,2709,2725,2755,2761,2777,2780,2782,2784,2794,2809,2813,2813,2831,2846,2855,2865,2898,2937,2944,2949,2958,2959,2965};
-	
+		
 	static final int[] bobInputSortedArray_50 = {5,20,28,42,47,50,55,75,88,91,104,104,162,188,191,192,199,218,236,236,253,273,298,301,314,324,331,338,346,349,358,361,369,374,386,393,398,400,412,413,424,442,445,452,457,459,467,468,477,484};
 	static final int[] bobInputSortedArray_20  ={5,19,21,38,46,60,64,65,72,73,77,78,80,120,144,148,156,175,190,196};
 	static final int[] bobInputSortedArray_300 = {7,37,55,58,59,70,83,94,107,121,134,164,165,173,175,177,180,188,195,205,210,210,214,224,229,272,301,310,316,316,330,337,344,346,394,413,415,442,450,459,459,465,471,483,490,507,517,548,552,598,612,630,640,654,656,664,670,677,677,681,716,717,722,727,730,761,771,771,783,791,793,796,796,801,808,809,816,818,825,828,844,845,860,863,864,869,890,897,904,926,932,937,940,943,947,947,951,952,952,981,982,982,985,1004,1015,1035,1051,1074,1086,1090,1126,1130,1133,1142,1169,1178,1210,1216,1221,1222,1238,1239,1267,1267,1277,1291,1302,1307,1311,1324,1340,1342,1362,1371,1372,1373,1381,1381,1385,1388,1412,1413,1425,1439,1451,1453,1465,1465,1480,1485,1497,1502,1507,1519,1531,1560,1572,1583,1589,1605,1624,1625,1626,1635,1645,1675,1681,1717,1723,1729,1736,1741,1755,1778,1790,1790,1794,1814,1828,1831,1839,1853,1874,1898,1911,1921,1929,1934,1935,1944,1956,1970,1998,2014,2023,2031,2036,2038,2055,2065,2074,2103,2125,2128,2131,2134,2135,2143,2172,2182,2186,2187,2189,2207,2208,2209,2212,2222,2233,2248,2255,2258,2269,2273,2279,2285,2288,2293,2294,2296,2308,2310,2331,2339,2342,2357,2362,2377,2384,2385,2386,2390,2414,2446,2446,2448,2454,2462,2470,2483,2496,2509,2523,2528,2542,2571,2576,2599,2600,2607,2609,2616,2632,2649,2654,2664,2667,2672,2697,2698,2708,2722,2731,2745,2753,2764,2775,2781,2790,2831,2837,2838,2840,2858,2875,2876,2887,2888,2889,2905,2909,2925,2938,2940,2942,2943,2983,2989,2993,2995};  
@@ -87,7 +87,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	}
 
 	private void setRunParameters(LocalConfiguration config){
-		if (config.getBinaryFileName().equals("djikstra")|| config.getBinaryFileName().equals("bubble_sort")){
+		if (config.getBinaryFileName().equals("djikstra")|| config.getBinaryFileName().equals("bubble_sort") 
+				|| config.getBinaryFileName().equals("binary_search")){
 			config.setBobInputSize(0);
 		}	
 		if (config.getBinaryFileName().equals("djikstra")){
@@ -133,6 +134,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				aliceInputArray = aliceInputSortedArray_30;	
 			else if (config.getAliceInputSize() == 50)
 				aliceInputArray = aliceInputSortedArray_50;
+			else if (config.getAliceInputSize() == 300)
+				aliceInputArray = aliceInputSortedArray_300;
+			else if (config.getAliceInputSize() == 20)
+				aliceInputArray = aliceInputSortedArray_20;
 			stackFrameSize = 32;	
 		}
 		else{
@@ -253,7 +258,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		}
 		public SecureArray<T> reg;
 		public void mainloop(CompEnv<T> env) throws Exception{
-			testInstruction(env);
+			//testInstruction(env);
 			lib = new IntegerLib<T>(env);
 			CpuFcn<T> defaultCpu = new CpuImpl<T>(env);
 			MEM<T> mem = new MEM<T>(env);
@@ -447,15 +452,15 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			
 			//REGISTER 5
 			if (config.getBinaryFileName().equals("set_intersection"))
-					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(dataOffset - (4*config.getBobInputSize()), WORD_SIZE)));
-				else if (config.getBinaryFileName().equals("bubble_sort") || config.getBinaryFileName().equals("binary_search"))
-					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
-				else  
-					oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(config.getBobIntInput(), WORD_SIZE)));
-				
+				oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*config.getBobInputSize()), WORD_SIZE)));
+			else if (config.getBinaryFileName().equals("bubble_sort") || config.getBinaryFileName().equals("binary_search"))
+				oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
+						env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
+			else  
+				oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
+						env.inputOfAlice(Utils.fromInt(config.getBobIntInput(), WORD_SIZE)));
+
 			//REGISTER 6
 				if (config.getBinaryFileName().equals("djikstra"))
 					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
@@ -647,7 +652,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					memBank.write(index, data);					
 				}
 			}
-			if (config.getBinaryFileName().equals("bubble_sort")){
+			if (config.getBinaryFileName().equals("bubble_sort") || config.getBinaryFileName().equals("binary_search")){
 				for (int i = 0; i < aliceInputArray.length; i++){
 					index = lib.toSignals(stackSize - config.getAliceInputSize() + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
