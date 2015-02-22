@@ -150,11 +150,14 @@ public class Utils {
 	}
 
 	public static long toLong(boolean[] value) {
-		long res = 0;
-		for (int i = 0; i < value.length; i++)
-			res = (value[i]) ? (res | (1 << i)) : res;
+		System.out.println("res"+value);
 
-			return res;
+		long res = 0;
+		for (int i = 0; i < value.length; i++) {
+			res = (value[i]) ? (res | (1L << i)) : res;
+		}
+
+		return res;
 	}
 
 	public static double toFloat(boolean[] value, int widthV, int widthP) {

@@ -64,6 +64,26 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 
 		return res;
 	}
+	
+	public T[] multiplyMipsInternal(T[] x, T[] y, T signed) {
+		T[] padx = null,pady = null;
+		padx = mux(padSignal(x, 64), padSignedSignal(x, 64), signed);
+		pady = mux(padSignal(y, 64), padSignedSignal(y, 64), signed);
+		
+		T[] res = multiply(padx, pady);
+		System.out.println(Utils.toLong(env.outputToAlice(res)));
+
+		return res;
+	}
+	
+	public T[][] multiplyMips(T[] x, T[] y, T signed) {
+		T[] res = multiplyMipsInternal(x, y, signed);
+		T[][] ret = env.newTArray(2, 0);
+		ret[0] = Arrays.copyOf(res, 32);
+		ret[1] = Arrays.copyOfRange(res, 32,64);
+		return ret;
+	}
+	
 
 	// full n-bit adder
 	public T[] addFull(T[] x, T[] y, boolean cin) {

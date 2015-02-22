@@ -19,7 +19,31 @@ public class TestIntegerLib extends TestHarness {
 	Random rnd = new Random();
 
 
+	
 	@Test
+	public void testMulti() throws Exception {
+		for (int i = 0; i < testCases; i++) {
+			int a = rnd.nextInt()%(1<<30);
+			int b = rnd.nextInt()%(1<<30);
+			Test_2Input1Output.runThreads(new Helper(a, b) {
+				public<T> T[] secureCompute(T[] Signala,
+						T[] Signalb, CompEnv<T> e) throws Exception {
+					return new IntegerLib<T>(e).multiplyMipsInternal(Signala, Signalb,e.ONE());
+				}
+
+				public int plainCompute(int x, int y) {
+					long lx = x;
+					long ly = y;
+					long res = lx*ly;
+					System.out.println(res);
+					return 0;
+				}
+			});
+		}
+	}
+	
+	
+//	@Test
 	public void testSRA() throws Exception {
 		for (int i = 0; i < testCases; i++) {
 			int a = rnd.nextInt(1<<30);
