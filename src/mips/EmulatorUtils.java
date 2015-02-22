@@ -5,6 +5,7 @@ import oram.SecureMap;
 import circuits.arithmetic.IntegerLib;
 import flexsc.Mode;
 import flexsc.Party;
+import java.nio.ByteBuffer;
 
 public class EmulatorUtils {
 	
@@ -122,4 +123,20 @@ output+=" ";for(int i=array.length;i>0;i-=4)output+=String.format("%x", (temp[i-
 		if(lib.getEnv().getParty() == Party.Alice)
 			System.out.println(output);
 	}
+	
+	public static int[] castStringToIntArray(String str){
+		int arrLen = str.length()/4+1;
+		int dangle = str.length() - 4*(str.length()/4);
+		int[] ret = new int[arrLen];
+		byte[] byteArr = str.getBytes();
+		
+		for (int i = 0; i < arrLen-1; i++){
+			ret[i] = ((byteArr[i] << 24) | (byteArr[i+1] << 16) | (byteArr[i+3] << 8) | byteArr[i+3]);
+		}
+		for (int i = 0 ; i < dangle; i++)
+			ret[arrLen-1] = ret[arrLen-1] | (byteArr[str.length() - dangle + i] << ((3-i)*8));  
+		
+		return ret;
+	}
+	
 }
