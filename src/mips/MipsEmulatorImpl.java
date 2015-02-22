@@ -304,9 +304,12 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				fetchTime += System.nanoTime() - fetchTimeStamp;
 				
 				//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
-				loadStoreTimeStamp = System.nanoTime();
-				mem.func(reg, memBank, newInst, dataOffset);
-				loadStoreTime += System.nanoTime() - loadStoreTimeStamp;
+				
+				if (currentSet.isUsesMemory()){
+					loadStoreTimeStamp = System.nanoTime();
+					mem.func(reg, memBank, newInst, dataOffset);
+					loadStoreTime += System.nanoTime() - loadStoreTimeStamp;
+				}
 
 				testHalt = testTerminate(reg, newInst, lib);
 
