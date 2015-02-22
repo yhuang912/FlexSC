@@ -78,6 +78,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static int[] bobInputArray;
 	static String aliceInputString;
 	static String bobInputString;
+	static boolean[][] aliceInputFunction;
 	
 	// Should we blither about missing CPUs?
 	static final boolean blither = false;
