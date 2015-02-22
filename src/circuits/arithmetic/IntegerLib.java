@@ -71,7 +71,7 @@ public class IntegerLib<T> extends CircuitLib<T> implements ArithmeticLib<T> {
 		pady = mux(padSignal(y, 64), padSignedSignal(y, 64), signed);
 		
 		T[] res = multiply(padx, pady);
-		System.out.println(Utils.toLong(env.outputToAlice(res)));
+		//System.out.println(Utils.toLong(env.outputToAlice(res)));
 
 		return res;
 	}
