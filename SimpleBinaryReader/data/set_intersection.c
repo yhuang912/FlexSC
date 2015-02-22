@@ -1,6 +1,6 @@
 #include <stdio.h>
 #ifndef SIZE
-#define SIZE 20
+#define SIZE 50
 #endif
 
 int sfe_main(int arr1[], int arr2[], int m, int n)

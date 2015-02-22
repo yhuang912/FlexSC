@@ -70,10 +70,14 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	
 	static final int[] aliceInputUnsortedArray_11 = {20,5,10,4,30,10,32,10,3,22,24};
 	
+	static final String aliceInputString_9 = "aaaaaaaaa";
+	static final String bobInputString_9 = "aaaabbbba";
 	
 	static int[] aliceInputArray;
 	static int[][] aliceInput_2D;
 	static int[] bobInputArray;
+	static String aliceInputString;
+	static String bobInputString;
 	
 	// Should we blither about missing CPUs?
 	static final boolean blither = false;
@@ -140,12 +144,23 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				aliceInputArray = aliceInputSortedArray_20;
 			stackFrameSize = 32;	
 		}
+		else if (config.getBinaryFileName().equals("lcs")){
+			if (config.getAliceInputSize() == 9){
+				aliceInputString = aliceInputString_9;
+				stackFrameSize = 408;
+			}
+			if (config.getBobInputSize() == 9)
+				bobInputString = bobInputString_9;
+		}
 		else{
 			System.out.println("no setting for stackFrameSize.  exiting.");
 			System.exit(2);
 		}
 		stackFrameSize = stackFrameSize / 4 ;
-		stackSize = stackFrameSize + config.getAliceInputSize() + config.getBobInputSize() + 8;
+		if (config.getBinaryFileName().equals("lcs"))
+			stackSize = stackFrameSize + (config.getAliceInputSize()/4) + (config.getBobInputSize()/4) + 10;
+		else
+			stackSize = stackFrameSize + config.getAliceInputSize() + config.getBobInputSize() + 8;
 		
 	}
 	
@@ -465,9 +480,14 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 						env.inputOfAlice(Utils.fromInt(0, WORD_SIZE)));
 			
 			//REGISTER 4
-			if (config.getAliceInputSize() > 2) 
-				oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
+			if (config.getAliceInputSize() > 2) {
+				if (config.getBinaryFileName().equals("lcs"))
+					oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(dataOffset - (4*(((config.getAliceInputSize()/4)+1) + ((config.getBobInputSize()/4)+1))), WORD_SIZE)));
+				else
+					oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(dataOffset - (4*(config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
+			}
 			// we assume at least one input to the program!
 			else 
 				oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
@@ -480,6 +500,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			else if (config.getBinaryFileName().equals("bubble_sort") || config.getBinaryFileName().equals("binary_search"))
 				oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
 						env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
+			else if (config.getBinaryFileName().equals("lcs"))
+				oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
+						env.inputOfAlice(Utils.fromInt(dataOffset - (4*((config.getBobInputSize()/4)+1)), WORD_SIZE)));
 			else  
 				oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
 						env.inputOfAlice(Utils.fromInt(config.getBobIntInput(), WORD_SIZE)));
@@ -502,7 +525,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			
 			
 			env.flush();
-			int stackPointer = dataOffset - (4*(config.getAliceInputSize() + config.getBobInputSize())) - 32;
+			int stackPointer;
+			if (config.getBinaryFileName().equals("lcs"))
+				stackPointer = dataOffset - (4*(((config.getAliceInputSize()/4)+1) + ((config.getBobInputSize()/4)+1))) - 32;
+			else
+				stackPointer = dataOffset - (4*(config.getAliceInputSize() + config.getBobInputSize())) - 32;
 			oram.write(env.inputOfAlice(Utils.fromInt(29, oram.lengthOfIden)),
 					env.inputOfAlice(Utils.fromInt(stackPointer, WORD_SIZE)));
 			
