@@ -63,7 +63,7 @@ public class TestSpeed extends TestHarness {
 
 		public void run() {
 			try {
-				connect("localhost", 54321);
+				connect("10.42.120.27", 54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
