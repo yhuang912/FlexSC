@@ -76,7 +76,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static int[] bobInputArray;
 	
 	// Should we blither about missing CPUs?
-	static final boolean blither = true;
+	static final boolean blither = false;
 	
 	protected LocalConfiguration config;
 	
@@ -281,6 +281,12 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			//if (!config.isMultipleBanks())
 				//EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
 			long startTime = System.nanoTime();
+			long fetchTime = 0;
+			long fetchTimeStamp = 0;
+			long loadStoreTime = 0;
+			long loadStoreTimeStamp = 0;
+			long cpuTime = 0;
+			long cpuTimeStamp = 0;
 			MemorySet<T> currentSet = sets.get(0);
 			SecureMap<T> currentBank;
 			dataOffset -= (stackSize*4);
@@ -288,15 +294,19 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				currentBank = currentSet.getOramBank().getMap();
 				EmulatorUtils.print("count: " + count + "\nexecution step: " + currentSet.getExecutionStep(), lib, false);
 				count++;
-				if (count % 100 == 0)  System.out.println("count: " + count);
+				//if (count % 100 == 0)  System.out.println("count: " + count);
 				//if (config.isMultipleBanks())
 					//currentSet.getOramBank().getMap().print();
 				if (config.isMultipleBanks())
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
+				fetchTimeStamp = System.nanoTime();
 				newInst = mem.getInst(currentBank, pc, pcOffset);
+				fetchTime += System.nanoTime() - fetchTimeStamp;
+				
 				//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
+				loadStoreTimeStamp = System.nanoTime();
 				mem.func(reg, memBank, newInst, dataOffset);
-
+				loadStoreTime += System.nanoTime() - loadStoreTimeStamp;
 
 				testHalt = testTerminate(reg, newInst, lib);
 
@@ -306,13 +316,13 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				EmulatorUtils.printBooleanArray("newInst", newInst, lib);
 
 
-				//if (checkMatchBooleanArray(newInst, lib, 0b10001111110000110000000000101000))
-				//newInst = env.inputOfAlice(Utils.fromInt(0b10000011110000110000000000101001, 32));
 				CpuFcn<T> cpu = currentSet.getCpu();
+				cpuTimeStamp = System.nanoTime();
 				if(cpu == null)
 					pc = defaultCpu.function(reg, newInst, pc, null);
 				else
 					pc = cpu.function(reg, newInst, pc, null);
+				cpuTime += System.nanoTime() - cpuTimeStamp;
 
 				EmulatorUtils.printRegisters(reg, lib);
 
@@ -323,9 +333,19 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				currentSet = currentSet.getNextMemorySet();
 			}
 			float runTime =  ((float)(System.nanoTime() - startTime))/ 1000000000;
+			float cpuTimeFl = ((float)cpuTime) / 1000000000;
+			float fetchTimeFl = ((float)fetchTime) / 1000000000;
+			float loadStoreTimeFl = ((float)loadStoreTime) / 1000000000;
 			System.out.println("Count:"  + count);
 			System.out.println("Run time: " + runTime);
 			System.out.println("Average time / instruction: " + runTime / count );
+			System.out.println("Time in CPU: " + cpuTimeFl);
+			System.out.println("Average CPU time: " + cpuTimeFl / count);
+			System.out.println("Time in instruction fetch: " + fetchTimeFl);
+			System.out.println("Average fetch time: " + fetchTimeFl / count);
+			System.out.println("Time in loadStore: " + loadStoreTimeFl);
+			System.out.println("Average loadStore time: " + loadStoreTimeFl / count);
+
 			EmulatorUtils.printBooleanArray("Rsult", reg.read(lib.toSignals(2, 32)), lib, false);
 		}
 		
@@ -737,6 +757,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		// is this cast ok?  Or should we modify the mem circuit? 
 		int pcOffset = (int) ent.getAddress();
 		int dataOffset = (int) rdr.getDataAddress();
+		System.err.println("dataOffset: " + dataOffset);
 		MemSetBuilder<ET> b = new MemSetBuilder<ET>(config, config.getBinaryFileName());
 		//List<MemorySet>sets = b.build();
 		System.err.println("mode is " + config.getMode());
