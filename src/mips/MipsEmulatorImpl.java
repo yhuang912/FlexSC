@@ -357,7 +357,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				System.out.println("Not loading CPUs for single bank execution");
 				return;
 			}
-			System.out.println("Entering loadCpus");
+			//System.out.println("Entering loadCpus");
 			// Uses arcane knowledge. FIXME
 			String packageName = CPU.class.getPackage().getName();
 			String classNameRoot = "Cpu";
@@ -370,7 +370,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 							);
 				}
 			}
-			System.out.println("Exiting loadCpus");
+			//System.out.println("Exiting loadCpus");
 		}
 
 		public void testInstruction (CompEnv<T> env) throws Exception {
@@ -543,12 +543,12 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 //				instBank.write(index, data);
 //				//System.out.println("Wrote instruction number "+i);
 //			}		
-			System.out.println("exiting getInstructions");
+			//System.out.println("exiting getInstructions");
 			return instBank;
 		}			
 
 		private void loadInstructionsMultiBanks(CompEnv<T> env, SecureMap<T> singleBank, List<MemorySet<T>> sets) throws Exception {
-			System.out.println("entering loadInstructions");
+			//System.out.println("entering loadInstructions");
 			IntegerLib<T> lib = new IntegerLib<T>(env);
 			T[] data; 
 			T[] index;
@@ -623,12 +623,12 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				bank.setMinAddress(minAddr);
 				s.setOramBank(bank);
 			}		
-			System.out.println("exiting getInstructions");
+			//System.out.println("exiting getInstructions");
 		}
 
 		//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
 		public SecureArray<T> getMemory(CompEnv<T> env, DataSegment memData) throws Exception{
-			System.out.println("entering getMemoryGen");
+			//System.out.println("entering getMemoryGen");
 			boolean memory[][] = memData.getDataAsBoolean();	
 			IntegerLib<T> lib = new IntegerLib<T>(env);
 			int dataLen = memData.getDataLength();
@@ -686,7 +686,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				}
 			}
 			EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
-			System.out.println("exiting getMemoryGen");
+			//System.out.println("exiting getMemoryGen");
 			
 			return memBank;
 		}
