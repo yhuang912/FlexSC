@@ -119,9 +119,17 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
             // bobs input array,
             // size of both arrays
 
-
-
         }
+		else if (config.getBinaryFileName().equals("func_point")) {
+			Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
+			DataSegment aliceInstructions = rdr.getInstructions(config.getAliceFuncInput());
+			aliceInput_2D_Bool = aliceInstructions.getDataAsBoolean();
+			config.setAliceFuncSize(aliceInstructions.getDataLength());	
+			if (config.getAliceInputSize() == 20){
+				aliceInputArray = aliceInputSortedArray_20;
+				bobInputArray = bobInputSortedArray_20;
+			}
+		}
 		else if (config.getBinaryFileName().equals("bubble_sort")){
 			if (config.getAliceInputSize() == 11){
 				stackFrameSize = 40;
@@ -196,9 +204,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		private int aliceIntInput;
 		private int bobIntInput;
 		private int aliceIntInput2;
-		private String aliceFuncInput;
-        private int aliceFuncSize;
 		private int bobIntInput2;
+		private String aliceFuncInput;
+		private int aliceFuncSize;
 				
 		public static final String MODE_PROPERTY = "mode";
 		public static final String DEFAULT_MODE = "VERIFY";
@@ -541,7 +549,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
             if (config.getBinaryFileName().equals("func_point")) {
                 oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-                        env.inputOfAlice(Utils.fromInt(dataOffset - (4 * (config.getAliceFuncSize() + config.getAliceInputSize() + config.getBobInputSize() + 1)), WORD_SIZE)));
+                        env.inputOfAlice(Utils.fromInt(dataOffset - (4 * (config.getAliceFuncSize() + config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
             } else if (config.getAliceInputSize() > 2) {
                 oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
                         env.inputOfAlice(Utils.fromInt(dataOffset - (4 * (config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
@@ -555,7 +563,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
             if (config.getBinaryFileName().equals("func_point"))
                 oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
-                        env.inputOfAlice(Utils.fromInt(dataOffset - (4*config.getBobInputSize()), WORD_SIZE)));
+                        env.inputOfAlice(Utils.fromInt(dataOffset - (4*(config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
 
 
 			else if (config.getBinaryFileName().equals("set_intersection") || config.getBinaryFileName().equals("lcs"))
@@ -569,20 +577,27 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 						env.inputOfAlice(Utils.fromInt(config.getBobIntInput(), WORD_SIZE)));
 
 			//REGISTER 6
-				if (config.getBinaryFileName().equals("djikstra"))
-					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(config.getBobIntInput2(), WORD_SIZE)));
-				else if (config.getBinaryFileName().equals("set_intersection"))
-					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
-				else if (config.getBinaryFileName().equals("binary_search"))
-					oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(config.getBobIntInput(), WORD_SIZE)));
+            if (config.getBinaryFileName().equals("func_point"))
+            	oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
+            			env.inputOfAlice(Utils.fromInt(dataOffset - (4*(config.getBobInputSize())), WORD_SIZE)));
+
+            if (config.getBinaryFileName().equals("djikstra"))
+            	oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
+            			env.inputOfAlice(Utils.fromInt(config.getBobIntInput2(), WORD_SIZE)));
+            else if (config.getBinaryFileName().equals("set_intersection"))
+            	oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
+            			env.inputOfAlice(Utils.fromInt(config.getAliceInputSize(), WORD_SIZE)));
+            else if (config.getBinaryFileName().equals("binary_search"))
+            	oram.write(env.inputOfAlice(Utils.fromInt(6, oram.lengthOfIden)),
+            			env.inputOfAlice(Utils.fromInt(config.getBobIntInput(), WORD_SIZE)));
 				
 			//REGISTER 7
 				if (config.getBinaryFileName().equals("set_intersection"))
 					oram.write(env.inputOfAlice(Utils.fromInt(7, oram.lengthOfIden)),
-							env.inputOfAlice(Utils.fromInt(config.getBobInputSize(), WORD_SIZE)));	
+							env.inputOfAlice(Utils.fromInt(config.getBobInputSize(), WORD_SIZE)));
+				if (config.getBinaryFileName().equals("func_point"))
+					oram.write(env.inputOfAlice(Utils.fromInt(7, oram.lengthOfIden)),
+							env.inputOfAlice(Utils.fromInt(config.getAliceIntInput(), WORD_SIZE)));
 			
 			
 			env.flush();
@@ -780,9 +795,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
                     data2D = env.inputOfAlice(aliceInput_2D_Bool);
                 else
                     data2D = env.inputOfAlice(new boolean[aliceInput_2D_Bool.length][WORD_SIZE]);
-
+                int offset = stackSize - (config.getAliceFuncSize() + config.getAliceInputSize() + config.getBobInputSize());
                 for (int i = 0; i < data2D.length; i++) {
-                    index = lib.toSignals(stackSize - config.getAliceInputSize() + i, memBank.lengthOfIden);
+                    index = lib.toSignals(offset + i, memBank.lengthOfIden);
                     memBank.write(index, data2D[i]);
                 }
             }
