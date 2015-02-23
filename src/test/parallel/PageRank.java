@@ -18,7 +18,6 @@ import circuits.ArithmeticLib;
 import circuits.IntegerLib;
 import circuits.arithmetic.FixedPointLib;
 import flexsc.CompEnv;
-import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
