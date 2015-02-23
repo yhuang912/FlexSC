@@ -130,7 +130,8 @@ int32 oldPC = pc;
 
 
    // then process pc
-   if ((op == 0 && funct == FUNCT_JR) || (op == 0 && funct == FUNCT_JALR)) {
+   //   if ((op == 0 && funct == FUNCT_JR) || (op == 0 && funct == FUNCT_JALR)) {
+   if (op == 0 && funct == FUNCT_JR) {
       pc = reg_rs;
    } else if (op == 3) { // OP_JAL
       pc = (inst << 6) >> 6;
