@@ -104,7 +104,7 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
          reg_rd = (reg_rt | reg_rs);    
       } else if (funct == FUNCT_JALR){
     	  reg_rd = pc + 4;
-    	  	pc = reg_rs;
+    	  	//pc = reg_rs;
       }
       reg[rd] = reg_rd;
    }
@@ -130,7 +130,7 @@ int32 oldPC = pc;
 
 
    // then process pc
-   if (op == 0 && funct == FUNCT_JR) {
+   if ((op == 0 && funct == FUNCT_JR) || (op == 0 && funct == FUNCT_JALR)) {
       pc = reg_rs;
    } else if (op == 3) { // OP_JAL
       pc = (inst << 6) >> 6;
