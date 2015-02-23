@@ -1,4 +1,3 @@
-#define PRINT
 #ifdef PRINT
 #include <stdio.h>
 #endif
@@ -22,7 +21,6 @@ int sfe_main(char * a, char * b){
 #ifndef bLen
   int bLen = 9;
 #endif
-  int result = 0;
   int C[aLen+1][bLen+1];
   for (i = 0; i <= aLen; i++){
     C[i][0] = 0;
@@ -34,16 +32,12 @@ int sfe_main(char * a, char * b){
     for (j = 1; j<= bLen; j++){
       if (a[i-1] == b[j-1]){
 	C[i][j] = C[i-1][j-1] + 1;
-	if (result < C[i][j])
-	  result = C[i][j];
       } else {
-	//	C[i][j] = (C[i][j-1] >= C[i-1][j]) ? C[i][j-1] : C[i-1][j];
-	C[i][j] = 0;
+	C[i][j] = (C[i][j-1] >= C[i-1][j]) ? C[i][j-1] : C[i-1][j];
       }
     }
   }
-  //  return C[aLen][bLen];
-  return result;
+  return C[aLen][bLen];
 }
 
 /*function backtrack(C[0..m,0..n], X[1..m], Y[1..n], i, j)
