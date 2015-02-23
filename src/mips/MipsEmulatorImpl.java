@@ -78,8 +78,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static int[] bobInputArray;
 	static String aliceInputString;
 	static String bobInputString;
-	static boolean[][] aliceInputFunction;
-	
+	static boolean[][] aliceInput_2D_Bool;
+
 	// Should we blither about missing CPUs?
 	static final boolean blither = false;
 	
@@ -91,8 +91,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		
 	}
 
-	private void setRunParameters(LocalConfiguration config){
-		if (config.getBinaryFileName().equals("djikstra")|| config.getBinaryFileName().equals("bubble_sort") 
+	private void setRunParameters(LocalConfiguration config) throws Exception{
+
+
+
+        if (config.getBinaryFileName().equals("djikstra")|| config.getBinaryFileName().equals("bubble_sort")
 				|| config.getBinaryFileName().equals("binary_search")){
 			config.setBobInputSize(0);
 		}	
@@ -105,7 +108,20 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				stackFrameSize = 200;
 				aliceInput_2D = aliceInput_2D_100;
 			}
-		}
+		}else if (config.getBinaryFileName().equals("func_point")) {
+            Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
+            DataSegment aliceInstructions = rdr.getInstructions(config.getAliceFuncInput());
+            aliceInput_2D_Bool = aliceInstructions.getDataAsBoolean();
+
+            config.setAliceFuncSize(aliceInstructions.getDataLength());
+            // alices function desc,
+            // alices input array,
+            // bobs input array,
+            // size of both arrays
+
+
+
+        }
 		else if (config.getBinaryFileName().equals("bubble_sort")){
 			if (config.getAliceInputSize() == 11){
 				stackFrameSize = 40;
@@ -180,6 +196,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		private int aliceIntInput;
 		private int bobIntInput;
 		private int aliceIntInput2;
+		private String aliceFuncInput;
+        private int aliceFuncSize;
 		private int bobIntInput2;
 				
 		public static final String MODE_PROPERTY = "mode";
@@ -194,6 +212,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		public static final String DEFAULT_ALICE_INPUT = "-1";
 		public static final String ALICE_INPUT2_PROPERTY = "alice_integer_input2";
 		public static final String DEFAULT_ALICE_INPUT2 = "-1";
+		public static final String ALICE_FUNC_INPUT_PROPERTY = "alice_func_input";
+        public static final String ALICE_FUNC_SIZE_PROPERTY = "alice_func_size";
+        public static final String DEFAULT_ALICE_FUNC_SIZE = "0";
+        public static final String DEFAULT_ALICE_FUNC_INPUT = "aliceInput_set_intersection";
 		public static final String BOB_INPUT_PROPERTY = "bob_integer_input";
 		public static final String DEFAULT_BOB_INPUT = "2";
 		public static final String BOB_INPUT2_PROPERTY = "bob_integer_input2";
@@ -217,6 +239,10 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				bobIntInput = Integer.parseInt(tmp);
 				tmp = getProperties().getProperty(ALICE_INPUT2_PROPERTY, DEFAULT_ALICE_INPUT2);
 				aliceIntInput2 = Integer.parseInt(tmp);
+				tmp = getProperties().getProperty(ALICE_FUNC_INPUT_PROPERTY, DEFAULT_ALICE_FUNC_INPUT);
+				aliceFuncInput = tmp;
+                tmp = getProperties().getProperty(ALICE_FUNC_SIZE_PROPERTY, DEFAULT_ALICE_FUNC_SIZE);
+                aliceFuncSize = Integer.parseInt(tmp);
 				tmp = getProperties().getProperty(BOB_INPUT2_PROPERTY, DEFAULT_BOB_INPUT2);
 				bobIntInput2 = Integer.parseInt(tmp);
 				
@@ -239,6 +265,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		public int getAliceIntInput(){ return aliceIntInput; }
 		public int getBobIntInput(){ return bobIntInput; }
 		public int getAliceIntInput2(){ return aliceIntInput2; }
+		public String getAliceFuncInput() { return aliceFuncInput; }
+        public int getAliceFuncSize() {return aliceFuncSize; }
+        public void setAliceFuncSize(int x) { aliceFuncSize = x; }
 		public int getBobIntInput2(){ return bobIntInput2; }
 		public void setBinaryFileName(String fileName) {
 			binaryFileName = fileName;
@@ -476,6 +505,28 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			return lib.declassifyToBoth(res)[0]; 
 		}
 
+
+
+		// integer or pointer to array.
+
+		// we are doing point to array
+
+		// load right pointer to correct register
+
+
+
+		// execute program that takes as input a pointer to function
+
+		// along with other inputs
+
+		// program takes pointer to set intersection and 4 inputs
+
+
+
+		// alice_input()
+
+
+
 		private SecureArray<T> loadInputsToRegister(CompEnv<T> env, int dataOffset)
 				throws Exception {
 			int aliceReg = 4; 
@@ -487,17 +538,27 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 						env.inputOfAlice(Utils.fromInt(0, WORD_SIZE)));
 			
 			//REGISTER 4
-			if (config.getAliceInputSize() > 2) {
-				oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(dataOffset - (4*(config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
-			}
-			// we assume at least one input to the program!
-			else 
-				oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-						env.inputOfAlice(Utils.fromInt(config.getAliceIntInput(), WORD_SIZE)));
-			
+
+            if (config.getBinaryFileName().equals("func_point")) {
+                oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
+                        env.inputOfAlice(Utils.fromInt(dataOffset - (4 * (config.getAliceFuncSize() + config.getAliceInputSize() + config.getBobInputSize() + 1)), WORD_SIZE)));
+            } else if (config.getAliceInputSize() > 2) {
+                oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
+                        env.inputOfAlice(Utils.fromInt(dataOffset - (4 * (config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
+            }
+            // we assume at least one input to the program!
+            else
+                oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
+                        env.inputOfAlice(Utils.fromInt(config.getAliceIntInput(), WORD_SIZE)));
+
 			//REGISTER 5
-			if (config.getBinaryFileName().equals("set_intersection") || config.getBinaryFileName().equals("lcs"))
+
+            if (config.getBinaryFileName().equals("func_point"))
+                oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
+                        env.inputOfAlice(Utils.fromInt(dataOffset - (4*config.getBobInputSize()), WORD_SIZE)));
+
+
+			else if (config.getBinaryFileName().equals("set_intersection") || config.getBinaryFileName().equals("lcs"))
 				oram.write(env.inputOfAlice(Utils.fromInt(5, oram.lengthOfIden)),
 						env.inputOfAlice(Utils.fromInt(dataOffset - (4*config.getBobInputSize()), WORD_SIZE)));
 			else if (config.getBinaryFileName().equals("bubble_sort") || config.getBinaryFileName().equals("binary_search"))
@@ -650,6 +711,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			//System.out.println("exiting getInstructions");
 		}
 
+
+		// load Alices code into memory here. (should be setMemory)
+
 		//Change API to remove memBank and numInst.  Instantiate  memBank inside instead. 
 		public SecureArray<T> getMemory(CompEnv<T> env, DataSegment memData) throws Exception{
 			//System.out.println("entering getMemoryGen");
@@ -661,6 +725,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			
 			T[] index; 
 			T[] data;
+            T[][] data2D;
 			for (int i = 0; i < dataLen; i++){
 				index = lib.toSignals(i + stackSize, memBank.lengthOfIden);
 				if (env.getParty() == Party.Alice)
@@ -704,26 +769,28 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					index = lib.toSignals(stackSize - config.getAliceInputSize() + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
 						data = env.inputOfAlice(Utils.fromInt(aliceInputArray[i], WORD_SIZE));
-					else 
+					else
 						data = env.inputOfAlice(new boolean[WORD_SIZE]);
-					memBank.write(index, data);					
+					memBank.write(index, data);
 				}
 			}
 
+            if (config.getBinaryFileName().equals("func_point")){
+                if (env.getParty() == Party.Alice)
+                    data2D = env.inputOfAlice(aliceInput_2D_Bool);
+                else
+                    data2D = env.inputOfAlice(new boolean[aliceInput_2D_Bool.length][WORD_SIZE]);
+
+                for (int i = 0; i < data2D.length; i++) {
+                    index = lib.toSignals(stackSize - config.getAliceInputSize() + i, memBank.lengthOfIden);
+                    memBank.write(index, data2D[i]);
+                }
+            }
+
+            env.inputOfAlice(aliceInput_2D_Bool);
+
 		
-//			if (config.getBinaryFileName().equals("lcs")){
-//				for (int i = 0; i < aliceInputString.length()/4+1; i=i+4){
-//					index = lib.toSignals(stackSize - ((config.getAliceInputSize()/4)+1) + i , memBank.lengthOfIden);
-//					if (env.getParty() == Party.Alice){
-//						ByteArray bb = aliceInputString.getBytes()
-//								data = env.inputOfAlice(Utils.fromInt(aliceInputArray[i], WORD_SIZE));
-//					}
-//					else 
-//						data = env.inputOfAlice(new boolean[WORD_SIZE]);
-//					memBank.write(index, data);					
-//				}
-//
-//			}
+
 			EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
 			//System.out.println("exiting getMemoryGen");
 			
@@ -791,9 +858,49 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		System.err.println("Bob integer input2: " + config.getBobIntInput2());
 		System.err.println("Alice integer input: " + config.getAliceIntInput());
 		System.err.println("Alice integer input2: " + config.getAliceIntInput2());
+		System.err.println("Alice function input: " + config.getAliceFuncInput());
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
+
+
+
+		//load sfe_main as input
+
+		// setup sep data segment obj
+
+		// single call to get bool array of instructions
+
+		// load into memory
+
+		// getMemory print statements to see if it loads to memory
+
+		// where to memory to put it, leave to me.
+
+		// set intersection has two arrays
+
+		// alices input in memory, bobs next to it
+
+
+
 		
+
+
+		// function load list is functions we are execuing in program
+
+		// getInstructions goes through and gets the instructions for every function
+		// in the load list
+
 		DataSegment instData = rdr.getInstructions(config.getFunctionLoadList());
+
+
+
+		// load alices function with same getInstruction into DataSegment
+
+		// get instructions from DataSegment as array
+
+		// create another data input that doesnt include alices input
+		// separate data input just for alices input
+		// grab alices code in a separte data segment containing instructions
+
 		DataSegment memData = rdr.getData();
 
 		// is this cast ok?  Or should we modify the mem circuit? 
