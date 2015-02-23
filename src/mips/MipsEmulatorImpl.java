@@ -361,20 +361,24 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				if (config.isMultipleBanks())
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
 				fetchTimeStamp = System.nanoTime();
-				fetchAndStamp = ((CVCompEnv)(env)).numOfAnds;
+				if(env.m == Mode.VERIFY)
+					fetchAndStamp = ((CVCompEnv)(env)).numOfAnds;
 				newInst = mem.getInst(currentBank, pc, pcOffset);
 				fetchTime += System.nanoTime() - fetchTimeStamp;
-				fetchAnd += ((CVCompEnv)(env)).numOfAnds - fetchAndStamp;
+				if(env.m == Mode.VERIFY)
+					fetchAnd += ((CVCompEnv)(env)).numOfAnds - fetchAndStamp;
 
 				
 				//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
 				
 				if (currentSet.isUsesMemory()){
 					loadStoreTimeStamp = System.nanoTime();
-					loadStoreAndStamp = ((CVCompEnv)(env)).numOfAnds;
+					if(env.m == Mode.VERIFY)
+						loadStoreAndStamp = ((CVCompEnv)(env)).numOfAnds;
 					mem.func(reg, memBank, newInst, dataOffset);
 					loadStoreTime += System.nanoTime() - loadStoreTimeStamp;
-					loadStoreAnd += ((CVCompEnv)(env)).numOfAnds - loadStoreAndStamp;
+					if(env.m == Mode.VERIFY)
+						loadStoreAnd += ((CVCompEnv)(env)).numOfAnds - loadStoreAndStamp;
 
 				}
 
@@ -388,14 +392,16 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
 				CpuFcn<T> cpu = currentSet.getCpu();
 				cpuTimeStamp = System.nanoTime();
-				cpuAndStamp = ((CVCompEnv)(env)).numOfAnds;
+				if(env.m == Mode.VERIFY)
+					cpuAndStamp = ((CVCompEnv)(env)).numOfAnds;
 
 				if(cpu == null  || !config.isMultipleBanks())
 					pc = defaultCpu.function(reg, newInst, pc, null);
 				else
 					pc = cpu.function(reg, newInst, pc, null);
 				cpuTime += System.nanoTime() - cpuTimeStamp;
-				cpuAnd += ((CVCompEnv)(env)).numOfAnds - cpuAndStamp;
+				if(env.m == Mode.VERIFY)
+					cpuAnd += ((CVCompEnv)(env)).numOfAnds - cpuAndStamp;
 
 
 				EmulatorUtils.printRegisters(reg, lib);
