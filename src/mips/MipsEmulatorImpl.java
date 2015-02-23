@@ -398,15 +398,18 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			float cpuTimeFl = ((float)cpuTime) / 1000000000;
 			float fetchTimeFl = ((float)fetchTime) / 1000000000;
 			float loadStoreTimeFl = ((float)loadStoreTime) / 1000000000;
-			System.out.println("Count:"  + count);
-			System.out.println("Run time: " + runTime);
-			System.out.println("Average time / instruction: " + runTime / count );
-			System.out.println("Time in CPU: " + cpuTimeFl);
-			System.out.println("Average CPU time: " + cpuTimeFl / count);
-			System.out.println("Time in instruction fetch: " + fetchTimeFl);
-			System.out.println("Average fetch time: " + fetchTimeFl / count);
-			System.out.println("Time in loadStore: " + loadStoreTimeFl);
-			System.out.println("Average loadStore time: " + loadStoreTimeFl / count);
+			synchronized (MipsParty.class) {
+				System.out.println(env.getParty());
+				System.out.println("Count:"  + count);
+				System.out.println("Run time: " + runTime);
+				System.out.println("Average time / instruction: " + runTime / count );
+				System.out.println("Time in CPU: " + cpuTimeFl);
+				System.out.println("Average CPU time: " + cpuTimeFl / count);
+				System.out.println("Time in instruction fetch: " + fetchTimeFl);
+				System.out.println("Average fetch time: " + fetchTimeFl / count);
+				System.out.println("Time in loadStore: " + loadStoreTimeFl);
+				System.out.println("Average loadStore time: " + loadStoreTimeFl / count);
+			}
 
 			EmulatorUtils.printBooleanArray("Rsult", reg.read(lib.toSignals(2, 32)), lib, false);
 		}
