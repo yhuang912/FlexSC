@@ -31,6 +31,7 @@ import compiledlib.dov.CPU;
 import compiledlib.dov.CpuImpl;
 import compiledlib.dov.MEM;
 import mips.EmulatorUtils;
+import flexsc.CVCompEnv;
 import flexsc.CompEnv;
 import flexsc.CpuFcn;
 // NEW import flexsc.CpuFcn;
@@ -341,12 +342,12 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			//if (!config.isMultipleBanks())
 				//EmulatorUtils.printOramBank(singleInstructionBank, lib, 60);
 			long startTime = System.nanoTime();
-			long fetchTime = 0;
-			long fetchTimeStamp = 0;
-			long loadStoreTime = 0;
-			long loadStoreTimeStamp = 0;
-			long cpuTime = 0;
-			long cpuTimeStamp = 0;
+			long fetchTime = 0, fetchAnd =0;
+			long fetchTimeStamp = 0, fetchAndStamp = 0;
+			long loadStoreTime = 0, loadStoreAnd = 0;
+			long loadStoreTimeStamp = 0, loadStoreAndStamp=0;
+			long cpuTime = 0, cpuAnd = 0;
+			long cpuTimeStamp = 0, cpuAndStamp = 0;
 			MemorySet<T> currentSet = sets.get(0);
 			SecureMap<T> currentBank;
 			dataOffset -= (stackSize*4);
@@ -360,15 +361,21 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				if (config.isMultipleBanks())
 					pcOffset = (int) currentSet.getOramBank().getMinAddress();
 				fetchTimeStamp = System.nanoTime();
+				fetchAndStamp = ((CVCompEnv)(env)).numOfAnds;
 				newInst = mem.getInst(currentBank, pc, pcOffset);
 				fetchTime += System.nanoTime() - fetchTimeStamp;
+				fetchAnd += ((CVCompEnv)(env)).numOfAnds - fetchAndStamp;
+
 				
 				//newInst = mem.getInst(singleInstructionBank, pc, pcOffset); 
 				
 				if (currentSet.isUsesMemory()){
 					loadStoreTimeStamp = System.nanoTime();
+					loadStoreAndStamp = ((CVCompEnv)(env)).numOfAnds;
 					mem.func(reg, memBank, newInst, dataOffset);
 					loadStoreTime += System.nanoTime() - loadStoreTimeStamp;
+					loadStoreAnd += ((CVCompEnv)(env)).numOfAnds - loadStoreAndStamp;
+
 				}
 
 				testHalt = testTerminate(reg, newInst, lib);
@@ -381,11 +388,15 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
 				CpuFcn<T> cpu = currentSet.getCpu();
 				cpuTimeStamp = System.nanoTime();
+				cpuAndStamp = ((CVCompEnv)(env)).numOfAnds;
+
 				if(cpu == null  || !config.isMultipleBanks())
 					pc = defaultCpu.function(reg, newInst, pc, null);
 				else
 					pc = cpu.function(reg, newInst, pc, null);
 				cpuTime += System.nanoTime() - cpuTimeStamp;
+				cpuAnd += ((CVCompEnv)(env)).numOfAnds - cpuAndStamp;
+
 
 				EmulatorUtils.printRegisters(reg, lib);
 
@@ -411,6 +422,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 				System.out.println("Time in loadStore: " + loadStoreTimeFl);
 				System.out.println("Average loadStore time: " + loadStoreTimeFl / count);
 			
+				System.out.println("Average CPU #ANDs: " + cpuAnd / count);
+				System.out.println("Average fetch #ANDS: " + fetchAnd / count);
+				System.out.println("Average loadStore #ANDS: " + loadStoreAnd/count);
 			}
 			EmulatorUtils.printBooleanArray("Rsult", reg.read(lib.toSignals(2, 32)), lib, false);
 
