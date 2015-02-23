@@ -94,7 +94,7 @@ public class PageRankInsecure {
 		inStream = new ObjectInputStream(sock.getInputStream());
 	}
 
-	public void sort(PageRankNode[] nodes, Comparator c, boolean print) throws IOException, ClassNotFoundException {
+	public void sort(PageRankNode[] nodes, Comparator c, boolean print, boolean calculateCommTime) throws IOException, ClassNotFoundException {
 		Arrays.sort(nodes, c);
 		if (print) {
 			print(nodes);
@@ -103,7 +103,9 @@ public class PageRankInsecure {
 		outStream.writeObject(nodes.clone());
 		outStream.flush();
 		PageRankNode[] otherNodes  = (PageRankNode[]) inStream.readObject();
-		time = time + (System.nanoTime() - one);
+		if (calculateCommTime) {
+			time = time + (System.nanoTime() - one);
+		}
 		int i = 0, j = 0;
 		PageRankNode[] res = new PageRankNode[otherNodes.length + nodes.length];
 		int k = 0;
@@ -165,7 +167,7 @@ public class PageRankInsecure {
 				cntToReceive = 0;
 			}
 		}
-		time = time + (System.nanoTime() - one);
+		// time = time + (System.nanoTime() - one);
 
 		for (int i = 0; i < nodes.length; i++) {
 			if (nodes[i].isVertex == 1) {
@@ -271,21 +273,21 @@ public class PageRankInsecure {
 			}
 		}
 
-		main.sort(nodes, new OutgoingVertexLast(), false);
+		main.sort(nodes, new OutgoingVertexLast(), false, false /* calculateCommTime */);
 		main.outStream.reset();
 		main.prComputeL(nodes);
 		long startTime = System.nanoTime();
 		for (int i = 0; i < ITERATIONS; i++) {
-			main.sort(nodes, new OutgoingVertexFirst(), false);
+			main.sort(nodes, new OutgoingVertexFirst(), false, true /* calculateCommTime */);
 			main.outStream.reset();
 			main.prScatter(nodes);
-			main.sort(nodes, new IncomingVertexLast(), false);
+			main.sort(nodes, new IncomingVertexLast(), false, true /* calculateCommTime */);
 			main.prGather(nodes);
 		}
 		long endTime = System.nanoTime();
 		System.out.println("2," + id + "," + inputLength + "," + 1.0 * (endTime - startTime)/(1000 * 1000 * 1000) + "," + 1.0 * main.time/(1000 * 1000 * 1000));
 		main.outStream.reset();
-		main.sort(nodes, new AllVertexFirst(), false);
+		main.sort(nodes, new AllVertexFirst(), false, false /* calculateCommTime */);
 //		main.print(nodes);
 	}
 }
