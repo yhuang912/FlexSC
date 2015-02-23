@@ -626,8 +626,9 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		private SecureMap<T> loadInstructionsSingleBank(CompEnv<T> env, DataSegment instData)
 				throws Exception {
 			TreeMap<Long, boolean[]> instructions = null; 
-			System.out.println("entering getInstructions, SingleBank");
+			
 			int numInst = instData.getDataLength();
+			System.out.println("entering getInstructions, SingleBank.  Size:" + numInst);
 			instructions = instData.getDataAsBooleanMap(); 
 
 			if(config.getBinaryFileName().equals("func_point")){
@@ -876,6 +877,14 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		System.err.println("Alice integer input: " + config.getAliceIntInput());
 		System.err.println("Alice integer input2: " + config.getAliceIntInput2());
 		System.err.println("Alice function input: " + config.getAliceFuncInput());
+		System.out.println("Executing binary file: " + config.getBinaryFileName());
+		System.out.println("Alice input Size: " + config.getAliceInputSize());
+		System.out.println("Bob input Size: " + config.getBobInputSize());
+		System.out.println("Bob integer input: " + config.getBobIntInput());
+		System.out.println("Bob integer input2: " + config.getBobIntInput2());
+		System.out.println("Alice integer input: " + config.getAliceIntInput());
+		System.out.println("Alice integer input2: " + config.getAliceIntInput2());
+		System.out.println("Alice function input: " + config.getAliceFuncInput());
 		SymbolTableEntry ent = rdr.getSymbolTableEntry(config.getEntryPoint());
 
 
