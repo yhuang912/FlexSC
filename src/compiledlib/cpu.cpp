@@ -102,7 +102,10 @@ int32 CPU.function(secure int32[32] reg, secure int32 inst, secure int32 pc) {
       reg_rd = SLL(reg_rt, shamt);//(reg_rt << shamt);    
       } else if (funct == FUNCT_OR){
          reg_rd = (reg_rt | reg_rs);    
-      }       
+      } else if (funct == FUNCT_JALR){
+    	  reg_rd = pc + 4;
+    	  	pc = reg_rs;
+      }
       reg[rd] = reg_rd;
    }
    else {

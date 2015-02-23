@@ -78,7 +78,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 	static int[] bobInputArray;
 	static String aliceInputString;
 	static String bobInputString;
-	static boolean[][] aliceInput_2D_Bool;
+	static TreeMap<Long, boolean[]> aliceFuncMap;
+	static int aliceFuncAddress;
 
 	// Should we blither about missing CPUs?
 	static final boolean blither = false;
@@ -111,24 +112,16 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 		}else if (config.getBinaryFileName().equals("func_point")) {
             Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
             DataSegment aliceInstructions = rdr.getInstructions(config.getAliceFuncInput());
-            aliceInput_2D_Bool = aliceInstructions.getDataAsBoolean();
-
+            aliceFuncMap = aliceInstructions.getDataAsBooleanMap();
+            //note, casting an address to int. 
+            aliceFuncAddress = (int) aliceInstructions.getStartAddress();
             config.setAliceFuncSize(aliceInstructions.getDataLength());
-            // alices function desc,
-            // alices input array,
-            // bobs input array,
-            // size of both arrays
-
-        }
-		else if (config.getBinaryFileName().equals("func_point")) {
-			Reader rdr = new Reader(new File(config.getBinaryFileName()), config);
-			DataSegment aliceInstructions = rdr.getInstructions(config.getAliceFuncInput());
-			aliceInput_2D_Bool = aliceInstructions.getDataAsBoolean();
-			config.setAliceFuncSize(aliceInstructions.getDataLength());	
-			if (config.getAliceInputSize() == 20){
+            config.setMultipleBanks(false);
+        	if (config.getAliceInputSize() == 20){
 				aliceInputArray = aliceInputSortedArray_20;
 				bobInputArray = bobInputSortedArray_20;
-			}
+			}    
+        	stackFrameSize = 128;
 		}
 		else if (config.getBinaryFileName().equals("bubble_sort")){
 			if (config.getAliceInputSize() == 11){
@@ -380,7 +373,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
 				CpuFcn<T> cpu = currentSet.getCpu();
 				cpuTimeStamp = System.nanoTime();
-				if(cpu == null)
+				if(cpu == null  || !config.isMultipleBanks())
 					pc = defaultCpu.function(reg, newInst, pc, null);
 				else
 					pc = cpu.function(reg, newInst, pc, null);
@@ -552,7 +545,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 
             if (config.getBinaryFileName().equals("func_point")) {
                 oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
-                        env.inputOfAlice(Utils.fromInt(dataOffset - (4 * (config.getAliceFuncSize() + config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
+                        env.inputOfAlice(Utils.fromInt(aliceFuncAddress, WORD_SIZE)));
             } else if (config.getAliceInputSize() > 2) {
                 oram.write(env.inputOfAlice(Utils.fromInt(4, oram.lengthOfIden)),
                         env.inputOfAlice(Utils.fromInt(dataOffset - (4 * (config.getAliceInputSize() + config.getBobInputSize())), WORD_SIZE)));
@@ -627,6 +620,11 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			int numInst = instData.getDataLength();
 			instructions = instData.getDataAsBooleanMap(); 
 
+			if(config.getBinaryFileName().equals("func_point")){
+				instructions.putAll(aliceFuncMap);
+				numInst += config.getAliceFuncSize();
+			}
+			
 			//once we split the instruction from memory, remove the + MEMORY_SIZE
 			SecureMap<T> instBank = new SecureMap<T>(env, numInst, WORD_SIZE, THRESHOLD);
 			IntegerLib<T> lib = new IntegerLib<T>(env);
@@ -764,7 +762,8 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 					}
 				}
 			}
-			if (config.getBinaryFileName().equals("set_intersection") || config.getBinaryFileName().equals("lcs")){
+			if (config.getBinaryFileName().equals("set_intersection") || config.getBinaryFileName().equals("lcs") 
+					|| config.getBinaryFileName().equals("func_point") ){
 				for (int i = 0; i < aliceInputArray.length; i++){
 					index = lib.toSignals(stackSize - config.getAliceInputSize() - config.getBobInputSize() + i , memBank.lengthOfIden);
 					if (env.getParty() == Party.Alice)
@@ -794,15 +793,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
 			}
 
             if (config.getBinaryFileName().equals("func_point")){
-                if (env.getParty() == Party.Alice)
-                    data2D = env.inputOfAlice(aliceInput_2D_Bool);
-                else
-                    data2D = env.inputOfAlice(new boolean[aliceInput_2D_Bool.length][WORD_SIZE]);
-                int offset = stackSize - (config.getAliceFuncSize() + config.getAliceInputSize() + config.getBobInputSize());
-                for (int i = 0; i < data2D.length; i++) {
-                    index = lib.toSignals(offset + i, memBank.lengthOfIden);
-                    memBank.write(index, data2D[i]);
-                }
+                
             }
 
 
