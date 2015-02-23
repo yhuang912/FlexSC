@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class Server {
-	static int bufferSize = 655360;
+	static int bufferSize = 10;
 	private ServerSocket sock;
 
 	public InputStream is;

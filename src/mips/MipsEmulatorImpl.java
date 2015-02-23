@@ -802,9 +802,7 @@ public class MipsEmulatorImpl<ET> implements MipsEmulator {
                 }
             }
 
-            env.inputOfAlice(aliceInput_2D_Bool);
 
-		
 
 			EmulatorUtils.printOramBank(memBank, lib, stackSize + dataLen);
 			//System.out.println("exiting getMemoryGen");
