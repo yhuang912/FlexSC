@@ -41,14 +41,15 @@ public class PageRankNonOblivious {
 		for (int it = 0; it < iterations; it++) {
 			for (int j = 0; j < nodes.length; j++) {
 				nodes[j].prTemp = 0;
-				for (int k = 0; k < nodes[j].u.size(); k++) {
+				int size = nodes[j].u.size();
+				for (int k = 0; k < size; k++) {
 					int u = nodes[j].u.get(k);
 					nodes[j].prTemp += (nodes[u - 1].pr / nodes[u - 1].l);
 				}
 			}
-//			for (int j = 0; j < nodes.length; j++) {
-//				nodes[j].pr = nodes[j].prTemp;
-//			}
+			for (int j = 0; j < nodes.length; j++) {
+				nodes[j].pr = nodes[j].prTemp;
+			}
 		}
 		long endTime = System.nanoTime();
 		for (int j = 0; j < nodes.length; j++) {
