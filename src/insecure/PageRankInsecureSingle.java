@@ -132,8 +132,8 @@ public class PageRankInsecureSingle {
 			main.prGather(nodes);
 		}
 		long endTime = System.nanoTime();
-//		main.print(nodes);
-		System.out.println(inputLength + "," + 1.0 * (endTime - startTime)/(1000 * 1000 * 1000));
+		main.print(nodes);
+//		System.out.println(inputLength + "," + 1.0 * (endTime - startTime)/(1000 * 1000 * 1000));
 		main.sort(nodes, new AllVertexFirst(), false);
 	}
 }
