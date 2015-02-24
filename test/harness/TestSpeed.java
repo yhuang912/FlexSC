@@ -27,8 +27,6 @@ public class TestSpeed extends TestHarness {
 			System.out.println(t +"\t"+ Flag.sw.ands/t);
 		}
 		
-		
-		
 		return res;
 	}
 	int LEN = 4089446;
@@ -63,7 +61,7 @@ public class TestSpeed extends TestHarness {
 
 		public void run() {
 			try {
-				connect("10.42.120.27", 54321);
+				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
