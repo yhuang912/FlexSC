@@ -46,9 +46,9 @@ public class PageRankNonOblivious {
 					nodes[j].prTemp += (nodes[u - 1].pr / nodes[u - 1].l);
 				}
 			}
-			for (int j = 0; j < nodes.length; j++) {
-				nodes[j].pr = nodes[j].prTemp;
-			}
+//			for (int j = 0; j < nodes.length; j++) {
+//				nodes[j].pr = nodes[j].prTemp;
+//			}
 		}
 		long endTime = System.nanoTime();
 		for (int j = 0; j < nodes.length; j++) {
