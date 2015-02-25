@@ -273,8 +273,8 @@ public class Machine {
 			client.connect(ipManager.gIp[machineId], compPoolGenEvaPort);
 			is = client.is;
 			os = client.os;
-			cisOther = client.cis;
-			cosOther = client.cos;
+//			cisOther = client.cis;
+//			cosOther = client.cos;
 		}
 		return CompEnv.getEnv(mode, party, is, os);
 	}
