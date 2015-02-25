@@ -14,6 +14,7 @@ import flexsc.Party;
 public class TestSpeed extends TestHarness {
 
 	public static int PORT = -1;
+	public static int ID = -1;
 	public <T>T[] secureCompute(T[] a, T[] b, CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
 		T[] res = null;
@@ -24,7 +25,7 @@ public class TestSpeed extends TestHarness {
 			res = lib.and(a, b);
 			double t2 = System.nanoTime();
 			double t = (t2-t1)/1000000000.0;
-			System.out.println(t +"\t"+ Flag.sw.ands/t);
+			System.out.println(ID + "\t" + t +"\t"+ Flag.sw.ands/t);
 		}
 		
 		return res;
@@ -109,7 +110,8 @@ public class TestSpeed extends TestHarness {
 	
 	public static void main(String args[]) throws Exception {
 		 TestSpeed test = new TestSpeed();
-		 TestSpeed.PORT = Integer.parseInt(args[1]); 
+		 TestSpeed.PORT = Integer.parseInt(args[1]);
+		 TestSpeed.ID = Integer.parseInt(args[2]); 
 		 if(new Integer(args[0]) == 0)
 			 test.new GenRunnable().run();
 		 else test.new EvaRunnable().run();
