@@ -8,7 +8,6 @@ import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
-import flexsc.PMCompEnv;
 import flexsc.Party;
 
 
@@ -21,7 +20,7 @@ public class TestSpeed extends TestHarness {
 		
 		double t1 = System.nanoTime();
 		Flag.sw.ands = 0;
-		for(int i = 0; i < 1; ++i) {
+		for(int i = 0; i < 10; ++i) {
 			res = lib.and(a, b);
 			double t2 = System.nanoTime();
 			double t = (t2-t1)/1000000000.0;
@@ -36,7 +35,9 @@ public class TestSpeed extends TestHarness {
 
 		public void run() {
 			try {
+				System.out.println("hello");
 				listen(PORT);
+				System.out.println("connected");
 				@SuppressWarnings("unchecked")
 				CompEnv<T> gen = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
 
@@ -62,7 +63,9 @@ public class TestSpeed extends TestHarness {
 
 		public void run() {
 			try {
+				System.out.println("hello");
 				connect("localhost", PORT);
+				System.out.println("connected");
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
 
