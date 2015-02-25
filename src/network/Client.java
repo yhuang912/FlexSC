@@ -34,8 +34,8 @@ public class Client {
 		if (Flag.countIO) {
 			cos = new CountingOutputStream(sock.getOutputStream());
 			cis = new CountingInputStream(sock.getInputStream());
-			os = new BufferedOutputStream(cos, Server.bufferSize);
-			is = new BufferedInputStream(cis, Server.bufferSize);
+			os = new BufferedOutputStream(cos);
+			is = new BufferedInputStream(cis);
 		} else {
 			os = new BufferedOutputStream(sock.getOutputStream(),
 					Server.bufferSize);
