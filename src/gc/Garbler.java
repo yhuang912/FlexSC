@@ -5,10 +5,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
-final class Garbler {
+final public class Garbler {
 	private MessageDigest sha1 = null;
 
-	Garbler() {
+	public Garbler() {
 		try {
 			sha1 = MessageDigest.getInstance("SHA-1");
 		} catch (NoSuchAlgorithmException e) {

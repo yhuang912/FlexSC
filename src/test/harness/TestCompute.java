@@ -13,7 +13,7 @@ import gc.GCSignal;
 import gc.Garbler;
 
 
-public class TestSpeed extends TestHarness {
+public class TestCompute extends TestHarness {
 
 	public static int PORT = -1;
 	public static int ID = -1;
@@ -21,17 +21,14 @@ public class TestSpeed extends TestHarness {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
 		T[] res = null;
 		
-		double t1 = System.nanoTime();
-		Flag.sw.ands = 0;
 		Garbler gb = new Garbler();
-		for(int i = 0; i < 10; ++i) {
-			res = lib.and(a, b);
+		double t1 = System.nanoTime();
+		for(int i = 0; i < 40894460; ++i) {
 			gb.enc(GCSignal.ZERO, GCSignal.ZERO, 0, GCSignal.ZERO);
-			double t2 = System.nanoTime();
-			double t = (t2-t1)/1000000000.0;
-			System.out.println(ID + "\t" + t +"\t"+ Flag.sw.ands/t);
 		}
-		
+		double t2 = System.nanoTime();
+		double t = (t2-t1)/1000000000.0;
+		System.out.println(ID + "\t" + t +"\t"+ 40894460.0/t);
 		return res;
 	}
 	int LEN = 4089446;
@@ -113,9 +110,9 @@ public class TestSpeed extends TestHarness {
 	}
 	
 	public static void main(String args[]) throws Exception {
-		 TestSpeed test = new TestSpeed();
-		 TestSpeed.PORT = Integer.parseInt(args[1]);
-		 TestSpeed.ID = Integer.parseInt(args[2]); 
+		TestCompute test = new TestCompute();
+		TestCompute.PORT = Integer.parseInt(args[1]);
+		TestCompute.ID = Integer.parseInt(args[2]); 
 		 if(new Integer(args[0]) == 0)
 			 test.new GenRunnable().run();
 		 else test.new EvaRunnable().run();
