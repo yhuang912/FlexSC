@@ -23,15 +23,15 @@ public class TestCompute extends TestHarness {
 		
 		Garbler gb = new Garbler();
 		double t1 = System.nanoTime();
-		for(int i = 0; i < 40894460; ++i) {
+		for(int i = 0; i < LEN; ++i) {
 			gb.enc(GCSignal.ZERO, GCSignal.ZERO, 0, GCSignal.ZERO);
 		}
 		double t2 = System.nanoTime();
 		double t = (t2-t1)/1000000000.0;
-		System.out.println(ID + "\t" + t +"\t"+ 40894460.0 * 80 * 3/(4 * 1024 * 1024 * t) + "\t" + 40894460.0 /(4 * t));
+		System.out.println(ID + "\t" + t +"\t"+ LEN * 80.0 * 3/(4 * 1024 * 1024 * t) + "\t" + LEN * 1.0 /(4 * t));
 		return res;
 	}
-	int LEN = 4089446;
+	int LEN = 40894460 * 5;
 	class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[] z;
 
