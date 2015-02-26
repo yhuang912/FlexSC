@@ -28,7 +28,7 @@ public class TestCompute extends TestHarness {
 		}
 		double t2 = System.nanoTime();
 		double t = (t2-t1)/1000000000.0;
-		System.out.println(ID + "\t" + t +"\t"+ 40894460.0 * 0.75 * 80 * 3/t);
+		System.out.println(ID + "\t" + t +"\t"+ 40894460.0 * 0.75 * 80 * 3/(1024 * 1024 *t));
 		return res;
 	}
 	int LEN = 4089446;
@@ -49,7 +49,7 @@ public class TestCompute extends TestHarness {
 				T[] d = secureCompute(a, b, gen);
 				os.flush();
 
-				z = gen.outputToAlice(d);
+//				z = gen.outputToAlice(d);
 
 				disconnect();
 			} catch (Exception e) {
@@ -85,7 +85,7 @@ public class TestCompute extends TestHarness {
 //					encs = ((PMCompEnv) env).statistic.NumEncAlice;
 //				}
 
-				env.outputToAlice(d);
+//				env.outputToAlice(d);
 				os.flush();
 
 				disconnect();
