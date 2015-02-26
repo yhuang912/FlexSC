@@ -13,14 +13,15 @@ public class TestSend {
 			try {
 				listen(PORT);
 
-				byte[] data = new byte[1000];
+				byte[] data = new byte[10];
 				double t1 = System.nanoTime();
-				for(int i = 0; i < 1000000; ++i) {
+				for(int i = 0; i < 100000000; ++i) {
                                         os.write(data);
 //					writeByte(data, 10);
 				}
 //				os.flush();
-				System.out.println(ID + " " + (System.nanoTime()-t1)/1000000000.0);
+				double t2 = (System.nanoTime()-t1)/1000000000.0;
+				System.out.println(ID + " " + t2 + " " + 1000000*1000*8/(1024 * 1024 * t2));
 				os.flush();
 				disconnect();
 			} catch (Exception e) {
