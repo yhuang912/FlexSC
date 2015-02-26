@@ -21,7 +21,7 @@ public class TestSend {
 				}
 //				os.flush();
 				double t2 = (System.nanoTime()-t1)/1000000000.0;
-				System.out.println(ID + " " + t2 + " " + 1000000*1000*8/(1024 * 1024 * t2));
+				System.out.println(ID + " " + t2 + " " + 1.0 * 1000000*1000*8/(1024 * 1024 * t2));
 				os.flush();
 				disconnect();
 			} catch (Exception e) {
