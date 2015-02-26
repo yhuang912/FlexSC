@@ -130,7 +130,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 	static public void main(String args[]) throws InterruptedException {
 		genreateData(4096);
 
-		m = Mode.COUNT;
+		m = Mode.REAL;
 		GenRunnable env = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
 		Thread tGen = new Thread(env);

@@ -13,6 +13,7 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
+import gc.GCSignal;
 
 public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 	static public Mode m = Mode.REAL;
@@ -127,11 +128,11 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 	}
 
 	static public void main(String args[]) throws InterruptedException {
-		for(int i = 10; i <= 1024; i*=2) {
-			for(int l = 4096; l <= 4096; l*=2){
+		for(int i = 5; i <= 20; ++i) {
+			for(int l = (1<<8); l <= (1<<12); l*=2){
 			k = i;
 			genreateData(l);
-			m = Mode.COUNT;
+			m = Mode.REAL;
 			runonce();//runonce();//runonce();
 			}
 			System.out.println(" ");
@@ -164,53 +165,53 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 			try {
 				listen(54321);
 
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
-				FixedPointLib<Boolean> lib = new FixedPointLib(env,
+				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Alice, is, os);
+				FixedPointLib<GCSignal> lib = new FixedPointLib(env,
 						fixPointLength, offset);
 
 				double d1 = System.nanoTime();
 				if (env.m == Mode.COUNT) {
-					 sta = ((PMCompEnv)env).statistic;
-					 sta.flush();
+//					 sta = ((PMCompEnv)env).statistic;
+//					 sta.flush();
 				}
 
-				Boolean[][] sc = new Boolean[a.length][];
+				GCSignal[][] sc = new GCSignal[a.length][];
 				for (int i = 0; i < sc.length; ++i) {
-					sc[i] = new Boolean[2 * fixPointLength];
-					Boolean[] x = env.inputOfAlice(Utils.fromFixPoint(a[i],
+					sc[i] = new GCSignal[2 * fixPointLength];
+					GCSignal[] x = env.inputOfAlice(Utils.fromFixPoint(a[i],
 							fixPointLength, offset));
-					Boolean[] y = env.inputOfAlice(Utils.fromFixPoint(b[i],
+					GCSignal[] y = env.inputOfAlice(Utils.fromFixPoint(b[i],
 							fixPointLength, offset));
 					System.arraycopy(x, 0, sc[i], 0, x.length);
 					System.arraycopy(y, 0, sc[i], x.length, y.length);
 				}
 
-				Boolean[][] centers = new Boolean[k][];
+				GCSignal[][] centers = new GCSignal[k][];
 				for (int i = 0; i < k; ++i) {
-					centers[i] = new Boolean[2 * fixPointLength];
-					Boolean[] x = env.inputOfAlice(Utils.fromFixPoint(cenx[i],
+					centers[i] = new GCSignal[2 * fixPointLength];
+					GCSignal[] x = env.inputOfAlice(Utils.fromFixPoint(cenx[i],
 							fixPointLength, offset));
-					Boolean[] y = env.inputOfAlice(Utils.fromFixPoint(ceny[i],
+					GCSignal[] y = env.inputOfAlice(Utils.fromFixPoint(ceny[i],
 							fixPointLength, offset));
 					System.arraycopy(x, 0, centers[i], 0, x.length);
 					System.arraycopy(y, 0, centers[i], x.length, y.length);
 				}
-				MapreduceKMeans<Boolean> wc = new MapreduceKMeans<Boolean>(
+				MapreduceKMeans<GCSignal> wc = new MapreduceKMeans<GCSignal>(
 						env, centers);
-				KeyValue<Boolean>[] res = null;
+				KeyValue<GCSignal>[] res = null;
 				for (int iter = 0; iter < max_iter; ++iter) {
-					Boolean[] cntRes = null;
+					GCSignal[] cntRes = null;
 					res = wc.MapReduce(sc, cntRes, k);
 					for (int i = 0; i < k; ++i) {
-						Boolean[] x = Arrays.copyOfRange(res[i].value, 0,
+						GCSignal[] x = Arrays.copyOfRange(res[i].value, 0,
 								fixPointLength);
-						Boolean[] y = Arrays.copyOfRange(res[i].value,
+						GCSignal[] y = Arrays.copyOfRange(res[i].value,
 								fixPointLength, fixPointLength * 2);
-						Boolean[] cnt = Arrays.copyOfRange(res[i].value,
+						GCSignal[] cnt = Arrays.copyOfRange(res[i].value,
 								fixPointLength * 2, fixPointLength * 3);
 
-						Boolean[] avex = lib.div(x, cnt);
-						Boolean[] avey = lib.div(y, cnt);
+						GCSignal[] avex = lib.div(x, cnt);
+						GCSignal[] avey = lib.div(y, cnt);
 						System.arraycopy(avex, 0, wc.clusters[i], 0,
 								fixPointLength);
 						System.arraycopy(avey, 0, wc.clusters[i],
@@ -260,48 +261,48 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 			try {
 				connect("localhost", 54321);
 
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
-				FixedPointLib<Boolean> lib = new FixedPointLib<Boolean>(env,
+				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				FixedPointLib<GCSignal> lib = new FixedPointLib<GCSignal>(env,
 						fixPointLength, offset);
 
-				Boolean[][] sc = new Boolean[a.length][];
+				GCSignal[][] sc = new GCSignal[a.length][];
 				for (int i = 0; i < sc.length; ++i) {
-					sc[i] = new Boolean[2 * fixPointLength];
-					Boolean[] x = env.inputOfAlice(Utils.fromFixPoint(a[i],
+					sc[i] = new GCSignal[2 * fixPointLength];
+					GCSignal[] x = env.inputOfAlice(Utils.fromFixPoint(a[i],
 							fixPointLength, offset));
-					Boolean[] y = env.inputOfAlice(Utils.fromFixPoint(b[i],
+					GCSignal[] y = env.inputOfAlice(Utils.fromFixPoint(b[i],
 							fixPointLength, offset));
 					System.arraycopy(x, 0, sc[i], 0, x.length);
 					System.arraycopy(y, 0, sc[i], x.length, y.length);
 				}
-				Boolean[][] centers = new Boolean[k][];
+				GCSignal[][] centers = new GCSignal[k][];
 				for (int i = 0; i < k; ++i) {
-					centers[i] = new Boolean[2 * fixPointLength];
-					Boolean[] x = env.inputOfAlice(Utils.fromFixPoint(cenx[i],
+					centers[i] = new GCSignal[2 * fixPointLength];
+					GCSignal[] x = env.inputOfAlice(Utils.fromFixPoint(cenx[i],
 							fixPointLength, offset));
-					Boolean[] y = env.inputOfAlice(Utils.fromFixPoint(ceny[i],
+					GCSignal[] y = env.inputOfAlice(Utils.fromFixPoint(ceny[i],
 							fixPointLength, offset));
 					System.arraycopy(x, 0, centers[i], 0, x.length);
 					System.arraycopy(y, 0, centers[i], x.length, y.length);
 				}
-				MapreduceKMeans<Boolean> wc = new MapreduceKMeans<Boolean>(
+				MapreduceKMeans<GCSignal> wc = new MapreduceKMeans<GCSignal>(
 						env, centers);
-				KeyValue<Boolean>[] res = null;
+				KeyValue<GCSignal>[] res = null;
 
 				for (int iter = 0; iter < max_iter; ++iter) {
-					Boolean[] cntRes = null;
+					GCSignal[] cntRes = null;
 					res = wc.MapReduce(sc, cntRes, k);
 
 					for (int i = 0; i < res.length; ++i) {
-						Boolean[] x = Arrays.copyOfRange(res[i].value, 0,
+						GCSignal[] x = Arrays.copyOfRange(res[i].value, 0,
 								fixPointLength);
-						Boolean[] y = Arrays.copyOfRange(res[i].value,
+						GCSignal[] y = Arrays.copyOfRange(res[i].value,
 								fixPointLength, fixPointLength * 2);
-						Boolean[] cnt = Arrays.copyOfRange(res[i].value,
+						GCSignal[] cnt = Arrays.copyOfRange(res[i].value,
 								fixPointLength * 2, fixPointLength * 3);
 
-						Boolean[] avex = lib.div(x, cnt);
-						Boolean[] avey = lib.div(y, cnt);
+						GCSignal[] avex = lib.div(x, cnt);
+						GCSignal[] avey = lib.div(y, cnt);
 						System.arraycopy(avex, 0, wc.clusters[i], 0,
 								fixPointLength);
 						System.arraycopy(avey, 0, wc.clusters[i],

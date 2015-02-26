@@ -170,7 +170,7 @@ public class KNN {
 	}
 
 	static public void main(String args[]) throws InterruptedException {
-		m = Mode.COUNT;
+		m = Mode.REAL;
 		for(int dim = 1; dim <= 4; ++dim) {
 			for(int i =  3; i <= 18; i+=3) {
 				KNN.k = i;
