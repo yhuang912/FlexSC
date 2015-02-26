@@ -33,8 +33,10 @@ public class IPManager {
 		ips[14] = "52.0.96.161"; // third_amazon_large virg
 		ips[15] = "54.153.7.55"; // cali
 		ips[16] = "50.18.217.125"; // cali 15-16 group
-		ips[17] = "54.153.48.156"; // cali 17-18 group
-		ips[18] = "54.153.34.218"; // cali 17-18 group
+		//ips[17] = "54.153.48.156"; // cali 17-18 group
+		//ips[18] = "54.153.34.218"; // cali 17-18 group
+		ips[17] = "54.153.86.79";
+		ips[18] = "54.67.29.20";
 		IPManager ipManager = new IPManager();
 		BufferedReader br = null;
 		try {
