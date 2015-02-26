@@ -31,7 +31,7 @@ public class TestCompute extends TestHarness {
 		System.out.println(ID + "\t" + t +"\t"+ LEN * 80.0 * 3/(4 * 1024 * 1024 * t) + "\t" + LEN * 1.0 /(4 * t));
 		return res;
 	}
-	int LEN = 40894460 * 5;
+	int LEN = 40894460;
 	class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[] z;
 
