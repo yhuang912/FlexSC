@@ -28,7 +28,7 @@ public class TestCompute extends TestHarness {
 		}
 		double t2 = System.nanoTime();
 		double t = (t2-t1)/1000000000.0;
-		System.out.println(ID + "\t" + t +"\t"+ 40894460.0 * 0.75 * 80 * 3/(1024 * 1024 *t));
+		System.out.println(ID + "\t" + t +"\t"+ 40894460.0 * 80 * 3/(4 * 1024 * 1024 * t) + "\t" + 40894460.0 /(4 * t));
 		return res;
 	}
 	int LEN = 4089446;
