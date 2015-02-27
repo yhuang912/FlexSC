@@ -42,7 +42,7 @@ public class TestSend {
 //					readBytes(10);
 				}
 				System.out.println("b"+(System.nanoTime()-t1)/1000000000.0);
-				
+
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
