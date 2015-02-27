@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 import network.NetworkUtil;
+import network.Server;
 import flexsc.Signal;
 
 public class GCSignal extends Signal {
@@ -31,7 +32,10 @@ public class GCSignal extends Signal {
 		Arrays.fill(b, (byte) ((bs[0]<0)?0xff:0));
 		System.arraycopy(bs, 0, b, len-Math.min(len, bs.length), Math.min(len, bs.length));
 		Arrays.copyOf(bs, len);
-		return new GCSignal(b);
+		int index = Server.GC_INDEX;
+		Server.SIGNALS[index].bytes = b;
+		Server.GC_INDEX = (Server.GC_INDEX + 1) % Server.TOTAL_SIGNALS;
+		return Server.SIGNALS[index];
 	}
 	
 	public GCSignal(GCSignal lb) 
