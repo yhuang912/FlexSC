@@ -1,17 +1,13 @@
 package network;
 
+import gc.GCSignal;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-
-import org.apache.commons.io.input.CountingInputStream;
-import org.apache.commons.io.output.CountingOutputStream;
-
-import flexsc.Flag;
-import gc.GCSignal;
 
 public class Client {
 	private Socket sock = null;

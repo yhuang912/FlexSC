@@ -11,7 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-	public static int TOTAL_SIGNALS = 400000;
+	public static int TOTAL_SIGNALS = 400;
 	public static GCSignal SIGNALS[] = new GCSignal[TOTAL_SIGNALS];
 	public static int GC_INDEX = 0;
 	private ServerSocket sock;
