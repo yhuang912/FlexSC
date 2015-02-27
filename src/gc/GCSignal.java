@@ -21,19 +21,23 @@ public class GCSignal extends Signal {
 	public GCSignal(boolean b) { v = b; }
 	
 	public static GCSignal freshLabel(SecureRandom rnd) {
-		byte[] b = new byte[len];
-		rnd.nextBytes(b);
-		return new GCSignal(b);
+//		byte[] b = new byte[len];
+//		rnd.nextBytes(b);
+		int index = Server.GC_INDEX;
+		rnd.nextBytes(Server.SIGNALS[index].bytes);
+		Server.GC_INDEX = (Server.GC_INDEX + 1) % Server.TOTAL_SIGNALS;
+		return Server.SIGNALS[index];
+//		return new GCSignal(b);
 	}
 
 	public static GCSignal newInstance(byte[] bs) {
 		assert (bs.length <= len) : "Losing entropy when constructing signals.";
-		byte[] b = new byte[len];
-		Arrays.fill(b, (byte) ((bs[0]<0)?0xff:0));
-		System.arraycopy(bs, 0, b, len-Math.min(len, bs.length), Math.min(len, bs.length));
-		Arrays.copyOf(bs, len);
 		int index = Server.GC_INDEX;
-		Server.SIGNALS[index].bytes = b;
+//		byte[] b = new byte[len];
+		Arrays.fill(Server.SIGNALS[index].bytes, (byte) ((bs[0]<0)?0xff:0));
+		System.arraycopy(bs, 0, Server.SIGNALS[index].bytes, len-Math.min(len, bs.length), Math.min(len, bs.length));
+		Arrays.copyOf(bs, len);
+//		Server.SIGNALS[index].bytes = b;
 		Server.GC_INDEX = (Server.GC_INDEX + 1) % Server.TOTAL_SIGNALS;
 		return Server.SIGNALS[index];
 	}
@@ -43,13 +47,23 @@ public class GCSignal extends Signal {
 	
 	public boolean isPublic () { return bytes == null; }
 	
+//	public GCSignal xor(GCSignal lb) {
+//		byte[] nb = new byte[len];
+//		for (int i = 0; i < len; i++)
+//			nb[i] = (byte) (bytes[i] ^ lb.bytes[i]);
+//		return new GCSignal(nb);
+//	}
+
 	public GCSignal xor(GCSignal lb) {
-		byte[] nb = new byte[len];
+//		byte[] nb = new byte[len];
+		int index = Server.GC_INDEX;
 		for (int i = 0; i < len; i++)
-			nb[i] = (byte) (bytes[i] ^ lb.bytes[i]);
-		return new GCSignal(nb);
+			Server.SIGNALS[index].bytes[i] = (byte) (bytes[i] ^ lb.bytes[i]);
+		Server.GC_INDEX = (Server.GC_INDEX + 1) % Server.TOTAL_SIGNALS;
+		return Server.SIGNALS[index];
+//		return new GCSignal(nb);
 	}
-	
+
 	public void setLSB() {
 		bytes[0] |= 1;
 	}
