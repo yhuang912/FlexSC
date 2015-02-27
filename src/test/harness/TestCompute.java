@@ -17,7 +17,7 @@ public class TestCompute extends TestHarness {
 
 	public static int PORT = -1;
 	public static int ID = -1;
-	public <T>T[] secureCompute(T[] a, T[] b, CompEnv<T> env) {
+	public <T>T[] secureCompute(CompEnv<T> env) {
 		IntegerLib<T> lib = new IntegerLib<T>(env);
 		T[] res = null;
 		
@@ -43,10 +43,10 @@ public class TestCompute extends TestHarness {
 				@SuppressWarnings("unchecked")
 				CompEnv<T> gen = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
 
-				T[] a = gen.inputOfAlice(Utils.fromBigInteger(BigInteger.ONE, LEN));
-				T[] b = gen.inputOfBob(new boolean[LEN]);
+//				T[] a = gen.inputOfAlice(Utils.fromBigInteger(BigInteger.ONE, LEN));
+//				T[] b = gen.inputOfBob(new boolean[LEN]);
 
-				T[] d = secureCompute(a, b, gen);
+				T[] d = secureCompute(gen);
 				os.flush();
 
 //				z = gen.outputToAlice(d);
@@ -71,14 +71,14 @@ public class TestCompute extends TestHarness {
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
 
-				T[] a = env.inputOfAlice(new boolean[LEN]);
-				T[] b = env.inputOfBob(Utils.fromBigInteger(BigInteger.ONE, LEN));
+//				T[] a = env.inputOfAlice(new boolean[LEN]);
+//				T[] b = env.inputOfBob(Utils.fromBigInteger(BigInteger.ONE, LEN));
 
 //				if (Flag.mode == Mode.COUNT) {
 //					((PMCompEnv) env).statistic.flush();
 //					;
 //				}
-				T[] d = secureCompute(a, b, env);
+				T[] d = secureCompute(env);
 //				if (Flag.mode == Mode.COUNT) {
 //					((PMCompEnv) env).statistic.finalize();
 //					andgates = ((PMCompEnv) env).statistic.andGate;

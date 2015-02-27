@@ -24,7 +24,7 @@ public class TestSpeed extends TestHarness {
 		double t1 = System.nanoTime();
 		Flag.sw.ands = 0;
 		Garbler gb = new Garbler();
-		for(int i = 0; i < 10; ++i) {
+		for(int i = 0; i < 3; ++i) {
 			res = lib.and(a, b);
 			gb.enc(GCSignal.ZERO, GCSignal.ZERO, 0, GCSignal.ZERO);
 			double t2 = System.nanoTime();
