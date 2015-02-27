@@ -10,7 +10,7 @@ import network.Server;
 import flexsc.Signal;
 
 public class GCSignal extends Signal {
-	static final int len = 10;
+	public static final int len = 10;
 	public byte[] bytes;
 	boolean v;
 

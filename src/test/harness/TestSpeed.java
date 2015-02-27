@@ -26,21 +26,21 @@ public class TestSpeed extends TestHarness {
 		Garbler gb = new Garbler();
 		for(int i = 0; i < 3; ++i) {
 			res = lib.and(a, b);
-			gb.enc(GCSignal.ZERO, GCSignal.ZERO, 0, GCSignal.ZERO);
+//			gb.enc(GCSignal.ZERO, GCSignal.ZERO, 0, GCSignal.ZERO);
 			double t2 = System.nanoTime();
 			double t = (t2-t1)/1000000000.0;
 			System.out.println(ID + "\t" + t +"\t"+ Flag.sw.ands/t);
 		}
-		try {
-			Thread.sleep(10*1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			Thread.sleep(10*1000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		return res;
 	}
 	//int LEN = 4089446;
-	int LEN = 1000 * 1000 * 2;
+	int LEN = 1000 * 1000 * 3;
 	class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[] z;
 
@@ -58,7 +58,7 @@ public class TestSpeed extends TestHarness {
 				T[] d = secureCompute(a, b, gen);
 				os.flush();
 
-//				z = gen.outputToAlice(d);
+				z = gen.outputToAlice(d);
 
 				disconnect();
 			} catch (Exception e) {
@@ -94,7 +94,7 @@ public class TestSpeed extends TestHarness {
 //					encs = ((PMCompEnv) env).statistic.NumEncAlice;
 //				}
 
-//				env.outputToAlice(d);
+				env.outputToAlice(d);
 				os.flush();
 				disconnect();
 			} catch (Exception e) {

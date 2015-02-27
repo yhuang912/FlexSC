@@ -21,7 +21,7 @@ public class Server {
 
 	public Server() {
 		for (int i = 0; i < TOTAL_SIGNALS; i++) {
-			SIGNALS[i] = new GCSignal(new byte[10]);
+			SIGNALS[i] = new GCSignal(new byte[GCSignal.len]);
 		}
 	}
 
