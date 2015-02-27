@@ -153,8 +153,10 @@ public class GCGen extends GCCompEnv {
 		labelR[0] = b;
 		labelR[1] = R.xor(labelR[0]);
 
-		int cL = a.getLSB() ? 1 : 0;
-		int cR = b.getLSB() ? 1 : 0;
+//		int cL = a.getLSB() ? 1 : 0;
+//		int cR = b.getLSB() ? 1 : 0;
+		int cL = a.bytes[0] & 1;
+		int cR = b.bytes[0] & 1;
 
 		lb[cL & cR] = gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO);
 		lb[1 - (cL & cR)] = R.xor(lb[cL & cR]);
@@ -200,36 +202,31 @@ public class GCGen extends GCCompEnv {
 
 		Flag.sw.startGC();
 		GCSignal res;
-		if (a.isPublic() && b.isPublic())
-			res = new GCSignal(a.v && b.v);
-		else if (a.isPublic())
-			res = a.v ? b : new GCSignal(false);
-		else if (b.isPublic())
-			res = b.v ? a : new GCSignal(false);
-		else {
-
-			GCSignal ret;
-			ret = garble(a, b);
+		if (!a.isPublic() && !b.isPublic()) {
+			res = garble(a, b);
 
 			sendGTT();
 			gid++;
 			gatesRemain = true;
-			res = ret;
-		}
+		} else if (a.isPublic() && b.isPublic())
+			res = new GCSignal(a.v && b.v);
+		else if (a.isPublic())
+			res = a.v ? b : new GCSignal(false);
+		else //if (b.isPublic())
+			res = b.v ? a : new GCSignal(false);
 		Flag.sw.stopGC();
 		return res;
 	}
 
 	public GCSignal xor(GCSignal a, GCSignal b) {
-		if (a.isPublic() && b.isPublic())
+		if (!a.isPublic() && !b.isPublic()) {
+			return a.xor(b);
+		} else if (a.isPublic() && b.isPublic())
 			return new GCSignal(a.v ^ b.v);
 		else if (a.isPublic())
 			return a.v ? not(b) : new GCSignal(b);
-			else if (b.isPublic())
-				return b.v ? not(a) : new GCSignal(a);
-				else {
-					return a.xor(b);
-				}
+		else // if (b.isPublic())
+			return b.v ? not(a) : new GCSignal(a);
 	}
 
 	public GCSignal not(GCSignal a) {
