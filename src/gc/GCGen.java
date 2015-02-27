@@ -145,6 +145,7 @@ public class GCGen extends GCCompEnv {
 	private GCSignal[][] gtt = new GCSignal[2][2];
 	private GCSignal labelL[] = new GCSignal[2];
 	private GCSignal labelR[] = new GCSignal[2];
+	GCSignal[] lb = new GCSignal[2];
 
 	private GCSignal garble(GCSignal a, GCSignal b) {
 		labelL[0] = a;
@@ -155,7 +156,6 @@ public class GCGen extends GCCompEnv {
 		int cL = a.getLSB() ? 1 : 0;
 		int cR = b.getLSB() ? 1 : 0;
 
-		GCSignal[] lb = new GCSignal[2];
 		lb[cL & cR] = gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO);
 		lb[1 - (cL & cR)] = R.xor(lb[cL & cR]);
 

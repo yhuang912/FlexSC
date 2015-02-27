@@ -31,12 +31,13 @@ public class GCSignal extends Signal {
 	}
 
 	public static GCSignal newInstance(byte[] bs) {
-		assert (bs.length <= len) : "Losing entropy when constructing signals.";
+//		assert (bs.length <= len) : "Losing entropy when constructing signals.";
 		int index = Server.GC_INDEX;
 //		byte[] b = new byte[len];
 		Arrays.fill(Server.SIGNALS[index].bytes, (byte) ((bs[0]<0)?0xff:0));
-		System.arraycopy(bs, 0, Server.SIGNALS[index].bytes, len-Math.min(len, bs.length), Math.min(len, bs.length));
-		Arrays.copyOf(bs, len);
+//		System.arraycopy(bs, 0, Server.SIGNALS[index].bytes, len-Math.min(len, bs.length), Math.min(len, bs.length));
+		System.arraycopy(bs, 0, Server.SIGNALS[index].bytes, 0, len);
+//		Arrays.copyOf(bs, len);
 //		Server.SIGNALS[index].bytes = b;
 		Server.GC_INDEX = (Server.GC_INDEX + 1) % Server.TOTAL_SIGNALS;
 		return Server.SIGNALS[index];
