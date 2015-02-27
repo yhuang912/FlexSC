@@ -34,7 +34,8 @@ public class TestSpeed extends TestHarness {
 		
 		return res;
 	}
-	int LEN = 4089446;
+	// int LEN = 4089446;
+	int LEN = 1000 * 1000 * 2;
 	class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[] z;
 
