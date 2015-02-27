@@ -11,7 +11,6 @@ import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.output.CountingOutputStream;
 
 import flexsc.Flag;
-import gc.GCSignal;
 
 public class Client {
 	private Socket sock = null;
@@ -19,12 +18,6 @@ public class Client {
 	public OutputStream os;
 //	CountingOutputStream cos;
 //	CountingInputStream cis;
-
-	public Client() {
-		for (int i = 0; i < Server.TOTAL_SIGNALS; i++) {
-			Server.SIGNALS[i] = new GCSignal(new byte[10]);
-		}
-	}
 
 	public void connect(String server, int port) throws InterruptedException, IOException {
 		sock = NetworkUtil.connect(server, port);
