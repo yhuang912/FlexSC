@@ -41,9 +41,9 @@ public class TestSpeed extends TestHarness {
 
 		public void run() {
 			try {
-				System.out.println("hello");
+//				System.out.println("hello");
 				listen(PORT);
-				System.out.println("connected");
+//				System.out.println("connected");
 				@SuppressWarnings("unchecked")
 				CompEnv<T> gen = CompEnv.getEnv(Mode.REAL, Party.Alice, is, os);
 
@@ -69,9 +69,9 @@ public class TestSpeed extends TestHarness {
 
 		public void run() {
 			try {
-				System.out.println("hello");
+//				System.out.println("hello");
 				connect("localhost", PORT);
-				System.out.println("connected");
+//				System.out.println("connected");
 				@SuppressWarnings("unchecked")
 				CompEnv<T> env = CompEnv.getEnv(Mode.REAL, Party.Bob, is, os);
 
