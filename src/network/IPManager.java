@@ -15,7 +15,7 @@ public class IPManager {
 	int machines;
 
 	public static IPManager loadIPs(int machines, String machineConfigFile) throws IOException {
-		ips = new String[20];
+		ips = new String[40];
 		ips[0] = "127.0.0.1";
 		ips[1] = "10.42.120.15";
 		ips[2] = "10.42.120.18";
