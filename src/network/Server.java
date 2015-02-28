@@ -13,7 +13,7 @@ public class Server {
 	
 	public InputStream is;
 	public OutputStream os;
-	
+
 	public void listen(int port) throws IOException {
 		Socket clientSock;
         sock = new ServerSocket(port);            // create socket and bind to port

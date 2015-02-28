@@ -88,18 +88,20 @@ public class Machine {
 //									 int inputSize = NetworkUtil.readInt(masterIs);
 				                     input = parallelGadget.readInputFromMaster(inputLength, masterIs, env);
 									 int logMachines = Machine.log2(machines);
-									 peerIsUp = new BufferedInputStream[logMachines];
-									 peerOsUp = new BufferedOutputStream[logMachines];
-									 peerIsDown = new BufferedInputStream[logMachines];
-									 peerOsDown = new BufferedOutputStream[logMachines];
-
-									 cisUp = new CountingInputStream[logMachines];
-									 cisDown = new CountingInputStream[logMachines];
-									 cosUp = new CountingOutputStream[logMachines];
-									 cosDown = new CountingOutputStream[logMachines];
-
-									 upSocket = new Socket[logMachines];
-									 downSocket = new Socket[logMachines];
+									 if (logMachines >= 0) {
+										 peerIsUp = new BufferedInputStream[logMachines];
+										 peerOsUp = new BufferedOutputStream[logMachines];
+										 peerIsDown = new BufferedInputStream[logMachines];
+										 peerOsDown = new BufferedOutputStream[logMachines];
+	
+										 cisUp = new CountingInputStream[logMachines];
+										 cisDown = new CountingInputStream[logMachines];
+										 cosUp = new CountingOutputStream[logMachines];
+										 cosDown = new CountingOutputStream[logMachines];
+	
+										 upSocket = new Socket[logMachines];
+										 downSocket = new Socket[logMachines];
+									 }
 									 break;
 				case CONNECT: connectToPeers(ipManager);
 							  break;
