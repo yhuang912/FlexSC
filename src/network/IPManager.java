@@ -37,6 +37,8 @@ public class IPManager {
 		//ips[18] = "54.153.34.218"; // cali 17-18 group
 		ips[17] = "54.153.86.79";
 		ips[18] = "54.67.29.20";
+		ips[19] = "52.11.12.120"; // oregon
+		ips[20] = "52.1.133.199"; // virginia
 		IPManager ipManager = new IPManager();
 		BufferedReader br = null;
 		try {
