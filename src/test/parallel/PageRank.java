@@ -272,7 +272,7 @@ public class PageRank<T> implements ParallelGadget<T> {
 //			new SortGadget<T>(env, machine)
 //				.setInputs(aa, PageRankNode.vertexFirstComparator(env))
 //				.compute();
-//			print(machineId, env, aa, i);
+//			print(machineId, env, aa, i /* iterations */, flib);
 		}
 		communicateSort = (long) new SortGadget<T>(env, machine)
 			.setInputs(aa, PageRankNode.vertexFirstComparator(env))
