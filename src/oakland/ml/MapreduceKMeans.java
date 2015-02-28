@@ -129,7 +129,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 
 	static public void main(String args[]) throws InterruptedException {
 		for(int i = 5; i <= 20; ++i) {
-			for(int l = (1<<8); l <= (1<<12); l*=2){
+			for(int l = (1<<3); l <= (1<<12); l*=2){
 			k = i;
 			genreateData(l);
 			m = Mode.REAL;
@@ -225,8 +225,8 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 					}
 					//					System.out.println(" ");
 				}
-
-
+//System.out.println("hehe");
+System.out.print((System.nanoTime()-d1)/1000000000.0 + " ");
 				if (env.m == Mode.COUNT) {
 //					 sta = ((PMCompEnv)env).statistic;
 					 sta.finalize();
