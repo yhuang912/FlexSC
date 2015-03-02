@@ -9,6 +9,7 @@ import util.Utils;
 import circuits.arithmetic.FixedPointLib;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
@@ -125,7 +126,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 		return env.sta;
 	}
 
-	static public void main(String args[]) throws InterruptedException {
+	static public void main1(String args[]) throws InterruptedException {
 		for(int i = 2; i <= 2; ++i) {
 //			for(int l = (1<<10); l <= (1<<10); l*=2){
 			k = i;
@@ -136,6 +137,26 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 //		}
 	}
 
+	
+	public static void main(String args[]) throws Exception {
+		k = 2;
+		genreateData(1<<15);
+		if(args.length==0) {
+			GenRunnable gen = new GenRunnable();
+			EvaRunnable env = new EvaRunnable();
+			Thread tGen = new Thread(gen);
+			Thread tEva = new Thread(env);
+			tGen.start();
+			Thread.sleep(5);
+			tEva.start();
+			tGen.join();
+			tEva.join();
+		}
+		else if(new Integer(args[0]) == 0)
+			new GenRunnable().run();
+		else new EvaRunnable().run();
+		System.out.println(" "+Flag.sw.ands);
+	}
 	
 	static public void runonce() throws InterruptedException {
 		GenRunnable env = new GenRunnable();
