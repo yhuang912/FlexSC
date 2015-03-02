@@ -12,7 +12,7 @@ public class TestList extends TestHarness{
 		IntegerLib<T> lib = new IntegerLib<T>(e);
 		FloatLib<T> flib = new FloatLib<T>(e, 52, 11);
 		double t1, t2 , t;
-		int iter = 30;
+		int iter = 300;
 		T[] a = e.inputOfAlice(new boolean[1024]);
 		T[] b = e.inputOfBob(new boolean[1024]);
 		//int add
