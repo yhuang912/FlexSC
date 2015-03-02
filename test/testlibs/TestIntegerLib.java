@@ -19,7 +19,7 @@ public class TestIntegerLib extends TestHarness {
 
 	Random rnd = new Random();
 
-//	@Test
+	@Test
 	public void testIntAdd() throws Exception {
 		for (int i = 0; i < testCases; i++) {
 			Test_2Input1Output.runThreads(new Helper(rnd.nextInt() % (1 << 31), rnd.nextInt()
@@ -37,7 +37,7 @@ public class TestIntegerLib extends TestHarness {
 		Flag.sw.print();
 	}
 
-	//@Test
+	@Test
 	public void testIntSub() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
@@ -55,7 +55,7 @@ public class TestIntegerLib extends TestHarness {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testIntDiv() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
@@ -99,7 +99,7 @@ public class TestIntegerLib extends TestHarness {
 		}
 	}
 
-	//@Test
+	@Test
 	public void testIntMod() throws Exception {
 
 		for (int i = 0; i < testCases; i++) {
