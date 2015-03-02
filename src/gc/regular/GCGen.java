@@ -18,6 +18,8 @@ public class GCGen extends GCGenComp {
 		labelR[1] = GCSignal.freshLabel(CompEnv.rnd);
 		labelL[0] = GCSignal.freshLabel(CompEnv.rnd);
 		labelL[1] = GCSignal.freshLabel(CompEnv.rnd);
+		lb[0] = GCSignal.freshLabel(CompEnv.rnd);
+		lb[1] = GCSignal.freshLabel(CompEnv.rnd);
 	}
 
 	private GCSignal[][] gtt = new GCSignal[2][2];
