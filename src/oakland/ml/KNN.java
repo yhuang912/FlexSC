@@ -199,10 +199,10 @@ public class KNN {
 			tEva.start();
 			tGen.join();
 			tEva.join();
-			System.out.println(" "+Flag.sw.ands);
 		}
 		else if(new Integer(args[0]) == 0)
 			new GenRunnable().run();
 		else new EvaRunnable().run();
+		System.out.println(" "+Flag.sw.ands);
 	}
 }
