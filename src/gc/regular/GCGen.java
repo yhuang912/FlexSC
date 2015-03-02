@@ -20,9 +20,15 @@ public class GCGen extends GCGenComp {
 		labelL[1] = GCSignal.freshLabel(CompEnv.rnd);
 		lb[0] = GCSignal.freshLabel(CompEnv.rnd);
 		lb[1] = GCSignal.freshLabel(CompEnv.rnd);
+		for(int i = 0; i < 2; ++i)
+			for(int j = 0; j < 2; ++j) {
+					gtt[i][j] = GCSignal.freshLabel(CompEnv.rnd);
+					gttSend[i][j] = GCSignal.freshLabel(CompEnv.rnd);
+			}
 	}
 
 	private GCSignal[][] gtt = new GCSignal[2][2];
+	private GCSignal[][] gttSend = new GCSignal[2][2];
 	private GCSignal labelL[] = new GCSignal[2];
 	private GCSignal labelR[] = new GCSignal[2];
 	GCSignal[] lb = new GCSignal[2];
@@ -39,11 +45,10 @@ public class GCGen extends GCGenComp {
 		int cR = b.getLSB() ? 1 : 0;
 
 
-		lb[cL & cR] = gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO);
+		gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO, lb[cL & cR]);
 		
 		GCSignal.xor(R, lb[cL & cR], lb[1 - (cL & cR)]);
 		
-//		 = R.xor();
 
 		gtt[0 ^ cL][0 ^ cR] = lb[0];
 		gtt[0 ^ cL][1 ^ cR] = lb[0];
@@ -51,17 +56,17 @@ public class GCGen extends GCGenComp {
 		gtt[1 ^ cL][1 ^ cR] = lb[1];
 
 		if (cL != 0 || cR != 0)
-			gtt[0 ^ cL][0 ^ cR] = gb.enc(labelL[0], labelR[0], gid,
-					gtt[0 ^ cL][0 ^ cR]);
+			 gb.enc(labelL[0], labelR[0], gid,
+					gtt[0 ^ cL][0 ^ cR], gttSend[0 ^ cL][0 ^ cR]);
 		if (cL != 0 || cR != 1)
-			gtt[0 ^ cL][1 ^ cR] = gb.enc(labelL[0], labelR[1], gid,
-					gtt[0 ^ cL][1 ^ cR]);
+			gb.enc(labelL[0], labelR[1], gid,
+					gtt[0 ^ cL][1 ^ cR], gttSend[0 ^ cL][1 ^ cR]);
 		if (cL != 1 || cR != 0)
-			gtt[1 ^ cL][0 ^ cR] = gb.enc(labelL[1], labelR[0], gid,
-					gtt[1 ^ cL][0 ^ cR]);
+			gb.enc(labelL[1], labelR[0], gid,
+					gtt[1 ^ cL][0 ^ cR], gttSend[1 ^ cL][0 ^ cR]);
 		if (cL != 1 || cR != 1)
-			gtt[1 ^ cL][1 ^ cR] = gb.enc(labelL[1], labelR[1], gid,
-					gtt[1 ^ cL][1 ^ cR]);
+			gb.enc(labelL[1], labelR[1], gid,
+					gtt[1 ^ cL][1 ^ cR], gttSend[1 ^ cL][1 ^ cR]);
 
 		// assert(gb.enc(labelL[cL], labelR[cR], gid,
 		// gtt[0][0]).equals(Label.ZERO)) : "Garbling problem.";
@@ -71,9 +76,9 @@ public class GCGen extends GCGenComp {
 	private void sendGTT() {
 		try {
 			Flag.sw.startGCIO();
-			gtt[0][1].send(os);
-			gtt[1][0].send(os);
-			gtt[1][1].send(os);
+			gttSend[0][1].send(os);
+			gttSend[1][0].send(os);
+			gttSend[1][1].send(os);
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();

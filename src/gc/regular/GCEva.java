@@ -29,11 +29,12 @@ public class GCEva extends GCEvaComp {
 			System.exit(1);
 		}
 	}
-
+//	GCSignal ret = GCSignal.freshLabel(CompEnv.rnd);
+	
 	public GCSignal and(GCSignal a, GCSignal b) {
 		Flag.sw.startGC();
-
-		GCSignal res;
+		
+		GCSignal res = new GCSignal(new byte[10]);
 		if (a.isPublic() && b.isPublic())
 			res = ((a.v && b.v)? _ONE: _ZERO);
 		else if (a.isPublic())
@@ -46,7 +47,7 @@ public class GCEva extends GCEvaComp {
 			int i0 = a.getLSB() ? 1 : 0;
 			int i1 = b.getLSB() ? 1 : 0;
 
-			res = gb.dec(a, b, gid, gtt[i0][i1]);
+			 gb.dec(a, b, gid, gtt[i0][i1], res);
 			gid++;
 		}
 		Flag.sw.stopGC();
