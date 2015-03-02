@@ -1,5 +1,6 @@
 package gc.regular;
 
+import flexsc.CompEnv;
 import flexsc.Flag;
 import gc.GCGenComp;
 import gc.GCSignal;
@@ -13,12 +14,17 @@ public class GCGen extends GCGenComp {
 	public GCGen(InputStream is, OutputStream os) {
 		super(is, os);
 		gb = new Garbler();
+		labelR[0] = GCSignal.freshLabel(CompEnv.rnd);
+		labelR[1] = GCSignal.freshLabel(CompEnv.rnd);
+		labelL[0] = GCSignal.freshLabel(CompEnv.rnd);
+		labelL[1] = GCSignal.freshLabel(CompEnv.rnd);
 	}
 
 	private GCSignal[][] gtt = new GCSignal[2][2];
 	private GCSignal labelL[] = new GCSignal[2];
 	private GCSignal labelR[] = new GCSignal[2];
-
+	GCSignal[] lb = new GCSignal[2];
+	
 	private GCSignal garble(GCSignal a, GCSignal b) {
 		labelL[0] = a;
 		GCSignal.xor(R, labelL[0], labelL[1]);
@@ -30,7 +36,7 @@ public class GCGen extends GCGenComp {
 		int cL = a.getLSB() ? 1 : 0;
 		int cR = b.getLSB() ? 1 : 0;
 
-		GCSignal[] lb = new GCSignal[2];
+
 		lb[cL & cR] = gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO);
 		
 		GCSignal.xor(R, lb[cL & cR], lb[1 - (cL & cR)]);

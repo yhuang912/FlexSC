@@ -19,11 +19,11 @@ public class GCEva extends GCEvaComp {
 		Flag.sw.startGC();
 		GCSignal res;
 		if (a.isPublic() && b.isPublic())
-			res =  new GCSignal(a.v && b.v);
+			res =  ( (a.v && b.v) ? _ONE:_ZERO);
 		else if (a.isPublic())
-			res =  a.v ? b : new GCSignal(false);
+			res =  a.v ? b :_ZERO;
 		else if (b.isPublic())
-			res = b.v ? a : new GCSignal(false);
+			res = b.v ? a : _ZERO;
 		else {
 
 			int i0 = a.getLSB() ? 1 : 0;
@@ -43,10 +43,9 @@ public class GCEva extends GCEvaComp {
 			WG = gb.hash(a, gid, false).xor((i0 == 1) ? TG : GCSignal.ZERO);
 			WE = gb.hash(b, gid, true).xor((i1 == 1) ? (TE.xor(a)) : GCSignal.ZERO);
 			
-			GCSignal out = WG.xor(WE);
+			res = WG.xor(WE);
 			
 			gid++;
-			res =  out;
 		}
 		Flag.sw.stopGC();
 		return res;

@@ -26,8 +26,10 @@ final class Garbler {
 		return getPadding(lb0, lb1, k).xor(c);
 	}
 	
+	ByteBuffer buffer = ByteBuffer.allocate(GCSignal.len*2+8);
 	private GCSignal getPadding(GCSignal lb0, GCSignal lb1, long k) {
-		  sha1.update((ByteBuffer.allocate(GCSignal.len*2+8).put(lb0.bytes).put(lb1.bytes).putLong(k)));
+		buffer.clear();
+		  sha1.update((buffer.put(lb0.bytes).put(lb1.bytes).putLong(k)));
           GCSignal ret = GCSignal.newInstance(sha1.digest());
         return ret;
     }

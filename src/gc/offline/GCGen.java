@@ -135,11 +135,11 @@ public class GCGen extends GCGenComp {
 		Flag.sw.startGC();
 		GCSignal res = null;
 		if (a.isPublic() && b.isPublic())
-			res = new GCSignal(a.v && b.v);
+			res = ( (a.v && b.v) ? _ONE:_ZERO);
 		else if (a.isPublic())
-			res = a.v ? b : new GCSignal(false);
+			res = a.v ? b : _ZERO;
 		else if (b.isPublic())
-			res = b.v ? a : new GCSignal(false);
+			res = b.v ? a : _ZERO;
 		else {
 			if(Flag.offline) {
 				res = readGateFromFile();
