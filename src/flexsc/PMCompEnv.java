@@ -96,6 +96,7 @@ public class PMCompEnv extends BooleanCompEnv {
 	public Boolean and(Boolean a, Boolean b) {
 		++statistic.andGate;
 		statistic.bandwidth += 3 * 10;
+		Flag.sw.ands++;
 		return f;
 	}
 

@@ -1,12 +1,10 @@
 package oakland.ml;
 
-import java.util.Arrays;
-
 import circuits.arithmetic.ArithmeticLib;
 import circuits.arithmetic.FixedPointLib;
-import circuits.arithmetic.FloatLib;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
@@ -16,7 +14,6 @@ import flexsc.Party;
 
 public class KNN {
 
-	static public Mode m = Mode.COUNT;
 	public static int numEntries;
 	public static int VL = 23;
 	public static int PL = 8;
@@ -52,7 +49,7 @@ public class KNN {
 	public static <T>T[] secureCompute(ArithmeticLib<T> lib) {
 		T[] res = null;
 		double[] time = new double[3];
-		for(int tt = 0; tt < 3; ++tt) {
+//		for(int tt = 0; tt < 3; ++tt) {
 			double d1 = System.nanoTime();
 			IntegerLib<T> ilib = new IntegerLib<T>(lib.getEnv());
 			T[][][] cor = lib.getEnv().newTArray(clearcor.length, clearcor[0].length, 1);
@@ -96,11 +93,11 @@ public class KNN {
 				res = ilib.add(res, mini[i]);
 			}
 			res = lib.div(res, lib.publicValue(k));
-			time[tt] = System.nanoTime() - d1;
-		}
-		Arrays.sort(time);
-		if(lib.getEnv().getParty() == Party.Alice && m == Mode.REAL)
-			System.out.print(" "+time[1]/1000000000.0);
+			time[0] = System.nanoTime() - d1;
+//		}
+//		Arrays.sort(time);
+//		if(lib.getEnv().getParty() == Party.Alice && m == Mode.REAL)
+			System.out.print(" "+time[0]/1000000000.0);
 		return res;
 	}
 
@@ -116,16 +113,16 @@ public class KNN {
 			try {
 				listen(54321);
 
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Alice, is, os);
 				//				ArithmeticLib<T> lib = new FloatLib<T>(env, VL, PL);
 				ArithmeticLib<T> lib = new FixedPointLib<T>(env, 32, 20);
 
-				if(m == Mode.COUNT) {
+				if(Flag.mode == Mode.COUNT) {
 					sta = ((PMCompEnv)env).statistic;
 					sta.flush();
 				}
 				secureCompute(lib);
-				if(m == Mode.COUNT) {
+				if(Flag.mode == Mode.COUNT) {
 					sta.finalize();
 				}
 				env.flush();
@@ -141,7 +138,7 @@ public class KNN {
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 				//				ArithmeticLib<T> lib = new FloatLib<T>(env, VL, PL);
 				ArithmeticLib<T> lib = new FixedPointLib<T>(env, 32, 20);
 				secureCompute(lib);
@@ -156,7 +153,6 @@ public class KNN {
 
 	public static Statistics getCount(int length) throws InterruptedException {
 		preareData(2000, k);
-		m = Mode.REAL;
 		GenRunnable<Boolean> gen = new GenRunnable<Boolean>();
 		EvaRunnable<Boolean> eva = new EvaRunnable<Boolean>();
 		Thread tGen = new Thread(gen);
@@ -169,12 +165,11 @@ public class KNN {
 		return gen.sta;
 	}
 
-	static public void main(String args[]) throws InterruptedException {
-		m = Mode.REAL;
-		for(int dim = 1; dim <= 4; ++dim) {
-			for(int i =  3; i <= 18; i+=3) {
-				KNN.k = i;
-				preareData(3000, dim);
+	static public void main1(String args[]) throws InterruptedException {
+		for(int dim = 2; dim <= 2; ++dim) {
+			for(int i =  2; i <= 2; i+=3) {
+				KNN.k = 3;
+				preareData(1<<17, dim);
 				GenRunnable gen = new GenRunnable();
 				EvaRunnable eva = new EvaRunnable();
 				Thread tGen = new Thread(gen);
@@ -184,12 +179,30 @@ public class KNN {
 				tEva.start();
 				tGen.join();
 				tEva.join();
-				if(m == Mode.COUNT)
+				if(Flag.mode == Mode.COUNT)
 					System.out.print(" "+gen.sta.andGate);
 			}
 			System.out.print("\n");
 		}
 	}
 
-
+	public static void main(String args[]) throws Exception {
+		KNN.k = 3;
+		preareData(1<<17, 2);
+		if(args.length==0) {
+			GenRunnable gen = new GenRunnable();
+			EvaRunnable env = new EvaRunnable();
+			Thread tGen = new Thread(gen);
+			Thread tEva = new Thread(env);
+			tGen.start();
+			Thread.sleep(5);
+			tEva.start();
+			tGen.join();
+			tEva.join();
+			System.out.println(" "+Flag.sw.ands);
+		}
+		else if(new Integer(args[0]) == 0)
+			new GenRunnable().run();
+		else new EvaRunnable().run();
+	}
 }
