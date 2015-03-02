@@ -20,7 +20,7 @@ public class TestSpeed extends TestHarness {
 		
 		double t1 = System.nanoTime();
 		Flag.sw.ands = 0;
-		for(int i = 0; i < 1; ++i) {
+		for(int i = 0; i < 100; ++i) {
 			res = lib.and(a, b);
 			double t2 = System.nanoTime();
 			double t = (t2-t1)/1000000000.0;
@@ -29,7 +29,7 @@ public class TestSpeed extends TestHarness {
 		
 		return res;
 	}
-	int LEN = 4089446;
+	int LEN = 1024*1024;
 	class GenRunnable<T> extends network.Server implements Runnable {
 		boolean[] z;
 

@@ -56,6 +56,11 @@ public class GCSignal {
 			nb[i] = (byte) (bytes[i] ^ lb.bytes[i]);
 		return new GCSignal(nb);
 	}
+	
+	public static void xor(GCSignal lb2, GCSignal lb, GCSignal ret) {
+		for (int i = 0; i < len; i++)
+			ret.bytes[i] = (byte) (lb2.bytes[i] ^ lb.bytes[i]);
+	}
 
 	public void setLSB() {
 		bytes[0] |= 1;

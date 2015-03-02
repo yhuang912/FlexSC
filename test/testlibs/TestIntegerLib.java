@@ -87,9 +87,9 @@ public class TestIntegerLib extends TestHarness {
 			Test_2Input1Output.runThreads(new Helper(a, b) {
 				public<T> T[] secureCompute(T[] Signala,
 						T[] Signalb, CompEnv<T> e) throws Exception {
-//					return new IntegerLib<T>(e).multiply(Signala, Signalb);
-					compiledlib.NoClass<T> lib = new compiledlib.NoClass(e);
-					return lib.karatsubaMult(Signala.length, Signala, Signalb);
+					return new IntegerLib<T>(e).multiply(Signala, Signalb);
+//					compiledlib.NoClass<T> lib = new compiledlib.NoClass(e);
+//					return lib.karatsubaMult(Signala.length, Signala, Signalb);
 				}
 
 				public int plainCompute(int x, int y) {
