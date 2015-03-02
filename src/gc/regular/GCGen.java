@@ -21,16 +21,21 @@ public class GCGen extends GCGenComp {
 
 	private GCSignal garble(GCSignal a, GCSignal b) {
 		labelL[0] = a;
-		labelL[1] = R.xor(labelL[0]);
+		GCSignal.xor(R, labelL[0], labelL[1]);
+//		 = R.xor();
 		labelR[0] = b;
-		labelR[1] = R.xor(labelR[0]);
+		GCSignal.xor(R, labelR[0], labelR[1]);
+//		 = R.xor();
 
 		int cL = a.getLSB() ? 1 : 0;
 		int cR = b.getLSB() ? 1 : 0;
 
 		GCSignal[] lb = new GCSignal[2];
 		lb[cL & cR] = gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO);
-		lb[1 - (cL & cR)] = R.xor(lb[cL & cR]);
+		
+		GCSignal.xor(R, lb[cL & cR], lb[1 - (cL & cR)]);
+		
+//		 = R.xor();
 
 		gtt[0 ^ cL][0 ^ cR] = lb[0];
 		gtt[0 ^ cL][1 ^ cR] = lb[0];
@@ -74,11 +79,11 @@ public class GCGen extends GCGenComp {
 		Flag.sw.startGC();
 		GCSignal res;
 		if (a.isPublic() && b.isPublic())
-			res = new GCSignal(a.v && b.v);
+			res = ((a.v && b.v)?_ONE:_ZERO);
 		else if (a.isPublic())
-			res = a.v ? b : new GCSignal(false);
+			res = a.v ? b : _ZERO;
 		else if (b.isPublic())
-			res = b.v ? a : new GCSignal(false);
+			res = b.v ? a : _ZERO;
 		else {
 
 			GCSignal ret;

@@ -8,8 +8,6 @@ import gc.GCSignal;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import sun.misc.Signal;
-
 public class GCGen extends GCGenComp {
 	Garbler gb;
 

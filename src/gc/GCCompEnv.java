@@ -12,12 +12,14 @@ public abstract class GCCompEnv extends CompEnv<GCSignal> {
 		super(is, os, p, Mode.OPT);
 	}
 
+	public GCSignal _ONE = new GCSignal(true);
+	public GCSignal _ZERO = new GCSignal(false);
 	public GCSignal ONE() {
-		return new GCSignal(true);
+		return _ONE;
 	}
 	
 	public GCSignal ZERO() {
-		return new GCSignal(false);
+		return _ZERO;
 	}
 	
 	public GCSignal[] newTArray(int len) {
