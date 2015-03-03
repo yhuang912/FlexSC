@@ -18,7 +18,7 @@ public class TestSketch {
 			//AMS 20*2^23*8/1024/1024/1024
 //			GenRunnable gen = new GenRunnable(12345, 23, 3, 8, 8, 6);
 			//CM 20*2^20*8/1024/1024/1024
-			GenRunnable gen = new GenRunnable(12345, 20, 3, 8, 8, 6);
+			GenRunnable gen = new GenRunnable(12345, 23, 3, 64, 8, 6);
 			
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
@@ -39,7 +39,7 @@ public class TestSketch {
 		}
 	}
 
-	final static int writeCount = 5;//1 << 7;
+	final static int writeCount = 20;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
 	public static class GenRunnable extends network.Server implements Runnable {
