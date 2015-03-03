@@ -130,7 +130,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 		for(int i = 2; i <= 2; ++i) {
 //			for(int l = (1<<10); l <= (1<<10); l*=2){
 			k = i;
-			genreateData(1<<15);
+			genreateData(1<<10);
 			runonce();//runonce();//runonce();
 			}
 //			System.out.println(" ");
@@ -140,7 +140,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 	
 	public static void main(String args[]) throws Exception {
 		k = 2;
-		genreateData(1<<15);
+		genreateData(1<<16);
 		if(args.length==0) {
 			GenRunnable gen = new GenRunnable();
 			EvaRunnable env = new EvaRunnable();
