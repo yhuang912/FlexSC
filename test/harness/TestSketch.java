@@ -16,9 +16,9 @@ public class TestSketch {
 	public  static void main(String args[]) throws Exception {
 		if(args.length ==0) {
 			//AMS 20*2^23*8/1024/1024/1024
-//			GenRunnable gen = new GenRunnable(12345, 23, 3, 8, 8, 6);
+//			GenRunnable gen = new GenRunnable(12345, 23, 3, 64, 8, 6);
 			//CM 20*2^20*8/1024/1024/1024
-			GenRunnable gen = new GenRunnable(12345, 23, 3, 64, 8, 6);
+			GenRunnable gen = new GenRunnable(12345, 20, 3, 64, 8, 6);
 			
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
@@ -30,7 +30,7 @@ public class TestSketch {
 			return;
 		}
 		if(new Integer(args[0]) == 1) {
-			GenRunnable gen = new GenRunnable(12345, 10, 3, 8, 8, 6);
+			GenRunnable gen = new GenRunnable(12345, 20, 3, 64, 8, 6);
 			gen.run();
 		}
 		else {
@@ -39,7 +39,7 @@ public class TestSketch {
 		}
 	}
 
-	final static int writeCount = 20;//1 << 7;
+	final static int writeCount = 10;//1 << 7;
 	final static int readCount = 0;//(1 << 7);
 
 	public static class GenRunnable extends network.Server implements Runnable {
@@ -84,22 +84,22 @@ public class TestSketch {
 				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
 						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 				double t1 = 0, t2;
+
+				Flag.sw.ands = 0;
+				GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils
+						.fromInt(1, dataSize));
+				double t11 = System.nanoTime();
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
-
-					Flag.sw.ands = 0;
-					GCSignal[] scData = client.baseOram.env.inputOfAlice(Utils
-							.fromInt(element, dataSize));
-					os.flush();
 					//	System.out.println("Access: "+i +" start. currentTime" + System.nanoTime());
-					Flag.sw.startTotal();
-					double t11 = System.nanoTime();
+//					Flag.sw.startTotal();
+					os.flush();
 					client.write(client.baseOram.lib.toSignals(element), scData);
-					//System.out.println("Access: "+i +" finish. currentTime" + System.nanoTime());
-					System.out.println("Running time for the access:\t"+(System.nanoTime()-t11)/1000000000.0+" "+Flag.sw.ands+"\n");
-					double t = Flag.sw.stopTotal();
-					Flag.sw.addCounter();
+					//System.out.println("Access: "+i +" finish. currentTime" + System.nanoTime());	
+//					Flag.sw.addCounter();
 				}
+				System.out.println("Running time for the access:\t"+(System.nanoTime()-t11)/1000000000.0+" "+Flag.sw.ands+"\n");
+				double t = Flag.sw.stopTotal();
 				
 				System.out.println((System.nanoTime()-t1)/1000000000.0/(writeCount-10));
 
@@ -148,17 +148,17 @@ public class TestSketch {
 				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
 						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 
-
+				Flag.sw.ands = 0;
+				GCSignal[] scData = server.baseOram.env.inputOfAlice(Utils
+						.fromInt(1, dataSize));
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
-					GCSignal[] scData = server.baseOram.env
-							.inputOfAlice(new boolean[dataSize]);
-					Flag.sw.startTotal();
+					os.flush();
 					server.write(server.baseOram.lib.toSignals(element), scData);
-					Flag.sw.stopTotal();
-					Flag.sw.addCounter();
+
 				}
 
+				
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
