@@ -327,6 +327,9 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 //		System.out.println("Sort complete");
 		long bootstrap = System.nanoTime();
 //		System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (bootstrap - startTime)/1000000000.0 + "," + "Bootstrap" + "," + env.getParty().name());
+		if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
+			((PMCompEnv) env).statistic.flush();
+		}
 		for (int it = 0; it < ITERATIONS; it++) {
 			// scatter user profiles
 			communicateS1 += (long) new ScatterToEdgesRight<T>(env, machine, false /* isEdgeIncoming */) {
