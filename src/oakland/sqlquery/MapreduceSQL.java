@@ -8,15 +8,12 @@ import oakland.MapReduceBackEnd;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
-import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
-import gc.GCSignal;
 
 public class MapreduceSQL<T> extends MapReduceBackEnd<T> {
-
-	static public Mode m = Mode.REAL;
 	IntegerLib<T> lib;
 
 	public MapreduceSQL(CompEnv<T> env) {
@@ -82,7 +79,8 @@ public class MapreduceSQL<T> extends MapReduceBackEnd<T> {
 	}
 
 	static public void main(String args[]) throws InterruptedException {
-		numEntries = 1<<14;
+		numEntries = 1<<17;
+//		numEntries = 1<<8;
 		Random rnd = new Random();
 
 		a = new int[numEntries];
@@ -102,13 +100,13 @@ public class MapreduceSQL<T> extends MapReduceBackEnd<T> {
 		tEva.start();
 		tGen.join();
 		tEva.join();
-		flexsc.Flag.sw.addCounter();
-		flexsc.Flag.sw.print();
-		System.out.println(flexsc.Flag.sw.ands);
+//		flexsc.Flag.sw.addCounter();
+//		flexsc.Flag.sw.print();
+//		System.out.println(flexsc.Flag.sw.ands);
 
 	}
 
-	static public class GenRunnable extends network.Server implements Runnable {
+	static public class GenRunnable<T> extends network.Server implements Runnable {
 		int[] z;
 		Statistics sta;
 
@@ -129,18 +127,20 @@ public class MapreduceSQL<T> extends MapReduceBackEnd<T> {
 			try {
 				listen(54325);
 
-				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Alice, is, os);
 
-				GCSignal[][] sca = new GCSignal[numEntries][];
-				GCSignal[][] scb = new GCSignal[numEntries][];
-				GCSignal[][] sc = new GCSignal[numEntries][];
+				T[][] sca = env.newTArray(numEntries,0);
+				T[][] scb = env.newTArray(numEntries,0);
+				T[][] sc = env.newTArray(numEntries,0);
+				
+				double t1 = System.nanoTime();
 				for (int i = 0; i < scb.length; ++i)
 					sca[i] = env.inputOfAlice(Utils.fromInt(b[i],
 							bloodPressureBit + pidBit));
 				for (int i = 0; i < scb.length; ++i)
 					scb[i] = env.inputOfBob(new boolean[bloodPressureBit
 							+ pidBit]);
-				IntegerLib<GCSignal> lib = new IntegerLib(env);
+				IntegerLib<T> lib = new IntegerLib(env);
 				for (int i = 0; i < sc.length; ++i)
 					sc[i] = lib.xor(sca[i], scb[i]);
 
@@ -148,21 +148,23 @@ public class MapreduceSQL<T> extends MapReduceBackEnd<T> {
 //					sta = ((PMCompEnv) env).statistic;
 //					sta.flush();
 				}
-				MapreduceSQL<GCSignal> wc = new MapreduceSQL<GCSignal>(env);
-				KeyValue<GCSignal>[] res = wc.MapReduce(sc);
-
+				MapreduceSQL<T> wc = new MapreduceSQL<T>(env);
+				KeyValue<T>[] res = wc.MapReduce(sc);
+				double t2 = System.nanoTime();
+				double t = t2-t1;t = t / 1000000000;
+				System.out.println(t+" "+ Flag.sw.ands);
 				if (env.m == Mode.COUNT) {
-					sta.finalize();
+//					sta.finalize();
 				} else {
-					z = new int[res.length];
-					for (int i = 0; i < res.length; ++i) {
-						System.out.print(Utils.toInt(env
-								.outputToAlice(res[i].key)) + " ");
-						System.out.println(Utils.toInt(env
-								.outputToAlice(res[i].value)));
-					}
-					// if(checkResult(z, a, b))
-					System.out.println("Verified");
+//					z = new int[res.length];
+//					for (int i = 0; i < res.length; ++i) {
+//						System.out.print(Utils.toInt(env
+//								.outputToAlice(res[i].key)) + " ");
+//						System.out.println(Utils.toInt(env
+//								.outputToAlice(res[i].value)));
+//					}
+//					// if(checkResult(z, a, b))
+//					System.out.println("Verified");
 				}
 				disconnect();
 			} catch (Exception e) {
@@ -172,7 +174,7 @@ public class MapreduceSQL<T> extends MapReduceBackEnd<T> {
 		}
 	}
 
-	static public class EvaRunnable extends network.Client implements Runnable {
+	static public class EvaRunnable<T> extends network.Client implements Runnable {
 		EvaRunnable(int n) {
 				numEntries = n;
 				Random rnd = new Random();
@@ -190,22 +192,22 @@ public class MapreduceSQL<T> extends MapReduceBackEnd<T> {
 			try {
 				connect("localhost", 54325);
 
-				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Bob, is, os);
-				GCSignal[][] sca = new GCSignal[numEntries][];
-				GCSignal[][] scb = new GCSignal[numEntries][];
-				GCSignal[][] sc = new GCSignal[numEntries][];
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
+				T[][] sca = env.newTArray(numEntries,0);
+				T[][] scb = env.newTArray(numEntries,0);
+				T[][] sc = env.newTArray(numEntries,0);
 				for (int i = 0; i < scb.length; ++i)
 					sca[i] = env.inputOfAlice(Utils.fromInt(b[i],
 							bloodPressureBit + pidBit));
 				for (int i = 0; i < scb.length; ++i)
 					scb[i] = env.inputOfBob(new boolean[bloodPressureBit
 							+ pidBit]);
-				IntegerLib<GCSignal> lib = new IntegerLib(env);
+				IntegerLib<T> lib = new IntegerLib(env);
 				for (int i = 0; i < sc.length; ++i)
 					sc[i] = lib.xor(sca[i], scb[i]);
 
-				MapreduceSQL<GCSignal> wc = new MapreduceSQL<GCSignal>(env);
-				KeyValue<GCSignal>[] res = wc.MapReduce(sc);
+				MapreduceSQL<T> wc = new MapreduceSQL<T>(env);
+				KeyValue<T>[] res = wc.MapReduce(sc);
 
 				if (env.m == Mode.COUNT) {
 				} else {

@@ -10,7 +10,7 @@ public class Flag {
 	public static StopWatch sw = new StopWatch(CountTime);
 	public static boolean countIO = false;
 	public static boolean FakeOT = true;
-	public static boolean PreProcessOT = true;
+	public static boolean PreProcessOT = false;
 	public static boolean offline = true;
 	public static Mode mode = Mode.REAL;
 	public static String tableName = "table";
