@@ -313,7 +313,8 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 		}
 
 //		print(machineId, env, aa);
-		final T[] twoGammaLambda = fixedPointLib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.LAMBDA);
+		final T[] twoGammaLambda = fixedPointLib.inputOfAlice(2 * MatrixFactorization.GAMMA * MatrixFactorization.LAMBDA);
+				//fixedPointLib.publicValue(2 * MatrixFactorization.GAMMA * MatrixFactorization.LAMBDA);
 
 //		System.out.println("Started");
 		long scatter1 = 0, scatter2 = 0, gradient = 0, gather1 = 0, gather2 = 0, communicateS1 = 0;
