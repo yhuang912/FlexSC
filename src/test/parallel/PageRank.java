@@ -206,6 +206,9 @@ public class PageRank<T> implements ParallelGadget<T> {
 		}.setInputs(aa).compute();
 
 		long bootStrap = System.nanoTime();
+		if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
+			((PMCompEnv) env).statistic.flush();
+		}
 		for (int i = 0; i < ITERATIONS; i++) {
 			// 2. Write weighted PR to edges
 			communicate1 = (long) new ScatterToEdges<T>(env, machine, false /* isEdgeIncoming */) {
@@ -274,6 +277,13 @@ public class PageRank<T> implements ParallelGadget<T> {
 //				.compute();
 //			print(machineId, env, aa, i /* iterations */, flib);
 		}
+		if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
+			// Thread.sleep(10000);
+			Statistics a = ((PMCompEnv) env).statistic;
+			a.finalize();
+			// Thread.sleep(1000 * machineId);
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+		}
 		communicateSort = (long) new SortGadget<T>(env, machine)
 			.setInputs(aa, PageRankNode.vertexFirstComparator(env))
 			.compute();
@@ -292,13 +302,13 @@ public class PageRank<T> implements ParallelGadget<T> {
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicate2)/1000000000.0 + "," + "Communication gather time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication sort time" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateBootstrap + communicate1 + communicate2 + communicateSort)/1000000000.0 + "," + "Communication total time" + "," + env.getParty().name());
-		} else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
+		} /*else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
 			// Thread.sleep(10000);
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
 			// Thread.sleep(1000 * machineId);
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
-		}
+		}*/
 	}
 
 //	private <T> void output(int machineId, final CompEnv<T> env,
