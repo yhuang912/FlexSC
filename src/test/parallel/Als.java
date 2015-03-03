@@ -226,6 +226,9 @@ public class Als<T> implements ParallelGadget<T> {
 		}.setInputs(aa).compute();
 
 		long bootstrap = System.nanoTime();
+		if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
+			((PMCompEnv) env).statistic.flush();
+		}
 		for (int it = 0; it < ITERATIONS; it++) {
 			communicate += (long) new ScatterToEdges<T>(env, machine, true /* isEdgeIncoming */) {
 
