@@ -17,7 +17,6 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
-import gc.GCSignal;
 
 public class TestStack {
 
@@ -63,19 +62,21 @@ public class TestStack {
 		}
 	}
 
-	public static void compute(CompEnv<GCSignal> env, Stack<BoolArray> ostack,
-			IntegerLib<GCSignal> lib) throws Exception {
+	public static<T> void compute(CompEnv<T> env, Stack<T, BoolArray<T>> ostack,
+			IntegerLib<T> lib) throws Exception {
 
 		double[] time = new double[op.length];
 
+		
 		for (int i = 0; i < op.length; ++i) {
 			System.out.println(i);
+
 			if (op[i] == 1 && Flag.mode == Mode.VERIFY) {
 				int res = 0;
 				if (env.getParty() == Party.Alice) {
 					res = cstack.pop();
 				}
-				BoolArray scres = ostack.stack_op(new BoolArray(env), lib.SIGNAL_ONE);
+				BoolArray<T> scres = ostack.stack_op(new BoolArray<T>(env), lib.SIGNAL_ONE);
 				int srintres = Utils.toInt(env.outputToAlice(scres.data));
 				if (env.getParty() == Party.Alice && Flag.mode != Mode.COUNT) {
 					System.out.println(env.getParty() + "pop " + res + " "
@@ -90,7 +91,7 @@ public class TestStack {
 					System.out.println(env.getParty() + "push " + rand);
 				}
 				BoolArray tmp = new BoolArray(env);
-				tmp.data = env.inputOfAlice(Utils.fromInt(rand, 32));
+				tmp.data = env.inputOfAlice(Utils.fromInt(rand, 1024));
 				if(env.getParty() == Party.Alice) {
 					System.gc();
 					double a = System.nanoTime();
@@ -99,6 +100,7 @@ public class TestStack {
 				} else 
 					ostack.stack_op(tmp, lib.SIGNAL_ZERO);
 			}
+			
 			env.flush();
 		}
 		if(Flag.mode == Mode.REAL && env.getParty() == Party.Alice) {
@@ -110,8 +112,8 @@ public class TestStack {
 		}
 	}
 
-	public static class GenRunnable extends network.Server implements Runnable {
-		GCSignal[] z;
+	public static class GenRunnable<T> extends network.Server implements Runnable {
+		T[] z;
 		long andGate;
 		Statistics sta;
 		int logN = -1;
@@ -134,10 +136,10 @@ public class TestStack {
 			try {
 				listen(port);
 				CompEnv env = CompEnv.getEnv(Party.Alice, is, os);
-				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
-				Stack<BoolArray> ostack = new Stack<BoolArray>(env,
-						logN, new BoolArray(env), new CircuitOram<GCSignal>(env,
-								1 << logN, 32 + logN));
+				IntegerLib<T> lib = new IntegerLib<T>(env);
+				Stack<T, BoolArray<T>> ostack = new Stack<T, BoolArray<T>>(env,
+						logN, new BoolArray<T>(env), new CircuitOram<T>(env,
+								1 << logN, 1024 + logN));
 				if (Flag.mode == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
 					sta.flush();
@@ -148,8 +150,7 @@ public class TestStack {
 				if (Flag.mode == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
 					sta.finalize();
-					System.out.print(sta.andGate + "\t" + sta.NumEncAlice
-							+ "\t");
+					System.out.print(sta.andGate + "\t");
 				}
 
 			} catch (Exception e) {
@@ -159,7 +160,7 @@ public class TestStack {
 		}
 	}
 
-	public static class EvaRunnable extends network.Client implements Runnable {
+	public static class EvaRunnable<T> extends network.Client implements Runnable {
 		int logN;
 		String host; int port;
 		EvaRunnable(int logN, String host, int port) {
@@ -179,12 +180,10 @@ public class TestStack {
 			try {
 				connect(host, port);
 				CompEnv env = CompEnv.getEnv(Party.Bob, is, os);
-				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
-				System.out.println("..");
-				Stack<BoolArray> ostack = new Stack<BoolArray>(env,
-						logN, new BoolArray(env), new CircuitOram<GCSignal>(env,
-								1 << logN, 32 + logN));
-				System.out.println("..");
+				IntegerLib<T> lib = new IntegerLib<T>(env);
+				Stack<T, BoolArray<T>> ostack = new Stack<T, BoolArray<T>>(env,
+						logN, new BoolArray<T>(env), new CircuitOram<T>(env,
+								1 << logN, 1024 + logN));
 				compute(env, ostack, lib);
 				disconnect();
 			} catch (Exception e) {
@@ -223,18 +222,18 @@ public class TestStack {
 	}
 
 	public static void main(String[] args) throws InterruptedException {
-		int logN = new Integer(args[1]);
+		int logN = 23;
 		if(new Integer(args[0]) == 1) {
 			TestStack a = new TestStack();
 			a.getInput(5);
-			GenRunnable gen = new GenRunnable(logN, args[2], new Integer(args[3]));
+			GenRunnable gen = new GenRunnable(logN, "localhost", 54321);
 			Thread tGen = new Thread(gen);
 			tGen.run();		
 		}
 		else {
 			TestStack a = new TestStack();
 			a.getInput(5);
-			EvaRunnable eva = new EvaRunnable(logN, args[2], new Integer(args[3]));
+			EvaRunnable eva = new EvaRunnable(logN, "localhost", 54321);
 			Thread tEva = new Thread(eva);
 			tEva.run();
 		}
