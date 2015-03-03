@@ -214,7 +214,7 @@ public class GCGen extends GCCompEnv {
 			sendGTT();
 			gid++;
 			if (gid % 10000000 == 0) {
-				System.out.println
+				System.out.println(gid);
 			}
 			gatesRemain = true;
 			res = ret;
