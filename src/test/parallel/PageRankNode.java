@@ -10,8 +10,6 @@ import circuits.IntegerLib;
 import flexsc.CompEnv;
 
 public class PageRankNode<T> extends GraphNode<T> {
-	static int INT_LEN = 32;
-
 	T[] pr;
 	T[] l;
 

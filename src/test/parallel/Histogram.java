@@ -16,6 +16,7 @@ import circuits.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
+import flexsc.Party;
 import flexsc.PMCompEnv.Statistics;
 import gc.BadLabelException;
 
@@ -158,6 +159,9 @@ public class Histogram<T> implements ParallelGadget<T> {
 		}
 
 		long startTime = System.nanoTime();
+		if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
+			((PMCompEnv) env).statistic.flush();
+		}
 		long communicate = (long) new GatherFromEdges<T>(env, machine, true /* isEdgeIncoming */, new HistogramNode<>(env)) {
 
 			@Override
