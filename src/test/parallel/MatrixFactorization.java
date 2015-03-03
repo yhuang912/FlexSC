@@ -430,6 +430,12 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 //			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - gather1)/1000000000.0 + "," + "Gather 2" + "," + env.getParty().name());
 		}
 
+		if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
+			Statistics a = ((PMCompEnv) env).statistic;
+			a.finalize();
+			// Thread.sleep(1000 * machineId);
+			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
+		}
 		communicateSort += (long) new SortGadget<>(env, machine)
 			.setInputs(aa, GraphNode.vertexFirstComparator(env))
 			.compute();
@@ -455,12 +461,12 @@ public class MatrixFactorization<T> implements ParallelGadget<T> {
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateG2)/1000000000.0 + "," + "Communication time G2" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (communicateSort)/1000000000.0 + "," + "Communication time sort" + "," + env.getParty().name());
 			System.out.println(machineId + "," + machine.totalMachines + ","  + machine.inputLength + "," + (gather2 - bootstrap)/1000000000.0 + "," + "Iteration time" + "," + env.getParty().name() + "," + Machine.BW);
-		} else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
+		} /*else if (Mode.COUNT.equals(env.mode) && Party.Alice.equals(env.party)) {
 			Statistics a = ((PMCompEnv) env).statistic;
 			a.finalize();
 			// Thread.sleep(1000 * machineId);
 			System.out.println(machineId + "," + machine.totalMachines + "," + machine.inputLength + "," + a.andGate + "," + a.NumEncAlice);
-		}
+		}*/
 //		print(machineId, env, aa);
 //		printOnlyResult(machineId, env, aa);
 	}
