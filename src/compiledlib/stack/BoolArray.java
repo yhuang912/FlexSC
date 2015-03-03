@@ -1,49 +1,43 @@
 package compiledlib.stack;
 import java.security.SecureRandom;
-
-import oram.CircuitOram;
 import oram.SecureArray;
+import oram.CircuitOram;
 import flexsc.Mode;
 import flexsc.Party;
 import flexsc.CompEnv;
-
 import java.util.BitSet;
-
 import circuits.arithmetic.IntegerLib;
 import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
 import gc.GCSignal;
-
 import java.util.Arrays;
 import java.util.Random;
-
 import flexsc.IWritable;
 import flexsc.Comparator;
-
 import java.lang.reflect.Array;
-public class BoolArray implements IWritable<BoolArray, GCSignal> {
-	public GCSignal[] data;
+public class BoolArray<t__T> implements IWritable<BoolArray<t__T>, t__T> {
+	public t__T[] data;
 
-	public CompEnv<GCSignal> env;
-	public IntegerLib<GCSignal> intLib;
-	public FloatLib<GCSignal> floatLib;
+	public CompEnv<t__T> env;
+	public IntegerLib<t__T> intLib;
+	public FloatLib<t__T> floatLib;
 
-	public BoolArray(CompEnv<GCSignal> env) throws Exception {
+	public BoolArray(CompEnv<t__T> env) throws Exception {
 		this.env = env;
-		this.intLib = new IntegerLib<GCSignal>(env);
-		this.floatLib = new FloatLib<GCSignal>(env, 24, 8);
-		this.data = env.inputOfAlice(Utils.fromInt(0, 32));
+		this.intLib = new IntegerLib<t__T>(env);
+		this.floatLib = new FloatLib<t__T>(env, 24, 8);
+		this.data = env.inputOfAlice(Utils.fromInt(0, 1024));
 	}
 
 	public int numBits() {
-		return (0)+(32);
+		return (0)+(1024);
 	}
-	public GCSignal[] getBits() {
-		GCSignal[] ret = new GCSignal[this.numBits()];
-		GCSignal[] tmp_b;
-		GCSignal tmp;
+	public t__T[] getBits() {
+		t__T[] ret = env.newTArray(this.numBits());
+		t__T[] tmp_b;
+		t__T tmp;
 		int now = 0;
 		tmp_b = data;
 		System.arraycopy(tmp_b, 0, ret, now, tmp_b.length);
@@ -51,18 +45,18 @@ public class BoolArray implements IWritable<BoolArray, GCSignal> {
 		return ret;
 }
 
-	public BoolArray newObj(GCSignal[] data) throws Exception {
+	public BoolArray<t__T> newObj(t__T[] data) throws Exception {
 		if(data == null) {
-			data = new GCSignal[this.numBits()];
+			data = env.newTArray(this.numBits());
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		BoolArray ret = new BoolArray(env);
-		GCSignal[] tmp;
+		BoolArray<t__T> ret = new BoolArray<t__T>(env);
+		t__T[] tmp;
 		int now = 0;
-		ret.data = new GCSignal[32];
-		System.arraycopy(data, now, ret.data, 0, 32);
-		now += 32;
+		ret.data = env.newTArray(1024);
+		System.arraycopy(data, now, ret.data, 0, 1024);
+		now += 1024;
 		return ret;
 }
 

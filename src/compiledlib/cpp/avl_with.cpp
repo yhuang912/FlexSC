@@ -17,8 +17,8 @@ int@2 cmp(BoolArray x, BoolArray y) {
 }
 
 typedef AORAM@m<K, V> = native CircuitOram;
-dummy AVLNode@m<K, V> AORAM@m<K, V>.aoram_retrieve(int@32 id, rnd@m pos) = native conditionalReadAndRemove;
-dummy void AORAM@m<K, V>.aoram_write(int@32 id, int@m pos, AVLNode@m<K, V> node) = native conditionalPutBack;
+phantom AVLNode@m<K, V> AORAM@m<K, V>.aoram_retrieve(int@32 id, rnd@m pos) = native conditionalReadAndRemove;
+phantom void AORAM@m<K, V>.aoram_write(int@32 id, int@m pos, AVLNode@m<K, V> node) = native conditionalPutBack;
 
 struct Int@m {
 	ints_@m val;
