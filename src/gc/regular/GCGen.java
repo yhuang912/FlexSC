@@ -87,7 +87,6 @@ public class GCGen extends GCGenComp {
 	}
 
 	public GCSignal and(GCSignal a, GCSignal b) {
-		++Flag.sw.ands;
 if(Flag.sw.ands%10000000 == 0)System.out.println(Flag.sw.ands);
 		Flag.sw.startGC();
 		GCSignal res;
@@ -98,7 +97,7 @@ if(Flag.sw.ands%10000000 == 0)System.out.println(Flag.sw.ands);
 		else if (b.isPublic())
 			res = b.v ? a : _ZERO;
 		else {
-
+			++Flag.sw.ands;
 			GCSignal ret;
 			ret = garble(a, b);
 

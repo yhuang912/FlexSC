@@ -7,14 +7,13 @@ import oakland.MapReduceBackEnd;
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
-import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
 
 public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 
-	static public Mode m = Mode.COUNT;
 	IntegerLib<T> lib;
 
 	public MapreduceHistogram(CompEnv<T> env) {
@@ -93,7 +92,8 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 	}
 
 	static public void main(String args[]) throws InterruptedException {
-		genreateData(1000);
+		genreateData(1<<17);
+		if(args.length == 0) {
 		GenRunnable gen = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
 		Thread tGen = new Thread(gen);
@@ -103,10 +103,21 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 		tEva.start();
 		tGen.join();
 		tEva.join();
+		}
+		else {
+			if(new Integer(args[0]) == 0) {
+				GenRunnable gen = new GenRunnable();gen.run();
+				
+			}else {
+				EvaRunnable eva = new EvaRunnable();eva.run();
+				
+			}
+		}
+		System.out.println(Flag.sw.ands);
 
 	}
 
-	static class GenRunnable extends network.Server implements Runnable {
+	static class GenRunnable<T> extends network.Server implements Runnable {
 		int[] z;
 		int[] h;
 		Statistics sta;
@@ -118,11 +129,12 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 			try {
 				listen(54321);
 
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Alice, is, os);
 
-				Boolean[][] sca = new Boolean[numEntries / 2][];
-				Boolean[][] scb = new Boolean[numEntries / 2][];
-				Boolean[][] sc = new Boolean[numEntries][];
+				double t1 = System.nanoTime();
+				T[][] sca = env.newTArray(numEntries / 2, 0);
+				T[][] scb = env.newTArray(numEntries / 2, 0);
+				T[][] sc = env.newTArray(numEntries, 0);
 				for (int i = 0; i < sca.length; ++i)
 					sca[i] = env.inputOfAlice(Utils.fromInt(a[i], 32));
 				for (int i = 0; i < scb.length; ++i)
@@ -132,25 +144,27 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 				System.arraycopy(scb, 0, sc, sca.length, scb.length);
 				sca=null;scb=null;System.gc();
 
-				MapreduceHistogram<Boolean> wc = new MapreduceHistogram<Boolean>(
+				MapreduceHistogram<T> wc = new MapreduceHistogram<T>(
 						env);				
-				sta = ((PMCompEnv) env).statistic;
-				sta.flush();
-				KeyValue<Boolean>[] res = wc.MapReduce(sc);
+//				sta = ((PMCompEnv) env).statistic;
+//				sta.flush();
+				KeyValue<T>[] res = wc.MapReduce(sc);
+				double t2 = System.nanoTime();
+				System.out.println((t2-t1)/1000000000 +" "+ Flag.sw.ands/((t2-t1)/1000000000));
 				if (env.m == Mode.COUNT) {
 					sta.finalize();
 				} else {
-					z = new int[res.length];
-					h = new int[res.length];
-					for (int i = 0; i < res.length; ++i) {
-						z[i] = Utils.toInt(env.outputToAlice(res[i].key));
-						h[i] = Utils.toInt(env.outputToAlice(res[i].value));
-
-						System.out.print(z[i] + " ");
-						System.out.println(h[i]);
-					}
-					env.os.flush();
-					checkResult(z, h, a, b);
+//					z = new int[res.length];
+//					h = new int[res.length];
+//					for (int i = 0; i < res.length; ++i) {
+//						z[i] = Utils.toInt(env.outputToAlice(res[i].key));
+//						h[i] = Utils.toInt(env.outputToAlice(res[i].value));
+//
+//						System.out.print(z[i] + " ");
+//						System.out.println(h[i]);
+//					}
+//					env.os.flush();
+//					checkResult(z, h, a, b);
 				}
 				disconnect();
 			} catch (Exception e) {
@@ -160,7 +174,7 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 		}
 	}
 
-	static class EvaRunnable extends network.Client implements Runnable {
+	static class EvaRunnable<T> extends network.Client implements Runnable {
 		EvaRunnable() {
 		}
 
@@ -168,11 +182,11 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 			try {
 				connect("localhost", 54321);
 
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
-				Boolean[][] sca = new Boolean[numEntries / 2][];
-				Boolean[][] scb = new Boolean[numEntries / 2][];
-				Boolean[][] sc = new Boolean[numEntries][];
+				T[][] sca = env.newTArray(numEntries / 2, 0);
+				T[][] scb = env.newTArray(numEntries / 2, 0);
+				T[][] sc = env.newTArray(numEntries, 0);
 				for (int i = 0; i < sca.length; ++i)
 					sca[i] = env.inputOfAlice(new boolean[32]);
 				for (int i = 0; i < scb.length; ++i)
@@ -182,8 +196,8 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 				System.arraycopy(scb, 0, sc, sca.length, scb.length);
 				sca=null;scb=null;System.gc();
 
-				MapreduceHistogram<Boolean> wc = new MapreduceHistogram<Boolean>(env);
-				KeyValue<Boolean>[] res = wc.MapReduce(sc);
+				MapreduceHistogram<T> wc = new MapreduceHistogram<T>(env);
+				KeyValue<T>[] res = wc.MapReduce(sc);
 
 				if (env.m != Mode.COUNT) {
 					for (int i = 0; i < res.length; ++i) {
