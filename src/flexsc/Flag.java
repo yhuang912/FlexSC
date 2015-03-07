@@ -12,7 +12,7 @@ public class Flag {
 	public static boolean FakeOT = true;
 	public static boolean PreProcessOT = false;
 	public static boolean offline = true;
-	public static Mode mode = Mode.REAL;
+	public static Mode mode = Mode.COUNT;
 	public static String tableName = "table";
 
 	public Flag() {

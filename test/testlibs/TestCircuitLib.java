@@ -25,7 +25,8 @@ public class TestCircuitLib extends TestHarness {
 			BigInteger b = new BigInteger(TestBigInteger.LENGTH, rnd);
 			TestBigInteger.runThreads(new TestBigInteger.Helper(a, b) {
 				public <T>T[] secureCompute(T[] Signala, T[] Signalb, CompEnv<T> e) throws Exception {
-					return new IntegerLib<T>(e).hammingDistance(Signala, Signalb);}
+//					return new IntegerLib<T>(e).hammingDistance(Signala, Signalb);}
+					return new IntegerLib<T>(e).multiply(Signala, Signalb);}
 
 				public BigInteger plainCompute(BigInteger x, BigInteger y) {
 					BigInteger rb = x.xor(y);

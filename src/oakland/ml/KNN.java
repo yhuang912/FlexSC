@@ -50,7 +50,7 @@ public class KNN {
 		T[] res = null;
 		double[] time = new double[3];
 //		for(int tt = 0; tt < 3; ++tt) {
-			double d1 = System.nanoTime();
+
 			IntegerLib<T> ilib = new IntegerLib<T>(lib.getEnv());
 			T[][][] cor = lib.getEnv().newTArray(clearcor.length, clearcor[0].length, 1);
 			for(int i = 0; i < clearcor.length; ++i)
@@ -66,6 +66,7 @@ public class KNN {
 				label[i] = lib.inputOfAlice(clearlabel[i]);
 
 			T[][] dis = lib.getEnv().newTArray(cor.length, 0);
+			double d1 = System.nanoTime();
 			for(int i = 0; i < cor.length; ++i) {
 				dis[i] = distance(cor[i], cen, lib); 
 			}
@@ -88,8 +89,8 @@ public class KNN {
 				}
 			}
 
-			res =mini[0];
-			for(int i = 1; i < k; ++i ){
+			res = mini[0];
+			for(int i = 1; i < k; ++i ) {
 				res = ilib.add(res, mini[i]);
 			}
 			res = lib.div(res, lib.publicValue(k));
