@@ -15,6 +15,8 @@ class BitMatrix {
 		nRows = rows;
 		nCols = cols;
 		data = new BigInteger[nCols];
+		for(int i = 0; i < nCols; ++i)
+			data[i] = BigInteger.ZERO;
 	}
 
 	public void initialize(SecureRandom rnd) {
@@ -24,6 +26,20 @@ class BitMatrix {
 
 	public BitMatrix transpose() {
 		return NaiveTranspose(this);
+	}
+
+	public void updateRows(BigInteger b, int row) {
+		for (int i = 0; i < nCols; i++)
+			if( b.testBit(i) )
+				data[i] = data[i].setBit(row);
+	}
+	
+	public BigInteger getRow(int row) {
+		BigInteger res = BigInteger.ZERO;
+		for (int i = 0; i < nCols; i++)
+			if( data[i].testBit(row) )
+				res = res.setBit(i);
+		return res;
 	}
 
 	static public BitMatrix NaiveTranspose(BitMatrix a) {

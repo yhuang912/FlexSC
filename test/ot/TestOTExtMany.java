@@ -8,7 +8,7 @@ import java.util.Random;
 import org.junit.Test;
 
 public class TestOTExtMany {
-	static final int n = 10000000;
+	static final int n = 1000;
 	GCSignal[][] m;
 	boolean[] c;
 	GCSignal[] rcvd;
@@ -27,8 +27,9 @@ public class TestOTExtMany {
 					m[i][0] = GCSignal.freshLabel(rnd);
 					m[i][1] = GCSignal.freshLabel(rnd);
 				}
-				double t1 = System.nanoTime();
 				snd = new OTExtSender(80, is, os);
+				
+				double t1 = System.nanoTime();
 				snd.send(m);
 				double t2 = System.nanoTime() -t1;
 				System.out.println(t2/1000000000);
@@ -54,11 +55,12 @@ public class TestOTExtMany {
 				Random rnd = new Random();
 				for (int i = 0; i < n; i++)
 					c[i] = rnd.nextBoolean();
-				double t1 = System.nanoTime();
 				rcv = new OTExtReceiver(is, os);
+				
+				double t1 = System.nanoTime();
 				rcvd = rcv.receive(c);
 				double t2 = System.nanoTime() -t1;
-				System.out.println(t2/1000000000);
+				System.out.println("reciever"+t2/1000000000);
 
 				disconnect();
 			} catch (Exception e) {

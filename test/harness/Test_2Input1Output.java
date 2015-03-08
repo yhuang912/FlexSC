@@ -4,6 +4,7 @@ import org.junit.Assert;
 
 import util.Utils;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -41,7 +42,7 @@ public class Test_2Input1Output extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				T[] a = gen.inputOfAlice(h.a);
 				T[] b = gen.inputOfBob(new boolean[32]);
@@ -72,17 +73,17 @@ public class Test_2Input1Output extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				T[] a = env.inputOfAlice(new boolean[32]);
 				T[] b = env.inputOfBob(h.b);
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 					;
 				}
 				T[] d = h.secureCompute(a, b, env);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -110,7 +111,7 @@ public class Test_2Input1Output extends TestHarness {
 		tGen.join();
 		tEva.join();
 
-		if (m == Mode.COUNT) {
+		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
 			Assert.assertEquals(h.plainCompute(h.intA, h.intB),

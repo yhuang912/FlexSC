@@ -11,5 +11,7 @@ public enum Mode {
 	//Simulating the protocol and count number of gates/encs
 	COUNT,
 	//Half Gates
-	OPT;
+	OPT,
+	//
+	OFFLINE;
 }

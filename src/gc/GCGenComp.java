@@ -1,37 +1,55 @@
 package gc;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.SecureRandom;
 
+import network.Network;
 import ot.FakeOTSender;
 import ot.OTExtSender;
+import ot.OTPreprocessSender;
 import ot.OTSender;
+import flexsc.CompEnv;
 import flexsc.Flag;
+import flexsc.Mode;
 import flexsc.Party;
 
 public abstract class GCGenComp extends GCCompEnv{
 
 	static public GCSignal R = null;
 	static {
-		R = GCSignal.freshLabel(new SecureRandom());
+		R = GCSignal.freshLabel(CompEnv.rnd);
 		R.setLSB();
 	}
 
 	OTSender snd;
 	protected long gid = 0;
 
-	public GCGenComp(InputStream is, OutputStream os) {
-		super(is, os, Party.Alice);
+	public GCGenComp(Network w) {
+		super(w, Party.Alice);
 
 		if (Flag.FakeOT)
-			snd = new FakeOTSender(80, is, os);
-		else
-			snd = new OTExtSender(80, is, os);
+			snd = new FakeOTSender(80, w);
+//		else if(Flag.PreProcessOT)
+//			snd = new OTPreprocessSender(80, this);
+//		else
+//			snd = new OTExtSender(80, this);
 	}
 
-	private GCSignal[] genPair() {
+	public static GCSignal[] genPairForLabel() {
+		GCSignal[] label = new GCSignal[2];
+		if(Flag.mode != Mode.OFFLINE || !Flag.offline)
+			label[0] = GCSignal.freshLabel(rnd);
+		if(Flag.mode == Mode.OFFLINE) {
+			if(Flag.offline) {
+				label[0] = GCSignal.receive(gc.offline.GCGen.fin);
+			}
+			else 
+				label[0].send(gc.offline.GCGen.fout);
+		}
+		label[1] = R.xor(label[0]);
+		return label;
+	}
+	
+	public static GCSignal[] genPair() {
 		GCSignal[] label = new GCSignal[2];
 		label[0] = GCSignal.freshLabel(rnd);
 		label[1] = R.xor(label[0]);
@@ -40,9 +58,9 @@ public abstract class GCGenComp extends GCCompEnv{
 
 	public GCSignal inputOfAlice(boolean in) {
 		Flag.sw.startOT();
-		GCSignal[] label = genPair();
+		GCSignal[] label = genPairForLabel();
 		Flag.sw.startOTIO();
-		label[in ? 1 : 0].send(os);
+		label[in ? 1 : 0].send(w);
 		flush();
 		Flag.sw.stopOTIO();
 		Flag.sw.stopOT();
@@ -51,7 +69,7 @@ public abstract class GCGenComp extends GCCompEnv{
 
 	public GCSignal inputOfBob(boolean in) {
 		Flag.sw.startOT();
-		GCSignal[] label = genPair();
+		GCSignal[] label = genPairForLabel();
 		try {
 			snd.send(label);
 		} catch (IOException e) {
@@ -67,12 +85,12 @@ public abstract class GCGenComp extends GCCompEnv{
 		GCSignal[][] pairs = new GCSignal[x.length][2];
 		GCSignal[] result = new GCSignal[x.length];
 		for (int i = 0; i < x.length; ++i) {
-			pairs[i] = genPair();
+			pairs[i] = genPairForLabel();
 			result[i] = pairs[i][0];
 		}
 		Flag.sw.startOTIO();
 		for (int i = 0; i < x.length; ++i)
-			pairs[i][x[i] ? 1 : 0].send(os);
+			pairs[i][x[i] ? 1 : 0].send(w);
 		flush();
 		Flag.sw.stopOTIO();
 		Flag.sw.stopOT();
@@ -83,7 +101,7 @@ public abstract class GCGenComp extends GCCompEnv{
 		Flag.sw.startOT();
 		GCSignal[][] pair = new GCSignal[x.length][2];
 		for (int i = 0; i < x.length; ++i)
-			pair[i] = genPair();
+			pair[i] = genPairForLabel();
 		try {
 			snd.send(pair);
 		} catch (IOException e) {
@@ -95,7 +113,6 @@ public abstract class GCGenComp extends GCCompEnv{
 			result[i] = pair[i][0];
 		Flag.sw.stopOT();
 		return result;
-
 	}
 
 	protected boolean gatesRemain = false;
@@ -108,7 +125,7 @@ public abstract class GCGenComp extends GCCompEnv{
 		if (out.isPublic())
 			return out.v;
 
-		GCSignal lb = GCSignal.receive(is);
+		GCSignal lb = GCSignal.receive(w);
 		if (lb.equals(out))
 			return false;
 		else if (lb.equals(R.xor(out)))
@@ -125,7 +142,7 @@ public abstract class GCGenComp extends GCCompEnv{
 
 	public boolean outputToBob(GCSignal out) {
 		if (!out.isPublic())
-			out.send(os);
+			out.send(w);
 		return false;
 	}
 
@@ -134,7 +151,7 @@ public abstract class GCGenComp extends GCCompEnv{
 
 		for (int i = 0; i < result.length; ++i) {
 			if (!out[i].isPublic())
-				out[i].send(os);
+				out[i].send(w);
 		}
 		flush();
 

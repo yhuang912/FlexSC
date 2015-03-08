@@ -1,21 +1,27 @@
 package compiledlib.priority_queue;
 import java.security.SecureRandom;
-import oram.SecureArray;
+
 import oram.CircuitOram;
+import oram.SecureArray;
 import flexsc.Mode;
 import flexsc.Party;
 import flexsc.CompEnv;
+
 import java.util.BitSet;
+
 import circuits.arithmetic.IntegerLib;
 import circuits.arithmetic.FloatLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
 import gc.GCSignal;
+
 import java.util.Arrays;
 import java.util.Random;
+
 import flexsc.IWritable;
 import flexsc.Comparator;
+
 import java.lang.reflect.Array;
 public class PriorityQueue<T extends IWritable<T,Boolean>> {
 	public CircuitOram<Boolean> poram;

@@ -1,20 +1,26 @@
 package compiledlib.queue;
 import java.security.SecureRandom;
-import oram.SecureArray;
+
 import oram.CircuitOram;
+import oram.SecureArray;
 import flexsc.Mode;
 import flexsc.Party;
 import flexsc.CompEnv;
+
 import java.util.BitSet;
+
 import circuits.arithmetic.IntegerLib;
 import util.Utils;
 import gc.regular.GCEva;
 import gc.regular.GCGen;
 import gc.GCSignal;
+
 import java.util.Arrays;
 import java.util.Random;
+
 import flexsc.IWritable;
 import flexsc.Comparator;
+
 import java.lang.reflect.Array;
 public class QueueNode<T extends IWritable<T,GCSignal>> implements IWritable<QueueNode<T>, GCSignal> {
 	public GCSignal[] next;

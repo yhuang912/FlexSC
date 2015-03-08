@@ -8,7 +8,8 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import network.Server;
+import network.Network;
+import network.NetworkUtils;
 
 public class GCSignal {
 	public static final int len = 10;
@@ -66,19 +67,45 @@ public class GCSignal {
 	}
 
 	// 'send' and 'receive' are supposed to be used only for secret signals
-	public void send(OutputStream os) {
+	public void send(Network w) {
 		try {
-			os.write(bytes);
+			w.writeByte(bytes, len);
+//			Server.writeByte(os, bytes, len);
+//			os.write(bytes);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	// 'send' and 'receive' are supposed to be used only for secret signals
-	public static GCSignal receive(InputStream ois) {
+	public static GCSignal receive(InputStream is) {
 		byte[] b = null;
 		try {
-			b = Server.readBytes(ois, len);
+//			b = w.readBytes(len);
+			b = NetworkUtils.readBytes(is, len);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new GCSignal(b);
+	}
+	
+	
+	// 'send' and 'receive' are supposed to be used only for secret signals
+	public void send(OutputStream os) {
+		try {
+//			w.writeByte(bytes, len);
+			NetworkUtils.writeByte(os, bytes, len);
+//			os.write(bytes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 'send' and 'receive' are supposed to be used only for secret signals
+	public static GCSignal receive(Network w) {
+		byte[] b = null;
+		try {
+			b = w.readBytes(len);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

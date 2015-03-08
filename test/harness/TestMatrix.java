@@ -8,6 +8,7 @@ import circuits.arithmetic.DenseMatrixLib;
 import circuits.arithmetic.FixedPointLib;
 import circuits.arithmetic.FloatLib;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -71,7 +72,7 @@ public class TestMatrix extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				// PrintMatrix(h.a);
 				if (testFixedPoint)
@@ -118,7 +119,7 @@ public class TestMatrix extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				if (testFixedPoint)
 					lib = new DenseMatrixLib<T>(env, new FixedPointLib<T>(env, len, offset));
@@ -137,12 +138,12 @@ public class TestMatrix extends TestHarness {
 					for (int j = 0; j < h.b[0].length; ++j)
 						fgc2[i][j] = lib.lib.inputOfAlice(h.b[i][j]);
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
 				T[][][] re = h.secureCompute(fgc1, fgc2, lib);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -175,7 +176,7 @@ public class TestMatrix extends TestHarness {
 
 		 PrintMatrix(result);
 		 PrintMatrix(gen.z);
-		if (m == Mode.COUNT) {
+		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
 

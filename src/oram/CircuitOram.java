@@ -7,7 +7,7 @@ import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Party;
 
-public class CircuitOram<T> extends TreeBasedOramParty<T> {
+public class CircuitOram<T> extends TreeBasedOramParty<T> implements CircuitORAMInterface<T>{
 	public CircuitOramLib<T> lib;
 	Block<T>[] scQueue;
 	int cnt = 0;
@@ -160,5 +160,15 @@ public class CircuitOram<T> extends TreeBasedOramParty<T> {
 		lib.conditionalAdd(scQueue, b, condition);
 		env.flush();
 		ControlEviction();
+	}
+
+	@Override
+	public int getLengthOfPos() {
+		return lengthOfPos;
+	}
+
+	@Override
+	public int getLengthOfIndex() {
+		return lengthOfIden;
 	}
 }

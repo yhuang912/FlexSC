@@ -4,6 +4,7 @@ import org.junit.Assert;
 
 import util.Utils;
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -37,7 +38,7 @@ public class TestFixedPoint extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Alice, is, os);
 
 				T[] f1 = env.inputOfAlice(Utils
 						.fromFixPoint(h.a, width, offset));
@@ -66,17 +67,17 @@ public class TestFixedPoint extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv<T> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv<T> env = CompEnv.getEnv(Party.Bob, is, os);
 
 				T[] f1 = env.inputOfAlice(Utils.fromFixPoint(0, width, offset));
 				T[] f2 = env.inputOfBob(Utils.fromFixPoint(h.b, width, offset));
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 					;
 				}
 				T[] re = h.secureCompute(f1, f2, offset, env);
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
@@ -102,7 +103,7 @@ public class TestFixedPoint extends TestHarness {
 		tEva.start();
 		tGen.join();
 
-		if (m == Mode.COUNT) {
+		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + " " + env.encs);
 		} else {
 			if (Math.abs(h.plainCompute(h.a, h.b) - gen.z) > error)

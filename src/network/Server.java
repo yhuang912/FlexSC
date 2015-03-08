@@ -9,12 +9,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-public class Server {
-	static int bufferSize = 655360;
-	private ServerSocket sock;
+import flexsc.Flag;
+import flexsc.Mode;
 
-	public InputStream is;
-	public OutputStream os;
+public class Server extends Network{
+
+	private ServerSocket sock;
 
 	public void listen(int port) throws Exception {
 		Socket clientSock;
@@ -23,39 +23,26 @@ public class Server {
 
 		os = new BufferedOutputStream(clientSock.getOutputStream(), bufferSize);
 		is = new BufferedInputStream(clientSock.getInputStream(), bufferSize);
+		setUpThread();
 	}
+	
+
 
 	public void disconnect() throws Exception {
 		is.read();
 		os.write(0);
 		os.flush(); // dummy I/O to prevent dropping connection earlier than
 					// protocol payloads are received.
-
 		sock.close();
-	}
-
-	static public byte[] readBytes(InputStream is, int len) throws IOException {
-
-		byte[] temp = new byte[len];
-		int remain = len;
-		while (0 < remain) {
-			int readBytes = is.read(temp, len - remain, remain);
-			if (readBytes != -1) {
-				remain -= readBytes;
+		if(Flag.mode == Mode.OFFLINE && !Flag.offline) {
+			try {
+				gc.offline.GCGen.fout.flush();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
-		return temp;
 	}
 
-	static public byte[] readBytes(InputStream is) throws IOException {
-		byte[] lenBytes = readBytes(is, 4);
-		int len = ByteBuffer.wrap(lenBytes).getInt();
-		return readBytes(is, len);
-	}
 
-	static public void writeByte(OutputStream os, byte[] data)
-			throws IOException {
-		os.write(ByteBuffer.allocate(4).putInt(data.length).array());
-		os.write(data);
-	}
 }

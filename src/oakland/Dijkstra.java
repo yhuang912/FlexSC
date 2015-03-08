@@ -1,6 +1,7 @@
 package oakland;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -80,7 +81,7 @@ public class Dijkstra extends TestHarness {
 		BoolArray tmp = new BoolArray(lib.getEnv());tmp.data = lib.toSignals(0, bitLength);
 		pq.push(lib.toSignals(1000, bitLength), tmp, lib.SIGNAL_ONE);
 
-		if(m == Mode.COUNT) {
+		if(Flag.mode== Mode.COUNT) {
 			((PMCompEnv) lib.getEnv()).statistic.flush();
 		}
 		Boolean traversingNode = lib.SIGNAL_ZERO;
@@ -108,7 +109,7 @@ public class Dijkstra extends TestHarness {
 			BoolArray tmp2 = new BoolArray(lib.getEnv());tmp2.data = e[0];
 			pq.push(lib.sub(lib.toSignals(1000, bitLength), dist), tmp2, secondNest);	
 		}
-		if(m != Mode.COUNT){
+		if(Flag.mode!= Mode.COUNT){
 			if(lib.getEnv().getParty() == Party.Alice) {
 				for(int l = 0; l < v; ++l)
 					System.out.print(Utils.toInt(lib.getEnv().outputToAlice(dis.read(lib.publicValue(l)))) + "\t");
@@ -119,7 +120,7 @@ public class Dijkstra extends TestHarness {
 					lib.outputToAlice(dis.read(lib.publicValue(l)));
 			}
 		}
-		else  if (m == Mode.COUNT) {
+		else  if (Flag.mode== Mode.COUNT) {
 			((PMCompEnv) lib.getEnv()).statistic.andGate *= (v+e);
 		}
 
@@ -140,7 +141,7 @@ public class Dijkstra extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv gen = CompEnv.getEnv(Party.Alice, is, os);
 
 				lib = new IntegerLib(gen);
 
@@ -163,23 +164,23 @@ public class Dijkstra extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv env = CompEnv.getEnv(Party.Bob, is, os);
 
 				lib = new IntegerLib(env);
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode== Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
 				double a = System.nanoTime();
 				secureCompute(lib);
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode== Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
 				}
-				else if (m == Mode.REAL){
+				else if (Flag.mode== Mode.REAL){
 					System.out.println((System.nanoTime()-a)/1000000000);
 				}
 
@@ -195,7 +196,6 @@ public class Dijkstra extends TestHarness {
 	public void runThreads() throws Exception {
 		GenRunnable gen = new GenRunnable();
 		EvaRunnable env = new EvaRunnable();
-		m = Mode.COUNT;
 		Thread tGen = new Thread(gen);
 		Thread tEva = new Thread(env);
 		tGen.start();
@@ -203,7 +203,7 @@ public class Dijkstra extends TestHarness {
 		tEva.start();
 		tGen.join();
 
-		if (m == Mode.COUNT) {
+		if (Flag.mode== Mode.COUNT) {
 			System.out.println(env.andgates + "\t" + env.encs);
 		} else {
 		}

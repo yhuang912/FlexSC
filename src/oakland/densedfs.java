@@ -1,6 +1,7 @@
 package oakland;
 
 import flexsc.CompEnv;
+import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
@@ -10,7 +11,6 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import util.Utils;
 import circuits.BitonicSortLib;
 import circuits.arithmetic.IntegerLib;
 
@@ -202,7 +202,7 @@ public class densedfs  extends TestHarness {
 			try {
 				listen(54321);
 				@SuppressWarnings("unchecked")
-				CompEnv gen = CompEnv.getEnv(m, Party.Alice, is, os);
+				CompEnv gen = CompEnv.getEnv(Flag.mode, Party.Alice, is, os);
 
 				secureCompute(gen);
 
@@ -223,20 +223,20 @@ public class densedfs  extends TestHarness {
 			try {
 				connect("localhost", 54321);
 				@SuppressWarnings("unchecked")
-				CompEnv env = CompEnv.getEnv(m, Party.Bob, is, os);
+				CompEnv env = CompEnv.getEnv(Flag.mode, Party.Bob, is, os);
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
 				double a = System.nanoTime();
 				secureCompute(env);
 
-				if (m == Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates =  ((PMCompEnv) env).statistic.andGate*V;
 				}
-				else if (m == Mode.REAL){
+				else if (Flag.mode == Mode.REAL){
 					System.out.println((System.nanoTime()-a)/1000000000);
 				}
 
@@ -254,7 +254,6 @@ public class densedfs  extends TestHarness {
 			V = 1<<i;
 			GenRunnable gen = new GenRunnable();
 			EvaRunnable env = new EvaRunnable();
-			m = Mode.COUNT;
 			Thread tGen = new Thread(gen);
 			Thread tEva = new Thread(env);
 			tGen.start();
@@ -263,7 +262,7 @@ public class densedfs  extends TestHarness {
 			tGen.join();
 
 			
-			if (m == Mode.COUNT) {
+			if (Flag.mode == Mode.COUNT) {
 				System.out.println(i+"\t"+env.andgates);
 			} else {
 			}
