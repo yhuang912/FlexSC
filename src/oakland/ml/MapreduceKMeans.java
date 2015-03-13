@@ -127,37 +127,40 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 	}
 
 	static public void main1(String args[]) throws InterruptedException {
-		for(int i = 2; i <= 2; ++i) {
-//			for(int l = (1<<10); l <= (1<<10); l*=2){
-			k = i;
-			genreateData(1<<10);
+		//		for(int i = 2; i <= 2; ++i) {
+		for(int l = (1<<5); l <= (1<<10); l*=2) {
+			k = 2;
+			genreateData(l);
 			runonce();//runonce();//runonce();
-			}
-//			System.out.println(" ");
-//		}
+		}
+		//			System.out.println(" ");
+		//		}
 	}
 
-	
+
 	public static void main(String args[]) throws Exception {
-		k = 2;
-		genreateData(1<<16);
-		if(args.length==0) {
-			GenRunnable gen = new GenRunnable();
-			EvaRunnable env = new EvaRunnable();
-			Thread tGen = new Thread(gen);
-			Thread tEva = new Thread(env);
-			tGen.start();
-			Thread.sleep(5);
-			tEva.start();
-			tGen.join();
-			tEva.join();
+		for(int l = (1<<5); l <= (1<<10); l*=2) {
+			k = 2;
+			genreateData(l);
+			if(args.length == 0) {
+				GenRunnable gen = new GenRunnable();
+				EvaRunnable env = new EvaRunnable();
+				Thread tGen = new Thread(gen);
+				Thread tEva = new Thread(env);
+				tGen.start();
+				Thread.sleep(5);
+				tEva.start();
+				tGen.join();
+				tEva.join();
+				Flag.sw.print();
+			}
+			else if(new Integer(args[0]) == 0)
+				new GenRunnable().run();
+			else new EvaRunnable().run();
 		}
-		else if(new Integer(args[0]) == 0)
-			new GenRunnable().run();
-		else new EvaRunnable().run();
-		System.out.println(" "+Flag.sw.ands);
+		//		System.out.println(" "+Flag.sw.ands);
 	}
-	
+
 	static public void runonce() throws InterruptedException {
 		GenRunnable env = new GenRunnable();
 		EvaRunnable eva = new EvaRunnable();
@@ -170,8 +173,8 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 		tEva.join();
 	}
 
-	
-	
+
+
 	static class GenRunnable<T> extends network.Server implements Runnable {
 		int[] z;
 		Statistics sta;
@@ -188,8 +191,8 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 
 				double d1 = System.nanoTime();
 				if (env.m == Mode.COUNT) {
-//					 sta = ((PMCompEnv)env).statistic;
-//					 sta.flush();
+					//					 sta = ((PMCompEnv)env).statistic;
+					//					 sta.flush();
 				}
 
 				T[][] sc = env.newTArray(a.length, 0);// new T[a.length][];
@@ -243,11 +246,11 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 					//					System.out.println(" ");
 				}
 
-System.out.print((System.nanoTime()-d1)/1000000000.0 + " ");
+				//System.out.print((System.nanoTime()-d1)/1000000000.0 + " ");
 				if (env.m == Mode.COUNT) {
-					 sta = ((PMCompEnv)env).statistic;
-//					 sta.finalize();
-					 System.out.print(sta.andGate +" ");
+					sta = ((PMCompEnv)env).statistic;
+					//					 sta.finalize();
+					System.out.print(sta.andGate +" ");
 				} else if(env.m == Mode.REAL) {
 					System.out.print((System.nanoTime()-d1)/1000000000.0 + " ");
 				} 
@@ -261,7 +264,7 @@ System.out.print((System.nanoTime()-d1)/1000000000.0 + " ");
 					// if(checkResult(z, a, b))
 					//					System.out.println("Verified");
 				}
-				
+
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -294,7 +297,7 @@ System.out.print((System.nanoTime()-d1)/1000000000.0 + " ");
 				}
 				T[][] centers = env.newTArray(k, 0);
 				for (int i = 0; i < k; ++i) {
-					 centers[i] = env.newTArray(2 * fixPointLength);
+					centers[i] = env.newTArray(2 * fixPointLength);
 					T[] x = env.inputOfAlice(Utils.fromFixPoint(cenx[i],
 							fixPointLength, offset));
 					T[] y = env.inputOfAlice(Utils.fromFixPoint(ceny[i],
