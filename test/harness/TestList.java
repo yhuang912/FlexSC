@@ -1,7 +1,5 @@
 package harness;
 
-import java.util.Arrays;
-
 import circuits.arithmetic.FloatLib;
 import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
@@ -25,11 +23,12 @@ public class TestList extends TestHarness{
 			c = lib.add(a, b);
 		}
 		Flag.sw.ands = 0;
-		for(int i = 0; i < iter; ++i){
+		for(int i = 0; i < iter+10; ++i){
 			t1 = System.nanoTime();
 			c = lib.add(a, b);
 			t2 = System.nanoTime();
-			time[i] = (t2-t1)/1000000000;
+			if(iter > 10)
+			time[i-10] = (t2-t1)/1000000000;
 		}
 		System.out.println("1024add: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
@@ -37,11 +36,12 @@ public class TestList extends TestHarness{
 
 		//int mul
 		Flag.sw.ands = 0;
-		for(int i = 0; i < iter; ++i){
+		for(int i = 0; i < iter+10; ++i){
 			t1 = System.nanoTime();
 			c = lib.multiply(a, b);
 			t2 = System.nanoTime();
-			time[i] = (t2-t1)/1000000000;
+			if(iter > 10)
+				time[i-10] = (t2-t1)/1000000000;
 		}
 		System.out.println("1024mul: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
@@ -51,12 +51,12 @@ public class TestList extends TestHarness{
 		a = e.inputOfAlice(new boolean[16384]);
 		b = e.inputOfBob(new boolean[16384]);
 		Flag.sw.ands = 0;
-		for(int i = 0; i < iter; ++i){
+		for(int i = 0; i < iter+10; ++i){
 			t1 = System.nanoTime();
 			c[0] = lib.geq(a, b);
 			t2 = System.nanoTime();
-			time[i] = (t2-t1)/1000000000;
-		}
+			if(iter > 10)
+				time[i-10] = (t2-t1)/1000000000;		}
 		System.out.println("16384comp: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
@@ -68,12 +68,12 @@ public class TestList extends TestHarness{
 		b = e.inputOfBob(new boolean[1600]);
 		Flag.sw.ands = 0;
 		
-		for(int i = 0; i < iter; ++i){
+		for(int i = 0; i < iter+10; ++i){
 			t1 = System.nanoTime();
 			c = lib.hammingDistance(a, b);
 			t2 = System.nanoTime();
-			time[i] = (t2-t1)/1000000000;
-		}
+			if(iter > 10)
+				time[i-10] = (t2-t1)/1000000000;		}
 		System.out.println("1600hamming: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
@@ -82,12 +82,12 @@ public class TestList extends TestHarness{
 		a = flib.inputOfAlice(0.5);
 		b = flib.inputOfBob(0.5);
 		Flag.sw.ands = 0;
-		for(int i = 0; i < iter; ++i) {
+		for(int i = 0; i < iter+10; ++i){
 			t1 = System.nanoTime();
 			c = flib.add(a, b);
 			t2 = System.nanoTime();
-			time[i] = (t2-t1)/1000000000;
-		}
+			if(iter > 10)
+				time[i-10] = (t2-t1)/1000000000;		}
 		System.out.println("f64add: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
@@ -96,13 +96,13 @@ public class TestList extends TestHarness{
 		a = flib.inputOfAlice(0.5);
 		b = flib.inputOfBob(0.5);
 		Flag.sw.ands = 0;
-		for(int i = 0; i < iter; ++i){
+		for(int i = 0; i < iter+10; ++i){
 			t1 = System.nanoTime();
 			c = flib.multiply(a, b);
 			t2 = System.nanoTime();
 			t = (t2-t1)/1000000000;
-			time[i] = (t2-t1)/1000000000;
-		}
+			if(iter > 10)
+				time[i-10] = (t2-t1)/1000000000;		}
 		System.out.println("f64multi: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
