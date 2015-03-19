@@ -39,13 +39,13 @@ public class TestList extends TestHarness{
 
 		//int mul
 		Flag.sw.ands = 0;
-		
+		t1 = System.nanoTime();
 		for(int i = 0; i < iter; ++i){
-			t1 = System.nanoTime();
+			
 			c = lib.multiply(a, b);
-			t2 = System.nanoTime();
-			time[i] = (t2-t1)/1000000000;
-		}
+			
+		}t2 = System.nanoTime();
+		time[0] = (t2-t1)/1000000000;
 		System.out.println("1024mul: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < 20; ++i)
 			System.out.println(time[i]);

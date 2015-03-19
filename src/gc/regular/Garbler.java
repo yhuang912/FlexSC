@@ -4,7 +4,6 @@ import gc.GCSignal;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
-import java.util.Arrays;
 
 final class Garbler {
 	private MessageDigest sha1 = null;
@@ -33,7 +32,6 @@ final class Garbler {
 	}
 	
 	public void dec(GCSignal lb0, GCSignal lb1, long k, GCSignal c, GCSignal ret) {
-//		return getPadding(lb0, lb1, k).xor(c);
 		getPadding(lb0, lb1, k, ret);
 		GCSignal.xor(c, ret, ret);
 	}
