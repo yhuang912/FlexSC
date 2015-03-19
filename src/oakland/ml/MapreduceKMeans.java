@@ -189,7 +189,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 				CompEnv<T> env = CompEnv.getEnv(Party.Alice, is, os);
 				FixedPointLib<T> lib = new FixedPointLib<T>(env,fixPointLength, offset);
 
-				double d1 = System.nanoTime();
+				
 				if (env.m == Mode.COUNT) {
 					//					 sta = ((PMCompEnv)env).statistic;
 					//					 sta.flush();
@@ -216,6 +216,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 					System.arraycopy(x, 0, centers[i], 0, x.length);
 					System.arraycopy(y, 0, centers[i], x.length, y.length);
 				}
+				double d1 = System.nanoTime();
 				MapreduceKMeans<T> wc = new MapreduceKMeans<T>(
 						env, centers);
 				KeyValue<T>[] res = null;
@@ -246,7 +247,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 					//					System.out.println(" ");
 				}
 
-				//System.out.print((System.nanoTime()-d1)/1000000000.0 + " ");
+				System.out.print((System.nanoTime()-d1)/1000000000.0 + " ");
 				if (env.m == Mode.COUNT) {
 					sta = ((PMCompEnv)env).statistic;
 					//					 sta.finalize();
