@@ -153,6 +153,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 				tGen.join();
 				tEva.join();
 				Flag.sw.print();
+				
 			}
 			else if(new Integer(args[0]) == 0)
 				new GenRunnable().run();
@@ -265,7 +266,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 					// if(checkResult(z, a, b))
 					//					System.out.println("Verified");
 				}
-
+				System.out.println(((gc.offline.GCGen)env).t);
 				disconnect();
 			} catch (Exception e) {
 				e.printStackTrace();
