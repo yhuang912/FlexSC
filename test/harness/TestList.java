@@ -27,7 +27,7 @@ public class TestList extends TestHarness{
 			t2 = System.nanoTime();
 			time[i] = (t2-t1)/1000000000;
 		}
-		Flag.sw.ands = 0;System.gc();
+		Flag.sw.ands = 0;
 		for(int i = 0; i < iter; ++i){
 			
 			t1 = System.nanoTime();
@@ -40,7 +40,7 @@ public class TestList extends TestHarness{
 			System.out.println(time[i]);
 
 		//int mul
-		Flag.sw.ands = 0;System.gc();
+		Flag.sw.ands = 0;
 		
 		for(int i = 0; i < iter; ++i){
 			t1 = System.nanoTime();
@@ -55,7 +55,7 @@ public class TestList extends TestHarness{
 		//int comp
 		a = e.inputOfAlice(new boolean[16384]);
 		b = e.inputOfBob(new boolean[16384]);
-		Flag.sw.ands = 0;System.gc();
+		Flag.sw.ands = 0;
 		for(int i = 0; i < iter; ++i){
 			t1 = System.nanoTime();
 			c[0] = lib.geq(a, b);
@@ -71,7 +71,7 @@ public class TestList extends TestHarness{
 		//int hamming
 		a = e.inputOfAlice(new boolean[1600]);
 		b = e.inputOfBob(new boolean[1600]);
-		Flag.sw.ands = 0;System.gc();
+		Flag.sw.ands = 0;
 		
 		for(int i = 0; i < iter; ++i){
 			t1 = System.nanoTime();
@@ -86,7 +86,7 @@ public class TestList extends TestHarness{
 		//float
 		a = flib.inputOfAlice(0.5);
 		b = flib.inputOfBob(0.5);
-		Flag.sw.ands = 0;System.gc();
+		Flag.sw.ands = 0;
 		for(int i = 0; i < iter; ++i) {
 			t1 = System.nanoTime();
 			c = flib.add(a, b);
@@ -100,7 +100,7 @@ public class TestList extends TestHarness{
 		//float
 		a = flib.inputOfAlice(0.5);
 		b = flib.inputOfBob(0.5);
-		Flag.sw.ands = 0;System.gc();
+		Flag.sw.ands = 0;
 		for(int i = 0; i < iter; ++i){
 			t1 = System.nanoTime();
 			c = flib.multiply(a, b);
@@ -114,7 +114,7 @@ public class TestList extends TestHarness{
 		//float
 		a = flib.inputOfAlice(0.5);
 		b = flib.inputOfBob(0.5);
-		Flag.sw.ands = 0;System.gc();
+		Flag.sw.ands = 0;
 		for(int i = 0; i < iter; ++i){
 			t1 = System.nanoTime();
 			c = flib.div(a, b);
