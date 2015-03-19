@@ -37,7 +37,6 @@ public class TestList extends TestHarness{
 
 		//int mul
 		Flag.sw.ands = 0;
-		
 		for(int i = 0; i < iter; ++i){
 			t1 = System.nanoTime();
 			c = lib.multiply(a, b);
@@ -102,24 +101,25 @@ public class TestList extends TestHarness{
 			c = flib.multiply(a, b);
 			t2 = System.nanoTime();
 			t = (t2-t1)/1000000000;
+			time[i] = (t2-t1)/1000000000;
 		}
 		System.out.println("f64multi: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
 
 		//float
-		a = flib.inputOfAlice(0.5);
-		b = flib.inputOfBob(0.5);
-		Flag.sw.ands = 0;
-		for(int i = 0; i < iter; ++i){
-			t1 = System.nanoTime();
-			c = flib.div(a, b);
-			t2 = System.nanoTime();
-			t = (t2-t1)/1000000000;
-		}
-		System.out.println("f64div: " + (Flag.sw.ands/iter));
-		for(int i = 0; i < iter; ++i)
-			System.out.println(time[i]);
+//		a = flib.inputOfAlice(0.5);
+//		b = flib.inputOfBob(0.5);
+//		Flag.sw.ands = 0;
+//		for(int i = 0; i < iter; ++i){
+//			t1 = System.nanoTime();
+//			c = flib.div(a, b);
+//			t2 = System.nanoTime();
+//			t = (t2-t1)/1000000000;
+//		}
+//		System.out.println("f64div: " + (Flag.sw.ands/iter));
+//		for(int i = 0; i < iter; ++i)
+//			System.out.println(time[i]);
 	
 		
 		//AMS: 20*(2^11)^2*16/1024/1024/1024
