@@ -20,9 +20,9 @@ public class GCEva extends GCEvaComp {
 	private void receiveGTT() {
 		try {
 			Flag.sw.startGCIO();
-			gtt[0][1] = GCSignal.receive(is);
-			gtt[1][0] = GCSignal.receive(is);
-			gtt[1][1] = GCSignal.receive(is);
+			GCSignal.receive(is, gtt[0][1]);
+			GCSignal.receive(is, gtt[1][0]);
+			GCSignal.receive(is, gtt[1][1]);
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();
