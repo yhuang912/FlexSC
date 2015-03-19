@@ -1,5 +1,6 @@
 package gc.offline;
 
+import flexsc.CompEnv;
 import flexsc.Flag;
 import gc.GCEvaComp;
 import gc.GCSignal;
@@ -15,6 +16,9 @@ public class GCEva extends GCEvaComp {
 		super(is, os);
 		gb = new Garbler();
 		gtt[0][0] = GCSignal.ZERO;
+		gtt[0][1] = GCSignal.freshLabel(CompEnv.rnd);
+		gtt[1][0] = GCSignal.freshLabel(CompEnv.rnd);
+		gtt[1][1] = GCSignal.freshLabel(CompEnv.rnd);
 	}
 
 	private void receiveGTT() {
