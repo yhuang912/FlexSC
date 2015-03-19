@@ -139,7 +139,7 @@ public class MapreduceKMeans<T> extends MapReduceBackEnd<T> {
 
 
 	public static void main(String args[]) throws Exception {
-		for(int l = (1<<5); l <= (1<<10); l*=2) {
+		for(int l = (1<<16); l <= (1<<16); l*=2) {
 			k = 2;
 			genreateData(l);
 			if(args.length == 0) {
