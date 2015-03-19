@@ -89,6 +89,15 @@ public class GCSignal {
 		}
 		return new GCSignal(b);
 	}
+	
+	// 'send' and 'receive' are supposed to be used only for secret signals
+	public static void receive(InputStream ois, GCSignal ret) {
+		try {
+			Server.readBytes(ois, ret.bytes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public boolean equals(Object lb) {

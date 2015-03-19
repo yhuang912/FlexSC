@@ -106,9 +106,9 @@ public class GCGen extends GCGenComp {
 //		t += (System.nanoTime() - t1);
 //		return a;
 		double d1 = System.nanoTime();
-		gtt[0][1] = GCSignal.receive(fin);
-		gtt[1][0] = GCSignal.receive(fin);
-		gtt[1][1] = GCSignal.receive(fin);
+		GCSignal.receive(fin, gtt[0][1]);
+		GCSignal.receive(fin, gtt[1][0]);
+		GCSignal.receive(fin, gtt[1][1]);
 		GCSignal a = GCSignal.receive(fin);
 		t += (System.nanoTime() - d1);
 		return a;

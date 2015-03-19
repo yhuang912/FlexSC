@@ -59,6 +59,17 @@ public class Server {
 		return temp;
 	}
 
+	static public void readBytes(InputStream is, byte[] temp) throws IOException {
+		int remain = temp.length;
+		while (0 < remain) {
+			int readBytes = is.read(temp, temp.length - remain, remain);
+			if (readBytes != -1) {
+				remain -= readBytes;
+			}
+		}
+	}
+
+	
 	static public byte[] readBytes(InputStream is) throws IOException {
 		byte[] lenBytes = readBytes(is, 4);
 		int len = ByteBuffer.wrap(lenBytes).getInt();
