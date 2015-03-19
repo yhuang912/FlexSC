@@ -27,8 +27,8 @@ public class TestList extends TestHarness{
 			t1 = System.nanoTime();
 			c = lib.add(a, b);
 			t2 = System.nanoTime();
-			if(iter > 10)
-			time[i-10] = (t2-t1)/1000000000;
+			if(i >= 10)
+				time[i-10] = (t2-t1)/1000000000;
 		}
 		System.out.println("1024add: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
@@ -40,7 +40,7 @@ public class TestList extends TestHarness{
 			t1 = System.nanoTime();
 			c = lib.multiply(a, b);
 			t2 = System.nanoTime();
-			if(iter > 10)
+			if(i >= 10)
 				time[i-10] = (t2-t1)/1000000000;
 		}
 		System.out.println("1024mul: " + (Flag.sw.ands/iter));
@@ -55,7 +55,7 @@ public class TestList extends TestHarness{
 			t1 = System.nanoTime();
 			c[0] = lib.geq(a, b);
 			t2 = System.nanoTime();
-			if(iter > 10)
+			if(i >= 10)
 				time[i-10] = (t2-t1)/1000000000;		}
 		System.out.println("16384comp: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
@@ -72,7 +72,7 @@ public class TestList extends TestHarness{
 			t1 = System.nanoTime();
 			c = lib.hammingDistance(a, b);
 			t2 = System.nanoTime();
-			if(iter > 10)
+			if(i >= 10)
 				time[i-10] = (t2-t1)/1000000000;		}
 		System.out.println("1600hamming: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
@@ -86,7 +86,7 @@ public class TestList extends TestHarness{
 			t1 = System.nanoTime();
 			c = flib.add(a, b);
 			t2 = System.nanoTime();
-			if(iter > 10)
+			if(i >= 10)
 				time[i-10] = (t2-t1)/1000000000;		}
 		System.out.println("f64add: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
@@ -101,7 +101,7 @@ public class TestList extends TestHarness{
 			c = flib.multiply(a, b);
 			t2 = System.nanoTime();
 			t = (t2-t1)/1000000000;
-			if(iter > 10)
+			if(i >= 10)
 				time[i-10] = (t2-t1)/1000000000;		}
 		System.out.println("f64multi: " + (Flag.sw.ands/iter));
 		for(int i = 0; i < iter; ++i)
