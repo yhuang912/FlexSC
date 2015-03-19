@@ -17,7 +17,7 @@ public class TestList extends TestHarness{
 		int iter = 50;
 		T[] a = e.inputOfAlice(new boolean[1024]);
 		T[] b = e.inputOfBob(new boolean[1024]);
-		double[] time = new double[20];
+		double[] time = new double[iter];
 		//int add
 		Flag.sw.ands = 0;
 		T[] c = null;
@@ -35,7 +35,7 @@ public class TestList extends TestHarness{
 			time[i] = (t2-t1)/1000000000;
 		}
 		System.out.println("1024add: " + (Flag.sw.ands/iter));
-		for(int i = 0; i < 20; ++i)
+		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
 
 		//int mul
@@ -48,7 +48,7 @@ public class TestList extends TestHarness{
 			time[i] = (t2-t1)/1000000000;
 		}
 		System.out.println("1024mul: " + (Flag.sw.ands/iter));
-		for(int i = 0; i < 20; ++i)
+		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
 
 		//int comp
@@ -62,7 +62,7 @@ public class TestList extends TestHarness{
 			time[i] = (t2-t1)/1000000000;
 		}
 		System.out.println("16384comp: " + (Flag.sw.ands/iter));
-		for(int i = 0; i < 20; ++i)
+		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
 
 
@@ -79,7 +79,7 @@ public class TestList extends TestHarness{
 			time[i] = (t2-t1)/1000000000;
 		}
 		System.out.println("1600hamming: " + (Flag.sw.ands/iter));
-		for(int i = 0; i < 20; ++i)
+		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
 
 		//float
@@ -93,7 +93,7 @@ public class TestList extends TestHarness{
 			time[i] = (t2-t1)/1000000000;
 		}
 		System.out.println("f64add: " + (Flag.sw.ands/iter));
-		for(int i = 0; i < 20; ++i)
+		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
 
 		//float
@@ -107,7 +107,7 @@ public class TestList extends TestHarness{
 			t = (t2-t1)/1000000000;
 		}
 		System.out.println("f64multi: " + (Flag.sw.ands/iter));
-		for(int i = 0; i < 20; ++i)
+		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
 
 		//float
@@ -121,7 +121,7 @@ public class TestList extends TestHarness{
 			t = (t2-t1)/1000000000;
 		}
 		System.out.println("f64div: " + (Flag.sw.ands/iter));
-		for(int i = 0; i < 20; ++i)
+		for(int i = 0; i < iter; ++i)
 			System.out.println(time[i]);
 	
 		
