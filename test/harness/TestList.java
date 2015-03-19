@@ -21,12 +21,12 @@ public class TestList extends TestHarness{
 		//int add
 		
 		T[] c = null;
-		for(int i = 0; i < iter; ++i){
-			t1 = System.nanoTime();
-			c = lib.add(a, b);
-			t2 = System.nanoTime();
-			time[i] = (t2-t1)/1000000000;
-		}
+//		for(int i = 0; i < iter; ++i){
+//			t1 = System.nanoTime();
+//			c = lib.add(a, b);
+//			t2 = System.nanoTime();
+//			time[i] = (t2-t1)/1000000000;
+//		}
 		Flag.sw.ands = 0;
 		for(int i = 0; i < iter; ++i){
 			
