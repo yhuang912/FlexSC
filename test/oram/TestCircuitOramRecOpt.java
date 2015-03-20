@@ -70,9 +70,13 @@ public class TestCircuitOramRecOpt {
 				System.out.println(logN + " " + recurFactor + " " + cutoff
 						+ " " + capacity + " " + dataSize);
 
+				double tmp1 = System.nanoTime();
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Party.Alice,
 						is, os);
+				double tmp2 = System.nanoTime();
+				System.out.println((tmp2-tmp1)/1000000000.0);
+				
 				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
 						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
 System.gc();
