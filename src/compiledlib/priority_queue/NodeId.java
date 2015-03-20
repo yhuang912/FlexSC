@@ -17,19 +17,17 @@ import java.util.Random;
 import flexsc.IWritable;
 import flexsc.Comparator;
 import java.lang.reflect.Array;
-public class NodeId<t__T> implements IWritable<NodeId<t__T>, t__T> {
-	public t__T[] pos;
-	public t__T[] id;
+public class NodeId implements IWritable<NodeId, GCSignal> {
+	public GCSignal[] pos;
+	public GCSignal[] id;
 
-	public CompEnv<t__T> env;
-	public IntegerLib<t__T> intLib;
-	public FloatLib<t__T> floatLib;
+	public CompEnv<GCSignal> env;
+	public IntegerLib<GCSignal> intLib;
 	private int m;
 
-	public NodeId(CompEnv<t__T> env, int m) throws Exception {
+	public NodeId(CompEnv<GCSignal> env, IntegerLib<GCSignal> intLib, int m) throws Exception {
 		this.env = env;
-		this.intLib = new IntegerLib<t__T>(env);
-		this.floatLib = new FloatLib<t__T>(env, 24, 8);
+		this.intLib = intLib;
 		this.m = m;
 		this.pos = intLib.randBools(m);
 		this.id = env.inputOfAlice(Utils.fromInt(0, m));
@@ -38,10 +36,10 @@ public class NodeId<t__T> implements IWritable<NodeId<t__T>, t__T> {
 	public int numBits() {
 		return ((0)+(m))+(m);
 	}
-	public t__T[] getBits() {
-		t__T[] ret = env.newTArray(this.numBits());
-		t__T[] tmp_b;
-		t__T tmp;
+	public GCSignal[] getBits() {
+		GCSignal[] ret = new GCSignal[this.numBits()];
+		GCSignal[] tmp_b;
+		GCSignal tmp;
 		int now = 0;
 		tmp_b = pos;
 		System.arraycopy(tmp_b, 0, ret, now, tmp_b.length);
@@ -52,19 +50,19 @@ public class NodeId<t__T> implements IWritable<NodeId<t__T>, t__T> {
 		return ret;
 }
 
-	public NodeId<t__T> newObj(t__T[] data) throws Exception {
+	public NodeId newObj(GCSignal[] data) throws Exception {
 		if(data == null) {
-			data = env.newTArray(this.numBits());
+			data = new GCSignal[this.numBits()];
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		NodeId<t__T> ret = new NodeId<t__T>(env, m);
-		t__T[] tmp;
+		NodeId ret = new NodeId(env, intLib, m);
+		GCSignal[] tmp;
 		int now = 0;
-		ret.pos = env.newTArray(m);
+		ret.pos = new GCSignal[m];
 		System.arraycopy(data, now, ret.pos, 0, m);
 		now += m;
-		ret.id = env.newTArray(m);
+		ret.id = new GCSignal[m];
 		System.arraycopy(data, now, ret.id, 0, m);
 		now += m;
 		return ret;

@@ -17,27 +17,25 @@ import java.util.Random;
 import flexsc.IWritable;
 import flexsc.Comparator;
 import java.lang.reflect.Array;
-public class BoolArray<t__T> implements IWritable<BoolArray<t__T>, t__T> {
-	public t__T[] data;
+public class BoolArray implements IWritable<BoolArray, GCSignal> {
+	public GCSignal[] data;
 
-	public CompEnv<t__T> env;
-	public IntegerLib<t__T> intLib;
-	public FloatLib<t__T> floatLib;
+	public CompEnv<GCSignal> env;
+	public IntegerLib<GCSignal> intLib;
 
-	public BoolArray(CompEnv<t__T> env) throws Exception {
+	public BoolArray(CompEnv<GCSignal> env, IntegerLib<GCSignal> intLib) throws Exception {
 		this.env = env;
-		this.intLib = new IntegerLib<t__T>(env);
-		this.floatLib = new FloatLib<t__T>(env, 24, 8);
-		this.data = env.inputOfAlice(Utils.fromInt(0, 32));
+		this.intLib = intLib;
+		this.data = env.inputOfAlice(Utils.fromInt(0, 16));
 	}
 
 	public int numBits() {
-		return (0)+(32);
+		return (0)+(16);
 	}
-	public t__T[] getBits() {
-		t__T[] ret = env.newTArray(this.numBits());
-		t__T[] tmp_b;
-		t__T tmp;
+	public GCSignal[] getBits() {
+		GCSignal[] ret = new GCSignal[this.numBits()];
+		GCSignal[] tmp_b;
+		GCSignal tmp;
 		int now = 0;
 		tmp_b = data;
 		System.arraycopy(tmp_b, 0, ret, now, tmp_b.length);
@@ -45,18 +43,18 @@ public class BoolArray<t__T> implements IWritable<BoolArray<t__T>, t__T> {
 		return ret;
 }
 
-	public BoolArray<t__T> newObj(t__T[] data) throws Exception {
+	public BoolArray newObj(GCSignal[] data) throws Exception {
 		if(data == null) {
-			data = env.newTArray(this.numBits());
+			data = new GCSignal[this.numBits()];
 			for(int i=0; i<this.numBits(); ++i) { data[i] = intLib.SIGNAL_ZERO; }
 		}
 		if(data.length != this.numBits()) return null;
-		BoolArray<t__T> ret = new BoolArray<t__T>(env);
-		t__T[] tmp;
+		BoolArray ret = new BoolArray(env, intLib);
+		GCSignal[] tmp;
 		int now = 0;
-		ret.data = env.newTArray(32);
-		System.arraycopy(data, now, ret.data, 0, 32);
-		now += 32;
+		ret.data = new GCSignal[16];
+		System.arraycopy(data, now, ret.data, 0, 16);
+		now += 16;
 		return ret;
 }
 

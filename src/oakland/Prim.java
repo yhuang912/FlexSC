@@ -66,22 +66,22 @@ public class Prim extends TestHarness {
 		SecureArray<Boolean> dis = new SecureArray<Boolean>(lib.getEnv(), v, 2);
 		dis.setInitialValue(0);
 
-		BoolArray ba = new BoolArray(lib.getEnv());
-		PriorityQueueNode<Boolean, BoolArray<Boolean>> node = new PriorityQueueNode<Boolean, BoolArray<Boolean>>(lib.getEnv(), logoramsize, ba);
+		BoolArray ba = new BoolArray(lib.getEnv(), lib);
+		PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(lib.getEnv(), lib, logoramsize, ba);
 		CircuitOram<Boolean> oram = new CircuitOram<Boolean>(lib.getEnv(), v+e, node.numBits());
 //System.out.println(node.keyvalue.value.numBits());
-		PriorityQueue<Boolean, BoolArray<Boolean>> pq = new PriorityQueue<Boolean, BoolArray<Boolean>>(lib.getEnv(), logoramsize, 
-				new BoolArray(lib.getEnv()), oram);
+		PriorityQueue<BoolArray> pq = new PriorityQueue<BoolArray>(lib.getEnv(), lib, logoramsize, 
+				new BoolArray(lib.getEnv(),lib), oram);
 
-		BoolArray tmp1 = new BoolArray(lib.getEnv());
+		BoolArray tmp1 = new BoolArray(lib.getEnv(), lib);
 		pq.pqueue_op(lib.getEnv().inputOfAlice(Utils.fromInt(15, bitLength)), 
 				tmp1, lib.SIGNAL_ZERO);
 		pq.pqueue_op(lib.getEnv().inputOfAlice(Utils.fromInt(15, bitLength)), 
 				tmp1, lib.SIGNAL_ONE);
-		BoolArray tmp = new BoolArray(lib.getEnv());tmp.data = lib.toSignals(0, bitLength);
+		BoolArray tmp = new BoolArray(lib.getEnv(), lib);tmp.data = lib.toSignals(0, bitLength);
 		pq.push(lib.toSignals(1000, bitLength), tmp, lib.SIGNAL_ONE);
 
-		if(Flag.mode== Mode.COUNT) {
+		if(Flag.mode == Mode.COUNT) {
 			((PMCompEnv) lib.getEnv()).statistic.flush();
 		}
 		Boolean traversingNode = lib.SIGNAL_ZERO;
@@ -90,7 +90,7 @@ public class Prim extends TestHarness {
 		for(int i = 0; i < 1; ++i) {
 			Boolean traNd = traversingNode;
 			Boolean NtraNd = lib.not(traversingNode);
-			compiledlib.priority_queue.KeyValue<Boolean, BoolArray<Boolean>> t = pq.pop(NtraNd);
+			compiledlib.priority_queue.KeyValue<BoolArray> t = pq.pop(NtraNd);
 			t.key = lib.sub(lib.toSignals(1000, bitLength), t.key);
 			Boolean[] disvalue = dis.read(t.value.data);
 			Boolean newNode = lib.eq(disvalue, False);
@@ -106,10 +106,10 @@ public class Prim extends TestHarness {
 			Boolean secondNest = lib.and(traNd, lib.not(nodeEnds));
 			
 //			Boolean[] dist = lib.add(currentV, e[2]);
-			BoolArray tmp2 = new BoolArray(lib.getEnv());tmp2.data = e[0];
+			BoolArray tmp2 = new BoolArray(lib.getEnv(), lib);tmp2.data = e[0];
 			pq.push(lib.sub(lib.toSignals(1000, bitLength), e[2]), tmp2, secondNest);	
 		}
-		if(Flag.mode!= Mode.COUNT){
+		if(Flag.mode != Mode.COUNT){
 			if(lib.getEnv().getParty() == Party.Alice) {
 				System.out.println(Utils.toInt(lib.getEnv().outputToAlice(res)));
 			}
@@ -117,7 +117,7 @@ public class Prim extends TestHarness {
 				Utils.toInt(lib.getEnv().outputToAlice(res));
 			}
 		}
-		else  if (Flag.mode== Mode.COUNT) {
+		else  if (Flag.mode == Mode.COUNT) {
 			((PMCompEnv) lib.getEnv()).statistic.andGate *= (v+e);
 		}
 
@@ -165,19 +165,19 @@ public class Prim extends TestHarness {
 
 				lib = new IntegerLib(env);
 
-				if (Flag.mode== Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.flush();
 				}
 
 				double a = System.nanoTime();
 				secureCompute(lib);
 
-				if (Flag.mode== Mode.COUNT) {
+				if (Flag.mode == Mode.COUNT) {
 					((PMCompEnv) env).statistic.finalize();
 					andgates = ((PMCompEnv) env).statistic.andGate;
 					encs = ((PMCompEnv) env).statistic.NumEncAlice;
 				}
-				else if (Flag.mode== Mode.REAL){
+				else if (Flag.mode == Mode.REAL){
 					System.out.println((System.nanoTime()-a)/1000000000);
 				}
 
@@ -200,7 +200,7 @@ public class Prim extends TestHarness {
 		tEva.start();
 		tGen.join();
 
-		if (Flag.mode== Mode.COUNT) {
+		if (Flag.mode == Mode.COUNT) {
 			System.out.println(env.andgates + "\t" + env.encs);
 		} else {
 		}

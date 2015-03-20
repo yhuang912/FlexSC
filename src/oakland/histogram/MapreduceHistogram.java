@@ -9,6 +9,7 @@ import circuits.arithmetic.IntegerLib;
 import flexsc.CompEnv;
 import flexsc.Flag;
 import flexsc.Mode;
+import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
 
@@ -92,25 +93,25 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 	}
 
 	static public void main(String args[]) throws InterruptedException {
-		genreateData(1<<17);
+		genreateData(1<<16);
 		if(args.length == 0) {
-		GenRunnable gen = new GenRunnable();
-		EvaRunnable eva = new EvaRunnable();
-		Thread tGen = new Thread(gen);
-		Thread tEva = new Thread(eva);
-		tGen.start();
-		Thread.sleep(5);
-		tEva.start();
-		tGen.join();
-		tEva.join();
+			GenRunnable gen = new GenRunnable();
+			EvaRunnable eva = new EvaRunnable();
+			Thread tGen = new Thread(gen);
+			Thread tEva = new Thread(eva);
+			tGen.start();
+			Thread.sleep(5);
+			tEva.start();
+			tGen.join();
+			tEva.join();
 		}
 		else {
 			if(new Integer(args[0]) == 0) {
 				GenRunnable gen = new GenRunnable();gen.run();
-				
+
 			}else {
 				EvaRunnable eva = new EvaRunnable();eva.run();
-				
+
 			}
 		}
 		System.out.println(Flag.sw.ands);
@@ -146,25 +147,25 @@ public class MapreduceHistogram<T> extends MapReduceBackEnd<T> {
 
 				MapreduceHistogram<T> wc = new MapreduceHistogram<T>(
 						env);				
-//				sta = ((PMCompEnv) env).statistic;
-//				sta.flush();
+				sta = ((PMCompEnv) env).statistic;
+				sta.flush();
 				KeyValue<T>[] res = wc.MapReduce(sc);
 				double t2 = System.nanoTime();
 				System.out.println((t2-t1)/1000000000 +" "+ Flag.sw.ands/((t2-t1)/1000000000));
 				if (env.m == Mode.COUNT) {
 					sta.finalize();
 				} else {
-//					z = new int[res.length];
-//					h = new int[res.length];
-//					for (int i = 0; i < res.length; ++i) {
-//						z[i] = Utils.toInt(env.outputToAlice(res[i].key));
-//						h[i] = Utils.toInt(env.outputToAlice(res[i].value));
-//
-//						System.out.print(z[i] + " ");
-//						System.out.println(h[i]);
-//					}
-//					env.os.flush();
-//					checkResult(z, h, a, b);
+					//					z = new int[res.length];
+					//					h = new int[res.length];
+					//					for (int i = 0; i < res.length; ++i) {
+					//						z[i] = Utils.toInt(env.outputToAlice(res[i].key));
+					//						h[i] = Utils.toInt(env.outputToAlice(res[i].value));
+					//
+					//						System.out.print(z[i] + " ");
+					//						System.out.println(h[i]);
+					//					}
+					//					env.os.flush();
+					//					checkResult(z, h, a, b);
 				}
 				disconnect();
 			} catch (Exception e) {
