@@ -48,14 +48,15 @@ public class GCEva extends GCEvaComp {
 	private void receiveGTT() {
 		try {
 			Flag.sw.startGCIO();
-			if(Flag.offline) {
-			fread.read(gtt[0][1].bytes);
-			fread.read(gtt[1][0].bytes);
-			fread.read(gtt[1][1].bytes);}
-			else{
+//			if(Flag.offline) {
+//			fread.read(gtt[0][1].bytes);
+//			fread.read(gtt[1][0].bytes);
+//			fread.read(gtt[1][1].bytes);}
+//			else{
 			GCSignal.receive(is, gtt[0][1]);
 			GCSignal.receive(is, gtt[1][0]);
-			GCSignal.receive(is, gtt[1][1]);}
+			GCSignal.receive(is, gtt[1][1]);
+//			}
 			Flag.sw.stopGCIO();
 		} catch (Exception e) {
 			e.printStackTrace();

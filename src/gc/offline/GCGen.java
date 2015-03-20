@@ -148,6 +148,7 @@ public class GCGen extends GCGenComp {
 		else {
 			if(Flag.offline) {
 				res = readGateFromFile();
+				sendGTT();
 			} else {
 				res = garble(a, b);
 				writeGateToFile(res);
