@@ -89,7 +89,7 @@ public class Dijkstra extends TestHarness {
 		GCSignal[] next = lib.toSignals(0, bitLength);
 		GCSignal[] currentV = lib.toSignals(0, bitLength);
 		Flag.sw.ands = 0;
-		for(int i = 0; i < 100; ++i) {
+		for(int i = 0; i < 4; ++i) {
 			double a = System.nanoTime();
 			GCSignal traNd = traversingNode;
 			GCSignal NtraNd = lib.not(traversingNode);

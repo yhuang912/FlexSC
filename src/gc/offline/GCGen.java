@@ -23,14 +23,14 @@ public class GCGen extends GCGenComp {
 	static{
 		try {
 			if(Flag.offline) {
-				fin = new BufferedInputStream(new FileInputStream("table"), 1024*1024*1024);
+				fin = new BufferedInputStream(new FileInputStream(Flag.tableName), 1024*1024*1024);
 				R = GCSignal.receive(fin);
 //				fread = new FileReader(Flag.tableName);
 //				R = new GCSignal(fread.read(10));
 				R.setLSB();
 			}
 			else {
-				fout = new BufferedOutputStream(new FileOutputStream(Flag.tableName), 1024*1024*1024);
+				fout = new BufferedOutputStream(new FileOutputStream(Flag.tableName));
 				R.send(fout);
 			}
 		} catch (FileNotFoundException e) {
@@ -105,12 +105,12 @@ public class GCGen extends GCGenComp {
 //		GCSignal a = new GCSignal(fread.read(10));
 //		t += (System.nanoTime() - t1);
 //		return a;
-		double d1 = System.nanoTime();
+//		double d1 = System.nanoTime();
 		GCSignal.receive(fin, gtt[0][1]);
 		GCSignal.receive(fin, gtt[1][0]);
 		GCSignal.receive(fin, gtt[1][1]);
 		GCSignal a = GCSignal.receive(fin);
-		t += (System.nanoTime() - d1);
+//		t += (System.nanoTime() - d1);
 		return a;
 	}
 
@@ -151,8 +151,9 @@ public class GCGen extends GCGenComp {
 			} else {
 				res = garble(a, b);
 				writeGateToFile(res);
+				sendGTT();
 			}
-			sendGTT();
+			
 			gid++;
 			gatesRemain = true;
 		}

@@ -134,7 +134,7 @@ public abstract class GCGenComp extends GCCompEnv{
 			return true;
 
 		try {
-			throw new Exception("bad label at final output.");
+//			throw new Exception("bad label at final output.");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
