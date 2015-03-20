@@ -15,6 +15,7 @@ import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.PMCompEnv.Statistics;
 import flexsc.Party;
+import gc.GCSignal;
 
 public class TestPriorityQueue {
 
@@ -66,8 +67,8 @@ public class TestPriorityQueue {
 
 	boolean debug = false;
 
-	public void compute(CompEnv<Boolean> env, PriorityQueue<BoolArray> ostack,
-			IntegerLib<Boolean> lib) throws Exception {
+	public void compute(CompEnv<GCSignal> env, PriorityQueue<BoolArray> ostack,
+			IntegerLib<GCSignal> lib) throws Exception {
 		double[] time = new double[op.length];
 		BoolArray tmp1 = new BoolArray(env, lib);
 		tmp1.data = env.inputOfAlice(Utils.fromInt(15, 32));
@@ -99,7 +100,7 @@ public class TestPriorityQueue {
 			} else {
 				int rand = next[i];
 				BoolArray tmp = new BoolArray(env, lib);
-				Boolean[] in = env.inputOfAlice(Utils.fromInt(rand, 32));
+				GCSignal[] in = env.inputOfAlice(Utils.fromInt(rand, 32));
 				if(m == Mode.REAL && env.getParty() == Party.Alice) {
 					System.gc();
 					double a = System.nanoTime();
@@ -142,14 +143,14 @@ public class TestPriorityQueue {
 			try {
 				listen(54321);
 				CompEnv env = CompEnv.getEnv(m, Party.Alice, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(
 						env, lib, logN, new BoolArray(env, lib));
 				PriorityQueue<BoolArray> ostack = new PriorityQueue<BoolArray>(
 						env,
 						lib,
 						logN, new BoolArray(env, lib),
-						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
+						new CircuitOram<GCSignal>(env, 1 << logN, node.numBits()));
 				
 				if (m == Mode.COUNT) {
 					sta = ((PMCompEnv) (env)).statistic;
@@ -181,15 +182,15 @@ public class TestPriorityQueue {
 		public void run() {
 			try {
 				connect("localhost", 54321);
-				CompEnv<Boolean> env = CompEnv.getEnv(m, Party.Bob, is, os);
-				IntegerLib<Boolean> lib = new IntegerLib<Boolean>(env);
+				CompEnv<GCSignal> env = CompEnv.getEnv(m, Party.Bob, is, os);
+				IntegerLib<GCSignal> lib = new IntegerLib<GCSignal>(env);
 				PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(
 						env, lib, logN, new BoolArray(env, lib));
 				PriorityQueue<BoolArray> ostack = new PriorityQueue<BoolArray>(
 						env,
 						lib,
 						logN, new BoolArray(env, lib),
-						new CircuitOram<Boolean>(env, 1 << logN, node.numBits()));
+						new CircuitOram<GCSignal>(env, 1 << logN, node.numBits()));
 
 				compute(env, ostack, lib);
 				disconnect();

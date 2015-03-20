@@ -5,6 +5,7 @@ import flexsc.Flag;
 import flexsc.Mode;
 import flexsc.PMCompEnv;
 import flexsc.Party;
+import gc.GCSignal;
 import harness.TestHarness;
 
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import org.junit.Test;
 
 import util.Utils;
 import circuits.arithmetic.IntegerLib;
+
 import compiledlib.priority_queue.BoolArray;
 import compiledlib.priority_queue.PriorityQueue;
 import compiledlib.priority_queue.PriorityQueueNode;
@@ -33,19 +35,19 @@ public class Prim extends TestHarness {
 	static int bitLength = 16;
 	static int logoramsize = (int) (2*Math.log((v+e))/Math.log(2));
 
-	public static void insertEdge(SecureArray<Boolean> graph, IntegerLib<Boolean> lib, int index, int a, int b, int c) throws Exception {
-		Boolean[] aa = lib.publicValue(a);
-		Boolean[] bb = lib.publicValue(b);
-		Boolean[] cc = lib.publicValue(c);
-		Boolean[] ret = new Boolean[bitLength*3];
+	public static void insertEdge(SecureArray<GCSignal> graph, IntegerLib<GCSignal> lib, int index, int a, int b, int c) throws Exception {
+		GCSignal[] aa = lib.publicValue(a);
+		GCSignal[] bb = lib.publicValue(b);
+		GCSignal[] cc = lib.publicValue(c);
+		GCSignal[] ret = new GCSignal[bitLength*3];
 		System.arraycopy(aa, 0, ret, 0, bitLength);
 		System.arraycopy(bb, 0, ret, bitLength, bitLength);
 		System.arraycopy(cc, 0, ret, 2*bitLength, bitLength);
 		graph.write(lib.publicValue(index), ret);
 	}
 
-	public static SecureArray<Boolean> makegraph(IntegerLib<Boolean> lib) throws Exception {
-		SecureArray<Boolean> graph = new SecureArray<Boolean>(lib.getEnv(), v+e, 3*bitLength);
+	public static SecureArray<GCSignal> makegraph(IntegerLib<GCSignal> lib) throws Exception {
+		SecureArray<GCSignal> graph = new SecureArray<GCSignal>(lib.getEnv(), v+e, 3*bitLength);
 		insertEdge(graph, lib, 0, 1, 6, 10);
 		insertEdge(graph, lib, 1, 3, 8, 1);
 		insertEdge(graph, lib, 2, 1, 9, 1);
@@ -59,16 +61,16 @@ public class Prim extends TestHarness {
 		return graph;
 	}
 
-	public static void secureCompute(IntegerLib<Boolean> lib) throws Exception {
-		Boolean[] False = new Boolean[]{lib.SIGNAL_ZERO, lib.SIGNAL_ZERO};
-		Boolean[] True = new Boolean[]{lib.SIGNAL_ONE, lib.SIGNAL_ZERO};
-		SecureArray<Boolean> graph = makegraph(lib);
-		SecureArray<Boolean> dis = new SecureArray<Boolean>(lib.getEnv(), v, 2);
+	public static void secureCompute(IntegerLib<GCSignal> lib) throws Exception {
+		GCSignal[] False = new GCSignal[]{lib.SIGNAL_ZERO, lib.SIGNAL_ZERO};
+		GCSignal[] True = new GCSignal[]{lib.SIGNAL_ONE, lib.SIGNAL_ZERO};
+		SecureArray<GCSignal> graph = makegraph(lib);
+		SecureArray<GCSignal> dis = new SecureArray<GCSignal>(lib.getEnv(), v, 2);
 		dis.setInitialValue(0);
 
 		BoolArray ba = new BoolArray(lib.getEnv(), lib);
 		PriorityQueueNode<BoolArray> node = new PriorityQueueNode<BoolArray>(lib.getEnv(), lib, logoramsize, ba);
-		CircuitOram<Boolean> oram = new CircuitOram<Boolean>(lib.getEnv(), v+e, node.numBits());
+		CircuitOram<GCSignal> oram = new CircuitOram<GCSignal>(lib.getEnv(), v+e, node.numBits());
 //System.out.println(node.keyvalue.value.numBits());
 		PriorityQueue<BoolArray> pq = new PriorityQueue<BoolArray>(lib.getEnv(), lib, logoramsize, 
 				new BoolArray(lib.getEnv(),lib), oram);
@@ -82,30 +84,30 @@ public class Prim extends TestHarness {
 		pq.push(lib.toSignals(1000, bitLength), tmp, lib.SIGNAL_ONE);
 
 		if(Flag.mode == Mode.COUNT) {
-			((PMCompEnv) lib.getEnv()).statistic.flush();
+//			((PMCompEnv) lib.getEnv()).statistic.flush();
 		}
-		Boolean traversingNode = lib.SIGNAL_ZERO;
-		Boolean[] next = lib.toSignals(0, bitLength);
-		Boolean[] res = lib.toSignals(0, bitLength);
+		GCSignal traversingNode = lib.SIGNAL_ZERO;
+		GCSignal[] next = lib.toSignals(0, bitLength);
+		GCSignal[] res = lib.toSignals(0, bitLength);
 		for(int i = 0; i < 1; ++i) {
-			Boolean traNd = traversingNode;
-			Boolean NtraNd = lib.not(traversingNode);
+			GCSignal traNd = traversingNode;
+			GCSignal NtraNd = lib.not(traversingNode);
 			compiledlib.priority_queue.KeyValue<BoolArray> t = pq.pop(NtraNd);
 			t.key = lib.sub(lib.toSignals(1000, bitLength), t.key);
-			Boolean[] disvalue = dis.read(t.value.data);
-			Boolean newNode = lib.eq(disvalue, False);
-			Boolean nested = lib.and(newNode, NtraNd);
+			GCSignal[] disvalue = dis.read(t.value.data);
+			GCSignal newNode = lib.eq(disvalue, False);
+			GCSignal nested = lib.and(newNode, NtraNd);
 			traversingNode = lib.mux(traversingNode, lib.SIGNAL_ONE, nested);
 			next = lib.mux(next, t.value.data, nested);
 			dis.write(t.value.data, lib.mux(disvalue,True,nested));
 			res = lib.add(res, lib.mux(lib.zeros(res.length), t.key, nested));
-			Boolean[][]e = nextEdge(next, graph);
+			GCSignal[][]e = nextEdge(next, graph);
 			next = lib.mux(next, e[1], traNd);
-			Boolean nodeEnds = lib.eq(e[1], lib.toSignals(-1, e[1].length));
+			GCSignal nodeEnds = lib.eq(e[1], lib.toSignals(-1, e[1].length));
 			traversingNode = lib.mux(traversingNode, lib.SIGNAL_ZERO,lib.and(traNd, nodeEnds));
-			Boolean secondNest = lib.and(traNd, lib.not(nodeEnds));
+			GCSignal secondNest = lib.and(traNd, lib.not(nodeEnds));
 			
-//			Boolean[] dist = lib.add(currentV, e[2]);
+//			GCSignal[] dist = lib.add(currentV, e[2]);
 			BoolArray tmp2 = new BoolArray(lib.getEnv(), lib);tmp2.data = e[0];
 			pq.push(lib.sub(lib.toSignals(1000, bitLength), e[2]), tmp2, secondNest);	
 		}
@@ -118,14 +120,14 @@ public class Prim extends TestHarness {
 			}
 		}
 		else  if (Flag.mode == Mode.COUNT) {
-			((PMCompEnv) lib.getEnv()).statistic.andGate *= (v+e);
+//			((PMCompEnv) lib.getEnv()).statistic.andGate *= (v+e);
 		}
 
 	}
 
-	public static Boolean[][]nextEdge (Boolean[] next, SecureArray<Boolean> graph) {
-		Boolean[] res = graph.read(next);
-		return new Boolean[][] {Arrays.copyOfRange(res, 0, bitLength), 
+	public static GCSignal[][]nextEdge (GCSignal[] next, SecureArray<GCSignal> graph) {
+		GCSignal[] res = graph.read(next);
+		return new GCSignal[][] {Arrays.copyOfRange(res, 0, bitLength), 
 				Arrays.copyOfRange(res, bitLength, bitLength*2),
 				Arrays.copyOfRange(res,bitLength*2, bitLength*3)};
 	} 
