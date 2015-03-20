@@ -14,7 +14,8 @@ import gc.GCSignal;
 public class TestCircuitOramRecOpt {
 
 	public  static void main(String args[]) throws Exception {
-			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, new Integer(args[1]), 8, 6);
+//			GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, new Integer(args[1]), 8, 6);
+		GenRunnable gen = new GenRunnable(12345, new Integer(args[0]), 3, 1024-32, 8, 6);
 //		GenRunnable gen = new GenRunnable(12345, 10, 3, 32, 8, 6);
 			EvaRunnable eva = new EvaRunnable("localhost", 12345);
 			Thread tGen = new Thread(gen);
@@ -72,11 +73,11 @@ public class TestCircuitOramRecOpt {
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Party.Alice,
 						is, os);
-//				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
-//						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
+				BSCircuitOram<GCSignal> client = new BSCircuitOram<GCSignal>(
+						env, N, dataSize,  32, cutoff, recurFactor, capacity, 80);
 System.gc();
-				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
-						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
+//				RecursiveOptCircuitOram<GCSignal>client = new RecursiveOptCircuitOram<GCSignal>(
+//						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 double t1 = 0, t2;
 				for (int i = 0; i < writeCount; ++i) {
 					int element = i % N;
@@ -149,12 +150,12 @@ double t1 = 0, t2;
 				@SuppressWarnings("unchecked")
 				CompEnv<GCSignal> env = CompEnv.getEnv(Party.Bob,
 						is, os);
-//				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
-//						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
+				BSCircuitOram<GCSignal> server = new BSCircuitOram<GCSignal>(
+						env, N, dataSize, 32,  cutoff, recurFactor, capacity, 80);
 				
 System.gc();
-				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
-						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
+//				RecursiveOptCircuitOram<GCSignal>server = new RecursiveOptCircuitOram<GCSignal>(
+//						env, N, dataSize,  cutoff, recurFactor, capacity, 80);
 
 				
 				for (int i = 0; i < writeCount; ++i) {
