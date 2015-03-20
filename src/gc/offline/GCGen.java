@@ -17,16 +17,16 @@ import java.io.OutputStream;
 public class GCGen extends GCGenComp {
 	Garbler gb;
 
-	public static BufferedInputStream fin = null;
+//	public static BufferedInputStream fin = null;
 	public static BufferedOutputStream fout = null;
-//	public static FileReader fread = null;
+	public static FileReader fread = null;
 	static{
 		try {
 			if(Flag.offline) {
-				fin = new BufferedInputStream(new FileInputStream(Flag.tableName), 1024*1024*1024);
-				R = GCSignal.receive(fin);
-//				fread = new FileReader(Flag.tableName);
-//				R = new GCSignal(fread.read(10));
+//				fin = new BufferedInputStream(new FileInputStream(Flag.tableName), 1024*1024*1024);
+//				R = GCSignal.receive(fin);
+				fread = new FileReader(Flag.tableName);
+				R = new GCSignal(fread.read(10));
 				R.setLSB();
 			}
 			else {
@@ -99,17 +99,17 @@ public class GCGen extends GCGenComp {
 	public double t;
 	private GCSignal readGateFromFile() {
 //		double t1 = System.nanoTime();
-//		fread.read(gtt[0][1].bytes);
-//		fread.read(gtt[1][0].bytes);
-//		fread.read(gtt[1][1].bytes);
-//		GCSignal a = new GCSignal(fread.read(10));
+		fread.read(gtt[0][1].bytes);
+		fread.read(gtt[1][0].bytes);
+		fread.read(gtt[1][1].bytes);
+		GCSignal a = new GCSignal(fread.read(10));
 //		t += (System.nanoTime() - t1);
 //		return a;
 //		double d1 = System.nanoTime();
-		GCSignal.receive(fin, gtt[0][1]);
-		GCSignal.receive(fin, gtt[1][0]);
-		GCSignal.receive(fin, gtt[1][1]);
-		GCSignal a = GCSignal.receive(fin);
+//		GCSignal.receive(fin, gtt[0][1]);
+//		GCSignal.receive(fin, gtt[1][0]);
+//		GCSignal.receive(fin, gtt[1][1]);
+//		GCSignal a = GCSignal.receive(fin);
 //		t += (System.nanoTime() - d1);
 		return a;
 	}
