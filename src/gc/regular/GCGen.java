@@ -41,8 +41,8 @@ public class GCGen extends GCGenComp {
 		GCSignal.xor(R, labelR[0], labelR[1]);
 //		 = R.xor();
 
-		int cL = a.getLSB() ? 1 : 0;
-		int cR = b.getLSB() ? 1 : 0;
+		int cL = a.getLSB();
+		int cR = b.getLSB() ;
 
 
 		gb.enc(labelL[cL], labelR[cR], gid, GCSignal.ZERO, lb[cL & cR]);

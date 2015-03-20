@@ -39,8 +39,8 @@ public class GCGen extends GCGenComp {
 		GCSignal.xor(R, labelR[0], labelR[1]);
 //		labelR[1] = R.xor(labelR[0]);
 
-		int cL = a.getLSB() ? 1 : 0;
-		int cR = b.getLSB() ? 1 : 0;
+		int cL = a.getLSB();
+		int cR = b.getLSB();
 
 		// first half gate
 		GCSignal G1 = gb.hash(labelL[0], gid, false);

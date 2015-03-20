@@ -35,11 +35,11 @@ public class GCSignal {
 		assert (bs.length <= len) : "Losing entropy when constructing signals.";
 		byte[] b = new byte[len];
 		Arrays.fill(b, (byte) ((bs[0] < 0) ? 0xff : 0));
-		System.arraycopy(bs, 0, b, len - Math.min(len, bs.length),
-				Math.min(len, bs.length));
-		Arrays.copyOf(bs, len);
+		int newlen = len < bs.length ? len : bs.length;
+		System.arraycopy(bs, 0, b, len - newlen, newlen);
 		return new GCSignal(b);
 	}
+
 
 	public GCSignal(GCSignal lb) {
 		v = lb.v;
@@ -66,8 +66,8 @@ public class GCSignal {
 		bytes[0] |= 1;
 	}
 
-	public boolean getLSB() {
-		return (bytes[0] & 1) == 1;
+	public int getLSB() {
+		return (bytes[0] & 1);
 	}
 
 	// 'send' and 'receive' are supposed to be used only for secret signals

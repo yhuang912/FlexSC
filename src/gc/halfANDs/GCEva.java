@@ -26,8 +26,8 @@ public class GCEva extends GCEvaComp {
 			res = b.v ? a : _ZERO;
 		else {
 
-			int i0 = a.getLSB() ? 1 : 0;
-			int i1 = b.getLSB() ? 1 : 0;
+			int i0 = a.getLSB();
+			int i1 = b.getLSB();
 
 			GCSignal TG = GCSignal.ZERO, WG, TE = GCSignal.ZERO, WE;
 			try {
