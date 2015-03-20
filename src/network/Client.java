@@ -37,10 +37,8 @@ public class Client {
 			os = new BufferedOutputStream(cos);
 			is = new BufferedInputStream(cis);
 		} else {
-			os = new BufferedOutputStream(sock.getOutputStream(),
-					Server.bufferSize);
-			is = new BufferedInputStream(sock.getInputStream(),
-					Server.bufferSize);
+			os = new BufferedOutputStream(sock.getOutputStream());
+			is = new BufferedInputStream(sock.getInputStream());
 
 		}
 	}

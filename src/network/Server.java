@@ -14,7 +14,6 @@ import flexsc.Mode;
 import flexsc.Party;
 
 public class Server {
-	static int bufferSize = 1024*1024*10;
 	private ServerSocket sock;
 
 	public InputStream is;
