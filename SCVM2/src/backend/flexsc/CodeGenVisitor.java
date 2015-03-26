@@ -88,7 +88,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 			if(exp.idx.lab == Label.Pub) {
 				sb.append(indent(indent));
 				idx = "f_tmp_"+(this.tmpId++);
-				sb.append(this.visit(type.type)+" "+idx+" = env.inputOfAlice(Utils.fromInt("+exp.idx.name+", "+type.type.getBits()+"));\n");
+				sb.append(this.visit(type.type)+" "+idx+" = intLib.toSignals("+exp.idx.name+", "+type.type.getBits()+");\n");
 			}
 			sb.append(indent(indent));
 			sb.append(this.visit(type.type)+" "+ret+" = ");
@@ -171,7 +171,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 					sb.append(indent(indent));
 					v1 = "f_tmp_"+(this.tmpId++);
 					if(exp.x1.type instanceof IntType)
-						sb.append(dataType+"[] "+v1+" = env.inputOfAlice(Utils.fromInt("+exp.x1.name+", "+currentType.getBits()+"));\n");
+						sb.append(dataType+"[] "+v1+" = intLib.toSignals("+exp.x1.name+", "+currentType.getBits()+");\n");
 					else
 						sb.append(dataType+"[] "+v1+" = floatLib.inputOfAlice("+exp.x1.name+");\n");
 				}
@@ -180,7 +180,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 					sb.append(indent(indent));
 					v2 = "f_tmp_"+(this.tmpId++);
 					if(exp.x2.type instanceof IntType)
-						sb.append(dataType+"[] "+v2+" = env.inputOfAlice(Utils.fromInt("+exp.x2.name+", "+currentType.getBits()+"));\n");
+						sb.append(dataType+"[] "+v2+" = intLib.toSignals("+exp.x2.name+", "+currentType.getBits()+");\n");
 					else
 						sb.append(dataType+"[] "+v2+" = floatLib.inputOfAlice("+exp.x2.name+");\n");
 				}
@@ -273,7 +273,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 				if(currentType.getBits().isConstant(1))
 					sb.append(dataType+" "+v1+" = env.inputOfAlice("+exp.x1.name+");\n");
 				else
-					sb.append(dataType+"[] "+v1+" = env.inputOfAlice(Utils.fromInt("+exp.x1.name+", "+currentType.getBits()+"));\n");
+					sb.append(dataType+"[] "+v1+" = intLib.toSignals("+exp.x1.name+", "+currentType.getBits()+");\n");
 			}
 			if(!(exp.x1.type instanceof IntType) &&
 					!(exp.x1.type instanceof RndType) &&
@@ -288,7 +288,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 				if(currentType.getBits().isConstant(1))
 					sb.append(dataType+" "+v2+" = env.inputOfAlice("+exp.x2.name+");\n");
 				else
-					sb.append(dataType+"[] "+v2+" = env.inputOfAlice(Utils.fromInt("+exp.x2.name+", "+this.currentType.getBits()+"));\n");
+					sb.append(dataType+"[] "+v2+" = intLib.toSignals("+exp.x2.name+", "+this.currentType.getBits()+");\n");
 			}
 			if(!(exp.x2.type instanceof IntType) &&
 					!(exp.x2.type instanceof RndType) &&
@@ -352,7 +352,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 				if(bits.isConstant(1))
 					sb.append(type+" "+v1+" = env.inputOfAlice("+exp.x1.name+");\n");
 				else 
-					sb.append(type+" "+v1+" = env.inputOfAlice(Utils.fromInt("+exp.x1.name+", "+bits+"));\n");
+					sb.append(type+" "+v1+" = intLib.toSignals("+exp.x1.name+", "+bits+");\n");
 			}
 			String v2 = exp.x2.name;
 			if(exp.x2.lab == Label.Pub) {
@@ -361,7 +361,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 				if(bits.isConstant(1))
 					sb.append(type+" "+v2+" = env.inputOfAlice("+exp.x2.name+");\n");
 				else 
-					sb.append(type+" "+v2+" = env.inputOfAlice(Utils.fromInt("+exp.x2.name+", "+bits+"));\n");
+					sb.append(type+" "+v2+" = intLib.toSignals("+exp.x2.name+", "+bits+");\n");
 			}
 			sb.append(indent(indent));
 			if(exp.op == RopExp.Op.Eq)
@@ -442,7 +442,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 			if(arrayAssign.idx.lab == Label.Pub) {
 				sb.append(indent(indent));
 				v1 = "f_tmp_"+(this.tmpId++);
-				sb.append(dataType+"[] "+v1+" = env.inputOfAlice(Utils.fromInt("+arrayAssign.idx.name+", "+this.currentType.getBits()+"));\n");
+				sb.append(dataType+"[] "+v1+" = intLib.toSignals("+arrayAssign.idx.name+", "+this.currentType.getBits()+");\n");
 			}
 			String v2 = arrayAssign.value.name;
 			if(arrayAssign.value.lab == Label.Pub) {
@@ -450,7 +450,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 					this.currentType = new IntType(type.type.getBits(), Label.Secure);
 					sb.append(indent(indent));
 					v2 = "f_tmp_"+(this.tmpId++);
-					sb.append(dataType+"[] "+v2+" = env.inputOfAlice(Utils.fromInt("+arrayAssign.value.name+", "+this.currentType.getBits()+"));\n");
+					sb.append(dataType+"[] "+v2+" = intLib.toSignals("+arrayAssign.value.name+", "+this.currentType.getBits()+");\n");
 				} else if(arrayAssign.value.type instanceof FloatType) {
 					this.currentType = new FloatType(type.type.getBits(), Label.Secure);
 					sb.append(indent(indent));
@@ -477,7 +477,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 					if(type.type.getBits().isConstant(1))
 						sb.append(visit(type.type)+" "+v+" = env.inputOfAlice("+arrayAssign.value.name+");\n");
 					else
-						sb.append(visit(type.type)+" "+v+" = env.inputOfAlice(Utils.fromInt("+arrayAssign.value.name+", "+type.type.getBits()+"));\n");
+						sb.append(visit(type.type)+" "+v+" = intLib.toSignals("+arrayAssign.value.name+", "+type.type.getBits()+");\n");
 				} else if(type.type instanceof FloatType) {
 					sb.append(visit(type.type)+" "+v+" = floatLib.inputOfAlice("+arrayAssign.value.name+");\n");
 				} else
@@ -511,7 +511,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 						if(assign.name.type.getBits().isConstant(1))
 							sb.append(type + " "+assign.name.name+" = env.inputOfAlice("+tmp.left+")");
 						else
-							sb.append(type + " "+assign.name.name+" = env.inputOfAlice(Utils.fromInt("+tmp.left+", "+assign.name.type.getBits()+"))");
+							sb.append(type + " "+assign.name.name+" = intLib.toSignals("+tmp.left+", "+assign.name.type.getBits()+")");
 					} else {
 						sb.append(type + " "+assign.name.name+" = floatLib.inputOfAlice("+tmp.left+")");
 					}
@@ -537,7 +537,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 						if(assign.name.type.getBits().isConstant(1))
 							sb.append(assign.name.name+" = env.inputOfAlice("+tmp.left+");\n");
 						else
-							sb.append(assign.name.name+" = env.inputOfAlice(Utils.fromInt("+tmp.left+", "+assign.name.type.getBits()+"));\n");
+							sb.append(assign.name.name+" = intLib.toSignals("+tmp.left+", "+assign.name.type.getBits()+");\n");
 					} else {
 						sb.append(assign.name.name+" = floatLib.inputOfAlice("+tmp.left+");\n");
 					}
@@ -671,7 +671,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 						if(var.type.getBits().isConstant(1))
 							sb.append("env.inputOfAlice(" + var.name+")");
 						else 
-							sb.append("env.inputOfAlice(Utils.fromInt(" + var.name+", "+var.type.getBits()+"))");
+							sb.append("intLib.toSignals(" + var.name+", "+var.type.getBits()+")");
 					} else
 						sb.append(var.name);
 				}
@@ -724,7 +724,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 			if(type.fields.get(assign.field).getBits().isConstant(1))
 				sb.append(dataType+" "+v+" = env.inputOfAlice("+assign.value.name+");\n");
 			else 
-				sb.append(dataType+"[] "+v+" = env.inputOfAlice(Utils.fromInt("+assign.value.name+", "+type.fields.get(assign.field).getBits()+"));\n");
+				sb.append(dataType+"[] "+v+" = intLib.toSignals("+assign.value.name+", "+type.fields.get(assign.field).getBits()+");\n");
 		}
 		sb.append(indent(indent)+assign.base.name+"."+assign.field+" = "+v+";\n");
 		return sb.toString();
@@ -882,7 +882,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 					if(var.getValue().getBits().isConstant(1))
 						sb.append(ret+"."+var.getKey()+" = env.inputOfAlice("+var.getValue()+");\n");
 					else
-						sb.append(ret+"."+var.getKey()+" = env.inputOfAlice(Utils.fromInt("+var.getValue()+", "+var.getValue().type.getBits()+"));\n");
+						sb.append(ret+"."+var.getKey()+" = intLib.toSignals("+var.getValue()+", "+var.getValue().type.getBits()+");\n");
 				} else {
 					sb.append(ret+"."+var.getKey()+" = floatLib.inputOfAlice("+var.getValue()+");\n");
 				}
@@ -905,7 +905,7 @@ public class CodeGenVisitor extends SCVMCodeVisitor<String, Pair<String, String>
 
 			if(it.getLabel() != Label.Pub) {
 				if(!it.getBits().isConstant(1))
-					s = "env.inputOfAlice(Utils.fromInt(0, "+it.getBits()+"))";
+					s = "intLib.toSignals(0, "+it.getBits()+")";
 				else
 					s = "env.inputOfAlice(false)";
 

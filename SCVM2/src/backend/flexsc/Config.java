@@ -8,6 +8,7 @@ public class Config {
 		"oram.SecureArray",
 		"oram.SecureMap",
 		"oram.CircuitOram",
+		"oram.Register",
 		"flexsc.Mode",
 		"flexsc.Party",
 		"flexsc.CompEnv",
