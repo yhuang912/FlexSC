@@ -9,6 +9,7 @@ public class Config {
 		"oram.SecureMap",
 		"oram.CircuitOram",
 		"oram.Register",
+		"oram.Memory",
 		"flexsc.Mode",
 		"flexsc.Party",
 		"flexsc.CompEnv",
